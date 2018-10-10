@@ -8,6 +8,14 @@ GoMybatis 内部在初始化时反射分析mapper xml生成golang的func代码�
 
 mapper.go 文件案例
 <pre>
+//属性必须大写,GoBatis将会使用反射取得字段名称和值
+type SelectByConditionArg struct {
+	Name      string
+	StartTime time.Time
+	EndTime   time.Time
+	Page      int
+	Size      int
+}
 type ActivityMapperImpl struct {
   //mapper.go文件 函数必须为2个参数（第一个为自定义结构体参数（属性必须大写），第二个为指针类型的返回数据） error 为返回错误
 	SelectByCondition func(arg SelectByConditionArg, result *[]model.Activity) error
