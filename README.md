@@ -58,3 +58,30 @@ xml文件案例:
     </select>
 </mapper>
 ```
+在服务层实际使用mapper
+<pre>
+import (
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jinzhu/gorm"
+	"github.com/Knetic/govaluate"
+	)
+	
+func main() {
+  var mapper ActivityMapperImpl
+  engine, dbError := gorm.Open("mysql", "")
+	if dbError != nil {
+		fmt.Println(dbError)
+		return
+	}
+  engine.LogMode(true)
+  UseProxyMapper(&mapper, engine.DB)
+  //查询
+  var r []model.Activity //model.Activity 此处应改为你自己的数据库模型类型
+  var err = mapper.SelectByCondition(SelectByConditionArg{
+		Name: `rs`,
+	}, &r)
+	fmt.Println(err)
+	fmt.Println(r)
+}
+</pre>
+
