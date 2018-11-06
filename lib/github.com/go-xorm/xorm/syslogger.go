@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"log/syslog"
 
-	"github.com/go-xorm/core"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/core"
 )
 
 var _ core.ILogger = &SyslogLogger{}

@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-xorm/core"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/core"
 )
 
 func (session *Session) str2Time(col *core.Column, data string) (outTime time.Time, outErr error) {

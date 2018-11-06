@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-xorm/core"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/core"
 )
 
 // str2PK convert string value to primary key value according to tp

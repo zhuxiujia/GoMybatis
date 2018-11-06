@@ -2,11 +2,12 @@ package GoMybatis
 
 import (
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/go-xorm/xorm"
+
 	"fmt"
 	"testing"
 	"encoding/json"
 	"time"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/xorm"
 )
 
 var engine *xorm.Engine

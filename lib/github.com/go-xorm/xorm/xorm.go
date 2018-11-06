@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-xorm/core"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/core"
 )
 
 const (

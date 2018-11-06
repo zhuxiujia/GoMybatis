@@ -7,7 +7,7 @@ package xorm
 import (
 	"time"
 
-	"github.com/go-xorm/core"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/core"
 )
 
 // EngineGroup defines an engine group

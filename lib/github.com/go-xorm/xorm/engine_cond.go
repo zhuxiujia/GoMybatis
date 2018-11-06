@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-xorm/builder"
-	"github.com/go-xorm/core"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/core"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/builder"
 )
 
 func (engine *Engine) buildConds(table *core.Table, bean interface{},

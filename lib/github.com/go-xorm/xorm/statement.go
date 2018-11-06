@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-xorm/builder"
-	"github.com/go-xorm/core"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/builder"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/core"
 )
 
 // Statement save all the sql info for executing SQL

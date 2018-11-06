@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/go-xorm/core"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/core"
 )
 
 func (session *Session) cacheDelete(table *core.Table, tableName, sqlStr string, args ...interface{}) error {

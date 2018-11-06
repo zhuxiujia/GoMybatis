@@ -9,7 +9,7 @@ import (
 	"io"
 	"log"
 
-	"github.com/go-xorm/core"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/core"
 )
 
 // default log options

@@ -11,7 +11,7 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/go-xorm/core"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/core"
 )
 
 // Get retrieve one record from database, bean's non-empty fields

@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"errors"
 	"regexp"
-	"github.com/go-xorm/xorm"
-	"github.com/Knetic/govaluate"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/xorm"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
 )
 
 type Mapper struct {

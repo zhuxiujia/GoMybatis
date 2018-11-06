@@ -11,7 +11,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/go-xorm/core"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/core"
 )
 
 var (

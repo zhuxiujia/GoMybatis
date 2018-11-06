@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/go-xorm/core"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/core"
 )
 
 // Interface defines the interface which Engine, EngineGroup and Session will implementate.
