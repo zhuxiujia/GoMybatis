@@ -13,7 +13,7 @@ var engine *xorm.Engine
 
 func Test_main(t *testing.T) {
 	var err error
-	engine, err = xorm.NewEngine("mysql", "root:123!@#TEST@(rm-bp1149af62y4hnljoo.mysql.rds.aliyuncs.com:3306)/test?charset=utf8&parseTime=True&loc=Local")
+	engine, err = xorm.NewEngine("mysql", "root:*/test?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		panic(err.Error())
 	}
