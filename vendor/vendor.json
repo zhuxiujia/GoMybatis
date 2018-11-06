@@ -1,0 +1,19 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "XRH9UcCo34OZ0TARtNCsGJq0CM8=",
+			"path": "github.com/Knetic/govaluate",
+			"revision": "9aa49832a739dcd78a5542ff189fb82c3e423116",
+			"revisionTime": "2017-10-22T00:36:10Z"
+		},
+		{
+			"checksumSHA1": "QjZhU0Ys96b7iMozvySC/TTMDNQ=",
+			"path": "github.com/go-xorm/xorm",
+			"revision": "e88d32093409de90023f114e2fc31dbe2917a27f",
+			"revisionTime": "2018-08-09T14:38:41Z"
+		}
+	],
+	"rootPath": "github.com/zhuxiujia/GoMybatis"
+}
