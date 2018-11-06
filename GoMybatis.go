@@ -5,11 +5,11 @@ import (
 	"github.com/beevik/etree"
 	"strings"
 	"reflect"
-	"github.com/Knetic/govaluate"
 	"fmt"
 	"errors"
 	"regexp"
 	"github.com/go-xorm/xorm"
+	"github.com/zhuxiujia/GoMybatis/govaluate"
 )
 
 type Mapper struct {
