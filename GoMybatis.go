@@ -9,7 +9,7 @@ import (
 	"errors"
 	"regexp"
 	"github.com/go-xorm/xorm"
-	"github.com/zhuxiujia/GoMybatis/govaluate"
+	"github.com/zhuxiujia/GoMybatis/lib/govaluate"
 )
 
 type Mapper struct {
