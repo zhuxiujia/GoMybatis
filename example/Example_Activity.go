@@ -1,4 +1,4 @@
-package GoMybatis
+package example
 
 import "time"
 
