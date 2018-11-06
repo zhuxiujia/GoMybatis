@@ -8,8 +8,8 @@ import (
 	"github.com/Knetic/govaluate"
 	"fmt"
 	"errors"
-	"github.com/jinzhu/gorm"
 	"regexp"
+	"github.com/go-xorm/xorm"
 )
 
 type Mapper struct {
@@ -69,12 +69,12 @@ func LoadMapperXml(bytes []byte) (items []MapperXml) {
 //func的参数支持2种函数，第一种函数 基本参数个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
 //func的参数支持2种函数，第二种函数第一个参数必须为结构体(例如 arg model.User,该结构体的属性可以指定tag `json:"xxx"`为参数名称),最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
 //使用UseProxyMapper函数设置代理后即可正常使用。
-func UseProxyMapper(bean interface{}, xml []byte, gormDB *gorm.DB) {
+func UseProxyMapper(bean interface{}, xml []byte, xormEngine *xorm.Engine) {
 	v := reflect.ValueOf(bean)
 	if v.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
-	UseProxyMapperFromValue(v, xml, gormDB)
+	UseProxyMapperFromValue(v, xml, xormEngine)
 }
 
 //bean 工厂，根据xml配置创建函数,并且动态代理到你定义的struct func里
@@ -90,7 +90,7 @@ func UseProxyMapper(bean interface{}, xml []byte, gormDB *gorm.DB) {
 //func的参数支持2种函数，第一种函数 基本参数个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
 //func的参数支持2种函数，第二种函数第一个参数必须为结构体(例如 arg model.User,该结构体的属性可以指定tag `json:"xxx"`为参数名称),最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
 //使用UseProxyMapper函数设置代理后即可正常使用。
-func UseProxyMapperFromValue(bean reflect.Value, xml []byte, gormDB *gorm.DB) {
+func UseProxyMapperFromValue(bean reflect.Value, xml []byte, engine *xorm.Engine) {
 	var mapperTree = LoadMapperXml(xml)
 	var proxyFunc = func(method string, args []reflect.Value, params []string) error {
 		var paramsLen = len(params)
@@ -133,30 +133,33 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, gormDB *gorm.DB) {
 				//TODO do CRUD
 				if mapperXml.Tag == Select {
 					if lastArgValue != nil && (*lastArgValue).IsNil() == false {
-						var db *gorm.DB
-						if strings.Contains(sql, "count(") {
-							db = gormDB.Raw(sql).Count(lastArgValue.Interface())
-						} else {
-							db = gormDB.Raw(sql).Scan(lastArgValue.Interface())
+						results, err := engine.Query(sql)
+						if err != nil {
+							return err
 						}
-						if db.Error != nil {
-							return db.Error
+						err = Unmarshal(results, lastArgValue.Interface())
+						if err != nil {
+							return err
 						}
 					} else {
-						var dbResult = gormDB.Exec(sql)
-						if dbResult.Error != nil {
-							return dbResult.Error
+						var _, err = engine.Exec(sql)
+						if err != nil {
+							return err
 						}
 					}
 				} else if mapperXml.Tag == Update || mapperXml.Tag == Delete || mapperXml.Tag == Insert {
-					var dbResult = gormDB.Exec(sql)
+					var res, err = engine.Exec(sql)
 					if lastArgValue != nil {
 						if lastArgValue.IsNil() == false {
-							lastArgValue.Elem().Set(reflect.ValueOf(dbResult.RowsAffected))
+							var rows, err = res.RowsAffected()
+							if err != nil {
+								return err
+							}
+							lastArgValue.Elem().Set(reflect.ValueOf(rows))
 						}
 					}
-					if dbResult.Error != nil {
-						return dbResult.Error
+					if err != nil {
+						return err
 					}
 				}
 				//匹配完成退出
