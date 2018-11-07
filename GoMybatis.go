@@ -209,6 +209,9 @@ func loop(element *etree.Element) []ElementItem {
 		if typeString == `*etree.CharData` {
 			var d = el.(*etree.CharData)
 			var str = d.Data
+			if str == "" {
+				continue
+			}
 			str = strings.Replace(str, "\n", "", -1)
 			str = strings.Replace(str, "\t", "", -1)
 			str = strings.Trim(str, " ")
