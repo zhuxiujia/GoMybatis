@@ -8,6 +8,8 @@ import (
 	"regexp"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/xorm"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
+	"bytes"
+	"log"
 )
 
 
@@ -132,13 +134,13 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, engine *xorm.Engine
 }
 
 func buildSqlFromMap(paramMap map[string]interface{}, mapperXml MapperXml) (string, error) {
-	var sql = ``
+	var sql bytes.Buffer
 	sql, err := createFromElement(mapperXml.ElementItems, sql, paramMap)
 	if err != nil {
-		return sql, err
+		return sql.String(), err
 	}
-	fmt.Println("[create sql]", sql)
-	return sql, nil
+	log.Println("[create sql]", sql.String())
+	return sql.String(), nil
 }
 
 func buildSql(arg0 reflect.Value, mapperXml MapperXml) (string, error) {
@@ -151,12 +153,12 @@ func buildSql(arg0 reflect.Value, mapperXml MapperXml) (string, error) {
 	return buildSqlFromMap(params, mapperXml)
 }
 
-func createFromElement(itemTree []ElementItem, sql string, param map[string]interface{}) (result string, err error) {
+func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[string]interface{}) (result bytes.Buffer, err error) {
 	for _, v := range itemTree {
 		var loopChildItem = true
 		if v.ElementType == String {
 			//string element
-			sql += repleaceArg(v.DataString, param, DefaultSqlTypeConvertFunc)
+			sql.WriteString(repleaceArg(v.DataString, param, DefaultSqlTypeConvertFunc))
 		} else if v.ElementType == If {
 			//if element
 			var test = v.Propertys[`test`]
@@ -171,13 +173,17 @@ func createFromElement(itemTree []ElementItem, sql string, param map[string]inte
 				}
 				result, err := evalExpression.Evaluate(evaluateParameters)
 				if err != nil {
-					err = errors.New("test() -> `" + expression + "` " + err.Error())
+					var buffer bytes.Buffer
+					buffer.WriteString("test() -> `")
+					buffer.WriteString(expression)
+					buffer.WriteString(err.Error())
+					err = errors.New(buffer.String())
 					return sql, err
 				}
 				if result.(bool) {
 					//test表达式成立
 					if index == (len(andStrings) - 1) {
-						sql += repleaceArg(v.DataString, param, DefaultSqlTypeConvertFunc)
+						sql.WriteString(repleaceArg(v.DataString, param, DefaultSqlTypeConvertFunc))
 					}
 				} else {
 					loopChildItem = false
@@ -189,29 +195,34 @@ func createFromElement(itemTree []ElementItem, sql string, param map[string]inte
 			var suffix = v.Propertys[`suffix`]
 			var suffixOverrides = v.Propertys[`suffixOverrides`]
 			if v.ElementItems != nil && len(v.ElementItems) > 0 && loopChildItem {
-				var tempTrimSql = ``
+				var tempTrimSql bytes.Buffer
 				tempTrimSql, err = createFromElement(v.ElementItems, tempTrimSql, param)
 				if err != nil {
 					return tempTrimSql, err
 				}
-				tempTrimSql = strings.Trim(tempTrimSql, ` `)
-				tempTrimSql = strings.Trim(tempTrimSql, suffixOverrides)
-				tempTrimSql = prefix + ` ` + tempTrimSql + ` ` + suffix
-				sql = sql + tempTrimSql
+				var tempTrimSqlString = strings.Trim(tempTrimSql.String(), suffixOverrides)
+				var newBuffer bytes.Buffer
+				newBuffer.WriteString(prefix)
+				newBuffer.WriteString(` `)
+				newBuffer.WriteString(tempTrimSqlString)
+				newBuffer.WriteString(` `)
+				newBuffer.WriteString(suffix)
+				sql.Write(newBuffer.Bytes())
 				loopChildItem = false
 			}
 		} else if v.ElementType == Set {
-			var suffixOverrides = ","
 			if v.ElementItems != nil && len(v.ElementItems) > 0 && loopChildItem {
-				var trim = ``
+				var trim bytes.Buffer
 				trim, err = createFromElement(v.ElementItems, trim, param)
 				if err != nil {
 					return trim, err
 				}
-				trim = strings.Trim(trim, ` `)
-				trim = strings.Trim(trim, suffixOverrides)
-				trim = ` set ` + trim + ` `
-				sql = sql + trim
+				var trimString = strings.Trim(trim.String(), DefaultSuffixOverrides)
+				trim.Reset()
+				trim.WriteString(` set `)
+				trim.WriteString(trimString)
+				trim.WriteString(` `)
+				sql.Write(trim.Bytes())
 				loopChildItem = false
 			}
 		} else if v.ElementType == Foreach {
@@ -221,7 +232,7 @@ func createFromElement(itemTree []ElementItem, sql string, param map[string]inte
 			var open = v.Propertys[`open`]
 			var close = v.Propertys[`close`]
 			var separator = v.Propertys[`separator`]
-			var tempSql = ``
+			var tempSql bytes.Buffer
 			var datas = param[collection]
 			var collectionValue = reflect.ValueOf(datas)
 			if collectionValue.Len() > 0 {
@@ -241,9 +252,14 @@ func createFromElement(itemTree []ElementItem, sql string, param map[string]inte
 					}
 				}
 			}
-			tempSql = open + ` ` + tempSql + ` ` + close
-			tempSql = strings.Trim(tempSql, separator)
-			sql += tempSql
+			var newTempSql bytes.Buffer
+			newTempSql.WriteString(open)
+			newTempSql.Write(tempSql.Bytes())
+			newTempSql.WriteString(close)
+		    var	tempSqlString = strings.Trim(newTempSql.String(), separator)
+			tempSql.Reset()
+		    tempSql.WriteString(tempSqlString)
+			sql.Write(tempSql.Bytes())
 			loopChildItem = false
 		}
 		if v.ElementItems != nil && len(v.ElementItems) > 0 && loopChildItem {
@@ -282,7 +298,11 @@ func repleaceArg(data string, parameters map[string]interface{}, typeConvertFunc
 			data = re.ReplaceAllString(data, str)
 		} else {
 			var str = typeConvertFunc(v)
-			re, _ := regexp.Compile("\\#\\{" + k + "[^}]*\\}")
+			var compileStr bytes.Buffer
+			compileStr.WriteString("\\#\\{")
+			compileStr.WriteString(k)
+			compileStr.WriteString("[^}]*\\}")
+			re, _ := regexp.Compile(compileStr.String())
 			data = re.ReplaceAllString(data, str)
 		}
 	}

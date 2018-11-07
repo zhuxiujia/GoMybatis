@@ -36,6 +36,7 @@ func Test_main(t *testing.T) {
 	if err != nil {
 		panic(err.Error())
 	}
+	engine.ShowSQL()
 
 	file, err := os.Open("Example_ActivityMapper.xml")
 	if err != nil {
@@ -50,7 +51,15 @@ func Test_main(t *testing.T) {
 
 	//使用mapper
 	var result []Activity
-	exampleActivityMapperImpl.SelectAll(&result)
+	exampleActivityMapperImpl.SelectByCondition("",time.Time{},time.Time{},0,2000,&result)
 
 	fmt.Println(result)
+
+	//result[0].Name="rs-446"
+	//err=exampleActivityMapperImpl.UpdateById(result[0],nil)
+	//fmt.Println(err)
+	//
+	//result[0].Id=result[0].Id+"2"
+	//err=exampleActivityMapperImpl.Insert(result[0],nil)
+	//fmt.Println(err)
 }

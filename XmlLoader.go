@@ -6,6 +6,12 @@ import (
 	"strings"
 )
 
+const EtreeCharData = `*etree.CharData`
+const EtreeElement = `*etree.Element`
+
+const Element_Mapper = "mapper"
+const ID = `id`
+
 type MapperXml struct {
 	Tag          string
 	Id           string
@@ -18,20 +24,21 @@ type ElementItem struct {
 	DataString   string
 	ElementItems []ElementItem
 }
+
 //读取xml
 func LoadMapperXml(bytes []byte) (items []MapperXml) {
 	doc := etree.NewDocument()
 	if err := doc.ReadFromBytes(bytes); err != nil {
 		panic(err)
 	}
-	root := doc.SelectElement("mapper")
+	root := doc.SelectElement(Element_Mapper)
 	for _, s := range root.ChildElements() {
 		var attrMap = attrToProperty(s.Attr)
 		var elItems = loop(s)
 		if s.Tag == Insert || s.Tag == Delete || s.Tag == Update || s.Tag == Select {
 			items = append(items, MapperXml{
 				Tag:          s.Tag,
-				Id:           attrMap[`id`],
+				Id:           attrMap[ID],
 				ElementItems: elItems,
 			})
 		}
@@ -51,7 +58,7 @@ func loop(element *etree.Element) []ElementItem {
 	var els = make([]ElementItem, 0)
 	for _, el := range element.Child {
 		var typeString = reflect.ValueOf(el).Type().String()
-		if typeString == `*etree.CharData` {
+		if typeString == EtreeCharData {
 			var d = el.(*etree.CharData)
 			var str = d.Data
 			if str == "" {
@@ -61,14 +68,14 @@ func loop(element *etree.Element) []ElementItem {
 			str = strings.Replace(str, "\t", "", -1)
 			str = strings.Trim(str, " ")
 			if str != "" {
-				str = str + " "
+				str = " " + str
 				var elementItem = ElementItem{
 					ElementType: String,
 					DataString:  str,
 				}
 				els = append(els, elementItem)
 			}
-		} else if typeString == `*etree.Element` {
+		} else if typeString == EtreeElement {
 			var e = el.(*etree.Element)
 			var element = ElementItem{
 				ElementType:  e.Tag,
