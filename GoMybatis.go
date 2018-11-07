@@ -200,8 +200,9 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 				if err != nil {
 					return tempTrimSql, err
 				}
-				var tempTrimSqlString = strings.Trim(tempTrimSql.String(), suffixOverrides)
+				var tempTrimSqlString = strings.Trim(strings.Trim(tempTrimSql.String()," "), suffixOverrides)
 				var newBuffer bytes.Buffer
+				newBuffer.WriteString(` `)
 				newBuffer.WriteString(prefix)
 				newBuffer.WriteString(` `)
 				newBuffer.WriteString(tempTrimSqlString)
@@ -217,8 +218,9 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 				if err != nil {
 					return trim, err
 				}
-				var trimString = strings.Trim(trim.String(), DefaultSuffixOverrides)
+				var trimString = strings.Trim(strings.Trim(trim.String()," "), DefaultSuffixOverrides)
 				trim.Reset()
+				trim.WriteString(` `)
 				trim.WriteString(` set `)
 				trim.WriteString(trimString)
 				trim.WriteString(` `)
@@ -256,8 +258,9 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 			newTempSql.WriteString(open)
 			newTempSql.Write(tempSql.Bytes())
 			newTempSql.WriteString(close)
-		    var	tempSqlString = strings.Trim(newTempSql.String(), separator)
+		    var	tempSqlString = strings.Trim(strings.Trim(newTempSql.String()," "), separator)
 			tempSql.Reset()
+		    tempSql.WriteString(` `)
 		    tempSql.WriteString(tempSqlString)
 			sql.Write(tempSql.Bytes())
 			loopChildItem = false

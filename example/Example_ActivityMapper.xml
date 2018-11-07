@@ -16,47 +16,30 @@
     <!-- 后台查询产品 -->
     <select id="selectByCondition" resultMap="BaseResultMap">
         select * from biz_activity where delete_flag=1
-
-
         <if test="name != ''">
             and name like concat('%',#{name},'%')
         </if>
-
-
         <if test="startTime != ''">
             and create_time >= #{startTime}
         </if>
-
-
         <if test="endTime != ''">
             and create_time &lt;= #{endTime}
         </if>
         order by create_time desc
-
         <if test="page >= 0 and size != 0">limit #{page}, #{size}</if>
-
-
     </select>
     <!--int countByCondition(@Param("name")String name,@Param("startTime") Date startTime, @Param("endTime")Date endTime);-->
     <select id="countByCondition" resultType="java.lang.Integer">
         select count(id) from biz_activity where delete_flag=1
-
-
         <if test="name != ''">
             and name like concat('%',#{name},'%')
         </if>
-
-
         <if test="startTime != ''">
             and create_time >= #{startTime}
         </if>
-
-
         <if test="endTime != ''">
             and create_time &lt;= #{endTime}
         </if>
-
-
     </select>
     <!--List<Activity> selectAll();-->
     <select id="selectAll" resultMap="BaseResultMap">

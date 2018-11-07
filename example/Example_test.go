@@ -54,12 +54,4 @@ func Test_main(t *testing.T) {
 	exampleActivityMapperImpl.SelectByCondition("",time.Time{},time.Time{},0,2000,&result)
 
 	fmt.Println(result)
-
-	//result[0].Name="rs-446"
-	//err=exampleActivityMapperImpl.UpdateById(result[0],nil)
-	//fmt.Println(err)
-	//
-	//result[0].Id=result[0].Id+"2"
-	//err=exampleActivityMapperImpl.Insert(result[0],nil)
-	//fmt.Println(err)
 }
