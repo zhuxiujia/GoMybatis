@@ -209,8 +209,11 @@ func loop(element *etree.Element) []ElementItem {
 		if typeString == `*etree.CharData` {
 			var d = el.(*etree.CharData)
 			var str = d.Data
-			str = ReplaceAllBlankSpace(str)
+			str = strings.Replace(str, "\n", "", -1)
+			str = strings.Replace(str, "\t", "", -1)
+			str = strings.Trim(str, " ")
 			if str != "" {
+				str = " " + str + " "
 				var elementItem = ElementItem{
 					ElementType: String,
 					DataString:  str,
