@@ -4,6 +4,7 @@ import (
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 	"reflect"
 	"strings"
+	"bytes"
 )
 
 const EtreeCharData = `*etree.CharData`
@@ -67,11 +68,13 @@ func loop(element *etree.Element) []ElementItem {
 			str = strings.Replace(str, "\n", "", -1)
 			str = strings.Replace(str, "\t", "", -1)
 			str = strings.Trim(str, " ")
+			var buf bytes.Buffer
 			if str != "" {
-				str = " " + str
+				buf.WriteString(" ")
+				buf.WriteString(str)
 				var elementItem = ElementItem{
 					ElementType: String,
-					DataString:  str,
+					DataString:  buf.String(),
 				}
 				els = append(els, elementItem)
 			}
