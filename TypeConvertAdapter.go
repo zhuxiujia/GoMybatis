@@ -6,24 +6,27 @@ import (
 	"strconv"
 )
 
+const DateType  =  `time.Time`
+const StringType  =  `string`
+const FormateDate  =  `2006-01-02 15:04:05`
+
 var DefaultExpressionTypeConvertFunc = func(arg interface{}) interface{} {
-	if reflect.TypeOf(arg).String() == `time.Time` {
+	if reflect.TypeOf(arg).String() == DateType {
 		return arg.(time.Time).Nanosecond()
 	}
 	return arg
 }
 
 var DefaultSqlTypeConvertFunc = func(arg interface{}) string {
-	var t=reflect.TypeOf(arg)
-	if t.String() == `time.Time` {
-		arg = arg.(time.Time).Format(`2006-01-02 15:04:05`)
+	var t = reflect.TypeOf(arg)
+	if t.String() == DateType {
+		arg = arg.(time.Time).Format(FormateDate)
 	}
-	if t.String()  == `time.Time`|| t.String()==`string`{
-		return `'`+toString(arg)+`'`
+	if t.String() == DateType || t.String() == StringType {
+		return `'` + toString(arg) + `'`
 	}
 	return toString(arg)
 }
-
 
 func toString(value interface{}) string {
 	if value == nil {
@@ -33,7 +36,7 @@ func toString(value interface{}) string {
 	if v.Kind() == reflect.Int {
 		string := strconv.Itoa(value.(int))
 		return string
-	}else if v.Kind() == reflect.Int32 {
+	} else if v.Kind() == reflect.Int32 {
 		string := strconv.FormatInt(int64(value.(int32)), 10)
 		return string
 	} else if v.Kind() == reflect.Int64 {
