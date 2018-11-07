@@ -1,7 +1,6 @@
 package GoMybatis
 
 import (
-	"encoding/xml"
 	"strings"
 	"reflect"
 	"fmt"
@@ -9,52 +8,9 @@ import (
 	"regexp"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/xorm"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
-	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 )
 
-type Mapper struct {
-	XMLName    xml.Name    `xml:"mapper"`
-	ResultMaps []ResultMap `xml:"resultMap"`
-}
 
-type MapperXml struct {
-	Tag          string
-	Id           string
-	ElementItems []ElementItem
-}
-
-type ElementItem struct {
-	ElementType  string
-	Propertys    map[string]string
-	DataString   string
-	ElementItems []ElementItem
-}
-
-const DefaultOneArg = `[default]`
-
-//读取xml
-func LoadMapperXml(bytes []byte) (items []MapperXml) {
-	var m Mapper
-	xml.Unmarshal(bytes, &m)
-
-	doc := etree.NewDocument()
-	if err := doc.ReadFromBytes(bytes); err != nil {
-		panic(err)
-	}
-	root := doc.SelectElement("mapper")
-	for _, s := range root.ChildElements() {
-		var attrMap = attrToProperty(s.Attr)
-		var elItems = loop(s)
-		if s.Tag == Insert || s.Tag == Delete || s.Tag == Update || s.Tag == Select {
-			items = append(items, MapperXml{
-				Tag:          s.Tag,
-				Id:           attrMap[`id`],
-				ElementItems: elItems,
-			})
-		}
-	}
-	return items
-}
 
 //bean 工厂，根据xml配置创建函数,并且动态代理到你定义的struct func里
 //bean 参数必须为指针类型,指向你定义的struct
@@ -93,11 +49,12 @@ func UseProxyMapper(bean interface{}, xml []byte, xormEngine *xorm.Engine) {
 func UseProxyMapperFromValue(bean reflect.Value, xml []byte, engine *xorm.Engine) {
 	var mapperTree = LoadMapperXml(xml)
 	var proxyFunc = func(method string, args []reflect.Value, params []string) error {
+		var lastArgsIndex = len(args) - 1
 		var paramsLen = len(params)
 		var argsLen = len(args)
 		var lastArgValue *reflect.Value = nil
-		if argsLen != 0 && args[len(args)-1].Kind() == reflect.Ptr {
-			lastArgValue = &args[len(args)-1]
+		if argsLen != 0 && args[lastArgsIndex].Kind() == reflect.Ptr {
+			lastArgValue = &args[lastArgsIndex]
 			if lastArgValue.Kind() != reflect.Ptr {
 				//最后一个参数必须为指针，或者不传任何参数
 				return errors.New(`[method params last param must be pointer!],method =` + method)
@@ -192,54 +149,6 @@ func buildSql(arg0 reflect.Value, mapperXml MapperXml) (string, error) {
 		params[DefaultOneArg] = arg0.Interface()
 	}
 	return buildSqlFromMap(params, mapperXml)
-}
-
-func attrToProperty(attrs []etree.Attr) map[string]string {
-	var m = make(map[string]string)
-	for _, v := range attrs {
-		m[v.Key] = v.Value
-	}
-	return m
-}
-
-func loop(element *etree.Element) []ElementItem {
-	var els = make([]ElementItem, 0)
-	for _, el := range element.Child {
-		var typeString = reflect.ValueOf(el).Type().String()
-		if typeString == `*etree.CharData` {
-			var d = el.(*etree.CharData)
-			var str = d.Data
-			if str == "" {
-				continue
-			}
-			str = strings.Replace(str, "\n", "", -1)
-			str = strings.Replace(str, "\t", "", -1)
-			str = strings.Trim(str, " ")
-			if str != "" {
-				str = str + " "
-				var elementItem = ElementItem{
-					ElementType: String,
-					DataString:  str,
-				}
-				els = append(els, elementItem)
-			}
-		} else if typeString == `*etree.Element` {
-			var e = el.(*etree.Element)
-			var element = ElementItem{
-				ElementType:  e.Tag,
-				ElementItems: make([]ElementItem, 0),
-				Propertys:    attrToProperty(e.Attr),
-			}
-			if len(e.Child) > 0 {
-				var loopEls = loop(e)
-				for _, item := range loopEls {
-					element.ElementItems = append(element.ElementItems, item)
-				}
-			}
-			els = append(els, element)
-		}
-	}
-	return els
 }
 
 func createFromElement(itemTree []ElementItem, sql string, param map[string]interface{}) (result string, err error) {
