@@ -8,13 +8,14 @@ import (
 	"encoding/json"
 	"time"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/xorm"
+	"github.com/zhuxiujia/GoMybatis/example"
 )
 
 var engine *xorm.Engine
 
 func Test_main(t *testing.T) {
 	var err error
-	engine, err = xorm.NewEngine("mysql", "root:*/test?charset=utf8&parseTime=True&loc=Local")
+	engine, err = xorm.NewEngine("mysql", "*?charset=utf8&parseTime=True&loc=Local") //此处请填写你的mysql链接地址，这里用*号代替
 	if err != nil {
 		panic(err.Error())
 	}
@@ -43,16 +44,16 @@ func Test_main(t *testing.T) {
 	//var b, _ = json.Marshal(s)
 	//fmt.Println(string(b))
 
-	var activityArray map[string]int
+	var activityArray []example.Activity
 
-	var n =time.Now()
-	for  i:=0;i<1;i++  {
+	var n = time.Now()
+	for i := 0; i < 1; i++ {
 		var e = Unmarshal(results, &activityArray)
 		if e != nil {
 			panic(e.Error())
 		}
 	}
-	fmt.Println(time.Now().Sub(n).Nanoseconds()/int64(time.Millisecond))
+	fmt.Println(time.Now().Sub(n).Nanoseconds() / int64(time.Millisecond))
 	var bs, _ = json.Marshal(activityArray)
 	fmt.Println(string(bs))
 }
