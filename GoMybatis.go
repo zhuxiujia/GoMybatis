@@ -212,6 +212,8 @@ func loop(element *etree.Element) []ElementItem {
 			if str == "" {
 				continue
 			}
+			str = strings.Replace(str, "\n", "", -1)
+			str = strings.Replace(str, "\t", "", -1)
 			str = strings.Trim(str, " ")
 			if str != "" {
 				str = " " + str + " "
