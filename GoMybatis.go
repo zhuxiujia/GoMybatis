@@ -2,7 +2,6 @@ package GoMybatis
 
 import (
 	"encoding/xml"
-	"github.com/beevik/etree"
 	"strings"
 	"reflect"
 	"fmt"
@@ -10,6 +9,7 @@ import (
 	"regexp"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/xorm"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 )
 
 type Mapper struct {
