@@ -22,7 +22,7 @@ type ExampleActivityMapper interface {
 	CountByCondition(name string, startTime time.Time, endTime time.Time, result *int) error
 }
 //定义mapper文件的接口和结构体，也可以只定义结构体就行
-//mapper.go文件 函数必须为2个参数（第一个为自定义结构体参数（属性必须大写），第二个为指针类型的返回数据） error 为返回错误
+//mapper.go文件 函数必须为2个参数（前面的参数（可空），最后一个为指针返回数据(可空)） error 为返回错误(必须定义)
 type ExampleActivityMapperImpl struct {
 	ExampleActivityMapper
 	SelectAll         func(result *[]Activity) error
