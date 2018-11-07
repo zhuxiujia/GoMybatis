@@ -68,8 +68,8 @@ func loop(element *etree.Element) []ElementItem {
 			str = strings.Replace(str, "\n", "", -1)
 			str = strings.Replace(str, "\t", "", -1)
 			str = strings.Trim(str, " ")
-			var buf bytes.Buffer
 			if str != "" {
+				var buf bytes.Buffer
 				buf.WriteString(" ")
 				buf.WriteString(str)
 				var elementItem = ElementItem{
