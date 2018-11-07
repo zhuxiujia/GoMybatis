@@ -47,25 +47,9 @@ xml文件案例:
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="delete_flag" property="deleteFlag" jdbcType="INTEGER"/>
     </resultMap>
-    <!-- SelectByCondition func(arg SelectByConditionArg, result *[]model.Activity) error -->
-    <!-- 后台查询产品 -->
-    <select id="SelectByCondition" resultMap="BaseResultMap">
-        select
-        <trim prefix="" suffix="" suffixOverrides=",">
-            <if test="Name != ''">name,</if>
-        </trim>
-        from biz_activity where delete_flag=1
-        <if test="Name != ''">
-            and name like concat('%',#{Name},'%')
-        </if>
-        <if test="StartTime != 0">
-            and create_time >= #{StartTime}
-        </if>
-        <if test="EndTime != 0">
-            and create_time &lt;= #{EndTime}
-        </if>
-        order by create_time desc
-        <if test="Page != 0 and Size != 0">limit #{Page}, #{Size}</if>
+    <!--SelectAll(result *[]Activity)error-->
+    <select id="selectAll" resultMap="BaseResultMap">
+        select * from biz_activity where delete_flag=1 order by create_time desc
     </select>
 </mapper>
 ```
