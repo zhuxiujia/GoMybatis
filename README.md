@@ -7,12 +7,12 @@ GoMybatis 内部在初始化时反射分析mapper xml生成golang的func代码�
 支持标签
 `<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<foreach>`
 # 使用教程,代码文件请查看/example文件夹
-<pre>
+```
 go get github.com/zhuxiujia/GoMybatis
 go get github.com/go-sql-driver/mysql
-</pre>
+```
 mapper.go 文件案例
-<pre>
+```
 //定义mapper文件的接口和结构体
 type ExampleActivityMapper interface {
 	SelectAll(result *[]Activity) error
@@ -31,7 +31,7 @@ type ExampleActivityMapperImpl struct {
 	Insert            func(arg Activity, result *int64) error
 	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error                            `mapperParams:"name,startTime,endTime"`
 }
-</pre>
+```
 
 xml文件案例:
 ```xml
@@ -54,7 +54,7 @@ xml文件案例:
 </mapper>
 ```
 实际使用mapper
-<pre>
+```
 import (
 	_ "github.com/go-sql-driver/mysql"
 	"testing"
@@ -90,5 +90,5 @@ func main() {
   
   	fmt.Println(result)
 }
-</pre>
+```
 
