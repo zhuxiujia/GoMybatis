@@ -216,7 +216,7 @@ func loop(element *etree.Element) []ElementItem {
 			str = strings.Replace(str, "\t", "", -1)
 			str = strings.Trim(str, " ")
 			if str != "" {
-				str = " " + str + " "
+				str = str + " "
 				var elementItem = ElementItem{
 					ElementType: String,
 					DataString:  str,
