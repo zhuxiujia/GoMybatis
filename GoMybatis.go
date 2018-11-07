@@ -139,7 +139,7 @@ func buildSqlFromMap(paramMap map[string]interface{}, mapperXml MapperXml) (stri
 	if err != nil {
 		return sql.String(), err
 	}
-	log.Println("[create sql]", sql.String())
+	log.Println("[Preparing sql ==> ]", sql.String())
 	return sql.String(), nil
 }
 
