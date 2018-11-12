@@ -47,7 +47,7 @@ func Test_main(t *testing.T) {
 	bytes, _ := ioutil.ReadAll(file)
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	//设置对应的mapper xml文件
-	GoMybatis.UseProxyMapper(&exampleActivityMapperImpl, bytes, engine)
+	GoMybatis.UseProxyMapperByXorm(&exampleActivityMapperImpl, bytes, engine)
 
 	//使用mapper
 	var result []Activity
