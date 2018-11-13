@@ -31,7 +31,7 @@ type ExampleActivityMapperImpl struct {
 func Test_main(t *testing.T) {
 	var err error
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
-	engine, err := GoMybatis.Open("mysql", "root:123!@#TEST@(rm-bp1149af62y4hnljoo.mysql.rds.aliyuncs.com:3306)/test?charset=utf8&parseTime=True&loc=Local") //此处请按格式填写你的mysql链接，这里用*号代替
+	engine, err := GoMybatis.Open("mysql", "*?charset=utf8&parseTime=True&loc=Local") //此处请按格式填写你的mysql链接，这里用*号代替
 	if err != nil {
 		panic(err.Error())
 	}
