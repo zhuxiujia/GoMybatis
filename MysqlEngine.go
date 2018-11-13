@@ -122,7 +122,7 @@ func (this SqlSession) Exec(sqlorArgs string) (Result, error) {
 	}
 }
 
-func (this MysqlEngine) NewSession(sql string) *Session {
+func (this MysqlEngine) NewSession() *Session {
 	uuids, _ := uuid.NewV4()
 	var uuidstrig = uuids.String()
 	var isCommitedOrRollbacked = false
