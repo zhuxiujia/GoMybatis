@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"time"
 	"strconv"
+	"bytes"
 )
 
 const Adapter_DateType  =  `time.Time`
@@ -23,7 +24,11 @@ var DefaultSqlTypeConvertFunc = func(arg interface{}) string {
 		arg = arg.(time.Time).Format(Adapter_FormateDate)
 	}
 	if t.String() == Adapter_DateType || t.String() == Adapter_StringType {
-		return `'` + toString(arg) + `'`
+		var argStr bytes.Buffer
+		argStr.WriteString(`'`)
+		argStr.WriteString(toString(arg))
+		argStr.WriteString(`'`)
+		return argStr.String()
 	}
 	return toString(arg)
 }
