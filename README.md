@@ -60,7 +60,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"testing"
 	"time"
-	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/xorm"
 	"os"
 	"fmt"
 	"io/ioutil"
