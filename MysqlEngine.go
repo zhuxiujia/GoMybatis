@@ -15,7 +15,7 @@ type MysqlEngine struct {
 	DB *sql.DB
 }
 
-type MysqlSession struct {
+type SqlSession struct {
 	Session
 	id                     *string
 	db                     *sql.DB
@@ -24,7 +24,7 @@ type MysqlSession struct {
 	isCommitedOrRollbacked *bool
 }
 
-func (this MysqlSession) Rollback() error {
+func (this SqlSession) Rollback() error {
 	if this.tx != nil {
 		var err = this.tx.Rollback()
 		if err == nil {
@@ -36,7 +36,7 @@ func (this MysqlSession) Rollback() error {
 	return nil
 }
 
-func (this MysqlSession) Commit() error {
+func (this SqlSession) Commit() error {
 	if this.tx != nil {
 		var err = this.tx.Commit()
 		if err == nil {
@@ -46,7 +46,7 @@ func (this MysqlSession) Commit() error {
 	return nil
 }
 
-func (this MysqlSession) Begin() error {
+func (this SqlSession) Begin() error {
 	if this.tx == nil {
 		var tx, err = this.db.Begin()
 		if err == nil {
@@ -58,11 +58,11 @@ func (this MysqlSession) Begin() error {
 	return nil
 }
 
-func (this MysqlSession) SessionId() string {
+func (this SqlSession) SessionId() string {
 	return *this.id
 }
 
-func (this MysqlSession) Close() {
+func (this SqlSession) Close() {
 	if this.db != nil {
 		if this.stmt != nil {
 			this.stmt.Close()
@@ -78,11 +78,11 @@ func (this MysqlSession) Close() {
 	}
 }
 
-func (this MysqlSession) DB() *sql.DB {
+func (this SqlSession) DB() *sql.DB {
 	return this.db
 }
 
-func (this MysqlSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
+func (this SqlSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	var rows *sql.Rows
 	var err error
 	if this.tx != nil {
@@ -99,7 +99,7 @@ func (this MysqlSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	return nil, nil
 }
 
-func (this MysqlSession) Exec(sqlorArgs string) (Result, error) {
+func (this SqlSession) Exec(sqlorArgs string) (Result, error) {
 	var result sql.Result
 	var err error
 	if this.tx != nil {
@@ -126,7 +126,7 @@ func (this MysqlEngine) NewSession(sql string) *Session {
 	uuids, _ := uuid.NewV4()
 	var uuidstrig = uuids.String()
 	var isCommitedOrRollbacked = false
-	var mysqlSession = MysqlSession{
+	var mysqlSession = SqlSession{
 		id:                     &uuidstrig,
 		db:                     this.DB,
 		isCommitedOrRollbacked: &isCommitedOrRollbacked,
