@@ -19,6 +19,5 @@ type Session interface {
 }
 
 type SqlEngine interface {
-	NewSession(sql string) *Session
-	Open(driverName, dataSourceName string) (*SqlEngine, error)
+	NewSession() *Session
 }

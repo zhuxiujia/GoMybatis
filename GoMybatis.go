@@ -92,7 +92,7 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sqlEngine *SqlEngin
 				//TODO do CRUD
 				if mapperXml.Tag == Select {
 					if lastArgValue != nil && (*lastArgValue).IsNil() == false {
-						var session=engine.NewSession(sql)
+						var session=engine.NewSession()
 						defer (*session).Close()
 						results, err := (*session).Query(sql)
 						if err != nil {
@@ -103,7 +103,7 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sqlEngine *SqlEngin
 							return err
 						}
 					} else {
-						var session=engine.NewSession(sql)
+						var session=engine.NewSession()
 						defer (*session).Close()
 						var _, err = (*session).Exec(sql)
 						if err != nil {
@@ -111,7 +111,7 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sqlEngine *SqlEngin
 						}
 					}
 				} else if mapperXml.Tag == Update || mapperXml.Tag == Delete || mapperXml.Tag == Insert {
-					var session=engine.NewSession(sql)
+					var session=engine.NewSession()
 					defer (*session).Close()
 					var res, err = (*session).Exec(sql)
 					if lastArgValue != nil {
