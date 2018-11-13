@@ -92,7 +92,9 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sqlEngine *SqlEngin
 				//TODO do CRUD
 				if mapperXml.Tag == Select {
 					if lastArgValue != nil && (*lastArgValue).IsNil() == false {
-						results, err := engine.Query(sql)
+						var session=engine.NewSession(sql)
+						defer (*session).Close()
+						results, err := (*session).Query(sql)
 						if err != nil {
 							return err
 						}
@@ -101,13 +103,17 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sqlEngine *SqlEngin
 							return err
 						}
 					} else {
-						var _, err = engine.Exec(sql)
+						var session=engine.NewSession(sql)
+						defer (*session).Close()
+						var _, err = (*session).Exec(sql)
 						if err != nil {
 							return err
 						}
 					}
 				} else if mapperXml.Tag == Update || mapperXml.Tag == Delete || mapperXml.Tag == Insert {
-					var res, err = engine.Exec(sql)
+					var session=engine.NewSession(sql)
+					defer (*session).Close()
+					var res, err = (*session).Exec(sql)
 					if lastArgValue != nil {
 						if lastArgValue.IsNil() == false {
 							if err != nil {
@@ -156,10 +162,10 @@ func buildSql(arg0 reflect.Value, mapperXml MapperXml) (string, error) {
 func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[string]interface{}) (result bytes.Buffer, err error) {
 	for _, v := range itemTree {
 		var loopChildItem = true
-		if v.ElementType == String {
+		if v.ElementType == Element_String {
 			//string element
 			sql.WriteString(repleaceArg(v.DataString, param, DefaultSqlTypeConvertFunc))
-		} else if v.ElementType == If {
+		} else if v.ElementType == Element_If {
 			//if element
 			var test = v.Propertys[`test`]
 			var andStrings = strings.Split(test, ` and `)
@@ -190,7 +196,7 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 					break
 				}
 			}
-		} else if v.ElementType == Trim {
+		} else if v.ElementType == Element_Trim {
 			var prefix = v.Propertys[`prefix`]
 			var suffix = v.Propertys[`suffix`]
 			var suffixOverrides = v.Propertys[`suffixOverrides`]
@@ -227,7 +233,7 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 				sql.Write(trim.Bytes())
 				loopChildItem = false
 			}
-		} else if v.ElementType == Foreach {
+		} else if v.ElementType == Element_Foreach {
 			var collection = v.Propertys[`collection`]
 			var index = v.Propertys[`index`]
 			var item = v.Propertys[`item`]

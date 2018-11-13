@@ -3,9 +3,9 @@ package GoMybatis
 type ElementType = string
 
 const (
-	String  = "string"
-	If      = `if`
-	Trim    = "trim"
-	Foreach = "foreach"
-	Set     = "set"
+	Element_String  = "string"
+	Element_If      = `if`
+	Element_Trim    = "trim"
+	Element_Foreach = "foreach"
+	Element_Set     = "set"
 )

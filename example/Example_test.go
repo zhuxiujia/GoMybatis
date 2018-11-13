@@ -4,7 +4,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"testing"
 	"time"
-	"github.com/zhuxiujia/GoMybatis/lib/github.com/go-xorm/xorm"
 	"os"
 	"fmt"
 	"io/ioutil"
@@ -32,12 +31,11 @@ type ExampleActivityMapperImpl struct {
 func Test_main(t *testing.T) {
 	var err error
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
-	engine, err := xorm.NewEngine("mysql", "*?charset=utf8&parseTime=True&loc=Local") //此处请按格式填写你的mysql链接，这里用*号代替
+	engine, err := GoMybatis.Open("mysql", "root:123!@#TEST@(rm-bp1149af62y4hnljoo.mysql.rds.aliyuncs.com:3306)/test?charset=utf8&parseTime=True&loc=Local") //此处请按格式填写你的mysql链接，这里用*号代替
 	if err != nil {
 		panic(err.Error())
 	}
-	engine.ShowSQL()
-
+	//engine.ShowSQL()
 	file, err := os.Open("Example_ActivityMapper.xml")
 	if err != nil {
 		panic(err)
@@ -47,7 +45,7 @@ func Test_main(t *testing.T) {
 	bytes, _ := ioutil.ReadAll(file)
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	//设置对应的mapper xml文件
-	GoMybatis.UseProxyMapperByXorm(&exampleActivityMapperImpl, bytes, engine)
+	GoMybatis.UseProxyMapperByMysqlEngine(&exampleActivityMapperImpl, bytes, engine)
 
 	//使用mapper
 	var result []Activity

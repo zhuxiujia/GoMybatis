@@ -9,6 +9,7 @@ GoMybatis 内部在初始化时反射分析mapper xml生成golang的func代码�
 # 使用教程,代码文件请查看/example文件夹
 ```
 go get github.com/zhuxiujia/GoMybatis
+go get "database/sql"
 go get github.com/go-sql-driver/mysql
 ```
 mapper.go 文件案例
@@ -68,7 +69,7 @@ import (
 func main() {
   var err error
   	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
-  	engine, err := xorm.NewEngine("mysql", "*?charset=utf8&parseTime=True&loc=Local") //此处请按格式填写你的mysql链接，这里用*号代替
+  	engine, err := GoMybatis.Open("mysql", "*?charset=utf8&parseTime=True&loc=Local") //此处请按格式填写你的mysql链接，这里用*号代替
   	if err != nil {
   		panic(err.Error())
   	}

@@ -6,12 +6,12 @@ import (
 	"strconv"
 )
 
-const DateType  =  `time.Time`
-const StringType  =  `string`
-const FormateDate  =  `2006-01-02 15:04:05`
+const Adapter_DateType  =  `time.Time`
+const Adapter_StringType  =  `string`
+const Adapter_FormateDate  =  `2006-01-02 15:04:05`
 
 var DefaultExpressionTypeConvertFunc = func(arg interface{}) interface{} {
-	if reflect.TypeOf(arg).String() == DateType {
+	if reflect.TypeOf(arg).String() == Adapter_DateType {
 		return arg.(time.Time).Nanosecond()
 	}
 	return arg
@@ -19,10 +19,10 @@ var DefaultExpressionTypeConvertFunc = func(arg interface{}) interface{} {
 
 var DefaultSqlTypeConvertFunc = func(arg interface{}) string {
 	var t = reflect.TypeOf(arg)
-	if t.String() == DateType {
-		arg = arg.(time.Time).Format(FormateDate)
+	if t.String() == Adapter_DateType {
+		arg = arg.(time.Time).Format(Adapter_FormateDate)
 	}
-	if t.String() == DateType || t.String() == StringType {
+	if t.String() == Adapter_DateType || t.String() == Adapter_StringType {
 		return `'` + toString(arg) + `'`
 	}
 	return toString(arg)

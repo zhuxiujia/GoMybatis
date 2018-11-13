@@ -73,7 +73,7 @@ func loop(element *etree.Element) []ElementItem {
 				buf.WriteString(" ")
 				buf.WriteString(str)
 				var elementItem = ElementItem{
-					ElementType: String,
+					ElementType: Element_String,
 					DataString:  buf.String(),
 				}
 				els = append(els, elementItem)
