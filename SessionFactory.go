@@ -5,7 +5,7 @@ type SessionFactory struct {
 	Engine   *SqlEngine
 }
 
-func (this *SessionFactory) New(Engine *SqlEngine) *SessionFactory {
+func (this SessionFactory) New(Engine *SqlEngine) SessionFactory {
 	this.Sessions=make(map[string]*Session)
 	this.Engine = Engine
 	return this

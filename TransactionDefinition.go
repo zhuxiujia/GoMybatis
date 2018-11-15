@@ -28,12 +28,11 @@ type TransactionDefinition struct {
 	IsReadOnly          bool
 }
 
-func (this *TransactionDefinition) Default() *TransactionDefinition {
-	*this = TransactionDefinition{
+func (this TransactionDefinition) Default() TransactionDefinition {
+	return TransactionDefinition{
 		PropagationBehavior: PROPAGATION_REQUIRED,
 		IsolationLevel:      ISOLATION_DEFAULT,
 		Timeout:             0,
 		IsReadOnly:          false,
 	}
-	return this
 }
