@@ -1,6 +1,7 @@
 package GoMybatis
 
 type TransactionStatus struct {
+	OwnerId  string
 	IsNewTransaction bool
 	HasSavepoint     bool
 	IsRollbackOnly   bool
