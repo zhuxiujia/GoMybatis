@@ -11,13 +11,14 @@ func (this TransactionFactory) New(SessionFactory *SessionFactory) TransactionFa
 	return this
 }
 
-func (this TransactionFactory) GetTransactionStatus(transactionId string) *TransactionStatus {
+func (this *TransactionFactory) GetTransactionStatus(transactionId string) *TransactionStatus {
 	if transactionId == "" {
 		return nil
 	}
 	var result = this.TransactionStatuss[transactionId]
 	if result == nil {
 		var transaction = Transaction{
+			Id:transactionId,
 			Sqls: make([]string, 0),
 			Session:this.SessionFactory.GetSession(),
 		}

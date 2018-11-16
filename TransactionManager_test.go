@@ -3,11 +3,9 @@ package GoMybatis
 import (
 	"testing"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/zhuxiujia/GoMybatis/example"
-	"encoding/json"
-	"log"
 	"fmt"
 	"github.com/zhuxiujia/GoMybatis/utils"
+	"strconv"
 )
 
 var manager DefaultTransationManager
@@ -21,37 +19,13 @@ func TestManager(t *testing.T) {
 	var TransactionFactory = TransactionFactory{}.New(&SessionFactory)
 	manager = DefaultTransationManager{}.New(&SessionFactory, &TransactionFactory)
 
-	var dto = TransactionReqDTO{
-		TransactionId: "1234",
-		Status:        Transaction_Status_Pause,
-		ActionType:    ActionType_Query,
-		Sql:           "select * from biz_activity where delete_flag = 1",
+	var TestPropertyServiceA TestPropertyServiceA
+	var TestPropertyServiceB TestPropertyServiceB
+	var TestOrderService = TestOrderService{
+		TestPropertyServiceA: TestPropertyServiceA,
+		TestPropertyServiceB: TestPropertyServiceB,
 	}
-
-	//start
-	var result = manager.DoTransaction(manager, dto)
-
-	printData(result)
-
-	dto.Sql = "UPDATE `test`.`biz_activity` SET `name`='rs-updated' WHERE `id`='159'"
-	dto.Status = Transaction_Status_Pause
-	dto.ActionType = ActionType_Exec
-	manager.DoTransaction(manager, dto)
-
-	dto.Status = Transaction_Status_Rollback
-	manager.DoTransaction(manager, dto)
-
-}
-
-func printData(result TransactionRspDTO) {
-	if result.Error != "" {
-		log.Println(result.Error)
-		return
-	}
-	var Activity []example.Activity
-	Unmarshal(result.Query, &Activity)
-	var b, _ = json.Marshal(Activity)
-	log.Println("Activity Json=", string(b))
+	TestOrderService.Transform("3245543", "20180926172013b85403d3715d46ed", "20181023162632152fd236d6877ff4", 100)
 }
 
 //测试案例
@@ -65,18 +39,18 @@ type TestPropertyServiceA struct{}
 //单事务2
 func (TestPropertyServiceA) Add(transactionId string, id string, amt int) error {
 	var OwnerId = utils.CreateUUID()
-	var sql = "UPDATE `test`.`biz_property` SET `pool_amount`= (pool_amount+100) WHERE `id`='20180926172014a2a48a9491004603';"
+	var sql = "UPDATE `test`.`biz_property` SET `pool_amount`= (pool_amount+" + strconv.Itoa(amt) + ") WHERE `user_id`='" + id + "';"
 	//todo proxy send error
 	var dto = TransactionReqDTO{
-		TransactionId: "1234",
+		TransactionId: transactionId,
 		Status:        Transaction_Status_Pause,
 		ActionType:    ActionType_Exec,
 		Sql:           sql,
 	}
-	var result = manager.DoTransaction(manager, dto, OwnerId)
+	var result = manager.DoTransaction(dto, OwnerId)
 	fmt.Println(result.Exec)
 	dto.Status = Transaction_Status_Commit
-	manager.DoTransaction(manager, dto, OwnerId) //commit
+	manager.DoTransaction(dto, OwnerId) //commit
 	return nil
 }
 
@@ -85,18 +59,18 @@ type TestPropertyServiceB struct{}
 //单事务1
 func (TestPropertyServiceB) Reduce(transactionId string, id string, amt int) error {
 	var OwnerId = utils.CreateUUID()
-	var sql = "UPDATE `test`.`biz_property` SET `pool_amount`= (pool_amount-100) WHERE `id`='20180926172014a2a48a9491004603';"
+	var sql = "UPDATE `test`.`biz_property` SET `pool_amount`= (pool_amount-" + strconv.Itoa(amt) + ") WHERE `user_id`='" + id + "';"
 	//todo proxy send error
 	var dto = TransactionReqDTO{
-		TransactionId: "1234",
+		TransactionId: transactionId,
 		Status:        Transaction_Status_Pause,
 		ActionType:    ActionType_Exec,
 		Sql:           sql,
 	}
-	var result = manager.DoTransaction(manager, dto, OwnerId)
+	var result = manager.DoTransaction(dto, OwnerId)
 	fmt.Println(result.Exec)
 	dto.Status = Transaction_Status_Commit
-	manager.DoTransaction(manager, dto, OwnerId) //commit
+	manager.DoTransaction(dto, OwnerId) //commit
 	return nil
 }
 
@@ -115,7 +89,7 @@ func (this TestOrderService) Transform(transactionId string, outid string, inId 
 		ActionType:    ActionType_Exec,
 		Sql:           "",
 	}
-	manager.DoTransaction(manager, dto, OwnerId) //开启事务
+	manager.DoTransaction(dto, OwnerId) //开启事务
 
 	//事务id=2018092d6172014a2a4c8a949f1004623,已存在的事务不可提交commit，只能提交状态rollback和Pause
 	var e1 = this.TestPropertyServiceB.Reduce(transactionId, outid, amount)
@@ -127,8 +101,11 @@ func (this TestOrderService) Transform(transactionId string, outid string, inId 
 	if e2 != nil {
 		return e2
 	}
+
+	//manager.Rollback(transactionId)
 	//事务id=2018092d6172014a2a4c8a949f1004623,原始事务可提交commit,rollback和Pause
 	dto.Status = Transaction_Status_Commit
-	manager.DoTransaction(manager, dto, OwnerId)
+	manager.DoTransaction(dto, OwnerId)
+
 	return nil
 }

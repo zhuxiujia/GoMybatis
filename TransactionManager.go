@@ -38,7 +38,7 @@ type TransactionRspDTO struct {
 type TransactionManager interface {
 	GetTransaction(def *TransactionDefinition, transactionId string) (*TransactionStatus, error)
 	Commit() error
-	Rollback(status TransactionStatus) error
+	Rollback(transactionId string) error
 }
 
 type DefaultTransationManager struct {
@@ -82,20 +82,21 @@ func (this DefaultTransationManager) Commit() error {
 	return nil
 }
 
-func (this DefaultTransationManager) Rollback(status TransactionStatus) error {
-
+func (this DefaultTransationManager) Rollback(transactionId string) error {
+	var transactions=this.TransactionFactory.GetTransactionStatus(transactionId)
+	transactions.Rollback()
 	return nil
 }
 
 //执行事务
-func (this DefaultTransationManager) DoTransaction(manager DefaultTransationManager, dto TransactionReqDTO, OwnerId string) TransactionRspDTO {
+func (this DefaultTransationManager) DoTransaction(dto TransactionReqDTO, OwnerId string) TransactionRspDTO {
 	if dto.TransactionId == "" {
 		return TransactionRspDTO{
 			TransactionId: dto.TransactionId,
 			Error:         "[TransactionManager] arg TransactionId can no be null!",
 		}
 	}
-	transcationStatus, err := manager.GetTransaction(nil, dto.TransactionId, OwnerId)
+	transcationStatus, err := this.GetTransaction(nil, dto.TransactionId, OwnerId)
 	if err != nil {
 		return TransactionRspDTO{
 			TransactionId: dto.TransactionId,
@@ -105,20 +106,20 @@ func (this DefaultTransationManager) DoTransaction(manager DefaultTransationMana
 	if dto.Status == Transaction_Status_Pause {
 		return this.DoAction(dto, transcationStatus)
 	} else if dto.Status == Transaction_Status_Commit {
-		if transcationStatus.OwnerId != OwnerId { //PROPAGATION_REQUIRED 情况下 子事务 不可提交
+		if transcationStatus.OwnerId == OwnerId { //PROPAGATION_REQUIRED 情况下 子事务 不可提交
 			err = transcationStatus.Commit()
-			manager.TransactionFactory.GetTransactionStatus(dto.TransactionId).Flush()
+			this.TransactionFactory.GetTransactionStatus(dto.TransactionId).Flush()
 			if err != nil {
 				return TransactionRspDTO{
 					TransactionId: dto.TransactionId,
 					Error:         err.Error(),
 				}
 			}
-			manager.TransactionFactory.GetTransactionStatus(dto.TransactionId).Flush()
+			this.TransactionFactory.GetTransactionStatus(dto.TransactionId).Flush()
 		}
 	} else if dto.Status == Transaction_Status_Rollback {
 		err = transcationStatus.Rollback()
-		manager.TransactionFactory.GetTransactionStatus(dto.TransactionId).Flush()
+		this.TransactionFactory.GetTransactionStatus(dto.TransactionId).Flush()
 		if err != nil {
 			return TransactionRspDTO{
 				TransactionId: dto.TransactionId,
