@@ -6,13 +6,13 @@ import (
 )
 
 type TransactionStatus struct {
-	OwnerId          string
-	IsNewTransaction bool
-	HasSavepoint     bool
-	IsRollbackOnly   bool
-	IsCompleted      bool
-	HasSetDelayClose bool
-	Transaction      *Transaction
+	OwnerId          string       //所有者id
+	IsNewTransaction bool         //是否新启动的事务
+	HasSavepoint     bool         //是否保存点
+	IsRollbackOnly   bool         //是否只允许rollback
+	IsCompleted      bool         //是否完成
+	HasSetDelayClose bool         //是否设置了延迟关闭/回滚
+	Transaction      *Transaction //事务对象
 }
 
 type Transaction struct {
