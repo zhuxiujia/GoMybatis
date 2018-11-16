@@ -15,24 +15,27 @@ type Transaction struct {
 }
 
 
-func (this *Transaction) Append(sql string) error {
-	 this.Sqls=append(this.Sqls, sql)
+func (this *TransactionStatus) Append(sql string) error {
+	 this.Transaction.Sqls=append(this.Transaction.Sqls, sql)
 	 return nil
 }
 
-func (this Transaction) Rollback() error {
-	return (*this.Session).Rollback()
+func (this *TransactionStatus) Rollback() error {
+	this.IsCompleted=true
+	return (*this.Transaction.Session).Rollback()
 }
 
-func (this Transaction) Commit() error {
-	return (*this.Session).Commit()
+func (this *TransactionStatus) Commit() error {
+	this.IsCompleted=true
+	return (*this.Transaction.Session).Commit()
 }
 
-func (this Transaction) Begin() error {
-	return (*this.Session).Begin()
+func (this *TransactionStatus) Begin() error {
+	this.IsNewTransaction=false
+	return (*this.Transaction.Session).Begin()
 }
 
-func (this TransactionStatus) Flush() {
+func (this *TransactionStatus) Flush() {
 	if this.Transaction != nil && this.Transaction.Session != nil {
 		(*(*this.Transaction).Session).Close()
 		this.Transaction.Session = nil

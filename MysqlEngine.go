@@ -17,14 +17,14 @@ type MysqlEngine struct {
 
 type SqlSession struct {
 	Session
-	id                     *string
+	Id                     *string
 	db                     *sql.DB
 	stmt                   *sql.Stmt
 	tx                     *sql.Tx
 	isCommitedOrRollbacked *bool
 }
 
-func (this SqlSession) Rollback() error {
+func (this *SqlSession) Rollback() error {
 	if this.tx != nil {
 		var err = this.tx.Rollback()
 		if err == nil {
@@ -36,7 +36,7 @@ func (this SqlSession) Rollback() error {
 	return nil
 }
 
-func (this SqlSession) Commit() error {
+func (this *SqlSession) Commit() error {
 	if this.tx != nil {
 		var err = this.tx.Commit()
 		if err == nil {
@@ -46,7 +46,7 @@ func (this SqlSession) Commit() error {
 	return nil
 }
 
-func (this SqlSession) Begin() error {
+func (this *SqlSession) Begin() error {
 	if this.tx == nil {
 		var tx, err = this.db.Begin()
 		if err == nil {
@@ -58,11 +58,7 @@ func (this SqlSession) Begin() error {
 	return nil
 }
 
-func (this SqlSession) SessionId() string {
-	return *this.id
-}
-
-func (this SqlSession) Close() {
+func (this *SqlSession) Close() {
 	if this.db != nil {
 		if this.stmt != nil {
 			this.stmt.Close()
@@ -78,11 +74,11 @@ func (this SqlSession) Close() {
 	}
 }
 
-func (this SqlSession) DB() *sql.DB {
+func (this *SqlSession) DB() *sql.DB {
 	return this.db
 }
 
-func (this SqlSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
+func (this *SqlSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	var rows *sql.Rows
 	var err error
 	if this.tx != nil {
@@ -99,7 +95,7 @@ func (this SqlSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	return nil, nil
 }
 
-func (this SqlSession) Exec(sqlorArgs string) (Result, error) {
+func (this *SqlSession) Exec(sqlorArgs string) (Result, error) {
 	var result sql.Result
 	var err error
 	if this.tx != nil {
@@ -127,11 +123,11 @@ func (this MysqlEngine) NewSession() *Session {
 	var uuidstrig = uuids.String()
 	var isCommitedOrRollbacked = false
 	var mysqlSession = SqlSession{
-		id:                     &uuidstrig,
+		Id:                     &uuidstrig,
 		db:                     this.DB,
 		isCommitedOrRollbacked: &isCommitedOrRollbacked,
 	}
-	var session Session = mysqlSession
+	var session = Session(&mysqlSession)
 	return &session
 }
 

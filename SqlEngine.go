@@ -8,7 +8,6 @@ type Result struct {
 }
 
 type Session interface {
-	SessionId() string
 	DB() *sql.DB
 	Query(sqlorArgs string) ([]map[string][]byte, error)
 	Exec(sqlorArgs string) (Result, error)
