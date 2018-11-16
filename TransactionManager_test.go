@@ -6,6 +6,7 @@ import (
 	"github.com/zhuxiujia/GoMybatis/example"
 	"encoding/json"
 	"log"
+	"fmt"
 )
 
 func TestManager(t *testing.T) {
@@ -56,39 +57,42 @@ type TestUser struct {
 	Amount int
 }
 
-type TestPropertyService struct {
-}
+type TestPropertyServiceA struct{}
 
-//事务2
-func (TestPropertyService) Add(transactionId string, id string, amt int) error {
-
+//单事务2
+func (TestPropertyServiceA) Add(transactionId string, id string, amt int) error {
+	var sql="UPDATE `test`.`biz_property` SET `pool_amount`= (pool_amount+100) WHERE `id`='20180926172014a2a48a9491004603';"
+	fmt.Println(sql)
 	//todo proxy send error
 	return nil
 }
 
-//事务1
-func (TestPropertyService) Reduce(transactionId string, id string, amt int) error {
+type TestPropertyServiceB struct{}
 
+//单事务1
+func (TestPropertyServiceB) Reduce(transactionId string, id string, amt int) error {
+	var sql="UPDATE `test`.`biz_property` SET `pool_amount`= (pool_amount-100) WHERE `id`='20180926172014a2a48a9491004603';"
+	fmt.Println(sql)
 	//todo proxy send error
 	return nil
 }
 
 type TestOrderService struct {
-	TestPropertyService TestPropertyService
+	TestPropertyServiceA TestPropertyServiceA
+	TestPropertyServiceB TestPropertyServiceB
 }
 
-//事务
+//嵌套事务
 func (this TestOrderService) Transform(transactionId string, outid string, inId string, amount int) error {
 	//事务id=1234
-	var e1 = this.TestPropertyService.Reduce(transactionId, outid, amount)
+	var e1 = this.TestPropertyServiceB.Reduce(transactionId, outid, amount)
 	if e1 != nil {
 		return e1
 	}
-	var e2 = this.TestPropertyService.Add(transactionId, inId, amount)
+	var e2 = this.TestPropertyServiceA.Add(transactionId, inId, amount)
 	if e2 != nil {
 		return e2
 	}
-	//commit
 	//todo proxy send error
 	return nil
 }
