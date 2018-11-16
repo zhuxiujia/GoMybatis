@@ -11,7 +11,7 @@ import (
 var manager DefaultTransationManager
 
 func TestManager(t *testing.T) {
-	engine, err := Open("mysql", "*/test?charset=utf8&parseTime=True&loc=Local") //此处请按格式填写你的mysql链接，这里用*号代替
+	engine, err := Open("mysql", "*?charset=utf8&parseTime=True&loc=Local") //此处请按格式填写你的mysql链接，这里用*号代替
 	if err != nil {
 		panic(err.Error())
 	}
@@ -25,7 +25,7 @@ func TestManager(t *testing.T) {
 		TestPropertyServiceA: TestPropertyServiceA,
 		TestPropertyServiceB: TestPropertyServiceB,
 	}
-	TestOrderService.Transform("3245543", "20180926172013b85403d3715d46ed", "20181023162632152fd236d6877ff4", 100)
+	TestOrderService.Transform(utils.CreateUUID(),  "20181023162632152fd236d6877ff4","20180926172013b85403d3715d46ed", 100)
 }
 
 //测试案例
@@ -82,7 +82,6 @@ type TestOrderService struct {
 //嵌套事务
 func (this TestOrderService) Transform(transactionId string, outid string, inId string, amount int) error {
 	var OwnerId = utils.CreateUUID()
-	transactionId = "2018092d6172014a2a4c8a949f1004623"
 	var dto = TransactionReqDTO{
 		TransactionId: transactionId,
 		Status:        Transaction_Status_Pause,
@@ -96,16 +95,21 @@ func (this TestOrderService) Transform(transactionId string, outid string, inId 
 	if e1 != nil {
 		return e1
 	}
+
+	dto.Status=Transaction_Status_Rollback
+	manager.DoTransaction(dto, OwnerId)
+
 	//事务id=2018092d6172014a2a4c8a949f1004623,已存在的事务不可提交commit，只能提交状态rollback和Pause
 	var e2 = this.TestPropertyServiceA.Add(transactionId, inId, amount)
 	if e2 != nil {
 		return e2
 	}
 
+
+
 	//manager.Rollback(transactionId)
 	//事务id=2018092d6172014a2a4c8a949f1004623,原始事务可提交commit,rollback和Pause
 	dto.Status = Transaction_Status_Commit
 	manager.DoTransaction(dto, OwnerId)
-
 	return nil
 }
