@@ -19,7 +19,6 @@ func (this *TransactionFactory) GetTransactionStatus(transactionId string) *Tran
 	if result == nil {
 		var transaction = Transaction{
 			Id:transactionId,
-			Sqls: make([]string, 0),
 			Session:this.SessionFactory.GetSession(),
 		}
 		var transactionStatus = TransactionStatus{
