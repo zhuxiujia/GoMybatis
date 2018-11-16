@@ -36,8 +36,8 @@ type TransactionRspDTO struct {
 }
 
 type TransactionManager interface {
-	GetTransaction(def *TransactionDefinition, transactionId string) (*TransactionStatus, error)
-	Commit() error
+	GetTransaction(def *TransactionDefinition, transactionId string, OwnerId string) (*TransactionStatus, error)
+	Commit(transactionId string) error
 	Rollback(transactionId string) error
 }
 
@@ -77,15 +77,14 @@ func (this DefaultTransationManager) GetTransaction(def *TransactionDefinition, 
 	return transationStatus, nil
 }
 
-func (this DefaultTransationManager) Commit() error {
-
-	return nil
+func (this DefaultTransationManager) Commit(transactionId string) error {
+	var transactions=this.TransactionFactory.GetTransactionStatus(transactionId)
+	return transactions.Commit()
 }
 
 func (this DefaultTransationManager) Rollback(transactionId string) error {
 	var transactions=this.TransactionFactory.GetTransactionStatus(transactionId)
-	transactions.Rollback()
-	return nil
+	return transactions.Rollback()
 }
 
 //执行事务
