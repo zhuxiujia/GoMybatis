@@ -2,7 +2,7 @@ package GoMybatis
 
 import (
 	"testing"
-	_"github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/zhuxiujia/GoMybatis/example"
 	"encoding/json"
 	"log"
@@ -20,35 +20,34 @@ func TestManager(t *testing.T) {
 	var dto = TransactionReqDTO{
 		TransactionId: "1234",
 		Status:        Transaction_Status_Pause,
-		ActionType:ActionType_Query,
+		ActionType:    ActionType_Query,
 		Sql:           "select * from biz_activity where delete_flag = 1",
 	}
 
 	//start
-	var result=manager.DoTransaction(manager, dto)
+	var result = manager.DoTransaction(manager, dto)
 
 	printData(result)
 
-	dto.Sql="UPDATE `test`.`biz_activity` SET `name`='rs-updated' WHERE `id`='159'"
+	dto.Sql = "UPDATE `test`.`biz_activity` SET `name`='rs-updated' WHERE `id`='159'"
 	dto.Status = Transaction_Status_Pause
-	dto.ActionType= ActionType_Exec
+	dto.ActionType = ActionType_Exec
 	manager.DoTransaction(manager, dto)
 
 	dto.Status = Transaction_Status_Rollback
 	manager.DoTransaction(manager, dto)
 
-	manager.TransactionFactory.GetTransactionStatus(dto.TransactionId).Flush()
 }
 
 func printData(result TransactionRspDTO) {
-	if result.Error!=""{
+	if result.Error != "" {
 		log.Println(result.Error)
 		return
 	}
 	var Activity []example.Activity
-	Unmarshal(result.Query,&Activity)
-	var b,_=json.Marshal(Activity)
-	log.Println("Activity Json=",string(b))
+	Unmarshal(result.Query, &Activity)
+	var b, _ = json.Marshal(Activity)
+	log.Println("Activity Json=", string(b))
 }
 
 //测试案例
@@ -61,15 +60,17 @@ type TestPropertyService struct {
 }
 
 //事务2
-func (TestPropertyService) Add(id string, amt int) error {
+func (TestPropertyService) Add(transactionId string, id string, amt int) error {
 
+	//todo proxy send error
 	return nil
 }
 
 //事务1
-func (TestPropertyService) Reduce(id string, amt int) error {
-	var runtimeE error
-	return runtimeE
+func (TestPropertyService) Reduce(transactionId string, id string, amt int) error {
+
+	//todo proxy send error
+	return nil
 }
 
 type TestOrderService struct {
@@ -77,16 +78,17 @@ type TestOrderService struct {
 }
 
 //事务
-func (this TestOrderService) Transform(outid string, inId string, amount int) error {
+func (this TestOrderService) Transform(transactionId string, outid string, inId string, amount int) error {
 	//事务id=1234
-	var e1 = this.TestPropertyService.Reduce(outid, amount)
+	var e1 = this.TestPropertyService.Reduce(transactionId, outid, amount)
 	if e1 != nil {
 		return e1
 	}
-	var e2 = this.TestPropertyService.Add(inId, amount)
+	var e2 = this.TestPropertyService.Add(transactionId, inId, amount)
 	if e2 != nil {
 		return e2
 	}
 	//commit
+	//todo proxy send error
 	return nil
 }

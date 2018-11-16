@@ -104,9 +104,24 @@ func (this DefaultTransationManager) DoTransaction(manager DefaultTransationMana
 	if dto.Status == Transaction_Status_Pause {
 		return this.DoAction(dto, transcationStatus)
 	} else if dto.Status == Transaction_Status_Commit {
-		transcationStatus.Commit()
+		err = transcationStatus.Commit()
+		manager.TransactionFactory.GetTransactionStatus(dto.TransactionId).Flush()
+		if err != nil {
+			return TransactionRspDTO{
+				TransactionId: dto.TransactionId,
+				Error:         err.Error(),
+			}
+		}
+		manager.TransactionFactory.GetTransactionStatus(dto.TransactionId).Flush()
 	} else if dto.Status == Transaction_Status_Rollback {
-		transcationStatus.Rollback()
+		err = transcationStatus.Rollback()
+		manager.TransactionFactory.GetTransactionStatus(dto.TransactionId).Flush()
+		if err != nil {
+			return TransactionRspDTO{
+				TransactionId: dto.TransactionId,
+				Error:         err.Error(),
+			}
+		}
 	}
 	return TransactionRspDTO{
 		TransactionId: dto.TransactionId,
@@ -116,7 +131,7 @@ func (this DefaultTransationManager) DoTransaction(manager DefaultTransationMana
 
 //执行数据库操作
 func (this DefaultTransationManager) DoAction(dto TransactionReqDTO, transcationStatus *TransactionStatus) TransactionRspDTO {
-	if transcationStatus.IsCompleted{
+	if transcationStatus.IsCompleted {
 		var TransactionRspDTO = TransactionRspDTO{
 			TransactionId: dto.TransactionId,
 			Error:         "[TransactionManager] transaction fail!it is completed!",
