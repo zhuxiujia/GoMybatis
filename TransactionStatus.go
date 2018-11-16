@@ -21,6 +21,7 @@ func (this *TransactionStatus) Rollback() error {
 		return errors.New("[TransactionManager] can not Rollback() a completed Transaction!")
 	}
 	this.IsCompleted = true
+	defer this.Flush()//close session
 	return (*this.Transaction.Session).Rollback()
 }
 
@@ -29,6 +30,7 @@ func (this *TransactionStatus) Commit() error {
 		return errors.New("[TransactionManager] can not Commit() a completed Transaction!")
 	}
 	this.IsCompleted = true
+	defer this.Flush()//close session
 	return (*this.Transaction.Session).Commit()
 }
 
