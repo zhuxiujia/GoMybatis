@@ -23,6 +23,7 @@ const (
 type TransactionReqDTO struct {
 	Status        TransactionDTOStatus
 	TransactionId string //事务id(不可空)
+	OwnerId string//所有者
 	Sql           string //sql内容(可空)
 	ActionType    ActionType
 }
@@ -88,14 +89,14 @@ func (this DefaultTransationManager) Rollback(transactionId string) error {
 }
 
 //执行事务
-func (this DefaultTransationManager) DoTransaction(dto TransactionReqDTO, OwnerId string) TransactionRspDTO {
+func (this DefaultTransationManager) DoTransaction(dto TransactionReqDTO) TransactionRspDTO {
 	if dto.TransactionId == "" {
 		return TransactionRspDTO{
 			TransactionId: dto.TransactionId,
 			Error:         "[TransactionManager] arg TransactionId can no be null!",
 		}
 	}
-	transcationStatus, err := this.GetTransaction(nil, dto.TransactionId, OwnerId)
+	transcationStatus, err := this.GetTransaction(nil, dto.TransactionId, dto.OwnerId)
 	if err != nil {
 		return TransactionRspDTO{
 			TransactionId: dto.TransactionId,
@@ -105,7 +106,7 @@ func (this DefaultTransationManager) DoTransaction(dto TransactionReqDTO, OwnerI
 	if dto.Status == Transaction_Status_Pause {
 		return this.DoAction(dto, transcationStatus)
 	} else if dto.Status == Transaction_Status_Commit {
-		if transcationStatus.OwnerId == OwnerId { //PROPAGATION_REQUIRED 情况下 子事务 不可提交
+		if transcationStatus.OwnerId == dto.OwnerId { //PROPAGATION_REQUIRED 情况下 子事务 不可提交
 			err = transcationStatus.Commit()
 			this.TransactionFactory.GetTransactionStatus(dto.TransactionId).Flush()
 			if err != nil {
