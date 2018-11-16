@@ -11,6 +11,7 @@ type TransactionStatus struct {
 	HasSavepoint     bool
 	IsRollbackOnly   bool
 	IsCompleted      bool
+	HasSetDelayClose bool
 	Transaction      *Transaction
 }
 
@@ -52,12 +53,16 @@ func (this *TransactionStatus) Flush() {
 		this.Transaction = nil
 	}
 }
+
 //延迟关闭
 func (this *TransactionStatus) DelayFlush(t time.Duration) {
-	go func() {
-		time.Sleep(t)
-		if this.IsCompleted==false{
-			this.Rollback()
-		}
-	}()
+	if this.HasSetDelayClose == false {
+		go func() {
+			time.Sleep(t)
+			if this.IsCompleted == false {
+				this.Rollback()
+			}
+		}()
+		this.HasSetDelayClose = true
+	}
 }
