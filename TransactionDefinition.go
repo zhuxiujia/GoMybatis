@@ -1,5 +1,7 @@
 package GoMybatis
 
+import "time"
+
 type PROPAGATION int
 type ISOLATION int
 
@@ -26,7 +28,7 @@ const (
 type TransactionDefinition struct {
 	PropagationBehavior PROPAGATION
 	IsolationLevel      ISOLATION
-	Timeout             int
+	Timeout             time.Duration
 	IsReadOnly          bool
 }
 

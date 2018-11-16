@@ -1,6 +1,9 @@
 package GoMybatis
 
-import "github.com/kataras/iris/core/errors"
+import (
+	"github.com/kataras/iris/core/errors"
+	"time"
+)
 
 type TransactionStatus struct {
 	OwnerId          string
@@ -21,7 +24,7 @@ func (this *TransactionStatus) Rollback() error {
 		return errors.New("[TransactionManager] can not Rollback() a completed Transaction!")
 	}
 	this.IsCompleted = true
-	defer this.Flush()//close session
+	defer this.Flush() //close session
 	return (*this.Transaction.Session).Rollback()
 }
 
@@ -30,7 +33,7 @@ func (this *TransactionStatus) Commit() error {
 		return errors.New("[TransactionManager] can not Commit() a completed Transaction!")
 	}
 	this.IsCompleted = true
-	defer this.Flush()//close session
+	defer this.Flush() //close session
 	return (*this.Transaction.Session).Commit()
 }
 
@@ -48,4 +51,13 @@ func (this *TransactionStatus) Flush() {
 		this.Transaction.Session = nil
 		this.Transaction = nil
 	}
+}
+//延迟关闭
+func (this *TransactionStatus) DelayFlush(t time.Duration) {
+	go func() {
+		time.Sleep(t)
+		if this.IsCompleted==false{
+			this.Rollback()
+		}
+	}()
 }

@@ -23,7 +23,7 @@ const (
 type TransactionReqDTO struct {
 	Status        TransactionDTOStatus
 	TransactionId string //事务id(不可空)
-	OwnerId string//所有者
+	OwnerId       string //所有者
 	Sql           string //sql内容(可空)
 	ActionType    ActionType
 }
@@ -71,6 +71,11 @@ func (this DefaultTransationManager) GetTransaction(def *TransactionDefinition, 
 			transationStatus.OwnerId = OwnerId
 			var err = transationStatus.Begin()
 			if err != nil {
+				if def.Timeout != 0 {
+					//transation out of time,default not set out of time
+					//事务超时,时间大于0则启动超时机制
+					transationStatus.DelayFlush(def.Timeout)
+				}
 				return transationStatus, err
 			}
 		}
@@ -79,12 +84,12 @@ func (this DefaultTransationManager) GetTransaction(def *TransactionDefinition, 
 }
 
 func (this DefaultTransationManager) Commit(transactionId string) error {
-	var transactions=this.TransactionFactory.GetTransactionStatus(transactionId)
+	var transactions = this.TransactionFactory.GetTransactionStatus(transactionId)
 	return transactions.Commit()
 }
 
 func (this DefaultTransationManager) Rollback(transactionId string) error {
-	var transactions=this.TransactionFactory.GetTransactionStatus(transactionId)
+	var transactions = this.TransactionFactory.GetTransactionStatus(transactionId)
 	return transactions.Rollback()
 }
 
