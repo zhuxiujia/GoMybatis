@@ -8,9 +8,10 @@ import (
 type Transaction_Status int
 
 const (
-	Transaction_Status_Pause    Transaction_Status = iota //暂停
-	Transaction_Status_Commit                             //提交事务
-	Transaction_Status_Rollback                           //回滚事务
+	Transaction_Status_NO       Transaction_Status = iota - 1 //非事务
+	Transaction_Status_Pause                                  //暂停
+	Transaction_Status_Commit                                 //提交事务
+	Transaction_Status_Rollback                               //回滚事务
 )
 
 type ActionType int
@@ -101,14 +102,22 @@ func (this DefaultTransationManager) DoTransaction(dto TransactionReqDTO) Transa
 			Error:         "[TransactionManager] arg TransactionId can no be null!",
 		}
 	}
-	transcationStatus, err := this.GetTransaction(nil, dto.TransactionId, dto.OwnerId)
-	if err != nil {
-		return TransactionRspDTO{
-			TransactionId: dto.TransactionId,
-			Error:         err.Error(),
+	var transcationStatus *TransactionStatus
+	var err error
+	if dto.Status != Transaction_Status_NO {
+		transcationStatus, err = this.GetTransaction(nil, dto.TransactionId, dto.OwnerId)
+		if err != nil {
+			return TransactionRspDTO{
+				TransactionId: dto.TransactionId,
+				Error:         err.Error(),
+			}
 		}
 	}
-	if dto.Status == Transaction_Status_Pause {
+	if dto.Status == Transaction_Status_NO {
+		var status=this.TransactionFactory.GetTransactionStatus(dto.TransactionId)
+		defer status.Flush() //非事务执行
+		return this.DoAction(dto, status)
+	} else if dto.Status == Transaction_Status_Pause {
 		return this.DoAction(dto, transcationStatus)
 	} else if dto.Status == Transaction_Status_Commit {
 		if transcationStatus.OwnerId == dto.OwnerId { //PROPAGATION_REQUIRED 情况下 子事务 不可提交

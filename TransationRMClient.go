@@ -4,10 +4,63 @@ import (
 	"github.com/hashicorp/net-rpc-msgpackrpc"
 	"net/rpc"
 	"github.com/kataras/iris/core/errors"
+	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
 const ConnectError = "connection is shut down"
 const CallMethod = "TransationRMServer.Msg"
+
+type RemoteSessionEngine struct {
+	SessionEngine
+	Client *TransationRMClient
+}
+
+func (this RemoteSessionEngine) New(Client *TransationRMClient) RemoteSessionEngine {
+	this.Client = Client
+	return this
+}
+
+func (this *RemoteSessionEngine) NewSession() *Session {
+	var TransationSession = RemoteSession{Client: this.Client}
+	var session = Session(&TransationSession)
+	return &session
+}
+
+type RemoteSession struct {
+	Session
+	Client *TransationRMClient
+}
+
+func (this *RemoteSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
+	var result TransactionRspDTO
+	var error = this.Client.Call(TransactionReqDTO{Status: Transaction_Status_NO, TransactionId: utils.CreateUUID(), Sql: sqlorArgs, ActionType: ActionType_Query,}, &result)
+	if error == nil && result.Error != "" {
+		error = errors.New(result.Error)
+	}
+	return result.Query, error
+}
+func (this *RemoteSession) Exec(sqlorArgs string) (Result, error) {
+	var result TransactionRspDTO
+	var error = this.Client.Call(TransactionReqDTO{Status: Transaction_Status_NO, TransactionId: utils.CreateUUID(), Sql: sqlorArgs, ActionType: ActionType_Exec,}, &result)
+	if error == nil && result.Error != "" {
+		error = errors.New(result.Error)
+	}
+	return result.Exec, error
+}
+func (this *RemoteSession) Rollback() error {
+	panic("[RemoteSession] not alow local Rollback()")
+	return nil
+}
+func (this *RemoteSession) Commit() error {
+	panic("[RemoteSession] not alow local Commit()")
+	return nil
+}
+func (this *RemoteSession) Begin() error {
+	panic("[RemoteSession] not alow local Begin()")
+	return nil
+}
+func (this *RemoteSession) Close() {
+}
 
 type TransationRMClient struct {
 	Client    *rpc.Client

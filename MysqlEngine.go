@@ -29,6 +29,7 @@ func (this MysqlEngine) NewSession() *Session {
 	return &session
 }
 
+//打开一个本地引擎
 func Open(driverName, dataSourceName string) (*SessionEngine, error) {
 	db, err := sql.Open(driverName, dataSourceName)
 	if err != nil {
@@ -39,6 +40,18 @@ func Open(driverName, dataSourceName string) (*SessionEngine, error) {
 	}
 	var engine = SessionEngine(mysqlEngine)
 	return &engine, nil
+}
+
+
+//打开一个本地引擎
+func OpenRemote(addr string) (*SessionEngine, error) {
+	var TransationRMClient = TransationRMClient{
+		RetryTime: 3,
+		Addr:      addr,
+	}
+	var engine = RemoteSessionEngine{}.New(&TransationRMClient)
+	var sessionEngine=SessionEngine(&engine)
+	return &sessionEngine, nil
 }
 
 //bean 工厂，根据xml配置创建函数,并且动态代理到你定义的struct func里
@@ -54,7 +67,7 @@ func Open(driverName, dataSourceName string) (*SessionEngine, error) {
 //func的参数支持2种函数，第一种函数 基本参数个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
 //func的参数支持2种函数，第二种函数第一个参数必须为结构体(例如 arg model.User,该结构体的属性可以指定tag `json:"xxx"`为参数名称),最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
 //使用UseProxyMapper函数设置代理后即可正常使用。
-func UseProxyMapperByMysqlEngine(bean interface{}, xml []byte, engine *SessionEngine) {
+func UseProxyMapperBySessionEngine(bean interface{}, xml []byte, engine *SessionEngine) {
 	UseProxyMapper(bean, xml, engine)
 }
 

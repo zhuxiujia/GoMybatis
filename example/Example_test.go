@@ -10,7 +10,6 @@ import (
 	"github.com/zhuxiujia/GoMybatis"
 )
 
-
 //定义mapper文件的接口和结构体
 type ExampleActivityMapper interface {
 	SelectAll(result *[]Activity) error
@@ -19,6 +18,7 @@ type ExampleActivityMapper interface {
 	Insert(arg Activity, result *int64) error
 	CountByCondition(name string, startTime time.Time, endTime time.Time, result *int) error
 }
+
 //定义mapper文件的接口和结构体，也可以只定义结构体就行
 //mapper.go文件 函数必须为2个参数（第一个为自定义结构体参数（属性必须大写），第二个为指针类型的返回数据） error 为返回错误
 type ExampleActivityMapperImpl struct {
@@ -47,27 +47,26 @@ func Test_main(t *testing.T) {
 	bytes, _ := ioutil.ReadAll(file)
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	//设置对应的mapper xml文件
-	GoMybatis.UseProxyMapperByMysqlEngine(&exampleActivityMapperImpl, bytes, engine)
+	GoMybatis.UseProxyMapperBySessionEngine(&exampleActivityMapperImpl, bytes, engine)
 
 	//使用mapper
 	var result []Activity
-	exampleActivityMapperImpl.SelectByCondition("",time.Time{},time.Time{},0,2000,&result)
+	exampleActivityMapperImpl.SelectByCondition("", time.Time{}, time.Time{}, 0, 2000, &result)
 
 	fmt.Println(result)
 }
 
-func Test_Remote_Transation(t *testing.T)  {
-
+func Test_Remote_Transation(t *testing.T) {
 
 	var addr = "127.0.0.1:17235"
-	go GoMybatis.ServerTransationRM(addr, MysqlDriverName, MysqlUri) //事务服务器节点1
+	go GoMybatis.ServerTcp(addr, MysqlDriverName, MysqlUri) //GoMybatis独立事务节点服务器
 
-
+	time.Sleep(time.Second)
 
 	//本地连接
 	var err error
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
-	engine, err := GoMybatis.Open(MysqlDriverName, MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
+	engine, err := GoMybatis.OpenRemote(addr) //此处请按格式填写你的mysql链接，这里用*号代替
 	if err != nil {
 		panic(err.Error())
 	}
@@ -81,13 +80,13 @@ func Test_Remote_Transation(t *testing.T)  {
 	bytes, _ := ioutil.ReadAll(file)
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	//设置对应的mapper xml文件
-	GoMybatis.UseProxyMapperByMysqlEngine(&exampleActivityMapperImpl, bytes, engine)
-
-
+	GoMybatis.UseProxyMapperBySessionEngine(&exampleActivityMapperImpl, bytes, engine)
 
 	//使用mapper
 	var result []Activity
-	exampleActivityMapperImpl.SelectByCondition("",time.Time{},time.Time{},0,2000,&result)
-
+	err = exampleActivityMapperImpl.SelectByCondition("", time.Time{}, time.Time{}, 0, 2000, &result)
+	if err != nil {
+		panic(err)
+	}
 	fmt.Println(result)
 }
