@@ -20,12 +20,12 @@ func (this MysqlEngine) NewSession() *Session {
 	uuids, _ := uuid.NewV4()
 	var uuidstrig = uuids.String()
 	var isCommitedOrRollbacked = false
-	var mysqlSession = SqlSession{
+	var mysqlLocalSession = LocalSqlSession{
 		Id:                     &uuidstrig,
 		db:                     this.DB,
 		isCommitedOrRollbacked: &isCommitedOrRollbacked,
 	}
-	var session = Session(&mysqlSession)
+	var session = Session(&mysqlLocalSession)
 	return &session
 }
 

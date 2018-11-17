@@ -24,10 +24,8 @@ type SessionEngine interface {
 	NewSession() *Session
 }
 
-
-
-
-type SqlSession struct {
+//本地直连session
+type LocalSqlSession struct {
 	Session
 	Id                     *string
 	db                     *sql.DB
@@ -36,7 +34,7 @@ type SqlSession struct {
 	isCommitedOrRollbacked *bool
 }
 
-func (this *SqlSession) Rollback() error {
+func (this *LocalSqlSession) Rollback() error {
 	if this.tx != nil {
 		var err = this.tx.Rollback()
 		if err == nil {
@@ -48,7 +46,7 @@ func (this *SqlSession) Rollback() error {
 	return nil
 }
 
-func (this *SqlSession) Commit() error {
+func (this *LocalSqlSession) Commit() error {
 	if this.tx != nil {
 		var err = this.tx.Commit()
 		if err == nil {
@@ -58,7 +56,7 @@ func (this *SqlSession) Commit() error {
 	return nil
 }
 
-func (this *SqlSession) Begin() error {
+func (this *LocalSqlSession) Begin() error {
 	if this.tx == nil {
 		var tx, err = this.db.Begin()
 		if err == nil {
@@ -70,7 +68,7 @@ func (this *SqlSession) Begin() error {
 	return nil
 }
 
-func (this *SqlSession) Close() {
+func (this *LocalSqlSession) Close() {
 	if this.db != nil {
 		if this.stmt != nil {
 			this.stmt.Close()
@@ -86,7 +84,7 @@ func (this *SqlSession) Close() {
 	}
 }
 
-func (this *SqlSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
+func (this *LocalSqlSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	var rows *sql.Rows
 	var err error
 	if this.tx != nil {
@@ -103,7 +101,7 @@ func (this *SqlSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	return nil, nil
 }
 
-func (this *SqlSession) Exec(sqlorArgs string) (Result, error) {
+func (this *LocalSqlSession) Exec(sqlorArgs string) (Result, error) {
 	var result sql.Result
 	var err error
 	if this.tx != nil {
