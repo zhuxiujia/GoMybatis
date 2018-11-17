@@ -5,23 +5,23 @@ import (
 	"log"
 )
 
-type TransactionDTOStatus = int
+type Transaction_Status int
 
 const (
-	Transaction_Status_Pause    = 0 //暂停
-	Transaction_Status_Commit   = 1 //提交事务
-	Transaction_Status_Rollback = 2 //回滚事务
+	Transaction_Status_Pause    Transaction_Status = iota //暂停
+	Transaction_Status_Commit                             //提交事务
+	Transaction_Status_Rollback                           //回滚事务
 )
 
-type ActionType = int
+type ActionType int
 
 const (
-	ActionType_Exec  = 0 //执行
-	ActionType_Query = 1 //查询
+	ActionType_Exec  ActionType = iota //执行
+	ActionType_Query                   //查询
 )
 
 type TransactionReqDTO struct {
-	Status        TransactionDTOStatus
+	Status        Transaction_Status
 	TransactionId string //事务id(不可空)
 	OwnerId       string //所有者
 	Sql           string //sql内容(可空)
