@@ -1,10 +1,10 @@
 package GoMybatis
 
 type SessionFactory struct {
-	Engine   *SqlEngine
+	Engine   *SessionEngine
 }
 
-func (this SessionFactory) New(Engine *SqlEngine) SessionFactory {
+func (this SessionFactory) New(Engine *SessionEngine) SessionFactory {
 	this.Engine = Engine
 	return this
 }

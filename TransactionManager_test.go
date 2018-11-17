@@ -6,12 +6,13 @@ import (
 	"fmt"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"strconv"
+	"github.com/zhuxiujia/GoMybatis/example"
 )
 
 var manager DefaultTransationManager
 
 func TestManager(t *testing.T) {
-	engine, err := Open("mysql", "*?charset=utf8&parseTime=True&loc=Local") //此处请按格式填写你的mysql链接，这里用*号代替
+	engine, err := Open(example.MysqlDriverName, example.MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
 	if err != nil {
 		panic(err.Error())
 	}

@@ -6,117 +6,15 @@ import (
 	"strconv"
 	"fmt"
 	"time"
-	"errors"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/satori/go.uuid"
 )
 
 type MysqlEngine struct {
-	SqlEngine
+	SessionEngine
 	DB *sql.DB
 }
 
-type SqlSession struct {
-	Session
-	Id                     *string
-	db                     *sql.DB
-	stmt                   *sql.Stmt
-	tx                     *sql.Tx
-	isCommitedOrRollbacked *bool
-}
 
-func (this *SqlSession) Rollback() error {
-	if this.tx != nil {
-		var err = this.tx.Rollback()
-		if err == nil {
-			*this.isCommitedOrRollbacked = true
-		} else {
-			return err
-		}
-	}
-	return nil
-}
-
-func (this *SqlSession) Commit() error {
-	if this.tx != nil {
-		var err = this.tx.Commit()
-		if err == nil {
-			*this.isCommitedOrRollbacked = true
-		}
-	}
-	return nil
-}
-
-func (this *SqlSession) Begin() error {
-	if this.tx == nil {
-		var tx, err = this.db.Begin()
-		if err == nil {
-			this.tx = tx
-		} else {
-			return err
-		}
-	}
-	return nil
-}
-
-func (this *SqlSession) Close() {
-	if this.db != nil {
-		if this.stmt != nil {
-			this.stmt.Close()
-		}
-		// When Close be called, if session is a transaction and do not call
-		// Commit or Rollback, then call Rollback.
-		if this.tx != nil && !*this.isCommitedOrRollbacked {
-			this.tx.Rollback()
-		}
-		this.tx = nil
-		this.db = nil
-		this.stmt = nil
-	}
-}
-
-func (this *SqlSession) DB() *sql.DB {
-	return this.db
-}
-
-func (this *SqlSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
-	var rows *sql.Rows
-	var err error
-	if this.tx != nil {
-		rows, err = this.tx.Query(sqlorArgs)
-	} else {
-		rows, err = this.db.Query(sqlorArgs)
-	}
-	if err != nil {
-		return nil, err
-	} else {
-		defer rows.Close()
-		return rows2maps(rows)
-	}
-	return nil, nil
-}
-
-func (this *SqlSession) Exec(sqlorArgs string) (Result, error) {
-	var result sql.Result
-	var err error
-	if this.tx != nil {
-		if *this.isCommitedOrRollbacked {
-			return Result{}, errors.New("Exec sql fail!, session isCommitedOrRollbacked!")
-		}
-		result, err = this.tx.Exec(sqlorArgs)
-	} else {
-		result, err = this.db.Exec(sqlorArgs)
-	}
-	if err != nil {
-		return Result{}, err
-	} else {
-		var LastInsertId, _ = result.LastInsertId()
-		var RowsAffected, _ = result.RowsAffected()
-		return Result{
-			LastInsertId: LastInsertId,
-			RowsAffected: RowsAffected,
-		}, nil
-	}
-}
 
 func (this MysqlEngine) NewSession() *Session {
 	uuids, _ := uuid.NewV4()
@@ -131,7 +29,7 @@ func (this MysqlEngine) NewSession() *Session {
 	return &session
 }
 
-func Open(driverName, dataSourceName string) (*SqlEngine, error) {
+func Open(driverName, dataSourceName string) (*SessionEngine, error) {
 	db, err := sql.Open(driverName, dataSourceName)
 	if err != nil {
 		return nil, err
@@ -139,7 +37,7 @@ func Open(driverName, dataSourceName string) (*SqlEngine, error) {
 	var mysqlEngine = MysqlEngine{
 		DB: db,
 	}
-	var engine = SqlEngine(mysqlEngine)
+	var engine = SessionEngine(mysqlEngine)
 	return &engine, nil
 }
 
@@ -156,7 +54,7 @@ func Open(driverName, dataSourceName string) (*SqlEngine, error) {
 //func的参数支持2种函数，第一种函数 基本参数个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
 //func的参数支持2种函数，第二种函数第一个参数必须为结构体(例如 arg model.User,该结构体的属性可以指定tag `json:"xxx"`为参数名称),最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
 //使用UseProxyMapper函数设置代理后即可正常使用。
-func UseProxyMapperByMysqlEngine(bean interface{}, xml []byte, engine *SqlEngine) {
+func UseProxyMapperByMysqlEngine(bean interface{}, xml []byte, engine *SessionEngine) {
 	UseProxyMapper(bean, xml, engine)
 }
 

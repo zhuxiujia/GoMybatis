@@ -9,6 +9,8 @@ import (
 	"io/ioutil"
 	"github.com/zhuxiujia/GoMybatis"
 )
+
+
 //定义mapper文件的接口和结构体
 type ExampleActivityMapper interface {
 	SelectAll(result *[]Activity) error
@@ -31,7 +33,7 @@ type ExampleActivityMapperImpl struct {
 func Test_main(t *testing.T) {
 	var err error
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
-	engine, err := GoMybatis.Open("mysql", "*?charset=utf8&parseTime=True&loc=Local") //此处请按格式填写你的mysql链接，这里用*号代替
+	engine, err := GoMybatis.Open("mysql", MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
 	if err != nil {
 		panic(err.Error())
 	}
@@ -46,6 +48,42 @@ func Test_main(t *testing.T) {
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	//设置对应的mapper xml文件
 	GoMybatis.UseProxyMapperByMysqlEngine(&exampleActivityMapperImpl, bytes, engine)
+
+	//使用mapper
+	var result []Activity
+	exampleActivityMapperImpl.SelectByCondition("",time.Time{},time.Time{},0,2000,&result)
+
+	fmt.Println(result)
+}
+
+func Test_Remote_Transation(t *testing.T)  {
+
+
+	var addr = "127.0.0.1:17235"
+	go GoMybatis.ServerTransationRM(addr, MysqlDriverName, MysqlUri) //事务服务器节点1
+
+
+
+	//本地连接
+	var err error
+	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
+	engine, err := GoMybatis.Open(MysqlDriverName, MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
+	if err != nil {
+		panic(err.Error())
+	}
+	//engine.ShowSQL()
+	file, err := os.Open("Example_ActivityMapper.xml")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	bytes, _ := ioutil.ReadAll(file)
+	var exampleActivityMapperImpl ExampleActivityMapperImpl
+	//设置对应的mapper xml文件
+	GoMybatis.UseProxyMapperByMysqlEngine(&exampleActivityMapperImpl, bytes, engine)
+
+
 
 	//使用mapper
 	var result []Activity
