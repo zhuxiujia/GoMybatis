@@ -79,6 +79,10 @@ func (this *TransationRMClient) Link(addr string) (*rpc.Client, error) {
 	}
 }
 func (this *TransationRMClient) autoLink() (*rpc.Client, error) {
+	if this.Client != nil {
+		this.Client.Close()
+		this.Client = nil
+	}
 	return msgpackrpc.Dial("tcp", this.Addr)
 }
 

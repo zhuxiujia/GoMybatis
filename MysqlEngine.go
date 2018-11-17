@@ -44,9 +44,9 @@ func Open(driverName, dataSourceName string) (*SessionEngine, error) {
 
 
 //打开一个本地引擎
-func OpenRemote(addr string) (*SessionEngine, error) {
+func OpenRemote(addr string,RetryTime int) (*SessionEngine, error) {
 	var TransationRMClient = TransationRMClient{
-		RetryTime: 3,
+		RetryTime: RetryTime,
 		Addr:      addr,
 	}
 	var engine = RemoteSessionEngine{}.New(&TransationRMClient)
