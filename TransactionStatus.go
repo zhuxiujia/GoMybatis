@@ -48,7 +48,7 @@ func (this *TransactionStatus) Begin() error {
 
 func (this *TransactionStatus) Flush() {
 	if this.Transaction != nil && this.Transaction.Session != nil {
-		(*(*this.Transaction).Session).Close()
+		(*this.Transaction.Session).Close()
 		this.Transaction.Session = nil
 		this.Transaction = nil
 	}
