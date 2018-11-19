@@ -42,9 +42,9 @@ func UseProxyMapper(bean interface{}, xml []byte, sqlEngine *SessionEngine) {
 //使用UseProxyMapper函数设置代理后即可正常使用。
 func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionEngine *SessionEngine) {
 	var mapperTree = LoadMapperXml(xml)
-	var proxyFunc = func(method string, args []reflect.Value, params []string) error {
+	var proxyFunc = func(method string, args []reflect.Value, tagParams []string) error {
 		var lastArgsIndex = len(args) - 1
-		var paramsLen = len(params)
+		var tagParamsLen = len(tagParams)
 		var argsLen = len(args)
 		var lastArgValue *reflect.Value = nil
 		if argsLen != 0 && args[lastArgsIndex].Kind() == reflect.Ptr {
@@ -56,8 +56,8 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionEngine *Sess
 		}
 		//build params
 		var paramMap = make(map[string]interface{})
-		if paramsLen != 0 {
-			for index, v := range params {
+		if tagParamsLen != 0 {
+			for index, v := range tagParams {
 				paramMap[v] = args[index].Interface()
 			}
 		}
@@ -69,12 +69,12 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionEngine *Sess
 				//build sql string
 				var sql string
 				var err error
-				if paramsLen != 0 {
+				if tagParamsLen != 0 {
 					sql, err = BuildSqlFromMap(paramMap, mapperXml)
-				} else if paramsLen == 0 && argsLen == 0 {
+				} else if tagParamsLen == 0 && argsLen == 0 {
 					sql, err = BuildSqlFromMap(paramMap, mapperXml)
 				} else {
-					sql, err = buildSql(args[0], mapperXml)
+					sql, err = buildSql(args, mapperXml)
 				}
 				if err != nil {
 					return err
@@ -118,12 +118,18 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionEngine *Sess
 }
 
 
-func buildSql(arg0 reflect.Value, mapperXml MapperXml) (string, error) {
+func buildSql(args []reflect.Value, mapperXml MapperXml) (string, error) {
 	var params = make(map[string]interface{})
-	if arg0.Kind() == reflect.Struct && arg0.Type().String() != `time.Time` {
-		params = scanParamterBean(arg0.Interface(), nil)
-	} else {
-		params[DefaultOneArg] = arg0.Interface()
+	for _,arg:=range args  {
+		if arg.Kind()==reflect.Ptr{
+			//指针，则退出
+			continue
+		}
+		if arg.Kind() == reflect.Struct && arg.Type().String() != `time.Time` {
+			params = scanParamterBean(arg.Interface(), nil)
+		} else {
+			params[DefaultOneArg] = arg.Interface()
+		}
 	}
 	return BuildSqlFromMap(params, mapperXml)
 }
