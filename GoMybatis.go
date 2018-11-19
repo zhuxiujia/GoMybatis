@@ -107,11 +107,7 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionEngine *Sess
 						return err
 					}
 					if haveLastReturnValue {
-						if err != nil {
-							return err
-						} else {
-							lastArgValue.Elem().SetInt(res.RowsAffected)
-						}
+						lastArgValue.Elem().SetInt(res.RowsAffected)
 					}
 				}
 				//匹配完成退出
