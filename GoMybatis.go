@@ -110,7 +110,7 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionEngine *Sess
 						if err != nil {
 							return err
 						} else {
-							lastArgValue.Elem().Set(reflect.ValueOf(res.RowsAffected))
+							lastArgValue.Elem().SetInt(res.RowsAffected)
 						}
 					}
 				}
