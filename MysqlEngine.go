@@ -21,7 +21,7 @@ func (this MysqlEngine) NewSession() *Session {
 	var uuidstrig = uuids.String()
 	var isCommitedOrRollbacked = false
 	var mysqlLocalSession = LocalSqlSession{
-		Id:                     &uuidstrig,
+		SessionId:              uuidstrig,
 		db:                     this.DB,
 		isCommitedOrRollbacked: &isCommitedOrRollbacked,
 	}

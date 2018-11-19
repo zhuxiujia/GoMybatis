@@ -11,8 +11,6 @@ import (
 	"log"
 )
 
-
-
 //bean 工厂，根据xml配置创建函数,并且动态代理到你定义的struct func里
 //bean 参数必须为指针类型,指向你定义的struct
 //你定义的struct必须有可导出的func属性,例如：
@@ -61,7 +59,6 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionEngine *Sess
 				return errors.New(`[method params last param must be pointer!],method =` + method)
 			}
 		}
-
 		//build params
 		var paramMap = make(map[string]interface{})
 		if paramsLen != 0 {
@@ -69,7 +66,6 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionEngine *Sess
 				paramMap[v] = args[index].Interface()
 			}
 		}
-
 		var findMethod = false
 		for _, mapperXml := range mapperTree {
 			//exec sql,return data
@@ -88,42 +84,34 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionEngine *Sess
 				if err != nil {
 					return err
 				}
-				//TODO do CRUD
-				if mapperXml.Tag == Select {
-					if lastArgValue != nil && (*lastArgValue).IsNil() == false {
-						var session=(*sessionEngine).NewSession()
-						defer (*session).Close()
-						results, err := (*session).Query(sql)
-						if err != nil {
-							return err
-						}
-						err = Unmarshal(results, lastArgValue.Interface())
-						if err != nil {
-							return err
-						}
-					} else {
-						var session=(*sessionEngine).NewSession()
-						defer (*session).Close()
-						var _, err = (*session).Exec(sql)
-						if err != nil {
-							return err
-						}
-					}
-				} else if mapperXml.Tag == Update || mapperXml.Tag == Delete || mapperXml.Tag == Insert {
-					var session=(*sessionEngine).NewSession()
-					defer (*session).Close()
-					var res, err = (*session).Exec(sql)
-					if lastArgValue != nil {
-						if lastArgValue.IsNil() == false {
-							if err != nil {
-								return err
-							}else{
-								lastArgValue.Elem().Set(reflect.ValueOf(res.RowsAffected))
-							}
-						}
-					}
+				//session
+				var session *Session
+				session = (*sessionEngine).NewSession()
+				defer (*session).Close()
+
+				var haveLastReturnValue = lastArgValue != nil && (*lastArgValue).IsNil() == false
+				//do CRUD
+				if mapperXml.Tag == Select && haveLastReturnValue {
+					//is select and have return value
+					results, err := (*session).Query(sql)
 					if err != nil {
 						return err
+					}
+					err = Unmarshal(results, lastArgValue.Interface())
+					if err != nil {
+						return err
+					}
+				} else {
+					var res, err = (*session).Exec(sql)
+					if err != nil {
+						return err
+					}
+					if haveLastReturnValue {
+						if err != nil {
+							return err
+						} else {
+							lastArgValue.Elem().Set(reflect.ValueOf(res.RowsAffected))
+						}
 					}
 				}
 				//匹配完成退出
@@ -188,7 +176,8 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 				if result.(bool) {
 					//test表达式成立
 					if index == (len(andStrings) - 1) {
-						sql.WriteString(repleaceArg(v.DataString, param, DefaultSqlTypeConvertFunc))
+						var reps = repleaceArg(v.DataString, param, DefaultSqlTypeConvertFunc)
+						sql.WriteString(reps)
 					}
 				} else {
 					loopChildItem = false
@@ -205,7 +194,7 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 				if err != nil {
 					return tempTrimSql, err
 				}
-				var tempTrimSqlString = strings.Trim(strings.Trim(tempTrimSql.String()," "), suffixOverrides)
+				var tempTrimSqlString = strings.Trim(strings.Trim(tempTrimSql.String(), " "), suffixOverrides)
 				var newBuffer bytes.Buffer
 				newBuffer.WriteString(` `)
 				newBuffer.WriteString(prefix)
@@ -216,14 +205,14 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 				sql.Write(newBuffer.Bytes())
 				loopChildItem = false
 			}
-		} else if v.ElementType == Set {
+		} else if v.ElementType == Element_Set {
 			if v.ElementItems != nil && len(v.ElementItems) > 0 && loopChildItem {
 				var trim bytes.Buffer
 				trim, err = createFromElement(v.ElementItems, trim, param)
 				if err != nil {
 					return trim, err
 				}
-				var trimString = strings.Trim(strings.Trim(trim.String()," "), DefaultSuffixOverrides)
+				var trimString = strings.Trim(strings.Trim(trim.String(), " "), DefaultSuffixOverrides)
 				trim.Reset()
 				trim.WriteString(` `)
 				trim.WriteString(` set `)
@@ -263,10 +252,10 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 			newTempSql.WriteString(open)
 			newTempSql.Write(tempSql.Bytes())
 			newTempSql.WriteString(close)
-		    var	tempSqlString = strings.Trim(strings.Trim(newTempSql.String()," "), separator)
+			var tempSqlString = strings.Trim(strings.Trim(newTempSql.String(), " "), separator)
 			tempSql.Reset()
-		    tempSql.WriteString(` `)
-		    tempSql.WriteString(tempSqlString)
+			tempSql.WriteString(` `)
+			tempSql.WriteString(tempSqlString)
 			sql.Write(tempSql.Bytes())
 			loopChildItem = false
 		}

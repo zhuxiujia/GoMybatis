@@ -11,6 +11,7 @@ type Result struct {
 }
 
 type Session interface {
+	Id() string
 	Query(sqlorArgs string) ([]map[string][]byte, error)
 	Exec(sqlorArgs string) (Result, error)
 	Rollback() error
@@ -27,11 +28,15 @@ type SessionEngine interface {
 //本地直连session
 type LocalSqlSession struct {
 	Session
-	Id                     *string
+	SessionId              string
 	db                     *sql.DB
 	stmt                   *sql.Stmt
 	tx                     *sql.Tx
 	isCommitedOrRollbacked *bool
+}
+
+func (this *LocalSqlSession)Id() string  {
+	return this.SessionId
 }
 
 func (this *LocalSqlSession) Rollback() error {

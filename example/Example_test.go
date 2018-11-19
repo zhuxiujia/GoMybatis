@@ -49,11 +49,24 @@ func Test_main(t *testing.T) {
 	//设置对应的mapper xml文件
 	GoMybatis.UseProxyMapperBySessionEngine(&exampleActivityMapperImpl, bytes, engine)
 
+	//var se=*(*engine).NewSession()
+	//se.Begin()
 	//使用mapper
-	var result []Activity
-	exampleActivityMapperImpl.SelectByCondition("", time.Time{}, time.Time{}, 0, 2000, &result)
+	//var result []Activity
+	//exampleActivityMapperImpl.SelectByCondition("", time.Time{}, time.Time{}, 0, 2000, &result)
 
-	fmt.Println(result)
+	var update = Activity{
+		Id:   "170",
+		Name: "rs168-4",
+	}
+	var r int64 = 0
+	var e = exampleActivityMapperImpl.UpdateById(update, &r)
+	fmt.Println(r)
+	fmt.Println(e)
+
+	//se.Commit()
+	//se.Close()
+	//fmt.Println(result)
 }
 
 func Test_Remote_Transation(t *testing.T) {
@@ -66,7 +79,7 @@ func Test_Remote_Transation(t *testing.T) {
 	//本地连接
 	var err error
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
-	engine, err := GoMybatis.OpenRemote(addr,1) //远程服务地址
+	engine, err := GoMybatis.OpenRemote(addr, 1) //远程服务地址
 	if err != nil {
 		panic(err.Error())
 	}

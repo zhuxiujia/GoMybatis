@@ -28,7 +28,12 @@ func (this *RemoteSessionEngine) NewSession() *Session {
 
 type RemoteSession struct {
 	Session
+	SessionId string
 	Client *TransationRMClient
+}
+
+func (this *RemoteSession)Id() string {
+	return this.SessionId
 }
 
 func (this *RemoteSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
