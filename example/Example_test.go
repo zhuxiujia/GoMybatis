@@ -15,7 +15,7 @@ import (
 type ExampleActivityMapperImpl struct {
 	SelectAll         func(result *[]Activity) error
 	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int, result *[]Activity) error `mapperParams:"name,startTime,endTime,page,size"`
-	UpdateById        func(sessionId string, arg Activity, result *int64) error                                               `mapperParams:"sessionId"`
+	UpdateById        func(sessionId string, arg Activity, result *int64) error                                               `mapperParams:"sessionId"`  //如果要使用事务，请传入sessionId参数
 	Insert            func(arg Activity, result *int64) error
 	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error                            `mapperParams:"name,startTime,endTime"`
 }
