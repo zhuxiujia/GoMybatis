@@ -58,22 +58,23 @@ func Test_main(t *testing.T) {
 //本地事务使用例子
 func Test_local_Transation(t *testing.T) {
 	//初始化mapper文件
-	var exampleActivityMapperImpl = InitMapper()
+	exampleActivityMapperImpl := InitMapper()
 	//使用事务
-	var session = *GoMybatis.DefaultSessionFactory.NewSession()
+	session := *GoMybatis.DefaultSessionFactory.NewSession()
+	var sessionId = session.Id()
 	session.Begin() //开启事务
 	var activityBean = Activity{
 		Id:   "170",
-		Name: "rs168-4",
+		Name: "rs168-6",
 	}
 	var updateNum int64 = 0
-	var e = exampleActivityMapperImpl.UpdateById(session.Id(), activityBean, &updateNum)
+	var e = exampleActivityMapperImpl.UpdateById(sessionId, activityBean, &updateNum)
 	fmt.Println("updateNum=", updateNum)
 	if e != nil {
 		fmt.Println(e)
 	}
-	session.Commit()                                           //提交事务
-	GoMybatis.DefaultSessionFactory.CloseSession(session.Id()) //关闭事务
+	session.Commit() //提交事务
+	session.Close()  //关闭事务
 }
 
 func Test_Remote_Transation(t *testing.T) {
@@ -87,11 +88,13 @@ func Test_Remote_Transation(t *testing.T) {
 	var exampleActivityMapperImpl = InitMapper()
 
 	//使用mapper
-	var err error
-	var result []Activity
-	err = exampleActivityMapperImpl.SelectByCondition("", time.Time{}, time.Time{}, 0, 2000, &result)
+	var activityBean = Activity{
+		Id:   "170",
+		Name: "rs168-4",
+	}
+	var updateNum int64 = 0
+	var err = exampleActivityMapperImpl.UpdateById("", activityBean, &updateNum)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(result)
 }
