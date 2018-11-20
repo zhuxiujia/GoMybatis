@@ -1,47 +1,68 @@
 package GoMybatis
 
 import (
-	"github.com/zhuxiujia/GoMybatis/utils"
 	"errors"
+	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
-type TransationRMServerSession struct {
+type TransationRMSession struct {
 	Session
-	SessionId string
-	Client *TransationRMClient
+	TransactionId string
+	OwnerId       string
+	Client        *TransationRMClient
+	Status        Transaction_Status //默认0，非事务
 }
 
-func (this *TransationRMServerSession)Id() string {
-	return this.SessionId
+func (this TransationRMSession) New(TransactionId string, Client *TransationRMClient, Status Transaction_Status) *Session {
+	this.OwnerId = utils.CreateUUID()
+	this.TransactionId = TransactionId
+	this.Client = Client
+	this.Status = Status
+	var Session = Session(&this)
+	return &Session
 }
 
-func (this *TransationRMServerSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
+func (this *TransationRMSession) Id() string {
+	return this.TransactionId
+}
+
+func (this *TransationRMSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	var result TransactionRspDTO
-	var error = this.Client.Call(TransactionReqDTO{Status: Transaction_Status_NO, TransactionId: utils.CreateUUID(), Sql: sqlorArgs, ActionType: ActionType_Query,}, &result)
+	var error = this.Client.Call(TransactionReqDTO{Status: this.Status, TransactionId: this.TransactionId, Sql: sqlorArgs, ActionType: ActionType_Query, OwnerId: this.OwnerId}, &result)
 	if error == nil && result.Error != "" {
 		error = errors.New(result.Error)
 	}
 	return result.Query, error
 }
-func (this *TransationRMServerSession) Exec(sqlorArgs string) (*Result, error) {
+
+func (this *TransationRMSession) Exec(sqlorArgs string) (*Result, error) {
 	var result TransactionRspDTO
-	var error = this.Client.Call(TransactionReqDTO{Status: Transaction_Status_NO, TransactionId: utils.CreateUUID(), Sql: sqlorArgs, ActionType: ActionType_Exec,}, &result)
+	var error = this.Client.Call(TransactionReqDTO{Status: this.Status, TransactionId: this.TransactionId, Sql: sqlorArgs, ActionType: ActionType_Exec, OwnerId: this.OwnerId}, &result)
 	if error == nil && result.Error != "" {
 		error = errors.New(result.Error)
 	}
 	return &result.Exec, error
 }
-func (this *TransationRMServerSession) Rollback() error {
-	panic("[RemoteSession] not alow local Rollback()")
-	return nil
+
+func (this *TransationRMSession) Rollback() error {
+	this.Status = Transaction_Status_Rollback
+	var result TransactionRspDTO
+	return this.Client.Call(TransactionReqDTO{Status: this.Status, TransactionId: this.TransactionId, ActionType: ActionType_Exec, OwnerId: this.OwnerId}, &result)
 }
-func (this *TransationRMServerSession) Commit() error {
-	panic("[RemoteSession] not alow local Commit()")
-	return nil
+
+func (this *TransationRMSession) Commit() error {
+	this.Status = Transaction_Status_Commit
+	var result TransactionRspDTO
+	return this.Client.Call(TransactionReqDTO{Status: this.Status, TransactionId: this.TransactionId, ActionType: ActionType_Exec, OwnerId: this.OwnerId}, &result)
 }
-func (this *TransationRMServerSession) Begin() error {
-	panic("[RemoteSession] not alow local Begin()")
-	return nil
+
+func (this *TransationRMSession) Begin() error {
+	this.Status = Transaction_Status_Prepare
+	var result TransactionRspDTO
+	var err = this.Client.Call(TransactionReqDTO{Status: this.Status, ActionType: ActionType_Exec, OwnerId: this.OwnerId}, &result)
+	this.TransactionId = result.TransactionId
+	return err
 }
-func (this *TransationRMServerSession) Close() {
+
+func (this *TransationRMSession) Close() {
 }

@@ -44,8 +44,8 @@ func (TestPropertyServiceA) Add(transactionId string, id string, amt int) error 
 	//todo proxy send error
 	var dto = TransactionReqDTO{
 		TransactionId: transactionId,
-		OwnerId:OwnerId,
-		Status:        Transaction_Status_Pause,
+		OwnerId:       OwnerId,
+		Status:        Transaction_Status_Prepare,
 		ActionType:    ActionType_Exec,
 		Sql:           sql,
 	}
@@ -65,8 +65,8 @@ func (TestPropertyServiceB) Reduce(transactionId string, id string, amt int) err
 	//todo proxy send error
 	var dto = TransactionReqDTO{
 		TransactionId: transactionId,
-		OwnerId:OwnerId,
-		Status:        Transaction_Status_Pause,
+		OwnerId:       OwnerId,
+		Status:        Transaction_Status_Prepare,
 		ActionType:    ActionType_Exec,
 		Sql:           sql,
 	}
@@ -87,8 +87,8 @@ func (this TestOrderService) Transform(transactionId string, outid string, inId 
 	var OwnerId = utils.CreateUUID()
 	var dto = TransactionReqDTO{
 		TransactionId: transactionId,
-		OwnerId:OwnerId,
-		Status:        Transaction_Status_Pause,
+		OwnerId:       OwnerId,
+		Status:        Transaction_Status_Prepare,
 		ActionType:    ActionType_Exec,
 		Sql:           "",
 	}

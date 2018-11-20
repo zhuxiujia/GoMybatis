@@ -2,9 +2,8 @@ package GoMybatis
 
 import (
 	"testing"
-	"github.com/zhuxiujia/GoMybatis/utils"
-	"fmt"
 	"github.com/zhuxiujia/GoMybatis/example"
+	"fmt"
 )
 
 func TestTransationRM(t *testing.T) {
@@ -16,14 +15,29 @@ func TestTransationRM(t *testing.T) {
 		Addr:      addr,
 	}
 
-	var result TransactionRspDTO
+	var transationRMServerSession = TransationRMSession{
+		Client:&TransationRMClient,
+		OwnerId:"1234",
+	}
 
-	var TransactionId = utils.CreateUUID() //服务站点事务
+	var e error
 
-	TransationRMClient.Call(TransactionReqDTO{Status: Transaction_Status_Pause, TransactionId: TransactionId, Sql: "", ActionType: ActionType_Exec,}, &result)
+  	e=transationRMServerSession.Begin()
+    if e!=nil{
+    	panic(e)
+	}
 
-	TransationRMClient.Call(TransactionReqDTO{Status: Transaction_Status_Rollback, TransactionId: TransactionId, Sql: "", ActionType: ActionType_Exec,}, &result)
+	result,e:=transationRMServerSession.Exec("UPDATE `test`.`biz_activity` SET `name`='rs168-10' WHERE `id`='170';")
+	if e!=nil{
+		panic(e)
+	}
 
 	fmt.Println(result)
 
+
+
+	e=transationRMServerSession.Commit()
+	if e!=nil{
+		panic(e)
+	}
 }

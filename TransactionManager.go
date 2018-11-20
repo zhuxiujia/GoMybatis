@@ -8,10 +8,10 @@ import (
 type Transaction_Status int
 
 const (
-	Transaction_Status_NO       Transaction_Status = iota - 1 //非事务
-	Transaction_Status_Pause                                  //暂停
-	Transaction_Status_Commit                                 //提交事务
-	Transaction_Status_Rollback                               //回滚事务
+	Transaction_Status_NO       Transaction_Status = iota //非事务
+	Transaction_Status_Prepare                            //准备事务
+	Transaction_Status_Commit                             //提交事务
+	Transaction_Status_Rollback                           //回滚事务
 )
 
 type ActionType int
@@ -56,9 +56,9 @@ func (this DefaultTransationManager) New(SessionFactory *SessionFactory, Transac
 }
 
 func (this DefaultTransationManager) GetTransaction(def *TransactionDefinition, transactionId string, OwnerId string) (*TransactionStatus, error) {
-	if transactionId == "" {
-		return nil, errors.New("[TransactionManager] transactionId =" + transactionId + " transations is nil!")
-	}
+	//if transactionId == "" {
+	//	return nil, errors.New("[TransactionManager] transactionId =" + transactionId + " transations is nil!")
+	//}
 	if def == nil {
 		var d = TransactionDefinition{}.Default()
 		def = &d
@@ -68,7 +68,6 @@ func (this DefaultTransationManager) GetTransaction(def *TransactionDefinition, 
 		//todo doBegin
 		if transationStatus.IsNewTransaction {
 			//新事务，则调用begin
-			transationStatus.IsNewTransaction = false
 			transationStatus.OwnerId = OwnerId
 			var err = transationStatus.Begin()
 			if err != nil {
@@ -96,33 +95,28 @@ func (this DefaultTransationManager) Rollback(transactionId string) error {
 
 //执行事务
 func (this DefaultTransationManager) DoTransaction(dto TransactionReqDTO) TransactionRspDTO {
-	if dto.TransactionId == "" {
-		return TransactionRspDTO{
-			TransactionId: dto.TransactionId,
-			Error:         "[TransactionManager] arg TransactionId can no be null!",
-		}
-	}
 	var transcationStatus *TransactionStatus
 	var err error
-	if dto.Status != Transaction_Status_NO {
-		transcationStatus, err = this.GetTransaction(nil, dto.TransactionId, dto.OwnerId)
-		if err != nil {
-			return TransactionRspDTO{
-				TransactionId: dto.TransactionId,
-				Error:         err.Error(),
-			}
+
+	transcationStatus, err = this.GetTransaction(nil, dto.TransactionId, dto.OwnerId)
+	dto.TransactionId = (*transcationStatus.Transaction.Session).Id()
+	if err != nil {
+		return TransactionRspDTO{
+			TransactionId: dto.TransactionId,
+			Error:         err.Error(),
 		}
 	}
+	log.Println("[TransactionManager] transactionId=", dto.TransactionId)
+
 	if dto.Status == Transaction_Status_NO {
-		var status=this.TransactionFactory.GetTransactionStatus(dto.TransactionId)
-		defer status.Flush() //非事务执行
-		return this.DoAction(dto, status)
-	} else if dto.Status == Transaction_Status_Pause {
+		defer transcationStatus.Flush() //关闭
+		return this.DoAction(dto, transcationStatus)
+	} else if dto.Status == Transaction_Status_Prepare {
 		return this.DoAction(dto, transcationStatus)
 	} else if dto.Status == Transaction_Status_Commit {
 		if transcationStatus.OwnerId == dto.OwnerId { //PROPAGATION_REQUIRED 情况下 子事务 不可提交
+			defer transcationStatus.Flush() //关闭
 			err = transcationStatus.Commit()
-			this.TransactionFactory.GetTransactionStatus(dto.TransactionId).Flush()
 			if err != nil {
 				return TransactionRspDTO{
 					TransactionId: dto.TransactionId,
@@ -132,18 +126,24 @@ func (this DefaultTransationManager) DoTransaction(dto TransactionReqDTO) Transa
 			this.TransactionFactory.GetTransactionStatus(dto.TransactionId).Flush()
 		}
 	} else if dto.Status == Transaction_Status_Rollback {
+		defer transcationStatus.Flush() //关闭，//PROPAGATION_REQUIRED 情况下 子事务 可关闭
 		err = transcationStatus.Rollback()
-		this.TransactionFactory.GetTransactionStatus(dto.TransactionId).Flush()
 		if err != nil {
 			return TransactionRspDTO{
 				TransactionId: dto.TransactionId,
 				Error:         err.Error(),
 			}
 		}
+	} else {
+		err = errors.New("[TransactionManager] arg have no action!")
+	}
+	var errString = ""
+	if err != nil {
+		errString = err.Error()
 	}
 	return TransactionRspDTO{
 		TransactionId: dto.TransactionId,
-		Error:         "[TransactionManager] arg have no action!",
+		Error:         errString,
 	}
 }
 

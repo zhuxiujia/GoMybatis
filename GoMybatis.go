@@ -4,11 +4,7 @@ import (
 	"strings"
 	"reflect"
 	"errors"
-	"fmt"
 )
-
-const SessionIdKey = "sessionId"
-
 //如果使用UseProxyMapperByEngine，则内建默认的SessionFactory
 var DefaultSessionFactory SessionFactory
 
@@ -95,21 +91,15 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *Ses
 			if strings.EqualFold(mapperXml.Id, method) {
 				findMethod = true
 				//build sql string
+				var session *Session
 				var sql string
 				var err error
-				sql, err = buildSql(paramMap, args, mapperXml)
+				session,sql, err = buildSql(paramMap, args, mapperXml)
 				if err != nil {
 					return err
 				}
 				//session
-				var session *Session
-				var sessionId = paramMap[SessionIdKey]
-				if sessionId != nil && sessionId.(string) != "" {
-					session = sessionFactory.GetSession(sessionId.(string))
-					if session == nil {
-						return errors.New("[GoMybatis] session is nil! sessionId=" + fmt.Sprint(sessionId))
-					}
-				} else {
+				if session == nil  {
 					session = sessionFactory.NewSession()
 				}
 				var haveLastReturnValue = lastArgValue != nil && (*lastArgValue).IsNil() == false
@@ -133,7 +123,7 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *Ses
 						lastArgValue.Elem().SetInt(res.RowsAffected)
 					}
 				}
-				if sessionId == nil {
+				if session == nil {
 					sessionFactory.CloseSession((*session).Id())
 				}
 				//匹配完成退出
@@ -148,10 +138,14 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *Ses
 	UseMapperValue(bean, proxyFunc)
 }
 
-func buildSql(paramMap map[string]interface{}, args []reflect.Value, mapperXml MapperXml) (string, error) {
+func buildSql(paramMap map[string]interface{}, args []reflect.Value, mapperXml MapperXml) (*Session,string, error) {
+	var session *Session
 	for _, arg := range args {
-		if arg.Kind() == reflect.Ptr {
-			//指针，则退出
+		 if  arg.Kind() == reflect.Ptr {
+			 if arg.Type().String()=="*GoMybatis.Session"{
+				 //指针，则退出
+				 session=arg.Interface().(*Session)
+			 }
 			continue
 		}
 		if arg.Kind() == reflect.Struct && arg.Type().String() != `time.Time` {
@@ -160,7 +154,8 @@ func buildSql(paramMap map[string]interface{}, args []reflect.Value, mapperXml M
 			paramMap[DefaultOneArg] = arg.Interface()
 		}
 	}
-	return BuildSqlFromMap(paramMap, mapperXml)
+	result,err:=BuildSqlFromMap(paramMap, mapperXml)
+	return session,result,err
 }
 
 //scan params

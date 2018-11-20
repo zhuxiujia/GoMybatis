@@ -20,7 +20,7 @@ func (this RemoteSessionEngine) New(Client *TransationRMClient) RemoteSessionEng
 }
 
 func (this *RemoteSessionEngine) NewSession() *Session {
-	var TransationSession = TransationRMServerSession{Client: this.Client}
+	var TransationSession = TransationRMSession{Client: this.Client}
 	var session = Session(&TransationSession)
 	return &session
 }

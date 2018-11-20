@@ -1,21 +1,21 @@
 package GoMybatis
 
 import (
-	"net/rpc"
 	"net"
 	"log"
 	"github.com/hashicorp/net-rpc-msgpackrpc"
 	_ "github.com/go-sql-driver/mysql"
+	"net/rpc"
 )
 
 type TransationRMServer struct {
 	DefaultTransationManager *DefaultTransationManager
 }
 
-func (this TransationRMServer) Msg(arg TransactionReqDTO, result *TransactionRspDTO) error {
+func (this TransationRMServer) Msg(arg TransactionReqDTO, result *TransactionRspDTO) (err error) {
 	defer func() {
 		if err := recover(); err != nil {
-			log.Println("work failed:", err)
+			log.Println("[TransationRMServer]work failed:", err)
 		}
 	}()
 	var rsp=this.DefaultTransationManager.DoTransaction(arg)
@@ -44,7 +44,7 @@ func ServerTcp(addr string, driverName, dataSourceName string) {
 
 	l, e := net.Listen("tcp", tcpUrl)
 	if e != nil {
-		log.Fatalf("net rpc.Listen tcp :0: %v", e)
+		log.Fatalf("[TransationRMServer]net rpc.Listen tcp :0: %v", e)
 		panic(e)
 	}
 	for {
