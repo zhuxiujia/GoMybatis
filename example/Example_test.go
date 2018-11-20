@@ -20,7 +20,7 @@ type ExampleActivityMapperImpl struct {
 	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error                            `mapperParams:"name,startTime,endTime"`
 }
 
-func InitExample_ActivityMapper() ExampleActivityMapperImpl {
+func InitMapper() ExampleActivityMapperImpl {
 	var err error
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
 	engine, err := GoMybatis.Open("mysql", MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
@@ -44,7 +44,7 @@ func InitExample_ActivityMapper() ExampleActivityMapperImpl {
 //本地GoMybatis使用例子
 func Test_main(t *testing.T) {
 	//初始化mapper文件
-	var exampleActivityMapperImpl = InitExample_ActivityMapper()
+	var exampleActivityMapperImpl = InitMapper()
 	//使用mapper
 	var result []Activity
 	exampleActivityMapperImpl.SelectByCondition("", time.Time{}, time.Time{}, 0, 2000, &result)
@@ -53,7 +53,7 @@ func Test_main(t *testing.T) {
 //本地事务使用例子
 func Test_local_Transation(t *testing.T) {
 	//初始化mapper文件
-	var exampleActivityMapperImpl = InitExample_ActivityMapper()
+	var exampleActivityMapperImpl = InitMapper()
 	//使用事务
 	var session = *GoMybatis.DefaultSessionFactory.NewSession()
 	session.Begin()//开启事务
@@ -79,7 +79,7 @@ func Test_Remote_Transation(t *testing.T) {
 	time.Sleep(time.Second)
 
 	//初始化mapper文件
-	var exampleActivityMapperImpl = InitExample_ActivityMapper()
+	var exampleActivityMapperImpl = InitMapper()
 
 	//使用mapper
 	var err error
