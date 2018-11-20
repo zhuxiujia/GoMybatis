@@ -42,7 +42,7 @@ func (this *LocalSqlSession) Id() string {
 
 func (this *LocalSqlSession) Rollback() error {
 	if this.isClosed == true{
-		return errors.New("[Session] can not Rollback() a Closed Session!")
+		return errors.New("[LocalSqlSession] can not Rollback() a Closed Session!")
 	}
 	if this.tx != nil {
 		var err = this.tx.Rollback()
@@ -57,7 +57,7 @@ func (this *LocalSqlSession) Rollback() error {
 
 func (this *LocalSqlSession) Commit() error {
 	if this.isClosed == true{
-		return errors.New("[Session] can not Commit() a Closed Session!")
+		return errors.New("[LocalSqlSession] can not Commit() a Closed Session!")
 	}
 	if this.tx != nil {
 		var err = this.tx.Commit()
@@ -70,7 +70,7 @@ func (this *LocalSqlSession) Commit() error {
 
 func (this *LocalSqlSession) Begin() error {
 	if this.isClosed == true{
-		return errors.New("[Session] can not Begin() a Closed Session!")
+		return errors.New("[LocalSqlSession] can not Begin() a Closed Session!")
 	}
 	if this.tx == nil {
 		var tx, err = this.db.Begin()
@@ -102,7 +102,7 @@ func (this *LocalSqlSession) Close() {
 
 func (this *LocalSqlSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	if this.isClosed == true{
-		return nil,errors.New("[Session] can not Query() a Closed Session!")
+		return nil,errors.New("[LocalSqlSession] can not Query() a Closed Session!")
 	}
 	var rows *sql.Rows
 	var err error
@@ -122,13 +122,13 @@ func (this *LocalSqlSession) Query(sqlorArgs string) ([]map[string][]byte, error
 
 func (this *LocalSqlSession) Exec(sqlorArgs string) (*Result, error) {
 	if this.isClosed == true{
-		return nil,errors.New("[Session] can not Exec() a Closed Session!")
+		return nil,errors.New("[LocalSqlSession] can not Exec() a Closed Session!")
 	}
 	var result sql.Result
 	var err error
 	if this.tx != nil {
 		if this.isCommitedOrRollbacked {
-			return nil, errors.New("Exec sql fail!, session isCommitedOrRollbacked!")
+			return nil, errors.New("[LocalSqlSession] Exec() sql fail!, session isCommitedOrRollbacked!")
 		}
 		result, err = this.tx.Exec(sqlorArgs)
 	} else {
