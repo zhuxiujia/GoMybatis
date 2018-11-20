@@ -65,7 +65,7 @@ func Test_local_Transation(t *testing.T) {
 	session.Begin() //开启事务
 	var activityBean = Activity{
 		Id:   "170",
-		Name: "rs168-6",
+		Name: "rs168-8",
 	}
 	var updateNum int64 = 0
 	var e = exampleActivityMapperImpl.UpdateById(sessionId, activityBean, &updateNum)

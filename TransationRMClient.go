@@ -44,13 +44,13 @@ func (this *RemoteSession) Query(sqlorArgs string) ([]map[string][]byte, error) 
 	}
 	return result.Query, error
 }
-func (this *RemoteSession) Exec(sqlorArgs string) (Result, error) {
+func (this *RemoteSession) Exec(sqlorArgs string) (*Result, error) {
 	var result TransactionRspDTO
 	var error = this.Client.Call(TransactionReqDTO{Status: Transaction_Status_NO, TransactionId: utils.CreateUUID(), Sql: sqlorArgs, ActionType: ActionType_Exec,}, &result)
 	if error == nil && result.Error != "" {
 		error = errors.New(result.Error)
 	}
-	return result.Exec, error
+	return &result.Exec, error
 }
 func (this *RemoteSession) Rollback() error {
 	panic("[RemoteSession] not alow local Rollback()")

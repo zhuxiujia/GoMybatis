@@ -171,7 +171,7 @@ func (this DefaultTransationManager) DoAction(dto TransactionReqDTO, transcation
 		}
 		var TransactionRspDTO = TransactionRspDTO{
 			TransactionId: dto.TransactionId,
-			Exec:          res,
+			Exec:          *res,
 			Error:         err,
 		}
 		return TransactionRspDTO

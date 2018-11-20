@@ -19,11 +19,9 @@ type MysqlEngine struct {
 func (this MysqlEngine) NewSession() *Session {
 	uuids, _ := uuid.NewV4()
 	var uuidstrig = uuids.String()
-	var isCommitedOrRollbacked = false
 	var mysqlLocalSession = LocalSqlSession{
 		SessionId:              uuidstrig,
 		db:                     this.DB,
-		isCommitedOrRollbacked: &isCommitedOrRollbacked,
 	}
 	var session = Session(&mysqlLocalSession)
 	return &session
