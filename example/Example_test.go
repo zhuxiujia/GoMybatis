@@ -20,14 +20,14 @@ type ExampleActivityMapperImpl struct {
 	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error                            `mapperParams:"name,startTime,endTime"`
 }
 
-func Test_main(t *testing.T) {
+func InitExample_ActivityMapper() ExampleActivityMapperImpl {
 	var err error
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
 	engine, err := GoMybatis.Open("mysql", MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
 	if err != nil {
 		panic(err.Error())
 	}
-	//engine.ShowSQL()
+	//读取mapper xml文件
 	file, err := os.Open("Example_ActivityMapper.xml")
 	if err != nil {
 		panic(err)
@@ -38,30 +38,37 @@ func Test_main(t *testing.T) {
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	//设置对应的mapper xml文件
 	GoMybatis.UseProxyMapperByEngine(&exampleActivityMapperImpl, bytes, engine)
+	return exampleActivityMapperImpl
+}
 
-
-
+//本地GoMybatis使用例子
+func Test_main(t *testing.T) {
+	//初始化mapper文件
+	var exampleActivityMapperImpl = InitExample_ActivityMapper()
 	//使用mapper
 	var result []Activity
 	exampleActivityMapperImpl.SelectByCondition("", time.Time{}, time.Time{}, 0, 2000, &result)
+}
 
-
-
+//本地事务使用例子
+func Test_local_Transation(t *testing.T) {
+	//初始化mapper文件
+	var exampleActivityMapperImpl = InitExample_ActivityMapper()
 	//使用事务
-	var se = GoMybatis.DefaultSessionFactory.NewSession()
-	(*se).Begin()
-	defer GoMybatis.DefaultSessionFactory.CloseSession((*se).Id())//不要忘记关闭
-	var update = Activity{
+	var session = *GoMybatis.DefaultSessionFactory.NewSession()
+	session.Begin()//开启事务
+	var activityBean = Activity{
 		Id:   "170",
 		Name: "rs168-4",
 	}
-	var r int64 = 0
-	var e = exampleActivityMapperImpl.UpdateById((*se).Id(), update, &r)
-	fmt.Println(r)
-	if e!=nil{
+	var updateNum int64 = 0
+	var e = exampleActivityMapperImpl.UpdateById(session.Id(), activityBean, &updateNum)
+	fmt.Println("updateNum=",updateNum)
+	if e != nil {
 		fmt.Println(e)
 	}
-	(*se).Commit()
+	session.Commit()//提交事务
+	GoMybatis.DefaultSessionFactory.CloseSession(session.Id())//关闭事务
 }
 
 func Test_Remote_Transation(t *testing.T) {
@@ -71,26 +78,11 @@ func Test_Remote_Transation(t *testing.T) {
 
 	time.Sleep(time.Second)
 
-	//本地连接
-	var err error
-	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
-	engine, err := GoMybatis.OpenRemote(addr, 1) //远程服务地址
-	if err != nil {
-		panic(err.Error())
-	}
-	//engine.ShowSQL()
-	file, err := os.Open("Example_ActivityMapper.xml")
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-
-	bytes, _ := ioutil.ReadAll(file)
-	var exampleActivityMapperImpl ExampleActivityMapperImpl
-	//设置对应的mapper xml文件
-	GoMybatis.UseProxyMapperBySessionEngine(&exampleActivityMapperImpl, bytes, engine)
+	//初始化mapper文件
+	var exampleActivityMapperImpl = InitExample_ActivityMapper()
 
 	//使用mapper
+	var err error
 	var result []Activity
 	err = exampleActivityMapperImpl.SelectByCondition("", time.Time{}, time.Time{}, 0, 2000, &result)
 	if err != nil {
