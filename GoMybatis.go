@@ -141,7 +141,7 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *Ses
 			}
 		}
 		if findMethod == false {
-			return errors.New(`[not method find at xml file],method =` + method)
+			return errors.New(`[GoMybatis] not method find at xml file,method =` + method)
 		}
 		return nil
 	}
@@ -169,7 +169,7 @@ func scanParamterBean(arg interface{}, typeConvert func(arg interface{}) interfa
 	v := reflect.ValueOf(arg)
 	t := reflect.TypeOf(arg)
 	if t.Kind() != reflect.Struct {
-		panic(`the scanParamterBean() arg is not a struct type!,type =` + t.String())
+		panic(`[GoMybatis] the scanParamterBean() arg is not a struct type!,type =` + t.String())
 	}
 	for i := 0; i < t.NumField(); i++ {
 		var typeValue = t.Field(i)
