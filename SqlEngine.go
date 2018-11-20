@@ -35,7 +35,7 @@ type LocalSqlSession struct {
 	isCommitedOrRollbacked *bool
 }
 
-func (this *LocalSqlSession)Id() string  {
+func (this *LocalSqlSession) Id() string {
 	return this.SessionId
 }
 

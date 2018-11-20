@@ -9,12 +9,13 @@ import (
 	"io/ioutil"
 	"github.com/zhuxiujia/GoMybatis"
 )
+
 //定义mapper文件的接口和结构体，也可以只定义结构体就行
 //mapper.go文件 函数必须为2个参数（第一个为自定义结构体参数（属性必须大写），第二个为指针类型的返回数据） error 为返回错误
 type ExampleActivityMapperImpl struct {
 	SelectAll         func(result *[]Activity) error
 	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int, result *[]Activity) error `mapperParams:"name,startTime,endTime,page,size"`
-	UpdateById        func(arg Activity, result *int64) error
+	UpdateById        func(sessionId string, arg Activity, result *int64) error                                               `mapperParams:"sessionId"`
 	Insert            func(arg Activity, result *int64) error
 	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error                            `mapperParams:"name,startTime,endTime"`
 }
@@ -36,26 +37,31 @@ func Test_main(t *testing.T) {
 	bytes, _ := ioutil.ReadAll(file)
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	//设置对应的mapper xml文件
-	GoMybatis.UseProxyMapperBySessionEngine(&exampleActivityMapperImpl, bytes, engine)
+	GoMybatis.UseProxyMapperByEngine(&exampleActivityMapperImpl, bytes, engine)
 
-	//var se=*(*engine).NewSession()
-	//se.Begin()
+
+
 	//使用mapper
-	//var result []Activity
-	//exampleActivityMapperImpl.SelectByCondition("", time.Time{}, time.Time{}, 0, 2000, &result)
+	var result []Activity
+	exampleActivityMapperImpl.SelectByCondition("", time.Time{}, time.Time{}, 0, 2000, &result)
 
+
+
+	//使用事务
+	var se = GoMybatis.DefaultSessionFactory.NewSession()
+	(*se).Begin()
+	defer GoMybatis.DefaultSessionFactory.CloseSession((*se).Id())//不要忘记关闭
 	var update = Activity{
 		Id:   "170",
 		Name: "rs168-4",
 	}
 	var r int64 = 0
-	var e = exampleActivityMapperImpl.UpdateById(update, &r)
+	var e = exampleActivityMapperImpl.UpdateById((*se).Id(), update, &r)
 	fmt.Println(r)
-	fmt.Println(e)
-
-	//se.Commit()
-	//se.Close()
-	//fmt.Println(result)
+	if e!=nil{
+		fmt.Println(e)
+	}
+	(*se).Commit()
 }
 
 func Test_Remote_Transation(t *testing.T) {

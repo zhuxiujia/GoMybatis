@@ -19,7 +19,7 @@ func (this *TransactionFactory) GetTransactionStatus(transactionId string) *Tran
 	if result == nil {
 		var transaction = Transaction{
 			Id:transactionId,
-			Session:this.SessionFactory.GetSession(),
+			Session:this.SessionFactory.NewSession(),
 		}
 		var transactionStatus = TransactionStatus{
 			IsNewTransaction:true,

@@ -4,7 +4,13 @@ import (
 	"strings"
 	"reflect"
 	"errors"
+	"fmt"
 )
+
+const SessionIdKey = "sessionId"
+
+//如果使用UseProxyMapperByEngine，则内建默认的SessionFactory
+var DefaultSessionFactory SessionFactory
 
 //bean 工厂，根据xml配置创建函数,并且动态代理到你定义的struct func里
 //bean 参数必须为指针类型,指向你定义的struct
@@ -19,7 +25,29 @@ import (
 //func的参数支持2种函数，第一种函数 基本参数个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
 //func的参数支持2种函数，第二种函数第一个参数必须为结构体(例如 arg model.User,该结构体的属性可以指定tag `json:"xxx"`为参数名称),最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
 //使用UseProxyMapper函数设置代理后即可正常使用。
-func UseProxyMapper(bean interface{}, xml []byte, sqlEngine *SessionEngine) {
+func UseProxyMapperByEngine(bean interface{}, xml []byte, sqlEngine *SessionEngine) {
+	v := reflect.ValueOf(bean)
+	if v.Kind() != reflect.Ptr {
+		panic("UseMapper: UseMapper arg must be a pointer")
+	}
+	DefaultSessionFactory = SessionFactory{}.New(sqlEngine)
+	UseProxyMapperFromValue(v, xml, &DefaultSessionFactory)
+}
+
+//bean 工厂，根据xml配置创建函数,并且动态代理到你定义的struct func里
+//bean 参数必须为指针类型,指向你定义的struct
+//你定义的struct必须有可导出的func属性,例如：
+//type MyUserMapperImpl struct {
+//	UserMapper                                                 `mapperPath:"/mapper/user/UserMapper.xml"`
+//	SelectById    func(id string, result *model.User) error    `mapperParams:"id"`
+//	SelectByPhone func(id string, phone string, result *model.User) error `mapperParams:"id,phone"`
+//	DeleteById    func(id string, result *int64) error         `mapperParams:"id"`
+//	Insert        func(arg model.User, result *int64) error
+//}
+//func的参数支持2种函数，第一种函数 基本参数个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
+//func的参数支持2种函数，第二种函数第一个参数必须为结构体(例如 arg model.User,该结构体的属性可以指定tag `json:"xxx"`为参数名称),最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
+//使用UseProxyMapper函数设置代理后即可正常使用。
+func UseProxyMapperByFactory(bean interface{}, xml []byte, sqlEngine *SessionFactory) {
 	v := reflect.ValueOf(bean)
 	if v.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
@@ -40,7 +68,7 @@ func UseProxyMapper(bean interface{}, xml []byte, sqlEngine *SessionEngine) {
 //func的参数支持2种函数，第一种函数 基本参数个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
 //func的参数支持2种函数，第二种函数第一个参数必须为结构体(例如 arg model.User,该结构体的属性可以指定tag `json:"xxx"`为参数名称),最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
 //使用UseProxyMapper函数设置代理后即可正常使用。
-func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionEngine *SessionEngine) {
+func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *SessionFactory) {
 	var mapperTree = LoadMapperXml(xml)
 	var proxyFunc = func(method string, args []reflect.Value, tagParams []string) error {
 		var lastArgsIndex = len(args) - 1
@@ -69,21 +97,21 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionEngine *Sess
 				//build sql string
 				var sql string
 				var err error
-				if tagParamsLen != 0 {
-					sql, err = BuildSqlFromMap(paramMap, mapperXml)
-				} else if tagParamsLen == 0 && argsLen == 0 {
-					sql, err = BuildSqlFromMap(paramMap, mapperXml)
-				} else {
-					sql, err = buildSql(args, mapperXml)
-				}
+				sql, err = buildSql(paramMap, args, mapperXml)
 				if err != nil {
 					return err
 				}
 				//session
 				var session *Session
-				session = (*sessionEngine).NewSession()
-				defer (*session).Close()
-
+				var sessionId = paramMap[SessionIdKey]
+				if sessionId != nil {
+					session = sessionFactory.GetSession(sessionId.(string))
+					if session == nil {
+						return errors.New("[GoMybatis] session is nil! sessionId=" + fmt.Sprint(sessionId))
+					}
+				} else {
+					session = sessionFactory.NewSession()
+				}
 				var haveLastReturnValue = lastArgValue != nil && (*lastArgValue).IsNil() == false
 				//do CRUD
 				if mapperXml.Tag == Select && haveLastReturnValue {
@@ -105,6 +133,9 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionEngine *Sess
 						lastArgValue.Elem().SetInt(res.RowsAffected)
 					}
 				}
+				if sessionId == nil {
+					sessionFactory.CloseSession((*session).Id())
+				}
 				//匹配完成退出
 				break
 			}
@@ -117,23 +148,20 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionEngine *Sess
 	UseMapperValue(bean, proxyFunc)
 }
 
-
-func buildSql(args []reflect.Value, mapperXml MapperXml) (string, error) {
-	var params = make(map[string]interface{})
-	for _,arg:=range args  {
-		if arg.Kind()==reflect.Ptr{
+func buildSql(paramMap map[string]interface{}, args []reflect.Value, mapperXml MapperXml) (string, error) {
+	for _, arg := range args {
+		if arg.Kind() == reflect.Ptr {
 			//指针，则退出
 			continue
 		}
 		if arg.Kind() == reflect.Struct && arg.Type().String() != `time.Time` {
-			params = scanParamterBean(arg.Interface(), nil)
+			paramMap = scanParamterBean(arg.Interface(), nil)
 		} else {
-			params[DefaultOneArg] = arg.Interface()
+			paramMap[DefaultOneArg] = arg.Interface()
 		}
 	}
-	return BuildSqlFromMap(params, mapperXml)
+	return BuildSqlFromMap(paramMap, mapperXml)
 }
-
 
 //scan params
 func scanParamterBean(arg interface{}, typeConvert func(arg interface{}) interface{}) map[string]interface{} {
