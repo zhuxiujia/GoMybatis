@@ -19,7 +19,7 @@ type MysqlEngine struct {
 func (this MysqlEngine) NewSession() *Session {
 	uuids, _ := uuid.NewV4()
 	var uuidstrig = uuids.String()
-	var mysqlLocalSession = LocalSqlSession{
+	var mysqlLocalSession = LocalSession{
 		SessionId:              uuidstrig,
 		db:                     this.DB,
 	}

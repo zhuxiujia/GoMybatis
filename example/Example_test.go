@@ -68,7 +68,7 @@ func Test_local_Transation(t *testing.T) {
 		Name: "rs168-8",
 	}
 	var updateNum int64 = 0
-	var e = exampleActivityMapperImpl.UpdateById(sessionId, activityBean, &updateNum)
+	var e = exampleActivityMapperImpl.UpdateById(sessionId, activityBean, &updateNum)//sessionId 有值则使用已经创建的session，否则新建一个session
 	fmt.Println("updateNum=", updateNum)
 	if e != nil {
 		fmt.Println(e)
