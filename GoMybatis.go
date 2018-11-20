@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"errors"
 )
+
 //如果使用UseProxyMapperByEngine，则内建默认的SessionFactory
 var DefaultSessionFactory SessionFactory
 
@@ -90,42 +91,7 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *Ses
 			//exec sql,return data
 			if strings.EqualFold(mapperXml.Id, method) {
 				findMethod = true
-				//build sql string
-				var session *Session
-				var sql string
-				var err error
-				session,sql, err = buildSql(paramMap, args, mapperXml)
-				if err != nil {
-					return err
-				}
-				//session
-				if session == nil  {
-					session = sessionFactory.NewSession()
-				}
-				var haveLastReturnValue = lastArgValue != nil && (*lastArgValue).IsNil() == false
-				//do CRUD
-				if mapperXml.Tag == Select && haveLastReturnValue {
-					//is select and have return value
-					results, err := (*session).Query(sql)
-					if err != nil {
-						return err
-					}
-					err = Unmarshal(results, lastArgValue.Interface())
-					if err != nil {
-						return err
-					}
-				} else {
-					var res, err = (*session).Exec(sql)
-					if err != nil {
-						return err
-					}
-					if haveLastReturnValue {
-						lastArgValue.Elem().SetInt(res.RowsAffected)
-					}
-				}
-				if session == nil {
-					sessionFactory.CloseSession((*session).Id())
-				}
+				buildMethodBody(sessionFactory, paramMap, args, mapperXml, lastArgValue)
 				//匹配完成退出
 				break
 			}
@@ -138,14 +104,63 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *Ses
 	UseMapperValue(bean, proxyFunc)
 }
 
-func buildSql(paramMap map[string]interface{}, args []reflect.Value, mapperXml MapperXml) (*Session,string, error) {
+func buildMethodBody(sessionFactory *SessionFactory, paramMap map[string]interface{}, args []reflect.Value, mapperXml MapperXml, lastArgValue *reflect.Value) error {
+	//build sql string
+	var session *Session
+	var sql string
+	var err error
+	session, sql, err = buildSql(paramMap, args, mapperXml)
+	if err != nil {
+		return err
+	}
+	//session
+	var haveArgSession = false
+	if session == nil {
+		session = sessionFactory.NewSession()
+	} else {
+		haveArgSession = true
+	}
+	if haveArgSession == false {
+		//not arg session,just close!
+		defer closeSession(sessionFactory, session)
+	}
+	var haveLastReturnValue = lastArgValue != nil && (*lastArgValue).IsNil() == false
+	//do CRUD
+	if mapperXml.Tag == Select && haveLastReturnValue {
+		//is select and have return value
+		results, err := (*session).Query(sql)
+		if err != nil {
+			return err
+		}
+		err = Unmarshal(results, lastArgValue.Interface())
+		if err != nil {
+			return err
+		}
+	} else {
+		var res, err = (*session).Exec(sql)
+		if err != nil {
+			return err
+		}
+		if haveLastReturnValue {
+			lastArgValue.Elem().SetInt(res.RowsAffected)
+		}
+	}
+	return nil
+}
+
+func closeSession(factory *SessionFactory, session *Session) {
+	factory.CloseSession((*session).Id())
+	(*session).Close()
+}
+
+func buildSql(paramMap map[string]interface{}, args []reflect.Value, mapperXml MapperXml) (*Session, string, error) {
 	var session *Session
 	for _, arg := range args {
-		 if  arg.Kind() == reflect.Ptr {
-			 if arg.Type().String()=="*GoMybatis.Session"{
-				 //指针，则退出
-				 session=arg.Interface().(*Session)
-			 }
+		if arg.Kind() == reflect.Ptr {
+			if arg.Type().String() == "*GoMybatis.Session" {
+				//指针，则退出
+				session = arg.Interface().(*Session)
+			}
 			continue
 		}
 		if arg.Kind() == reflect.Struct && arg.Type().String() != `time.Time` {
@@ -154,8 +169,8 @@ func buildSql(paramMap map[string]interface{}, args []reflect.Value, mapperXml M
 			paramMap[DefaultOneArg] = arg.Interface()
 		}
 	}
-	result,err:=BuildSqlFromMap(paramMap, mapperXml)
-	return session,result,err
+	result, err := BuildSqlFromMap(paramMap, mapperXml)
+	return session, result, err
 }
 
 //scan params
