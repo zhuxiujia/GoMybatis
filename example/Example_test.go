@@ -15,11 +15,12 @@ import (
 type ExampleActivityMapperImpl struct {
 	SelectAll         func(result *[]Activity) error
 	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int, result *[]Activity) error `mapperParams:"name,startTime,endTime,page,size"`
-	UpdateById        func(sessionId string, arg Activity, result *int64) error                                               `mapperParams:"sessionId"`  //如果要使用事务，请传入sessionId参数
+	UpdateById        func(sessionId string, arg Activity, result *int64) error                                               `mapperParams:"sessionId"` //如果要使用事务，请传入sessionId参数
 	Insert            func(arg Activity, result *int64) error
 	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error                            `mapperParams:"name,startTime,endTime"`
 }
 
+//初始化mapper文件和结构体
 func InitMapper() ExampleActivityMapperImpl {
 	var err error
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
@@ -47,7 +48,11 @@ func Test_main(t *testing.T) {
 	var exampleActivityMapperImpl = InitMapper()
 	//使用mapper
 	var result []Activity
-	exampleActivityMapperImpl.SelectByCondition("", time.Time{}, time.Time{}, 0, 2000, &result)
+	var err = exampleActivityMapperImpl.SelectByCondition("", time.Time{}, time.Time{}, 0, 2000, &result)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("result=", result)
 }
 
 //本地事务使用例子
@@ -56,19 +61,19 @@ func Test_local_Transation(t *testing.T) {
 	var exampleActivityMapperImpl = InitMapper()
 	//使用事务
 	var session = *GoMybatis.DefaultSessionFactory.NewSession()
-	session.Begin()//开启事务
+	session.Begin() //开启事务
 	var activityBean = Activity{
 		Id:   "170",
 		Name: "rs168-4",
 	}
 	var updateNum int64 = 0
 	var e = exampleActivityMapperImpl.UpdateById(session.Id(), activityBean, &updateNum)
-	fmt.Println("updateNum=",updateNum)
+	fmt.Println("updateNum=", updateNum)
 	if e != nil {
 		fmt.Println(e)
 	}
-	session.Commit()//提交事务
-	GoMybatis.DefaultSessionFactory.CloseSession(session.Id())//关闭事务
+	session.Commit()                                           //提交事务
+	GoMybatis.DefaultSessionFactory.CloseSession(session.Id()) //关闭事务
 }
 
 func Test_Remote_Transation(t *testing.T) {
