@@ -104,7 +104,7 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *Ses
 				//session
 				var session *Session
 				var sessionId = paramMap[SessionIdKey]
-				if sessionId != nil {
+				if sessionId != nil && sessionId.(string) != "" {
 					session = sessionFactory.GetSession(sessionId.(string))
 					if session == nil {
 						return errors.New("[GoMybatis] session is nil! sessionId=" + fmt.Sprint(sessionId))
