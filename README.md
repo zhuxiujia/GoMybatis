@@ -2,33 +2,24 @@
 # 文档网站站点
 https://zhuxiujia.github.io/gomybatis.io/#/
 # 优势
-GoMybatis 是根据java版 Mybatis3 的实现,基于Xorm的Engine和govaluate表达式及反射实现。
+GoMybatis 是根据java版 Mybatis3 的实现,基于Go标准库sql驱动和govaluate表达式及反射实现。
 GoMybatis 内部在初始化时反射分析mapper xml生成golang的func代码，默认支持绝大部分的Java版的mybatis标签和规范,
 支持标签
 `<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<foreach>`
 # 使用教程,代码文件请查看/example文件夹
+设置好GoPath,用go get 命令下载库
 ```
 go get github.com/zhuxiujia/GoMybatis
-go get "database/sql"
 go get github.com/go-sql-driver/mysql
 ```
 mapper.go 文件案例
 ```
-//定义mapper文件的接口和结构体
-type ExampleActivityMapper interface {
-	SelectAll(result *[]Activity) error
-	SelectByCondition(Name string, StartTime time.Time, EndTime time.Time, Page int, Size int, result *[]Activity) error
-	UpdateById(arg Activity, result *int64) error
-	Insert(arg Activity, result *int64) error
-	CountByCondition(name string, startTime time.Time, endTime time.Time, result *int) error
-}
 //定义mapper文件的接口和结构体，也可以只定义结构体就行
-//mapper.go文件 函数必须为2个参数（前面的参数（可空），最后一个为指针返回数据(可空)） error 为返回错误(必须定义)
+//mapper.go文件 函数参数（自定义结构体参数（属性必须大写），为指针类型的返回数据,*GoMybatis.Session作为该sql执行的session） error 为返回错误
 type ExampleActivityMapperImpl struct {
-	ExampleActivityMapper
 	SelectAll         func(result *[]Activity) error
 	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int, result *[]Activity) error `mapperParams:"name,startTime,endTime,page,size"`
-	UpdateById        func(arg Activity, result *int64) error
+	UpdateById        func(session *GoMybatis.Session, arg Activity, result *int64) error //只要参数中包含有*GoMybatis.Session的类型，框架默认使用传入的session对象，用于自定义事务
 	Insert            func(arg Activity, result *int64) error
 	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error                            `mapperParams:"name,startTime,endTime"`
 }
