@@ -7,9 +7,9 @@ GoMybatis 内部在初始化时反射分析mapper xml生成golang的func代码�
 支持标签
 `<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<foreach>`
 # 使用教程,代码文件请查看/example文件夹
+设置好GoPath,用go get 命令下载库
 ```
 go get github.com/zhuxiujia/GoMybatis
-go get "database/sql"
 go get github.com/go-sql-driver/mysql
 ```
 mapper.go 文件案例
