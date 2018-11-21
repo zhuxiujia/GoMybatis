@@ -14,21 +14,12 @@ go get github.com/go-sql-driver/mysql
 ```
 mapper.go 文件案例
 ```
-//定义mapper文件的接口和结构体
-type ExampleActivityMapper interface {
-	SelectAll(result *[]Activity) error
-	SelectByCondition(Name string, StartTime time.Time, EndTime time.Time, Page int, Size int, result *[]Activity) error
-	UpdateById(arg Activity, result *int64) error
-	Insert(arg Activity, result *int64) error
-	CountByCondition(name string, startTime time.Time, endTime time.Time, result *int) error
-}
 //定义mapper文件的接口和结构体，也可以只定义结构体就行
-//mapper.go文件 函数必须为2个参数（前面的参数（可空），最后一个为指针返回数据(可空)） error 为返回错误(必须定义)
+//mapper.go文件 函数参数（自定义结构体参数（属性必须大写），为指针类型的返回数据,*GoMybatis.Session作为该sql执行的session） error 为返回错误
 type ExampleActivityMapperImpl struct {
-	ExampleActivityMapper
 	SelectAll         func(result *[]Activity) error
 	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int, result *[]Activity) error `mapperParams:"name,startTime,endTime,page,size"`
-	UpdateById        func(arg Activity, result *int64) error
+	UpdateById        func(session *GoMybatis.Session, arg Activity, result *int64) error //只要参数中包含有*GoMybatis.Session的类型，框架默认使用传入的session对象，用于自定义事务
 	Insert            func(arg Activity, result *int64) error
 	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error                            `mapperParams:"name,startTime,endTime"`
 }
