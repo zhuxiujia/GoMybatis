@@ -1,4 +1,5 @@
 # GoMybatis
+![Image text](https://github.com/zhuxiujia/GoMybatis/blob/master/logo.png)
 # 文档网站站点
 https://zhuxiujia.github.io/gomybatis.io/#/
 # 优势
