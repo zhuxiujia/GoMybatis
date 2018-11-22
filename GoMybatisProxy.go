@@ -5,8 +5,13 @@ import (
 	"strings"
 )
 
+type TagArg struct {
+	Name  string
+	Index int
+}
+
 // UseService 可写入每个函数代理方法
-func UseMapper(mapper interface{}, proxyFunc func(method string, args []reflect.Value, params []string) error) {
+func UseMapper(mapper interface{}, proxyFunc func(method string, args []reflect.Value, tagArgs []TagArg) error) {
 	v := reflect.ValueOf(mapper)
 	if v.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
@@ -15,11 +20,11 @@ func UseMapper(mapper interface{}, proxyFunc func(method string, args []reflect.
 }
 
 // UseService 可写入每个函数代理方法
-func UseMapperValue(mapperValue reflect.Value, proxyFunc func(method string, args []reflect.Value, params []string) error) {
+func UseMapperValue(mapperValue reflect.Value, proxyFunc func(method string, args []reflect.Value, tagArgs []TagArg) error) {
 	buildMapper(mapperValue, proxyFunc)
 }
 
-func buildMapper(v reflect.Value, proxyFunc func(method string, args []reflect.Value, params []string) error) {
+func buildMapper(v reflect.Value, proxyFunc func(method string, args []reflect.Value, tagArgs []TagArg) error) {
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
@@ -53,16 +58,28 @@ func buildMapper(v reflect.Value, proxyFunc func(method string, args []reflect.V
 	}
 }
 
-func buildRemoteMethod(f reflect.Value, ft reflect.Type, sf reflect.StructField, proxyFunc func(method string, args []reflect.Value, params []string) error) {
+func buildRemoteMethod(f reflect.Value, ft reflect.Type, sf reflect.StructField, proxyFunc func(method string, args []reflect.Value, tagArgs []TagArg) error) {
 	var params []string
 	var mapperParams = sf.Tag.Get(`mapperParams`)
 	if mapperParams != `` {
 		params = strings.Split(mapperParams, `,`)
 	}
+	if len(params) > ft.NumIn() {
+		panic(`[GoMybatisProxy] method fail! the tag "mapperParams" length can not > arg length! filed=` + ft.String())
+	}
+	var tagArgs = make([]TagArg, 0)
+	if len(params) != 0 {
+		for index, v := range params {
+			var tagArg = TagArg{
+				Index: index,
+				Name:  v,
+			}
+			tagArgs = append(tagArgs, tagArg)
+		}
+	}
 	var fn = func(args []reflect.Value) (results []reflect.Value) {
-		err := proxyFunc(sf.Name, args, params)
-		results = append(results, reflect.ValueOf(&err).Elem())
-		return
+		err := proxyFunc(sf.Name, args, tagArgs)
+		return append(results, reflect.ValueOf(&err).Elem())
 	}
 	if f.Kind() == reflect.Ptr {
 		fp := reflect.New(ft)
@@ -71,4 +88,5 @@ func buildRemoteMethod(f reflect.Value, ft reflect.Type, sf reflect.StructField,
 	} else {
 		f.Set(reflect.MakeFunc(ft, fn))
 	}
+	params = nil
 }

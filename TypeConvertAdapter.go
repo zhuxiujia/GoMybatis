@@ -22,8 +22,7 @@ var DefaultSqlTypeConvertFunc = func(arg interface{}) string {
 	var t = reflect.TypeOf(arg)
 	if t.String() == Adapter_DateType {
 		arg = arg.(time.Time).Format(Adapter_FormateDate)
-	}
-	if t.String() == Adapter_DateType || t.String() == Adapter_StringType {
+	}else if t.String() == Adapter_DateType || t.String() == Adapter_StringType {
 		var argStr bytes.Buffer
 		argStr.WriteString(`'`)
 		argStr.WriteString(toString(arg))
