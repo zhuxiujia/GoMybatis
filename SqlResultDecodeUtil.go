@@ -8,23 +8,15 @@ import (
 	"time"
 )
 
-//
-//func ByteMapConvertStringMap(resultsSlice []map[string][]byte) []map[string]string {
-//	if resultsSlice == nil {
-//		return nil
-//	}
-//	var s = make([]map[string]string, 0)
-//	for _, v := range resultsSlice {
-//		var m = make(map[string]string)
-//		for ik, iv := range v {
-//			m[ik] = string(iv)
-//		}
-//		s = append(s, m)
-//	}
-//	return s
-//}
+type SqlResultDecoder interface {
+	Decode(s []map[string][]byte, result interface{}) error
+}
 
-func Unmarshal(s []map[string][]byte, result interface{}) error {
+type GoMybatisSqlResultDecoder struct {
+	SqlResultDecoder
+}
+
+func (this GoMybatisSqlResultDecoder) Decode(s []map[string][]byte, result interface{}) error {
 	if s == nil || result == nil {
 		return nil
 	}
@@ -46,7 +38,7 @@ func Unmarshal(s []map[string][]byte, result interface{}) error {
 		renameMapArray = append(renameMapArray, m)
 	}
 
-	var isBasicType = isGoBasicType(resultV.Type())
+	var isBasicType = this.isGoBasicType(resultV.Type())
 
 	if isBasicType {
 		//single basic type
@@ -59,7 +51,7 @@ func Unmarshal(s []map[string][]byte, result interface{}) error {
 					continue
 				}
 				var tItemTypeFieldTypeValue = reflect.New(resultV.Type())
-				var success = sqlBasicTypeConvert(resultV.Type(), value, tItemTypeFieldTypeValue.Elem())
+				var success = this.sqlBasicTypeConvert(resultV.Type(), value, tItemTypeFieldTypeValue.Elem())
 				if success {
 					resultV.Set(tItemTypeFieldTypeValue.Elem())
 				}
@@ -71,13 +63,13 @@ func Unmarshal(s []map[string][]byte, result interface{}) error {
 			return errors.New("Unmarshal one data,but sql result size find > 1 !")
 		}
 		for index, sItemMap := range s {
-			var value = sqlStructConvert(resultT.Elem(), sItemMap, renameMapArray[index])
+			var value = this.sqlStructConvert(resultT.Elem(), sItemMap, renameMapArray[index])
 			resultV.Set(value)
 		}
 	} else if resultV.Kind() == reflect.Slice {
 		//slice
 		var resultTItemType = resultT.Elem().Elem()
-		var isBasicTypeSlice = isGoBasicType(resultTItemType)
+		var isBasicTypeSlice = this.isGoBasicType(resultTItemType)
 		if isBasicTypeSlice {
 			for _, sItemMap := range s {
 				for _, value := range sItemMap {
@@ -85,7 +77,7 @@ func Unmarshal(s []map[string][]byte, result interface{}) error {
 						continue
 					}
 					var tItemTypeFieldTypeValue = reflect.New(resultTItemType)
-					var success = sqlBasicTypeConvert(resultTItemType, value, tItemTypeFieldTypeValue.Elem())
+					var success = this.sqlBasicTypeConvert(resultTItemType, value, tItemTypeFieldTypeValue.Elem())
 					if success {
 						resultV = reflect.Append(resultV, tItemTypeFieldTypeValue.Elem())
 					}
@@ -94,14 +86,14 @@ func Unmarshal(s []map[string][]byte, result interface{}) error {
 		} else {
 			for index, sItemMap := range s {
 				if resultTItemType.Kind() == reflect.Struct {
-					resultV = reflect.Append(resultV, sqlStructConvert(resultTItemType, sItemMap, renameMapArray[index]))
+					resultV = reflect.Append(resultV, this.sqlStructConvert(resultTItemType, sItemMap, renameMapArray[index]))
 				}
 			}
 		}
 	} else if resultV.Kind() == reflect.Map {
 		//map
 		var resultTItemType = resultT.Elem().Elem() //int,string,time.Time.....
-		var isBasicTypeSlice = isGoBasicType(resultTItemType)
+		var isBasicTypeSlice = this.isGoBasicType(resultTItemType)
 		if isBasicTypeSlice {
 			if len(s) > 1 {
 				return errors.New("Unmarshal one data,but sql result size find > 1 !")
@@ -113,7 +105,7 @@ func Unmarshal(s []map[string][]byte, result interface{}) error {
 						continue
 					}
 					var tItemTypeFieldTypeValue = reflect.New(resultTItemType)
-					var success = sqlBasicTypeConvert(resultTItemType, value, tItemTypeFieldTypeValue.Elem())
+					var success = this.sqlBasicTypeConvert(resultTItemType, value, tItemTypeFieldTypeValue.Elem())
 					if success {
 						//resultV = reflect.Append(resultV, tItemTypeFieldTypeValue.Elem())
 						newResultV.SetMapIndex(reflect.ValueOf(key), tItemTypeFieldTypeValue.Elem())
@@ -132,7 +124,7 @@ func Unmarshal(s []map[string][]byte, result interface{}) error {
 	return nil
 }
 
-func sqlStructConvert(resultTItemType reflect.Type, sItemMap map[string][]byte, renamedSItemMap map[string][]byte) reflect.Value {
+func (this GoMybatisSqlResultDecoder) sqlStructConvert(resultTItemType reflect.Type, sItemMap map[string][]byte, renamedSItemMap map[string][]byte) reflect.Value {
 	if resultTItemType.Kind() == reflect.Struct {
 		var tItemTypeFieldTypeValue = reflect.New(resultTItemType)
 		for i := 0; i < resultTItemType.NumField(); i++ {
@@ -148,7 +140,7 @@ func sqlStructConvert(resultTItemType reflect.Type, sItemMap map[string][]byte, 
 					continue
 				}
 			}
-			sqlBasicTypeConvert(tItemTypeFieldType.Type, value, tItemTypeFieldTypeValue.Elem().Field(i))
+			this.sqlBasicTypeConvert(tItemTypeFieldType.Type, value, tItemTypeFieldTypeValue.Elem().Field(i))
 		}
 		return tItemTypeFieldTypeValue.Elem()
 	} else {
@@ -156,7 +148,7 @@ func sqlStructConvert(resultTItemType reflect.Type, sItemMap map[string][]byte, 
 	}
 }
 
-func sqlBasicTypeConvert(tItemTypeFieldType reflect.Type, valueByte []byte, resultValue reflect.Value) bool {
+func (this GoMybatisSqlResultDecoder) sqlBasicTypeConvert(tItemTypeFieldType reflect.Type, valueByte []byte, resultValue reflect.Value) bool {
 	var value = string(valueByte)
 	if tItemTypeFieldType.String() == "string" {
 		resultValue.Set(reflect.ValueOf(value))
@@ -202,7 +194,7 @@ func sqlBasicTypeConvert(tItemTypeFieldType reflect.Type, valueByte []byte, resu
 	return true
 }
 
-func isGoBasicType(tItemTypeFieldType reflect.Type) bool {
+func (this GoMybatisSqlResultDecoder) isGoBasicType(tItemTypeFieldType reflect.Type) bool {
 	if tItemTypeFieldType.Kind() == reflect.Bool ||
 		tItemTypeFieldType.Kind() == reflect.Int ||
 		tItemTypeFieldType.Kind() == reflect.Int8 ||
