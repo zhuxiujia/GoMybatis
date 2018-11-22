@@ -11,13 +11,6 @@ func replaceArg(data string, parameters map[string]interface{}, typeConvertFunc 
 	if data == "" {
 		return data
 	}
-	for k, v := range parameters {
-		if k == DefaultOneArg {
-			var str = typeConvertFunc(v)
-			re, _ := regexp.Compile("\\#\\{[^}]*\\}")
-			data = re.ReplaceAllString(data, str)
-		}
-	}
 	var defaultValue = parameters[DefaultOneArg]
 	if defaultValue != nil {
 		var str = typeConvertFunc(defaultValue)
