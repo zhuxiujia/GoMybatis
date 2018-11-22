@@ -1,10 +1,10 @@
 package GoMybatis
 
 import (
+	"bytes"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 	"reflect"
 	"strings"
-	"bytes"
 )
 
 const EtreeCharData = `*etree.CharData`

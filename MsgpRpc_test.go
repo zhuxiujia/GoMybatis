@@ -1,14 +1,14 @@
 package GoMybatis
 
 import (
-	"github.com/hashicorp/net-rpc-msgpackrpc"
-	"net"
-	"log"
-	"net/rpc"
 	"fmt"
-	"time"
-	"testing"
+	"github.com/hashicorp/net-rpc-msgpackrpc"
 	"github.com/zhuxiujia/GoMybatis/utils"
+	"log"
+	"net"
+	"net/rpc"
+	"testing"
+	"time"
 )
 
 //注意字段必须是导出

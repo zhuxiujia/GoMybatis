@@ -1,9 +1,9 @@
 package GoMybatis
 
 import (
-	"strings"
-	"reflect"
 	"errors"
+	"reflect"
+	"strings"
 )
 
 //如果使用UseProxyMapperByEngine，则内建默认的SessionFactory

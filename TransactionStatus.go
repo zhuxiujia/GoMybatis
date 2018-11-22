@@ -1,7 +1,7 @@
 package GoMybatis
 
 import (
-	"github.com/kataras/iris/core/errors"
+	"errors"
 	"time"
 )
 

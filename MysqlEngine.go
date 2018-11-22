@@ -2,11 +2,11 @@ package GoMybatis
 
 import (
 	"database/sql"
+	"fmt"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/satori/go.uuid"
 	"reflect"
 	"strconv"
-	"fmt"
 	"time"
-	"github.com/zhuxiujia/GoMybatis/lib/github.com/satori/go.uuid"
 )
 
 type MysqlEngine struct {
@@ -14,14 +14,12 @@ type MysqlEngine struct {
 	DB *sql.DB
 }
 
-
-
 func (this MysqlEngine) NewSession() *Session {
 	uuids, _ := uuid.NewV4()
 	var uuidstrig = uuids.String()
 	var mysqlLocalSession = LocalSession{
-		SessionId:              uuidstrig,
-		db:                     this.DB,
+		SessionId: uuidstrig,
+		db:        this.DB,
 	}
 	var session = Session(&mysqlLocalSession)
 	return &session
@@ -40,15 +38,14 @@ func Open(driverName, dataSourceName string) (*SessionEngine, error) {
 	return &engine, nil
 }
 
-
 //打开一个本地引擎
-func OpenRemote(addr string,RetryTime int) (*SessionEngine, error) {
+func OpenRemote(addr string, RetryTime int) (*SessionEngine, error) {
 	var TransationRMClient = TransationRMClient{
 		RetryTime: RetryTime,
 		Addr:      addr,
 	}
 	var engine = RemoteSessionEngine{}.New(&TransationRMClient)
-	var sessionEngine=SessionEngine(&engine)
+	var sessionEngine = SessionEngine(&engine)
 	return &sessionEngine, nil
 }
 

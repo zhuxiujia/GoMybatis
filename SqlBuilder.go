@@ -1,14 +1,14 @@
 package GoMybatis
 
 import (
-	"log"
 	"bytes"
-	"strings"
-	"fmt"
-	"reflect"
-	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
 	"errors"
+	"fmt"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
+	"log"
+	"reflect"
 	"regexp"
+	"strings"
 )
 
 func BuildSqlFromMap(paramMap map[string]interface{}, mapperXml MapperXml) (string, error) {
@@ -144,8 +144,6 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 	return sql, nil
 }
 
-
-
 //表达式 ''转换为 0
 func expressionToIfZeroExpression(evaluateParameters map[string]interface{}, expression string) string {
 	for k, v := range evaluateParameters {
@@ -182,7 +180,6 @@ func repleaceArg(data string, parameters map[string]interface{}, typeConvertFunc
 	}
 	return data
 }
-
 
 //scan params
 func scanParamterMap(parameters map[string]interface{}, typeConvert func(arg interface{}) interface{}) map[string]interface{} {

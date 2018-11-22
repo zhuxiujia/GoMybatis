@@ -1,12 +1,12 @@
 package GoMybatis
 
 import (
-	"testing"
-	_ "github.com/go-sql-driver/mysql"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/zhuxiujia/GoMybatis/example"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"strconv"
-	"github.com/zhuxiujia/GoMybatis/example"
+	"testing"
 )
 
 var manager DefaultTransationManager
@@ -26,7 +26,7 @@ func TestManager(t *testing.T) {
 		TestPropertyServiceA: TestPropertyServiceA,
 		TestPropertyServiceB: TestPropertyServiceB,
 	}
-	TestOrderService.Transform(utils.CreateUUID(),  "20181023162632152fd236d6877ff4","20180926172013b85403d3715d46ed", 100)
+	TestOrderService.Transform(utils.CreateUUID(), "20181023162632152fd236d6877ff4", "20180926172013b85403d3715d46ed", 100)
 }
 
 //测试案例
@@ -100,7 +100,7 @@ func (this TestOrderService) Transform(transactionId string, outid string, inId 
 		return e1
 	}
 
-	dto.Status=Transaction_Status_Rollback
+	dto.Status = Transaction_Status_Rollback
 	manager.DoTransaction(dto)
 
 	//事务id=2018092d6172014a2a4c8a949f1004623,已存在的事务不可提交commit，只能提交状态rollback和Pause
@@ -108,8 +108,6 @@ func (this TestOrderService) Transform(transactionId string, outid string, inId 
 	if e2 != nil {
 		return e2
 	}
-
-
 
 	//manager.Rollback(transactionId)
 	//事务id=2018092d6172014a2a4c8a949f1004623,原始事务可提交commit,rollback和Pause

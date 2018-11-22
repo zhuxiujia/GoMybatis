@@ -1,13 +1,13 @@
 package example
 
 import (
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/zhuxiujia/GoMybatis"
+	"io/ioutil"
+	"os"
 	"testing"
 	"time"
-	"os"
-	"fmt"
-	"io/ioutil"
-	"github.com/zhuxiujia/GoMybatis"
 )
 
 //定义mapper文件的接口和结构体，也可以只定义结构体就行
@@ -15,9 +15,9 @@ import (
 type ExampleActivityMapperImpl struct {
 	SelectAll         func(result *[]Activity) error
 	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int, result *[]Activity) error `mapperParams:"name,startTime,endTime,page,size"`
-	UpdateById        func(session *GoMybatis.Session, arg Activity, result *int64) error //只要参数中包含有*GoMybatis.Session的类型，框架默认使用传入的session对象，用于自定义事务
+	UpdateById        func(session *GoMybatis.Session, arg Activity, result *int64) error                                     //只要参数中包含有*GoMybatis.Session的类型，框架默认使用传入的session对象，用于自定义事务
 	Insert            func(arg Activity, result *int64) error
-	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error                            `mapperParams:"name,startTime,endTime"`
+	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error `mapperParams:"name,startTime,endTime"`
 }
 
 //初始化mapper文件和结构体
@@ -41,7 +41,6 @@ func InitMapperByLocalSession() ExampleActivityMapperImpl {
 	GoMybatis.UseProxyMapperByEngine(&exampleActivityMapperImpl, bytes, engine)
 	return exampleActivityMapperImpl
 }
-
 
 //本地GoMybatis使用例子
 func Test_main(t *testing.T) {
@@ -68,7 +67,7 @@ func Test_local_Transation(t *testing.T) {
 		Name: "rs168-8",
 	}
 	var updateNum int64 = 0
-	var e = exampleActivityMapperImpl.UpdateById(&session, activityBean, &updateNum)//sessionId 有值则使用已经创建的session，否则新建一个session
+	var e = exampleActivityMapperImpl.UpdateById(&session, activityBean, &updateNum) //sessionId 有值则使用已经创建的session，否则新建一个session
 	fmt.Println("updateNum=", updateNum)
 	if e != nil {
 		fmt.Println(e)
@@ -76,7 +75,6 @@ func Test_local_Transation(t *testing.T) {
 	session.Commit() //提交事务
 	session.Close()  //关闭事务
 }
-
 
 //远程事务示例，可用于分布式微服务(单数据库，多个微服务)
 func Test_Remote_Transation(t *testing.T) {
@@ -91,7 +89,7 @@ func Test_Remote_Transation(t *testing.T) {
 	}
 
 	//这里是关键，使用原程的transationRMSession（即Transation Resource Manager）替换LocalSession本地的session调用
-	var transationRMSession = *GoMybatis.TransationRMSession{}.New("",&TransationRMClient,GoMybatis.Transaction_Status_NO)
+	var transationRMSession = *GoMybatis.TransationRMSession{}.New("", &TransationRMClient, GoMybatis.Transaction_Status_NO)
 
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()

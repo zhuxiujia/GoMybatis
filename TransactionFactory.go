@@ -2,12 +2,12 @@ package GoMybatis
 
 type TransactionFactory struct {
 	TransactionStatuss map[string]*TransactionStatus
-	SessionFactory *SessionFactory
+	SessionFactory     *SessionFactory
 }
 
 func (this TransactionFactory) New(SessionFactory *SessionFactory) TransactionFactory {
 	this.TransactionStatuss = make(map[string]*TransactionStatus)
-	this.SessionFactory=SessionFactory
+	this.SessionFactory = SessionFactory
 	return this
 }
 
@@ -15,17 +15,17 @@ func (this *TransactionFactory) GetTransactionStatus(transactionId string) *Tran
 	var Session *Session
 	if transactionId == "" {
 		Session = this.SessionFactory.NewSession()
-		transactionId=(*Session).Id()
+		transactionId = (*Session).Id()
 	}
 	var result = this.TransactionStatuss[transactionId]
 	if result == nil {
 		var transaction = Transaction{
-			Id:transactionId,
-			Session:Session,
+			Id:      transactionId,
+			Session: Session,
 		}
 		var transactionStatus = TransactionStatus{
-			IsNewTransaction:true,
-			Transaction: &transaction,
+			IsNewTransaction: true,
+			Transaction:      &transaction,
 		}
 		result = &transactionStatus
 		this.TransactionStatuss[transactionId] = result

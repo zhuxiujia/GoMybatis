@@ -1,15 +1,15 @@
 package GoMybatis
 
 import (
-	"reflect"
-	"time"
 	"bytes"
 	"fmt"
+	"reflect"
+	"time"
 )
 
-const Adapter_DateType  =  `time.Time`
-const Adapter_StringType  =  `string`
-const Adapter_FormateDate  =  `2006-01-02 15:04:05`
+const Adapter_DateType = `time.Time`
+const Adapter_StringType = `string`
+const Adapter_FormateDate = `2006-01-02 15:04:05`
 
 var DefaultExpressionTypeConvertFunc = func(arg interface{}) interface{} {
 	if reflect.TypeOf(arg).String() == Adapter_DateType {

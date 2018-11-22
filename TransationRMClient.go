@@ -1,9 +1,9 @@
 package GoMybatis
 
 import (
+	"errors"
 	"github.com/hashicorp/net-rpc-msgpackrpc"
 	"net/rpc"
-	"github.com/kataras/iris/core/errors"
 )
 
 const ConnectError = "connection is shut down"
@@ -24,7 +24,6 @@ func (this *RemoteSessionEngine) NewSession() *Session {
 	var session = Session(&TransationSession)
 	return &session
 }
-
 
 type TransationRMClient struct {
 	Client    *rpc.Client

@@ -1,9 +1,9 @@
 package GoMybatis
 
 import (
-	"testing"
-	"github.com/zhuxiujia/GoMybatis/example"
 	"fmt"
+	"github.com/zhuxiujia/GoMybatis/example"
+	"testing"
 )
 
 func TestTransationRM(t *testing.T) {
@@ -16,28 +16,26 @@ func TestTransationRM(t *testing.T) {
 	}
 
 	var transationRMServerSession = TransationRMSession{
-		Client:&TransationRMClient,
-		OwnerId:"1234",
+		Client:  &TransationRMClient,
+		OwnerId: "1234",
 	}
 
 	var e error
 
-  	e=transationRMServerSession.Begin()
-    if e!=nil{
-    	panic(e)
+	e = transationRMServerSession.Begin()
+	if e != nil {
+		panic(e)
 	}
 
-	result,e:=transationRMServerSession.Exec("UPDATE `test`.`biz_activity` SET `name`='rs168-10' WHERE `id`='170';")
-	if e!=nil{
+	result, e := transationRMServerSession.Exec("UPDATE `test`.`biz_activity` SET `name`='rs168-10' WHERE `id`='170';")
+	if e != nil {
 		panic(e)
 	}
 
 	fmt.Println(result)
 
-
-
-	e=transationRMServerSession.Commit()
-	if e!=nil{
+	e = transationRMServerSession.Commit()
+	if e != nil {
 		panic(e)
 	}
 }

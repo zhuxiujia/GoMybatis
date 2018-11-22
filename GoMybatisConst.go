@@ -1,4 +1,4 @@
 package GoMybatis
 
 const DefaultOneArg = `[default]`
-const DefaultSuffixOverrides  =  ","
+const DefaultSuffixOverrides = ","

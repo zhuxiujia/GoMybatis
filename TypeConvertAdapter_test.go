@@ -7,6 +7,6 @@ import (
 
 func Test_Adapter(t *testing.T) {
 	var a bool
-	var s=toString(a)
+	var s = toString(a)
 	fmt.Println(s)
 }

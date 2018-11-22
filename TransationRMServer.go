@@ -1,10 +1,10 @@
 package GoMybatis
 
 import (
-	"net"
-	"log"
-	"github.com/hashicorp/net-rpc-msgpackrpc"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/hashicorp/net-rpc-msgpackrpc"
+	"log"
+	"net"
 	"net/rpc"
 )
 
@@ -18,8 +18,8 @@ func (this TransationRMServer) Msg(arg TransactionReqDTO, result *TransactionRsp
 			log.Println("[TransationRMServer]work failed:", err)
 		}
 	}()
-	var rsp=this.DefaultTransationManager.DoTransaction(arg)
-	*result=rsp
+	var rsp = this.DefaultTransationManager.DoTransaction(arg)
+	*result = rsp
 	return nil
 }
 

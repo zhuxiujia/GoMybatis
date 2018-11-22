@@ -10,4 +10,3 @@ func CreateUUID() string {
 	var uuidString = u1.String()
 	return uuidString
 }
-

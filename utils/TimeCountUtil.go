@@ -1,9 +1,9 @@
 package utils
 
 import (
-	"time"
-	"fmt"
 	"bytes"
+	"fmt"
+	"time"
 )
 
 //调用次方法 必须加上 defer 关键字！
