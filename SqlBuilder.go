@@ -7,7 +7,6 @@ import (
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
 	"log"
 	"reflect"
-	"regexp"
 	"strings"
 )
 
@@ -26,7 +25,7 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 		var loopChildItem = true
 		if v.ElementType == Element_String {
 			//string element
-			sql.WriteString(repleaceArg(v.DataString, param, DefaultSqlTypeConvertFunc))
+			sql.WriteString(replaceArg(v.DataString, param, DefaultSqlTypeConvertFunc))
 		} else if v.ElementType == Element_If {
 			//if element
 			var test = v.Propertys[`test`]
@@ -51,7 +50,7 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 				if result.(bool) {
 					//test表达式成立
 					if index == (len(andStrings) - 1) {
-						var reps = repleaceArg(v.DataString, param, DefaultSqlTypeConvertFunc)
+						var reps = replaceArg(v.DataString, param, DefaultSqlTypeConvertFunc)
 						sql.WriteString(reps)
 					}
 				} else {
@@ -109,14 +108,14 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 			if collectionValue.Len() > 0 {
 				for i := 0; i < collectionValue.Len(); i++ {
 					var dataItem = collectionValue.Index(i).Interface()
-					var tempParam = make(map[string]interface{})
-					tempParam[item] = dataItem
-					tempParam[index] = index
+					var tempArgMap = make(map[string]interface{})
+					tempArgMap[item] = dataItem
+					tempArgMap[index] = index
 					for k, v := range param {
-						tempParam[k] = v
+						tempArgMap[k] = v
 					}
 					if v.ElementItems != nil && len(v.ElementItems) > 0 && loopChildItem {
-						tempSql, err = createFromElement(v.ElementItems, tempSql, tempParam)
+						tempSql, err = createFromElement(v.ElementItems, tempSql, tempArgMap)
 						if err != nil {
 							return tempSql, err
 						}
@@ -156,29 +155,6 @@ func expressionToIfZeroExpression(evaluateParameters map[string]interface{}, exp
 		}
 	}
 	return expression
-}
-
-//替换参数
-func repleaceArg(data string, parameters map[string]interface{}, typeConvertFunc func(arg interface{}) string) string {
-	if data == "" {
-		return data
-	}
-	for k, v := range parameters {
-		if k == DefaultOneArg {
-			var str = typeConvertFunc(v)
-			re, _ := regexp.Compile("\\#\\{[^}]*\\}")
-			data = re.ReplaceAllString(data, str)
-		} else {
-			var str = typeConvertFunc(v)
-			var compileStr bytes.Buffer
-			compileStr.WriteString("\\#\\{")
-			compileStr.WriteString(k)
-			compileStr.WriteString("[^}]*\\}")
-			re, _ := regexp.Compile(compileStr.String())
-			data = re.ReplaceAllString(data, str)
-		}
-	}
-	return data
 }
 
 //scan params

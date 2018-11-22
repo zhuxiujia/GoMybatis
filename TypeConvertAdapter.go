@@ -19,10 +19,13 @@ var DefaultExpressionTypeConvertFunc = func(arg interface{}) interface{} {
 }
 
 var DefaultSqlTypeConvertFunc = func(arg interface{}) string {
+	if arg == nil {
+		return ""
+	}
 	var t = reflect.TypeOf(arg)
 	if t.String() == Adapter_DateType {
 		arg = arg.(time.Time).Format(Adapter_FormateDate)
-	}else if t.String() == Adapter_DateType || t.String() == Adapter_StringType {
+	} else if t.String() == Adapter_DateType || t.String() == Adapter_StringType {
 		var argStr bytes.Buffer
 		argStr.WriteString(`'`)
 		argStr.WriteString(toString(arg))
