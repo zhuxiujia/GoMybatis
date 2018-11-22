@@ -11,7 +11,6 @@ var DefaultSessionFactory SessionFactory
 
 var DefaultSqlResultDecoder = GoMybatisSqlResultDecoder{}
 
-
 func UseProxyMapperByEngine(bean interface{}, xml []byte, sqlEngine *SessionEngine) {
 	v := reflect.ValueOf(bean)
 	if v.Kind() != reflect.Ptr {
@@ -29,8 +28,7 @@ func UseProxyMapperByFactory(bean interface{}, xml []byte, sessionFactory *Sessi
 	UseProxyMapperFromValue(v, xml, sessionFactory)
 }
 
-
-func UseProxyMapperFromValue(bean reflect.Value, xml []byte,sessionFactory *SessionFactory) {
+func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *SessionFactory) {
 	UseProxyMapper(bean, xml, sessionFactory, DefaultSqlResultDecoder)
 }
 
