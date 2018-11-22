@@ -3,7 +3,7 @@
 # 文档网站站点
 https://zhuxiujia.github.io/gomybatis.io/#/
 # 优势
-GoMybatis 是根据java版 Mybatis3 的实现,基于Go标准库sql驱动和govaluate表达式及反射实现。
+GoMybatis 是根据java版 Mybatis3 的实现,基于Go标准库和github.com/Knetic/govaluate表达式及github.com/beevik/etree实现。
 GoMybatis 内部在初始化时反射分析mapper xml生成golang的func代码，默认支持绝大部分的Java版的mybatis标签和规范,
 支持标签
 `<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<foreach>`
