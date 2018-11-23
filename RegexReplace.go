@@ -61,7 +61,11 @@ func getFeildInterface(repleaceStr string, arg interface{}) interface{} {
 		for index, fieldName := range spArr {
 			//包含子属性
 			if index > 0 {
-				arg = reflect.ValueOf(arg).FieldByName(upperFieldFirstName(fieldName)).Interface()
+				var v = reflect.ValueOf(arg).FieldByName(upperFieldFirstName(fieldName))
+				if v.IsValid() {
+					panic(`[GoMybatis] access field ` + fieldName + " fail! please check you struct.Field !")
+				}
+				arg = v.Interface()
 			}
 		}
 	}
