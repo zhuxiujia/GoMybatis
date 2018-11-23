@@ -7,29 +7,40 @@ import (
 )
 
 //如果使用UseProxyMapperByEngine，则内建默认的SessionFactory
-var DefaultSessionFactory SessionFactory
+var DefaultSessionFactory *SessionFactory
 
-var DefaultSqlResultDecoder = GoMybatisSqlResultDecoder{}
+var DefaultSqlResultDecoder SqlResultDecoder
+
+var DefaultSqlBuilder SqlBuilder
 
 func UseProxyMapperByEngine(bean interface{}, xml []byte, sqlEngine *SessionEngine) {
 	v := reflect.ValueOf(bean)
 	if v.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
-	DefaultSessionFactory = SessionFactory{}.New(sqlEngine)
-	UseProxyMapper(v, xml, &DefaultSessionFactory, &DefaultSqlResultDecoder)
+	if DefaultSessionFactory == nil {
+		var factory = SessionFactory{}.New(sqlEngine)
+		DefaultSessionFactory = &factory
+	}
+	if DefaultSqlResultDecoder == nil {
+		DefaultSqlResultDecoder = GoMybatisSqlResultDecoder{}
+	}
+	if DefaultSqlBuilder == nil {
+		DefaultSqlBuilder = GoMybatisSqlBuilder{}
+	}
+	UseProxyMapper(v, xml, DefaultSessionFactory, DefaultSqlResultDecoder, DefaultSqlBuilder)
 }
 
-func UseProxyMapperByFactory(bean interface{}, xml []byte, sessionFactory *SessionFactory) {
+func UseProxyMapperByFactory(bean interface{}, xml []byte, sessionFactory *SessionFactory, sqlResultDecoder SqlResultDecoder, sqlBuilder SqlBuilder) {
 	v := reflect.ValueOf(bean)
 	if v.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
-	UseProxyMapperFromValue(v, xml, sessionFactory)
+	UseProxyMapperFromValue(v, xml, sessionFactory, sqlResultDecoder, sqlBuilder)
 }
 
-func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *SessionFactory) {
-	UseProxyMapper(bean, xml, sessionFactory, DefaultSqlResultDecoder)
+func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, sqlResultDecoder SqlResultDecoder, sqlBuilder SqlBuilder) {
+	UseProxyMapper(bean, xml, sessionFactory, sqlResultDecoder, sqlBuilder)
 }
 
 //例如
@@ -45,7 +56,7 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *Ses
 //func的基本类型的参数（例如string,int,time.Time,int64,float....）个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
 //func的结构体参数无需指定mapperParams的tag，框架会自动扫描它的属性，封装为map处理掉
 //使用UseProxyMapper函数设置代理后即可正常使用。
-func UseProxyMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, decoder SqlResultDecoder) {
+func UseProxyMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, decoder SqlResultDecoder, sqlBuilder SqlBuilder) {
 	var mapperTree = LoadMapperXml(xml)
 	var proxyFunc = func(method string, args []reflect.Value, tagArgs []TagArg) error {
 		var lastArgsIndex = len(args) - 1
@@ -63,7 +74,7 @@ func UseProxyMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFacto
 			//exec sql,return data
 			if strings.EqualFold(mapperXml.Id, method) {
 				findMethod = true
-				buildMethodBody(sessionFactory, tagArgs, args, mapperXml, lastArgValue, decoder)
+				buildMethodBody(sessionFactory, tagArgs, args, mapperXml, lastArgValue, decoder, sqlBuilder)
 				//匹配完成退出
 				break
 			}
@@ -76,12 +87,12 @@ func UseProxyMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFacto
 	UseMapperValue(bean, proxyFunc)
 }
 
-func buildMethodBody(sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, mapperXml MapperXml, lastArgValue *reflect.Value, decoder SqlResultDecoder) error {
+func buildMethodBody(sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, mapperXml MapperXml, lastArgValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder) error {
 	//build sql string
 	var session *Session
 	var sql string
 	var err error
-	session, sql, err = buildSql(tagParamMap, args, mapperXml)
+	session, sql, err = buildSql(tagParamMap, args, mapperXml, sqlBuilder)
 	if err != nil {
 		return err
 	}
@@ -125,7 +136,7 @@ func closeSession(factory *SessionFactory, session *Session) {
 	(*session).Close()
 }
 
-func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml MapperXml) (*Session, string, error) {
+func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml MapperXml, sqlBuilder SqlBuilder) (*Session, string, error) {
 	var session *Session
 	var paramMap = make(map[string]interface{})
 	var tagArgsLen = len(tagArgs)
@@ -146,7 +157,7 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml MapperXml) (*Ses
 			paramMap[DefaultOneArg] = argInterface
 		}
 	}
-	result, err := BuildSqlFromMap(paramMap, mapperXml)
+	result, err := sqlBuilder.BuildSqlFromMap(paramMap, mapperXml)
 	return session, result, err
 }
 

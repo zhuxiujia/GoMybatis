@@ -10,9 +10,17 @@ import (
 	"strings"
 )
 
-func BuildSqlFromMap(paramMap map[string]interface{}, mapperXml MapperXml) (string, error) {
+type SqlBuilder interface {
+	BuildSqlFromMap(paramMap map[string]interface{}, mapperXml MapperXml) (string, error)
+}
+
+type GoMybatisSqlBuilder struct {
+	SqlBuilder
+}
+
+func (this GoMybatisSqlBuilder) BuildSqlFromMap(paramMap map[string]interface{}, mapperXml MapperXml) (string, error) {
 	var sql bytes.Buffer
-	sql, err := createFromElement(mapperXml.ElementItems, sql, paramMap)
+	sql, err := this.createFromElement(mapperXml.ElementItems, sql, paramMap)
 	if err != nil {
 		return sql.String(), err
 	}
@@ -20,7 +28,7 @@ func BuildSqlFromMap(paramMap map[string]interface{}, mapperXml MapperXml) (stri
 	return sql.String(), nil
 }
 
-func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[string]interface{}) (result bytes.Buffer, err error) {
+func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[string]interface{}) (result bytes.Buffer, err error) {
 	for _, v := range itemTree {
 		var loopChildItem = true
 		if v.ElementType == Element_String {
@@ -32,8 +40,8 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 			var andStrings = strings.Split(test, ` and `)
 			for index, expression := range andStrings {
 				//test表达式解析
-				var evaluateParameters = scanParamterMap(param, DefaultExpressionTypeConvertFunc)
-				expression = expressionToIfZeroExpression(evaluateParameters, expression)
+				var evaluateParameters = this.scanParamterMap(param, DefaultExpressionTypeConvertFunc)
+				expression = this.expressionToIfZeroExpression(evaluateParameters, expression)
 				evalExpression, err := govaluate.NewEvaluableExpression(expression)
 				if err != nil {
 					fmt.Println(err)
@@ -64,7 +72,7 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 			var suffixOverrides = v.Propertys[`suffixOverrides`]
 			if v.ElementItems != nil && len(v.ElementItems) > 0 && loopChildItem {
 				var tempTrimSql bytes.Buffer
-				tempTrimSql, err = createFromElement(v.ElementItems, tempTrimSql, param)
+				tempTrimSql, err = this.createFromElement(v.ElementItems, tempTrimSql, param)
 				if err != nil {
 					return tempTrimSql, err
 				}
@@ -82,7 +90,7 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 		} else if v.ElementType == Element_Set {
 			if v.ElementItems != nil && len(v.ElementItems) > 0 && loopChildItem {
 				var trim bytes.Buffer
-				trim, err = createFromElement(v.ElementItems, trim, param)
+				trim, err = this.createFromElement(v.ElementItems, trim, param)
 				if err != nil {
 					return trim, err
 				}
@@ -115,7 +123,7 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 						tempArgMap[k] = v
 					}
 					if v.ElementItems != nil && len(v.ElementItems) > 0 && loopChildItem {
-						tempSql, err = createFromElement(v.ElementItems, tempSql, tempArgMap)
+						tempSql, err = this.createFromElement(v.ElementItems, tempSql, tempArgMap)
 						if err != nil {
 							return tempSql, err
 						}
@@ -134,7 +142,7 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 			loopChildItem = false
 		}
 		if v.ElementItems != nil && len(v.ElementItems) > 0 && loopChildItem {
-			sql, err = createFromElement(v.ElementItems, sql, param)
+			sql, err = this.createFromElement(v.ElementItems, sql, param)
 			if err != nil {
 				return sql, err
 			}
@@ -144,7 +152,7 @@ func createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[strin
 }
 
 //表达式 ''转换为 0
-func expressionToIfZeroExpression(evaluateParameters map[string]interface{}, expression string) string {
+func (this GoMybatisSqlBuilder) expressionToIfZeroExpression(evaluateParameters map[string]interface{}, expression string) string {
 	for k, v := range evaluateParameters {
 		if strings.Index(expression, k) != -1 {
 			var t = reflect.TypeOf(v)
@@ -158,7 +166,7 @@ func expressionToIfZeroExpression(evaluateParameters map[string]interface{}, exp
 }
 
 //scan params
-func scanParamterMap(parameters map[string]interface{}, typeConvert func(arg interface{}) interface{}) map[string]interface{} {
+func (this GoMybatisSqlBuilder) scanParamterMap(parameters map[string]interface{}, typeConvert func(arg interface{}) interface{}) map[string]interface{} {
 	var newMap = make(map[string]interface{})
 	for k, obj := range parameters {
 		if typeConvert != nil {
