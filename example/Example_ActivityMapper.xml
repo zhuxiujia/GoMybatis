@@ -56,6 +56,14 @@
         where id = #{id}
         and delete_flag = 1
     </select>
+    <select id="selectByIds"  resultMap="BaseResultMap">
+        select * from biz_activity
+        where  delete_flag = 1
+        and id in
+        <foreach collection="ids" item="item" index="index" open="(" close=")" >
+            #{item}
+        </foreach>
+    </select>
     <update id="deleteById" >
         update biz_activity
         set delete_flag = 0
