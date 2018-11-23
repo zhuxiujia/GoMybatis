@@ -95,7 +95,7 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql by
 				if err != nil {
 					return trim, err
 				}
-				var trimString = strings.Trim(strings.Trim(trim.String(), " "), DefaultSuffixOverrides)
+				var trimString = strings.Trim(strings.Trim(trim.String(), " "), DefaultOverrides)
 				trim.Reset()
 				trim.WriteString(` `)
 				trim.WriteString(` set `)
