@@ -70,13 +70,14 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql by
 			var prefix = v.Propertys[`prefix`]
 			var suffix = v.Propertys[`suffix`]
 			var suffixOverrides = v.Propertys[`suffixOverrides`]
+			var prefixOverrides = v.Propertys[`prefixOverrides`]
 			if v.ElementItems != nil && len(v.ElementItems) > 0 && loopChildItem {
 				var tempTrimSql bytes.Buffer
 				tempTrimSql, err = this.createFromElement(v.ElementItems, tempTrimSql, param)
 				if err != nil {
 					return tempTrimSql, err
 				}
-				var tempTrimSqlString = strings.Trim(strings.Trim(tempTrimSql.String(), " "), suffixOverrides)
+				var tempTrimSqlString = strings.Trim(strings.Trim(strings.Trim(tempTrimSql.String(), " "), suffixOverrides), prefixOverrides)
 				var newBuffer bytes.Buffer
 				newBuffer.WriteString(` `)
 				newBuffer.WriteString(prefix)
