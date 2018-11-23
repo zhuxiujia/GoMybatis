@@ -31,29 +31,48 @@ func repleace(data string, typeConvertFunc func(arg interface{}) string, arg map
 		if strings.Contains(repleaceStr, ",") {
 			repleaceStr = strings.Split(repleaceStr, ",")[0]
 		}
-		if strings.Contains(repleaceStr, ".") {
-			var spArr = strings.Split(repleaceStr, ".")
-			var objStr = spArr[0]
-			var fieldStr = spArr[1]
-			if fieldStr != "" {
-				var fieldBytes = []byte(fieldStr)
-				var fieldLength = len(fieldStr)
-				fieldStr = strings.ToUpper(string(fieldBytes[:1])) + string(fieldBytes[1:fieldLength])
-				fieldBytes = nil
-			}
-			var fieldValue = reflect.ValueOf(arg[objStr]).FieldByName(fieldStr).Interface()
-			repleaceStr = typeConvertFunc(fieldValue)
-			data = strings.Replace(data, findStr, repleaceStr, -1)
-			fieldValue = nil
-			spArr = nil
-			objStr = ""
-			fieldStr = ""
-		} else {
-			repleaceStr = typeConvertFunc(arg[repleaceStr])
-			data = strings.Replace(data, findStr, repleaceStr, -1)
-		}
+		data = repleaceChildFeild(data, repleaceStr, findStr, typeConvertFunc, arg)
 	}
 	arg = nil
 	typeConvertFunc = nil
 	return data
+}
+
+func repleaceChildFeild(data string, repleaceStr string, findStr string, typeConvertFunc func(arg interface{}) string, arg map[string]interface{}) string {
+	var spArr = strings.Split(repleaceStr, ".")
+	if len(spArr) > 0 {
+		var objStr = spArr[0]
+		var fieldValue = getFeildInterface(repleaceStr, arg[objStr])
+		var repleaceStr = typeConvertFunc(fieldValue)
+		data = strings.Replace(data, findStr, repleaceStr, -1)
+		fieldValue = nil
+		spArr = nil
+		objStr = ""
+	} else {
+		repleaceStr = typeConvertFunc(arg[repleaceStr])
+		data = strings.Replace(data, findStr, repleaceStr, -1)
+		return data
+	}
+	return data
+}
+func getFeildInterface(repleaceStr string, arg interface{}) interface{} {
+	var spArr = strings.Split(repleaceStr, ".")
+	if len(spArr) > 1 {
+		for index, fieldName := range spArr {
+			//包含子属性
+			if index > 0 {
+				arg = reflect.ValueOf(arg).FieldByName(upperFieldFirstName(fieldName)).Interface()
+			}
+		}
+	}
+	return arg
+}
+func upperFieldFirstName(fieldStr string) string {
+	if fieldStr != "" {
+		var fieldBytes = []byte(fieldStr)
+		var fieldLength = len(fieldStr)
+		fieldStr = strings.ToUpper(string(fieldBytes[:1])) + string(fieldBytes[1:fieldLength])
+		fieldBytes = nil
+	}
+	return fieldStr
 }
