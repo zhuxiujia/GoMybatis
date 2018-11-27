@@ -14,8 +14,8 @@ func (this SessionFactory) New(Engine *SessionEngine) SessionFactory {
 func (this *SessionFactory) NewSession() *Session {
 	var session = (*this.Engine).NewSession()
 	var factorySession = SessionFactorySession{
-		SessionHolder: session,
-		Factory:       this,
+		Session: *session,
+		Factory: this,
 	}
 	var newSession = Session(&factorySession)
 	this.SessionMap[newSession.Id()] = &newSession
