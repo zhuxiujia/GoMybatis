@@ -37,7 +37,7 @@ func Test_SqlBuilder_Tps(t *testing.T) {
 		Value: "ss",
 		Type:  reflect.TypeOf("ss"),
 	}
-	defer utils.CountMethodTps(100000, time.Now(), "Test_SqlBuilder")
+	defer utils.CountMethodTps(100000, time.Now(), "Test_SqlBuilder_Tps")
 	for i := 0; i < 100000; i++ {
 		//var sql, e =
 		builder.BuildSql(paramMap, mapperTree[0])
