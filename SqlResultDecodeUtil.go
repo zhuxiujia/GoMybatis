@@ -163,13 +163,13 @@ func (this GoMybatisSqlResultDecoder) sqlBasicTypeConvert(tItemTypeFieldType ref
 			resultValue.SetBool(false)
 		}
 	} else if tItemTypeFieldType.Kind() == reflect.Int || tItemTypeFieldType.Kind() == reflect.Int32 || tItemTypeFieldType.Kind() == reflect.Int64 {
-		newValue, e := strconv.ParseInt(value, 10, 64)
+		newValue, e := strconv.ParseInt(value, 0, 64)
 		if e != nil {
 			return false
 		}
 		resultValue.SetInt(newValue)
 	} else if tItemTypeFieldType.Kind() == reflect.Uint || tItemTypeFieldType.Kind() == reflect.Uint8 || tItemTypeFieldType.Kind() == reflect.Uint16 || tItemTypeFieldType.Kind() == reflect.Uint32 || tItemTypeFieldType.Kind() == reflect.Uint64 {
-		newValue, e := strconv.ParseUint(value, 10, 64)
+		newValue, e := strconv.ParseUint(value, 0, 64)
 		if e != nil {
 			return false
 		}
