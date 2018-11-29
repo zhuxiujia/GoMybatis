@@ -123,13 +123,8 @@ func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args [
 		return err
 	}
 	//session
-	var haveArgSession = false
 	if session == nil {
 		session = sessionFactory.NewSession()
-	} else {
-		haveArgSession = true
-	}
-	if haveArgSession == false {
 		//not arg session,just close!
 		defer closeSession(sessionFactory, session)
 	}
