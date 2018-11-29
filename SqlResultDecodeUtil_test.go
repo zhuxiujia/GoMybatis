@@ -36,7 +36,7 @@ func Test_convert(t *testing.T) {
 	resMap["Age6"] = []byte("1908")
 	resMap["Age7"] = []byte("1908")
 	resMap["Age8"] = []byte("1908")
-	resMap["Bool"] = []byte("true")
+	resMap["Bool"] = []byte("1")
 	res = append(res, resMap)
 
 	var result TestResult
@@ -61,7 +61,7 @@ func Test_Ignore_Case_Underscores(t *testing.T)  {
 	resMap["age_6"] = []byte("1908")
 	resMap["age_7"] = []byte("1908")
 	resMap["age_8"] = []byte("1908")
-	resMap["Bool"] = []byte("true")
+	resMap["Bool"] = []byte("1")
 	res = append(res, resMap)
 
 	var result TestResult
