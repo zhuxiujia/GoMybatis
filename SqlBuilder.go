@@ -157,7 +157,7 @@ func (this GoMybatisSqlBuilder) expressionToIfZeroExpression(evaluateParameters 
 	for k, v := range evaluateParameters {
 		if strings.Index(expression, k) != -1 {
 			var t = reflect.TypeOf(v)
-			if t.String() != `string` {
+			if t.Kind() != reflect.String {
 				expression = strings.Replace(expression, `''`, `0`, -1)
 			}
 			return expression
