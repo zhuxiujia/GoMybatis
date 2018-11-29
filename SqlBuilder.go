@@ -60,8 +60,9 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql by
 				result, err := evalExpression.Evaluate(evaluateParameters)
 				if err != nil {
 					var buffer bytes.Buffer
-					buffer.WriteString("test() -> `")
+					buffer.WriteString("[GoMybatis] <test `")
 					buffer.WriteString(expression)
+					buffer.WriteString(`> fail,`)
 					buffer.WriteString(err.Error())
 					err = errors.New(buffer.String())
 					return sql, err
