@@ -44,3 +44,28 @@ func Test_convert(t *testing.T) {
 
 	fmt.Println(result)
 }
+
+func Test_Ignore_Case_Underscores(t *testing.T)  {
+	var GoMybatisSqlResultDecoder = GoMybatisSqlResultDecoder{}
+	var res = make([]map[string][]byte, 0)
+
+	var resMap = make(map[string][]byte)
+	resMap["name"] = []byte("xiao ming")
+	resMap["Amount_1"] = []byte("1908.1")
+	resMap["amount_2"] = []byte("1908.444")
+	resMap["age_1"] = []byte("1908")
+	resMap["age_2"] = []byte("1908")
+	resMap["age_3"] = []byte("1908")
+	resMap["age_4"] = []byte("1908")
+	resMap["age_5"] = []byte("1908")
+	resMap["age_6"] = []byte("1908")
+	resMap["age_7"] = []byte("1908")
+	resMap["age_8"] = []byte("1908")
+	resMap["Bool"] = []byte("true")
+	res = append(res, resMap)
+
+	var result TestResult
+	GoMybatisSqlResultDecoder.Decode(res, &result)
+
+	fmt.Println(result)
+}
