@@ -89,7 +89,7 @@ func Test_local_Transation(t *testing.T) {
 	var e = exampleActivityMapperImpl.UpdateById(&session, activityBean, &updateNum) //sessionId 有值则使用已经创建的session，否则新建一个session
 	fmt.Println("updateNum=", updateNum)
 	if e != nil {
-		fmt.Println(e)
+		panic(e)
 	}
 	session.Commit() //提交事务
 	session.Close()  //关闭事务
@@ -127,6 +127,6 @@ func Test_Remote_Transation(t *testing.T) {
 	}
 	//提交远程事务
 	transationRMSession.Commit()
-	//关闭远程事务
+	//回滚远程事务
 	//transationRMSession.Rollback()
 }

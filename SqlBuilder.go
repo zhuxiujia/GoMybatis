@@ -11,7 +11,7 @@ import (
 )
 
 type SqlBuilder interface {
-	BuildSqlFromMap(paramMap map[string]interface{}, mapperXml MapperXml) (string, error)
+	BuildSql(paramMap map[string]SqlArg, mapperXml MapperXml) (string, error)
 }
 
 type GoMybatisSqlBuilder struct {
@@ -26,7 +26,7 @@ func (this GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert,
 	return this
 }
 
-func (this GoMybatisSqlBuilder) BuildSqlFromMap(paramMap map[string]interface{}, mapperXml MapperXml) (string, error) {
+func (this GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml MapperXml) (string, error) {
 	var sql bytes.Buffer
 	sql, err := this.createFromElement(mapperXml.ElementItems, sql, paramMap)
 	if err != nil {
@@ -36,8 +36,8 @@ func (this GoMybatisSqlBuilder) BuildSqlFromMap(paramMap map[string]interface{},
 	return sql.String(), nil
 }
 
-func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[string]interface{}) (result bytes.Buffer, err error) {
-	if this.SqlArgTypeConvert == nil || this.ExpressionTypeConvert == nil{
+func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[string]SqlArg) (result bytes.Buffer, err error) {
+	if this.SqlArgTypeConvert == nil || this.ExpressionTypeConvert == nil {
 		panic("[GoMybatis] GoMybatisSqlBuilder.SqlArgTypeConvert and GoMybatisSqlBuilder.ExpressionTypeConvert can not be nil!")
 	}
 	for _, v := range itemTree {
@@ -123,14 +123,20 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql by
 			var close = v.Propertys[`close`]
 			var separator = v.Propertys[`separator`]
 			var tempSql bytes.Buffer
-			var datas = param[collection]
+			var datas = param[collection].Value
 			var collectionValue = reflect.ValueOf(datas)
 			if collectionValue.Len() > 0 {
 				for i := 0; i < collectionValue.Len(); i++ {
 					var dataItem = collectionValue.Index(i).Interface()
-					var tempArgMap = make(map[string]interface{})
-					tempArgMap[item] = dataItem
-					tempArgMap[index] = index
+					var tempArgMap = make(map[string]SqlArg)
+					tempArgMap[item] = SqlArg{
+						Value: dataItem,
+						Type:  collectionValue.Index(i).Type(),
+					}
+					tempArgMap[index] = SqlArg{
+						Value: index,
+						Type:  reflect.TypeOf(index),
+					}
 					for k, v := range param {
 						tempArgMap[k] = v
 					}
@@ -178,13 +184,14 @@ func (this GoMybatisSqlBuilder) expressionToIfZeroExpression(evaluateParameters 
 }
 
 //scan params
-func (this GoMybatisSqlBuilder) scanParamterMap(parameters map[string]interface{}, typeConvert ExpressionTypeConvert) map[string]interface{} {
+func (this GoMybatisSqlBuilder) scanParamterMap(parameters map[string]SqlArg, typeConvert ExpressionTypeConvert) map[string]interface{} {
 	var newMap = make(map[string]interface{})
 	for k, obj := range parameters {
+		var value = obj.Value
 		if typeConvert != nil {
-			obj = typeConvert.Convert(obj)
+			value = typeConvert.Convert(obj)
 		}
-		newMap[k] = obj
+		newMap[k] = value
 	}
 	return newMap
 }

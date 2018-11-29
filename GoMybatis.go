@@ -148,7 +148,7 @@ func closeSession(factory *SessionFactory, session *Session) {
 
 func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml MapperXml, sqlBuilder SqlBuilder) (*Session, string, error) {
 	var session *Session
-	var paramMap = make(map[string]interface{})
+	var paramMap = make(map[string]SqlArg)
 	var tagArgsLen = len(tagArgs)
 	for argIndex, arg := range args {
 		var argInterface = arg.Interface()
@@ -162,18 +162,24 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml MapperXml, sqlBu
 		if arg.Kind() == reflect.Struct && arg.Type().String() != GoMybatis_Time {
 			paramMap = scanStructArgFields(argInterface, nil)
 		} else if tagArgsLen > 0 && argIndex < tagArgsLen && tagArgs[argIndex].Name != "" && argInterface != nil {
-			paramMap[tagArgs[argIndex].Name] = argInterface
+			paramMap[tagArgs[argIndex].Name] = SqlArg{
+				Value:argInterface,
+				Type:arg.Type(),
+			}
 		} else {
-			paramMap[DefaultOneArg] = argInterface
+			paramMap[DefaultOneArg] = SqlArg{
+				Value:argInterface,
+				Type:arg.Type(),
+			}
 		}
 	}
-	result, err := sqlBuilder.BuildSqlFromMap(paramMap, mapperXml)
+	result, err := sqlBuilder.BuildSql(paramMap, mapperXml)
 	return session, result, err
 }
 
 //scan params
-func scanStructArgFields(arg interface{}, typeConvert func(arg interface{}) interface{}) map[string]interface{} {
-	parameters := make(map[string]interface{})
+func scanStructArgFields(arg interface{}, typeConvert func(arg interface{}) interface{}) map[string]SqlArg {
+	parameters := make(map[string]SqlArg)
 	v := reflect.ValueOf(arg)
 	t := reflect.TypeOf(arg)
 	if t.Kind() != reflect.Struct {
@@ -187,9 +193,15 @@ func scanStructArgFields(arg interface{}, typeConvert func(arg interface{}) inte
 		}
 		var jsonKey = typeValue.Tag.Get(`json`)
 		if jsonKey != "" {
-			parameters[jsonKey] = obj
+			parameters[jsonKey] = SqlArg{
+				Type:v.Field(i).Type(),
+				Value:obj,
+			}
 		} else {
-			parameters[typeValue.Name] = obj
+			parameters[typeValue.Name] = SqlArg{
+				Type:v.Field(i).Type(),
+				Value:obj,
+			}
 		}
 	}
 	return parameters

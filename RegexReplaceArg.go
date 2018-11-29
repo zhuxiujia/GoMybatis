@@ -7,12 +7,12 @@ import (
 )
 
 //替换参数
-func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlArgTypeConvert) string {
+func replaceArg(data string, parameters map[string]SqlArg, typeConvert SqlArgTypeConvert) string {
 	if data == "" {
 		return data
 	}
 	var defaultValue = parameters[DefaultOneArg]
-	if defaultValue != nil {
+	if defaultValue.Value != nil {
 		var str = typeConvert.Convert(defaultValue)
 		data = re.ReplaceAllString(data, str)
 	}
@@ -22,7 +22,7 @@ func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlA
 
 var re, _ = regexp.Compile("\\#\\{[^}]*\\}")
 
-func repleace(data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}) string {
+func repleace(data string, typeConvert SqlArgTypeConvert, arg map[string]SqlArg) string {
 	var findStrs = re.FindAllString(data, -1)
 	var repleaceStr = ""
 	for _, findStr := range findStrs {
@@ -38,14 +38,13 @@ func repleace(data string, typeConvert SqlArgTypeConvert, arg map[string]interfa
 	return data
 }
 
-func repleaceChildFeild(data string, repleaceStr string, findStr string, typeConvert SqlArgTypeConvert, arg map[string]interface{}) string {
+func repleaceChildFeild(data string, repleaceStr string, findStr string, typeConvert SqlArgTypeConvert, arg map[string]SqlArg) string {
 	var spArr = strings.Split(repleaceStr, ".")
 	if len(spArr) > 0 {
 		var objStr = spArr[0]
 		var fieldValue = getFeildInterface(repleaceStr, arg[objStr])
 		var repleaceStr = typeConvert.Convert(fieldValue)
 		data = strings.Replace(data, findStr, repleaceStr, -1)
-		fieldValue = nil
 		spArr = nil
 		objStr = ""
 	} else {
@@ -55,7 +54,7 @@ func repleaceChildFeild(data string, repleaceStr string, findStr string, typeCon
 	}
 	return data
 }
-func getFeildInterface(repleaceStr string, arg interface{}) interface{} {
+func getFeildInterface(repleaceStr string, arg SqlArg) SqlArg {
 	var spArr = strings.Split(repleaceStr, ".")
 	if len(spArr) > 1 {
 		for index, fieldName := range spArr {
@@ -65,7 +64,7 @@ func getFeildInterface(repleaceStr string, arg interface{}) interface{} {
 				if v.IsValid() {
 					panic(`[GoMybatis] access field ` + fieldName + " fail! please check you struct.Field !")
 				}
-				arg = v.Interface()
+				arg.Value = v.Interface()
 			}
 		}
 	}

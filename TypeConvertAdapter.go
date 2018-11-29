@@ -12,58 +12,56 @@ const Adapter_FormateDate = `2006-01-02 15:04:05`
 
 //表达式类型(基本类型)转换函数
 type ExpressionTypeConvert interface {
-	Convert(arg interface{}) interface{}
+	Convert(arg SqlArg) interface{}
 }
 
 //表达式类型(基本类型)转换函数
 type SqlArgTypeConvert interface {
-	Convert(arg interface{}) string
+	Convert(arg SqlArg) string
 }
 
 type GoMybatisExpressionTypeConvert struct {
 	ExpressionTypeConvert
 }
 
-func (this GoMybatisExpressionTypeConvert) Convert(arg interface{}) interface{} {
-	var t = reflect.TypeOf(arg)
-	if t.Kind() == reflect.Struct && t.String() == Adapter_DateType {
-		return arg.(time.Time).Nanosecond()
+func (this GoMybatisExpressionTypeConvert) Convert(arg SqlArg) interface{} {
+	if arg.Type.Kind() == reflect.Struct && arg.Type.String() == Adapter_DateType {
+		return arg.Value.(time.Time).Nanosecond()
 	}
-	return arg
+	return arg.Value
 }
 
 type GoMybatisSqlArgTypeConvert struct {
 	SqlArgTypeConvert
 }
 
-func (this GoMybatisSqlArgTypeConvert) Convert(arg interface{}) string {
-	if arg == nil {
+func (this GoMybatisSqlArgTypeConvert) Convert(arg SqlArg) string {
+	if arg.Value == nil {
 		return ""
 	}
-	var t = reflect.TypeOf(arg)
-	if t.Kind() == reflect.Struct && t.String() == Adapter_DateType {
-		arg = arg.(time.Time).Format(Adapter_FormateDate)
+	if arg.Type.Kind() == reflect.Struct && arg.Type.String() == Adapter_DateType {
+		arg.Value = arg.Value.(time.Time).Format(Adapter_FormateDate)
 	}
-	if t.Kind() == reflect.Bool {
-		if arg.(bool) {
-			arg = 1
+	if arg.Type.Kind() == reflect.Bool {
+		if arg.Value.(bool) {
+			arg.Value = 1
 		} else {
-			arg = 0
+			arg.Value = 0
 		}
 	}
-	if t.Kind() == reflect.String {
+	if arg.Type.Kind() == reflect.String {
 		var argStr bytes.Buffer
 		argStr.WriteString(`'`)
-		argStr.WriteString(this.toString(arg))
+		argStr.WriteString(this.toString(&arg))
 		argStr.WriteString(`'`)
 		return argStr.String()
 	}
-	return this.toString(arg)
+	return this.toString(&arg)
 }
 
-func (this GoMybatisSqlArgTypeConvert) toString(value interface{}) string {
-	if value == nil {
+func (this GoMybatisSqlArgTypeConvert) toString(value *SqlArg) string {
+	if value.Value == nil {
 		return ""
 	}
-	return fmt.Sprint(value)
+	return fmt.Sprint(value.Value)
 }
