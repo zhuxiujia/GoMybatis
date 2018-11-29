@@ -16,7 +16,6 @@
         </if>
         order by create_time desc
         <if test="page >= 0 and size != 0">limit #{page}, #{size}</if>
-        <include refid="selectsdf"></include>
     </select>
     <!--int countByCondition(@Param("name")String name,@Param("startTime") Date startTime, @Param("endTime")Date endTime);-->
     <select id="countByCondition">
