@@ -16,6 +16,14 @@ type SqlBuilder interface {
 
 type GoMybatisSqlBuilder struct {
 	SqlBuilder
+	ExpressionTypeConvert ExpressionTypeConvert
+	SqlArgTypeConvert     SqlArgTypeConvert
+}
+
+func (this GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert, SqlArgTypeConvert SqlArgTypeConvert) GoMybatisSqlBuilder {
+	this.ExpressionTypeConvert = ExpressionTypeConvert
+	this.SqlArgTypeConvert = SqlArgTypeConvert
+	return this
 }
 
 func (this GoMybatisSqlBuilder) BuildSqlFromMap(paramMap map[string]interface{}, mapperXml MapperXml) (string, error) {
@@ -24,23 +32,26 @@ func (this GoMybatisSqlBuilder) BuildSqlFromMap(paramMap map[string]interface{},
 	if err != nil {
 		return sql.String(), err
 	}
-	log.Println("[Preparing sql ==> ]", sql.String())
+	log.Println("[GoMybatis] Preparing sql ==> ", sql.String())
 	return sql.String(), nil
 }
 
 func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[string]interface{}) (result bytes.Buffer, err error) {
+	if this.SqlArgTypeConvert == nil || this.ExpressionTypeConvert == nil{
+		panic("[GoMybatis] GoMybatisSqlBuilder.SqlArgTypeConvert and GoMybatisSqlBuilder.ExpressionTypeConvert can not be nil!")
+	}
 	for _, v := range itemTree {
 		var loopChildItem = true
 		if v.ElementType == Element_String {
 			//string element
-			sql.WriteString(replaceArg(v.DataString, param, DefaultSqlTypeConvertFunc))
+			sql.WriteString(replaceArg(v.DataString, param, this.SqlArgTypeConvert))
 		} else if v.ElementType == Element_If {
 			//if element
 			var test = v.Propertys[`test`]
 			var andStrings = strings.Split(test, ` and `)
 			for index, expression := range andStrings {
 				//test表达式解析
-				var evaluateParameters = this.scanParamterMap(param, DefaultExpressionTypeConvertFunc)
+				var evaluateParameters = this.scanParamterMap(param, this.ExpressionTypeConvert)
 				expression = this.expressionToIfZeroExpression(evaluateParameters, expression)
 				evalExpression, err := govaluate.NewEvaluableExpression(expression)
 				if err != nil {
@@ -58,7 +69,7 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql by
 				if result.(bool) {
 					//test表达式成立
 					if index == (len(andStrings) - 1) {
-						var reps = replaceArg(v.DataString, param, DefaultSqlTypeConvertFunc)
+						var reps = replaceArg(v.DataString, param, this.SqlArgTypeConvert)
 						sql.WriteString(reps)
 					}
 				} else {
@@ -167,11 +178,11 @@ func (this GoMybatisSqlBuilder) expressionToIfZeroExpression(evaluateParameters 
 }
 
 //scan params
-func (this GoMybatisSqlBuilder) scanParamterMap(parameters map[string]interface{}, typeConvert func(arg interface{}) interface{}) map[string]interface{} {
+func (this GoMybatisSqlBuilder) scanParamterMap(parameters map[string]interface{}, typeConvert ExpressionTypeConvert) map[string]interface{} {
 	var newMap = make(map[string]interface{})
 	for k, obj := range parameters {
 		if typeConvert != nil {
-			obj = typeConvert(obj)
+			obj = typeConvert.Convert(obj)
 		}
 		newMap[k] = obj
 	}

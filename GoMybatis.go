@@ -9,29 +9,19 @@ import (
 //如果使用UseProxyMapperByEngine，则内建默认的SessionFactory
 var DefaultSessionFactory *SessionFactory
 
-var DefaultSqlResultDecoder SqlResultDecoder
-
-var DefaultSqlBuilder SqlBuilder
-
 func UseProxyMapperByEngine(bean interface{}, xml []byte, sqlEngine *SessionEngine) {
 	v := reflect.ValueOf(bean)
 	if v.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
+	var factory = SessionFactory{}.New(sqlEngine)
 	if DefaultSessionFactory == nil {
-		var factory = SessionFactory{}.New(sqlEngine)
 		DefaultSessionFactory = &factory
 	}
-	if DefaultSqlResultDecoder == nil {
-		DefaultSqlResultDecoder = GoMybatisSqlResultDecoder{}
-	}
-	if DefaultSqlBuilder == nil {
-		DefaultSqlBuilder = GoMybatisSqlBuilder{}
-	}
-	UseProxyMapper(v, xml, DefaultSessionFactory, DefaultSqlResultDecoder, DefaultSqlBuilder)
+	UseProxyMapper(v, xml, DefaultSessionFactory, GoMybatisSqlResultDecoder{}, GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{}))
 }
 
-func UseProxyMapperByFactory(bean interface{}, xml []byte, sessionFactory *SessionFactory, sqlResultDecoder SqlResultDecoder, sqlBuilder SqlBuilder) {
+func UseProxyMapperFromBean(bean interface{}, xml []byte, sessionFactory *SessionFactory, sqlResultDecoder SqlResultDecoder, sqlBuilder SqlBuilder) {
 	v := reflect.ValueOf(bean)
 	if v.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
@@ -58,7 +48,6 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *Ses
 //使用UseProxyMapper函数设置代理后即可正常使用。
 func UseProxyMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, decoder SqlResultDecoder, sqlBuilder SqlBuilder) {
 	var mapperTree = LoadMapperXml(xml)
-
 	//make a map[method]xml
 	var methodXmlMap = makeEethodXmlMap(bean, mapperTree)
 

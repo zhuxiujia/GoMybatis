@@ -7,22 +7,22 @@ import (
 )
 
 //替换参数
-func replaceArg(data string, parameters map[string]interface{}, typeConvertFunc func(arg interface{}) string) string {
+func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlArgTypeConvert) string {
 	if data == "" {
 		return data
 	}
 	var defaultValue = parameters[DefaultOneArg]
 	if defaultValue != nil {
-		var str = typeConvertFunc(defaultValue)
+		var str = typeConvert.Convert(defaultValue)
 		data = re.ReplaceAllString(data, str)
 	}
-	data = repleace(data, typeConvertFunc, parameters)
+	data = repleace(data, typeConvert, parameters)
 	return data
 }
 
 var re, _ = regexp.Compile("\\#\\{[^}]*\\}")
 
-func repleace(data string, typeConvertFunc func(arg interface{}) string, arg map[string]interface{}) string {
+func repleace(data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}) string {
 	var findStrs = re.FindAllString(data, -1)
 	var repleaceStr = ""
 	for _, findStr := range findStrs {
@@ -31,25 +31,25 @@ func repleace(data string, typeConvertFunc func(arg interface{}) string, arg map
 		if strings.Contains(repleaceStr, ",") {
 			repleaceStr = strings.Split(repleaceStr, ",")[0]
 		}
-		data = repleaceChildFeild(data, repleaceStr, findStr, typeConvertFunc, arg)
+		data = repleaceChildFeild(data, repleaceStr, findStr, typeConvert, arg)
 	}
 	arg = nil
-	typeConvertFunc = nil
+	typeConvert = nil
 	return data
 }
 
-func repleaceChildFeild(data string, repleaceStr string, findStr string, typeConvertFunc func(arg interface{}) string, arg map[string]interface{}) string {
+func repleaceChildFeild(data string, repleaceStr string, findStr string, typeConvert SqlArgTypeConvert, arg map[string]interface{}) string {
 	var spArr = strings.Split(repleaceStr, ".")
 	if len(spArr) > 0 {
 		var objStr = spArr[0]
 		var fieldValue = getFeildInterface(repleaceStr, arg[objStr])
-		var repleaceStr = typeConvertFunc(fieldValue)
+		var repleaceStr = typeConvert.Convert(fieldValue)
 		data = strings.Replace(data, findStr, repleaceStr, -1)
 		fieldValue = nil
 		spArr = nil
 		objStr = ""
 	} else {
-		repleaceStr = typeConvertFunc(arg[repleaceStr])
+		repleaceStr = typeConvert.Convert(arg[repleaceStr])
 		data = strings.Replace(data, findStr, repleaceStr, -1)
 		return data
 	}
