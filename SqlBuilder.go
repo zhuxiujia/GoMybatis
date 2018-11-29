@@ -135,7 +135,7 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql by
 					}
 					tempArgMap[index] = SqlArg{
 						Value: index,
-						Type:  reflect.TypeOf(index),
+						Type:  IntType,
 					}
 					for k, v := range param {
 						tempArgMap[k] = v
