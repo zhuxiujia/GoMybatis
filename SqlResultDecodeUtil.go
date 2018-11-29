@@ -150,38 +150,26 @@ func (this GoMybatisSqlResultDecoder) sqlStructConvert(resultTItemType reflect.T
 
 func (this GoMybatisSqlResultDecoder) sqlBasicTypeConvert(tItemTypeFieldType reflect.Type, valueByte []byte, resultValue reflect.Value) bool {
 	var value = string(valueByte)
-	if tItemTypeFieldType.String() == "string" {
-		resultValue.Set(reflect.ValueOf(value))
-	} else if tItemTypeFieldType.String() == "int" {
-		newValue, e := strconv.Atoi(value)
-		if e != nil {
-			return false
-		}
-		resultValue.Set(reflect.ValueOf(newValue))
-	} else if tItemTypeFieldType.String() == "int32" {
-		newValue, e := strconv.ParseInt(value, 10, 32)
-		if e != nil {
-			return false
-		}
-		resultValue.Set(reflect.ValueOf(int32(newValue)))
-	} else if tItemTypeFieldType.String() == "int64" {
+	if tItemTypeFieldType.Kind()==reflect.String {
+		resultValue.SetString(value)
+	}  else if tItemTypeFieldType.Kind() == reflect.Int || tItemTypeFieldType.Kind() == reflect.Int32 || tItemTypeFieldType.Kind() == reflect.Int64 {
 		newValue, e := strconv.ParseInt(value, 10, 64)
 		if e != nil {
 			return false
 		}
-		resultValue.Set(reflect.ValueOf(newValue))
-	} else if tItemTypeFieldType.String() == "float32" {
+		resultValue.SetInt(newValue)
+	} else if tItemTypeFieldType.Kind() == reflect.Uint || tItemTypeFieldType.Kind() == reflect.Uint8 || tItemTypeFieldType.Kind() == reflect.Uint16 || tItemTypeFieldType.Kind() == reflect.Uint32 || tItemTypeFieldType.Kind() == reflect.Uint64 {
+		newValue, e := strconv.ParseUint(value, 10, 64)
+		if e != nil {
+			return false
+		}
+		resultValue.SetUint(newValue)
+	}else if tItemTypeFieldType.Kind() == reflect.Float32 || tItemTypeFieldType.Kind() == reflect.Float64{
 		newValue, e := strconv.ParseFloat(value, 32)
 		if e != nil {
 			return false
 		}
-		resultValue.Set(reflect.ValueOf(float32(newValue)))
-	} else if tItemTypeFieldType.String() == "float64" {
-		newValue, e := strconv.ParseFloat(value, 64)
-		if e != nil {
-			return false
-		}
-		resultValue.Set(reflect.ValueOf(newValue))
+		resultValue.SetFloat(newValue)
 	} else if tItemTypeFieldType.String() == "time.Time" {
 		newValue, e := time.Parse(string(time.RFC3339), value)
 		if e != nil {
