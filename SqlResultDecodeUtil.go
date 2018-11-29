@@ -165,7 +165,7 @@ func (this GoMybatisSqlResultDecoder) sqlBasicTypeConvert(tItemTypeFieldType ref
 		}
 		resultValue.SetUint(newValue)
 	}else if tItemTypeFieldType.Kind() == reflect.Float32 || tItemTypeFieldType.Kind() == reflect.Float64{
-		newValue, e := strconv.ParseFloat(value, 32)
+		newValue, e := strconv.ParseFloat(value, 64)
 		if e != nil {
 			return false
 		}

@@ -27,7 +27,7 @@ func Test_convert(t *testing.T) {
 	var resMap = make(map[string][]byte)
 	resMap["Name"] = []byte("xiao ming")
 	resMap["Amount1"] = []byte("1908.1")
-	resMap["Amount2"] = []byte("1908.2")
+	resMap["Amount2"] = []byte("1908.444")
 	resMap["Age1"] = []byte("1908")
 	resMap["Age2"] = []byte("1908")
 	resMap["Age3"] = []byte("1908")
