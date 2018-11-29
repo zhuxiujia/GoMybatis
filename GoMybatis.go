@@ -58,6 +58,10 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *Ses
 //使用UseProxyMapper函数设置代理后即可正常使用。
 func UseProxyMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, decoder SqlResultDecoder, sqlBuilder SqlBuilder) {
 	var mapperTree = LoadMapperXml(xml)
+
+	//make a map[method]xml
+	var methodXmlMap = makeEethodXmlMap(bean, mapperTree)
+
 	var proxyFunc = func(method string, args []reflect.Value, tagArgs []TagArg) error {
 		var lastArgsIndex = len(args) - 1
 		var argsLen = len(args)
@@ -66,28 +70,50 @@ func UseProxyMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFacto
 			lastArgValue = &args[lastArgsIndex]
 			if lastArgValue.Kind() != reflect.Ptr {
 				//最后一个参数必须为指针，或者不传任何参数
-				return errors.New(`[method params last param must be pointer!],method =` + method)
+				return errors.New(`[GoMybatis] method params last param must be pointer!,method =` + method)
 			}
 		}
-		var findMethod = false
-		for _, mapperXml := range mapperTree {
-			//exec sql,return data
-			if strings.EqualFold(mapperXml.Id, method) {
-				findMethod = true
-				buildMethodBody(sessionFactory, tagArgs, args, mapperXml, lastArgValue, decoder, sqlBuilder)
-				//匹配完成退出
-				break
-			}
-		}
-		if findMethod == false {
-			return errors.New(`[GoMybatis] not method find at xml file,method =` + method)
-		}
-		return nil
+		return exeMethodByXml(sessionFactory, tagArgs, args, *methodXmlMap[method], lastArgValue, decoder, sqlBuilder)
 	}
 	UseMapperValue(bean, proxyFunc)
 }
 
-func buildMethodBody(sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, mapperXml MapperXml, lastArgValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder) error {
+func makeEethodXmlMap(bean reflect.Value, mapperTree []MapperXml) map[string]*MapperXml {
+	var methodXmlMap = make(map[string]*MapperXml)
+	var totalField = bean.Elem().Type().NumField()
+	for i := 0; i < totalField; i++ {
+		var fieldItem = bean.Elem().Type().Field(i)
+		if fieldItem.Type.Kind() == reflect.Func {
+			//field must be func
+			methodFieldCheck(fieldItem)
+			var mapperXml = findMapperXml(mapperTree, fieldItem.Name)
+			if mapperXml != nil {
+				methodXmlMap[fieldItem.Name] = mapperXml
+			} else {
+				panic("[GoMybatis] can not find method " + fieldItem.Name + " in xml !")
+			}
+		}
+	}
+	return methodXmlMap
+}
+
+func methodFieldCheck(methodType reflect.StructField) {
+	if methodType.Type.NumOut() != 1 {
+		panic("[GoMybatis] method field must be return one 'error' type!")
+	}
+}
+
+func findMapperXml(mapperTree []MapperXml, methodName string) *MapperXml {
+	for _, mapperXml := range mapperTree {
+		//exec sql,return data
+		if strings.EqualFold(mapperXml.Id, methodName) {
+			return &mapperXml
+		}
+	}
+	return nil
+}
+
+func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, mapperXml MapperXml, lastArgValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder) error {
 	//build sql string
 	var session *Session
 	var sql string
