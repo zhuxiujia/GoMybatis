@@ -93,7 +93,7 @@ func makeResultMaps(xmls []MapperXml) map[string]map[string]*ResultProperty {
 	}
 	return resultMaps
 }
-
+//return a map map[`method`]*MapperXml
 func makeMethodXmlMap(bean reflect.Value, mapperTree []MapperXml) map[string]*MapperXml {
 	if bean.Kind() == reflect.Ptr {
 		bean = bean.Elem()
