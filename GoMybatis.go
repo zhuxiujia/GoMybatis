@@ -49,7 +49,7 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *Ses
 func UseProxyMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, decoder SqlResultDecoder, sqlBuilder SqlBuilder) {
 	var mapperTree = LoadMapperXml(xml)
 	//make a map[method]xml
-	var methodXmlMap = makeEethodXmlMap(bean, mapperTree)
+	var methodXmlMap = makeMethodXmlMap(bean, mapperTree)
 	var resultMaps = makeResultMaps(mapperTree)
 	var proxyFunc = func(method string, args []reflect.Value, tagArgs []TagArg) error {
 		var lastArgsIndex = len(args) - 1
@@ -94,7 +94,7 @@ func makeResultMaps(xmls []MapperXml) map[string]map[string]*ResultProperty {
 	return resultMaps
 }
 
-func makeEethodXmlMap(bean reflect.Value, mapperTree []MapperXml) map[string]*MapperXml {
+func makeMethodXmlMap(bean reflect.Value, mapperTree []MapperXml) map[string]*MapperXml {
 	if bean.Kind() == reflect.Ptr {
 		bean = bean.Elem()
 	}
