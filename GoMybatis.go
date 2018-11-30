@@ -110,7 +110,7 @@ func makeMethodXmlMap(bean reflect.Value, mapperTree []MapperXml) map[string]*Ma
 			if mapperXml != nil {
 				methodXmlMap[fieldItem.Name] = mapperXml
 			} else {
-				panic("[GoMybatis] can not find method " + fieldItem.Name + " in xml !")
+				panic("[GoMybatis] can not find method "+bean.Type().String() +"."+ fieldItem.Name + "() in xml !")
 			}
 		}
 	}
