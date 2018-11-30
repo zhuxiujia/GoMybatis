@@ -6,7 +6,7 @@ https://zhuxiujia.github.io/gomybatis.io/#/
 GoMybatis 是根据java版 Mybatis3 的实现,基于Go标准库和github.com/Knetic/govaluate表达式及github.com/beevik/etree读取Xml解析,github.com/satori/go.uuid生成库 实现。
 GoMybatis 内部在初始化时反射分析mapper xml生成golang的func代码，默认支持绝大部分的Java版的mybatis标签和规范,
 ### 已支持绝大部分标签
-`<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<foreach>`
+`<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<foreach><resultMap>`
 ### 已支持本地和远程事务,方便处于 单数据库(Mysql,postgresql)-分布式数据库（TiDB,cockroachdb...）过渡期间的微服务
 ![Image text](https://github.com/zhuxiujia/gomybatis.io/raw/master/docs/tx.png)
 
@@ -99,7 +99,6 @@ func main() {
 ```
 
 ## TODO 期待功能
--`<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<foreach>`（已支持）</br>
--`<resultMap>`标签支持（待支持..）</br>
+-`<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<foreach><resultMap>`（已完成）</br>
 -针对于 GoLand 的xml生成插件,可以使用鼠标右键点击一键生成CRUD基础XML(待支持..)</br>
 
