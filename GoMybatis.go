@@ -119,7 +119,7 @@ func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args [
 	}
 	var haveLastReturnValue = lastArgValue != nil && (*lastArgValue).IsNil() == false
 	//do CRUD
-	if mapperXml.Tag == Select && haveLastReturnValue {
+	if mapperXml.Tag == Element_Select && haveLastReturnValue {
 		//is select and have return value
 		results, err := (*session).Query(sql)
 		if err != nil {

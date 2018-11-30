@@ -36,7 +36,11 @@ func LoadMapperXml(bytes []byte) (items []MapperXml) {
 	for _, s := range root.ChildElements() {
 		var attrMap = attrToProperty(s.Attr)
 		var elItems = loop(s)
-		if s.Tag == Insert || s.Tag == Delete || s.Tag == Update || s.Tag == Select {
+		if s.Tag == Element_Insert ||
+			s.Tag == Element_Delete ||
+			s.Tag == Element_Update ||
+			s.Tag == Element_Select ||
+			s.Tag == Element_ResultMap{
 			items = append(items, MapperXml{
 				Tag:          s.Tag,
 				Id:           attrMap[ID],
