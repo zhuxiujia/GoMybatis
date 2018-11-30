@@ -11,12 +11,7 @@ GoMybatis 内部在初始化时反射分析mapper xml生成golang的func代码�
 ![Image text](https://github.com/zhuxiujia/gomybatis.io/raw/master/docs/tx.png)
 
 # 使用教程,代码文件请查看/example文件夹
-设置好GoPath,用go get 命令下载库
-```
-go get github.com/zhuxiujia/GoMybatis
-go get github.com/go-sql-driver/mysql
-```
-驱动支持
+各种数据库驱动支持
 ```
  Mysql: github.com/go-sql-driver/mysql
  MyMysql: github.com/ziutek/mymysql/godrv
@@ -27,6 +22,11 @@ go get github.com/go-sql-driver/mysql
  MsSql: github.com/lunny/godbc
  Oracle: github.com/mattn/go-oci8
  ```
+设置好GoPath,用go get 命令下载GoMybatis和对应的数据库驱动
+```
+go get github.com/zhuxiujia/GoMybatis
+go get github.com/go-sql-driver/mysql
+```
 mapper.go 文件案例
 ```
 //定义mapper文件的接口和结构体，也可以只定义结构体就行
