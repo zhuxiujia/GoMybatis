@@ -1,6 +1,6 @@
 # GoMybatis
 ![Image text](https://github.com/zhuxiujia/gomybatis.io/raw/master/docs/logo.png)
-# 文档网站站点
+# 网站地址
 https://zhuxiujia.github.io/gomybatis.io/#/
 # 优势
 GoMybatis 是根据java版 Mybatis3 的实现,基于Go标准库和github.com/Knetic/govaluate表达式及github.com/beevik/etree读取Xml解析,github.com/satori/go.uuid生成库 实现。
