@@ -50,7 +50,7 @@ func UseProxyMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFacto
 	var mapperTree = LoadMapperXml(xml)
 	//make a map[method]xml
 	var methodXmlMap = makeEethodXmlMap(bean, mapperTree)
-
+	var resultMaps = makeResultMaps(mapperTree)
 	var proxyFunc = func(method string, args []reflect.Value, tagArgs []TagArg) error {
 		var lastArgsIndex = len(args) - 1
 		var argsLen = len(args)
@@ -62,14 +62,41 @@ func UseProxyMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFacto
 				return errors.New(`[GoMybatis] method params last param must be pointer!,method =` + method)
 			}
 		}
-		return exeMethodByXml(sessionFactory, tagArgs, args, *methodXmlMap[method], lastArgValue, decoder, sqlBuilder)
+		var mapperXml = *methodXmlMap[method]
+		var resultMap map[string]*ResultProperty
+		var resultMapId = mapperXml.Propertys["resultMap"]
+		if resultMapId != "" {
+			resultMap = resultMaps[resultMapId]
+		}
+		return exeMethodByXml(sessionFactory, tagArgs, args, mapperXml, resultMap, lastArgValue, decoder, sqlBuilder)
 	}
 	UseMapperValue(bean, proxyFunc)
 }
 
+//map[id]map[cloum]Property
+func makeResultMaps(xmls []MapperXml) map[string]map[string]*ResultProperty {
+	var resultMaps = make(map[string]map[string]*ResultProperty)
+	for _, xmlItem := range xmls {
+		if xmlItem.Tag == "resultMap" {
+			var resultPropertyMap = make(map[string]*ResultProperty)
+			for _, elementItem := range xmlItem.ElementItems {
+				var property = ResultProperty{
+					XMLName:  elementItem.ElementType,
+					Column:   elementItem.Propertys["column"],
+					Property: elementItem.Propertys["property"],
+					GoType:   elementItem.Propertys["goType"],
+				}
+				resultPropertyMap[property.Column] = &property
+			}
+			resultMaps[xmlItem.Id] = resultPropertyMap
+		}
+	}
+	return resultMaps
+}
+
 func makeEethodXmlMap(bean reflect.Value, mapperTree []MapperXml) map[string]*MapperXml {
-	if bean.Kind()==reflect.Ptr{
-		bean=bean.Elem()
+	if bean.Kind() == reflect.Ptr {
+		bean = bean.Elem()
 	}
 
 	var methodXmlMap = make(map[string]*MapperXml)
@@ -106,7 +133,7 @@ func findMapperXml(mapperTree []MapperXml, methodName string) *MapperXml {
 	return nil
 }
 
-func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, mapperXml MapperXml, lastArgValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder) error {
+func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, mapperXml MapperXml, resultMap map[string]*ResultProperty, lastArgValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder) error {
 	//build sql string
 	var session *Session
 	var sql string
@@ -129,7 +156,7 @@ func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args [
 		if err != nil {
 			return err
 		}
-		err = decoder.Decode(nil,results, lastArgValue.Interface())
+		err = decoder.Decode(resultMap, results, lastArgValue.Interface())
 		if err != nil {
 			return err
 		}
@@ -167,13 +194,13 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml MapperXml, sqlBu
 			paramMap = scanStructArgFields(argInterface, nil)
 		} else if tagArgsLen > 0 && argIndex < tagArgsLen && tagArgs[argIndex].Name != "" && argInterface != nil {
 			paramMap[tagArgs[argIndex].Name] = SqlArg{
-				Value:argInterface,
-				Type:arg.Type(),
+				Value: argInterface,
+				Type:  arg.Type(),
 			}
 		} else {
 			paramMap[DefaultOneArg] = SqlArg{
-				Value:argInterface,
-				Type:arg.Type(),
+				Value: argInterface,
+				Type:  arg.Type(),
 			}
 		}
 	}
@@ -198,13 +225,13 @@ func scanStructArgFields(arg interface{}, typeConvert func(arg interface{}) inte
 		var jsonKey = typeValue.Tag.Get(`json`)
 		if jsonKey != "" {
 			parameters[jsonKey] = SqlArg{
-				Type:v.Field(i).Type(),
-				Value:obj,
+				Type:  v.Field(i).Type(),
+				Value: obj,
 			}
 		} else {
 			parameters[typeValue.Name] = SqlArg{
-				Type:v.Field(i).Type(),
-				Value:obj,
+				Type:  v.Field(i).Type(),
+				Value: obj,
 			}
 		}
 	}

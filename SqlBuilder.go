@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
+	"log"
 	"reflect"
 	"strings"
-	"log"
 )
 
 type SqlBuilder interface {

@@ -1,9 +1,9 @@
 package GoMybatis
 
 import (
-	"testing"
 	"fmt"
 	"github.com/zhuxiujia/GoMybatis/utils"
+	"testing"
 	"time"
 )
 
@@ -118,26 +118,26 @@ func Test_Decode_Interface(t *testing.T) {
 	resMap["Bool"] = []byte("1")
 	res = append(res, resMap)
 
-	var resultMap = make(map[string]ResultProperty)
-	resultMap["id"] = ResultProperty{
+	var resultMap = make(map[string]*ResultProperty)
+	resultMap["id"] = &ResultProperty{
 		XMLName:  "id",
 		Column:   "id",
 		Property: "id",
 		GoType:   "string",
 	}
-	resultMap["name"] = ResultProperty{
+	resultMap["name"] = &ResultProperty{
 		XMLName:  "result",
 		Column:   "name",
 		Property: "Name",
 		GoType:   "string",
 	}
-	resultMap["Amount_1"] = ResultProperty{
+	resultMap["Amount_1"] = &ResultProperty{
 		XMLName:  "result",
 		Column:   "Amount_1",
 		Property: "amount_1",
 		GoType:   "string",
 	}
-	resultMap["amount_2"] = ResultProperty{
+	resultMap["amount_2"] = &ResultProperty{
 		XMLName:  "result",
 		Column:   "Amount_2",
 		Property: "amount_2",

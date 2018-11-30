@@ -1,12 +1,12 @@
 package GoMybatis
 
 import (
-	"testing"
-	"reflect"
-	"github.com/zhuxiujia/GoMybatis/utils"
-	"time"
-	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
 	"fmt"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
+	"github.com/zhuxiujia/GoMybatis/utils"
+	"reflect"
+	"testing"
+	"time"
 )
 
 //测试sql生成tps
@@ -63,20 +63,19 @@ func Test_SqlBuilder_Tps2(t *testing.T) {
 	}
 }
 
-func Test_reflect_tps(t *testing.T)  {
-	var p=make(map[string]string)
-	var n=p
-	n["a"]="b"
+func Test_reflect_tps(t *testing.T) {
+	var p = make(map[string]string)
+	var n = p
+	n["a"] = "b"
 	fmt.Println(p)
-
 
 	defer utils.CountMethodTps(100000, time.Now(), "Test_reflect_tps")
 
 	for k := 0; k < 100000; k++ {
 		evalExpression, _ := govaluate.NewEvaluableExpression("name != ''")
 		//fmt.Println(err)
-		var p=make(map[string]interface{})
-		p["name"]="sdaf"
+		var p = make(map[string]interface{})
+		p["name"] = "sdaf"
 		evalExpression.Evaluate(p)
 		//fmt.Println(err)
 		//fmt.Println(result)

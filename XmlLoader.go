@@ -16,6 +16,7 @@ const ID = `id`
 type MapperXml struct {
 	Tag          string
 	Id           string
+	Propertys    map[string]string
 	ElementItems []ElementItem
 }
 
@@ -40,7 +41,7 @@ func LoadMapperXml(bytes []byte) (items []MapperXml) {
 			s.Tag == Element_Delete ||
 			s.Tag == Element_Update ||
 			s.Tag == Element_Select ||
-			s.Tag == Element_ResultMap{
+			s.Tag == Element_ResultMap {
 			items = append(items, MapperXml{
 				Tag:          s.Tag,
 				Id:           attrMap[ID],

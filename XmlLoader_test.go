@@ -1,13 +1,13 @@
 package GoMybatis
 
 import (
-	"testing"
-	"os"
 	"fmt"
 	"io/ioutil"
+	"os"
+	"testing"
 )
 
-func Test_Load_Xml(t *testing.T)  {
+func Test_Load_Xml(t *testing.T) {
 	//读取mapper xml文件
 	file, err := os.Open("example/Example_ActivityMapper.xml")
 	if err != nil {
@@ -15,6 +15,6 @@ func Test_Load_Xml(t *testing.T)  {
 	}
 	defer file.Close()
 	bytes, _ := ioutil.ReadAll(file)
-	var xmlItems=LoadMapperXml(bytes)
+	var xmlItems = LoadMapperXml(bytes)
 	fmt.Println(xmlItems)
 }

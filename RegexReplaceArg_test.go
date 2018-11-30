@@ -3,9 +3,9 @@ package GoMybatis
 import (
 	"fmt"
 	"github.com/zhuxiujia/GoMybatis/utils"
+	"reflect"
 	"testing"
 	"time"
-	"reflect"
 )
 
 type TestBean struct {
@@ -22,7 +22,7 @@ func Test_Access_Arg(t *testing.T) {
 	var param map[string]SqlArg
 	param = make(map[string]SqlArg)
 
-	var bean=TestBean{
+	var bean = TestBean{
 		Name: "father",
 		Child: TestBeanChild{
 			Name: "child",
@@ -30,8 +30,8 @@ func Test_Access_Arg(t *testing.T) {
 		},
 	}
 	param["bean"] = SqlArg{
-		Value:bean,
-		Type:reflect.TypeOf(bean),
+		Value: bean,
+		Type:  reflect.TypeOf(bean),
 	}
 	defer utils.CountMethodUseTime(time.Now(), "Test_Access_Arg", time.Millisecond)
 	var string = "-----#{bean.Name}------#{bean.Child.age}---"
