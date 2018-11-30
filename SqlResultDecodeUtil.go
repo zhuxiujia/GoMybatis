@@ -210,58 +210,23 @@ func (this GoMybatisSqlResultDecoder) sqlBasicTypeConvert(clomnName string, resu
 						return false
 					} else if strings.Contains(v.GoType, "string") {
 						tItemTypeFieldType = StringType
-						var newResultValue = reflect.New(tItemTypeFieldType)
-						if this.basicTypeConvert(tItemTypeFieldType, valueByte, newResultValue.Elem()) {
-							resultValue.Set(newResultValue.Elem())
-							return true
-						} else {
-							return false
-						}
 					} else if strings.Contains(v.GoType, "int") {
 						tItemTypeFieldType = Int64Type
-						var newResultValue = reflect.New(tItemTypeFieldType)
-						if this.basicTypeConvert(tItemTypeFieldType, valueByte, newResultValue.Elem()) {
-							resultValue.Set(newResultValue.Elem())
-							return true
-						} else {
-							return false
-						}
 					} else if strings.Contains(v.GoType, "uint") {
 						tItemTypeFieldType = Uint64Type
-						var newResultValue = reflect.New(tItemTypeFieldType)
-						if this.basicTypeConvert(tItemTypeFieldType, valueByte, newResultValue.Elem()) {
-							resultValue.Set(newResultValue.Elem())
-							return true
-						} else {
-							return false
-						}
 					} else if strings.Contains(v.GoType, "time.Time") {
 						tItemTypeFieldType = TimeType
-						var newResultValue = reflect.New(tItemTypeFieldType)
-						if this.basicTypeConvert(tItemTypeFieldType, valueByte, newResultValue.Elem()) {
-							resultValue.Set(newResultValue.Elem())
-							return true
-						} else {
-							return false
-						}
 					} else if strings.Contains(v.GoType, "float") {
 						tItemTypeFieldType = Float64Type
-						var newResultValue = reflect.New(tItemTypeFieldType)
-						if this.basicTypeConvert(tItemTypeFieldType, valueByte, newResultValue.Elem()) {
-							resultValue.Set(newResultValue.Elem())
-							return true
-						} else {
-							return false
-						}
 					} else if strings.Contains(v.GoType, "bool") {
 						tItemTypeFieldType = BoolType
-						var newResultValue = reflect.New(tItemTypeFieldType)
-						if this.basicTypeConvert(tItemTypeFieldType, valueByte, newResultValue.Elem()) {
-							resultValue.Set(newResultValue.Elem())
-							return true
-						} else {
-							return false
-						}
+					} else {
+						return false
+					}
+					var newResultValue = reflect.New(tItemTypeFieldType)
+					if this.basicTypeConvert(tItemTypeFieldType, valueByte, newResultValue.Elem()) {
+						resultValue.Set(newResultValue.Elem())
+						return true
 					} else {
 						return false
 					}
