@@ -38,7 +38,7 @@ func Test_convert(t *testing.T) {
 	resMap["Age6"] = []byte("1908")
 	resMap["Age7"] = []byte("1908")
 	resMap["Age8"] = []byte("1908")
-	resMap["Bool"] = []byte("1")
+	resMap["Bool"] = []byte("true")
 	res = append(res, resMap)
 
 	var result TestResult

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"time"
+	"strconv"
 )
 
 const Adapter_DateType = `time.Time`
@@ -44,9 +45,9 @@ func (this GoMybatisSqlArgTypeConvert) Convert(arg SqlArg) string {
 	}
 	if arg.Type.Kind() == reflect.Bool {
 		if arg.Value.(bool) {
-			arg.Value = 1
+			arg.Value = strconv.FormatBool(true)
 		} else {
-			arg.Value = 0
+			arg.Value = strconv.FormatBool(false)
 		}
 	}
 	if arg.Type.Kind() == reflect.String {

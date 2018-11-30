@@ -153,15 +153,11 @@ func (this GoMybatisSqlResultDecoder) sqlBasicTypeConvert(tItemTypeFieldType ref
 	if tItemTypeFieldType.Kind() == reflect.String {
 		resultValue.SetString(value)
 	} else if tItemTypeFieldType.Kind() == reflect.Bool {
-		newValue, e := strconv.ParseInt(value, 10, 64)
+		newValue, e := strconv.ParseBool(value)
 		if e != nil {
 			return false
 		}
-		if newValue > 0 {
-			resultValue.SetBool(true)
-		} else {
-			resultValue.SetBool(false)
-		}
+		resultValue.SetBool(newValue)
 	} else if tItemTypeFieldType.Kind() == reflect.Int || tItemTypeFieldType.Kind() == reflect.Int32 || tItemTypeFieldType.Kind() == reflect.Int64 {
 		newValue, e := strconv.ParseInt(value, 0, 64)
 		if e != nil {
