@@ -28,7 +28,7 @@ func (this GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert,
 
 func (this GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml MapperXml) (string, error) {
 	var sql bytes.Buffer
-	sql, err := this.createFromElement(mapperXml.ElementItems, sql, paramMap)
+	err := this.createFromElement(mapperXml.ElementItems, &sql, paramMap)
 	if err != nil {
 		return "", err
 	}
@@ -38,7 +38,7 @@ func (this GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml M
 	return sqlStr, nil
 }
 
-func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[string]SqlArg) (result bytes.Buffer, err error) {
+func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *bytes.Buffer, param map[string]SqlArg) error {
 	if this.SqlArgTypeConvert == nil || this.ExpressionTypeConvert == nil {
 		panic("[GoMybatis] GoMybatisSqlBuilder.SqlArgTypeConvert and GoMybatisSqlBuilder.ExpressionTypeConvert can not be nil!")
 	}
@@ -67,7 +67,7 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql by
 					buffer.WriteString(`> fail,`)
 					buffer.WriteString(err.Error())
 					err = errors.New(buffer.String())
-					return sql, err
+					return err
 				}
 				if result.(bool) {
 					//test表达式成立
@@ -87,9 +87,9 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql by
 			var prefixOverrides = v.Propertys[`prefixOverrides`]
 			if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
 				var tempTrimSql bytes.Buffer
-				tempTrimSql, err = this.createFromElement(v.ElementItems, tempTrimSql, param)
+				var err = this.createFromElement(v.ElementItems, &tempTrimSql, param)
 				if err != nil {
-					return tempTrimSql, err
+					return err
 				}
 				var tempTrimSqlString = strings.Trim(strings.Trim(strings.Trim(tempTrimSql.String(), " "), suffixOverrides), prefixOverrides)
 				var newBuffer bytes.Buffer
@@ -105,9 +105,9 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql by
 		} else if v.ElementType == Element_Set {
 			if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
 				var trim bytes.Buffer
-				trim, err = this.createFromElement(v.ElementItems, trim, param)
+				var err = this.createFromElement(v.ElementItems, &trim, param)
 				if err != nil {
-					return trim, err
+					return err
 				}
 				var trimString = strings.Trim(strings.Trim(trim.String(), " "), DefaultOverrides)
 				trim.Reset()
@@ -145,9 +145,9 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql by
 						Type:  IntType,
 					}
 					if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
-						tempSql, err = this.createFromElement(v.ElementItems, tempSql, tempArgMap)
+						var err = this.createFromElement(v.ElementItems, &tempSql, tempArgMap)
 						if err != nil {
-							return tempSql, err
+							return err
 						}
 					}
 				}
@@ -164,13 +164,13 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql by
 			loopChildItem = false
 		}
 		if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
-			sql, err = this.createFromElement(v.ElementItems, sql, param)
+			var err = this.createFromElement(v.ElementItems, sql, param)
 			if err != nil {
-				return sql, err
+				return err
 			}
 		}
 	}
-	return sql, nil
+	return nil
 }
 
 //表达式 ''转换为 0
