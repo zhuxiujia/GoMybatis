@@ -68,10 +68,14 @@ func UseProxyMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFacto
 }
 
 func makeEethodXmlMap(bean reflect.Value, mapperTree []MapperXml) map[string]*MapperXml {
+	if bean.Kind()==reflect.Ptr{
+		bean=bean.Elem()
+	}
+
 	var methodXmlMap = make(map[string]*MapperXml)
-	var totalField = bean.Elem().Type().NumField()
+	var totalField = bean.Type().NumField()
 	for i := 0; i < totalField; i++ {
-		var fieldItem = bean.Elem().Type().Field(i)
+		var fieldItem = bean.Type().Field(i)
 		if fieldItem.Type.Kind() == reflect.Func {
 			//field must be func
 			methodFieldCheck(fieldItem)
