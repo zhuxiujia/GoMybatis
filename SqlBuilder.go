@@ -30,10 +30,12 @@ func (this GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml M
 	var sql bytes.Buffer
 	sql, err := this.createFromElement(mapperXml.ElementItems, sql, paramMap)
 	if err != nil {
-		return sql.String(), err
+		return "", err
 	}
-	log.Println("[GoMybatis] Preparing sql ==> ", sql.String())
-	return sql.String(), nil
+	var sqlStr = sql.String()
+	sql.Reset()
+	log.Println("[GoMybatis] Preparing sql ==> ", sqlStr)
+	return sqlStr, nil
 }
 
 func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql bytes.Buffer, param map[string]SqlArg) (result bytes.Buffer, err error) {
@@ -83,7 +85,7 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql by
 			var suffix = v.Propertys[`suffix`]
 			var suffixOverrides = v.Propertys[`suffixOverrides`]
 			var prefixOverrides = v.Propertys[`prefixOverrides`]
-			if v.ElementItems != nil && len(v.ElementItems) > 0 && loopChildItem {
+			if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
 				var tempTrimSql bytes.Buffer
 				tempTrimSql, err = this.createFromElement(v.ElementItems, tempTrimSql, param)
 				if err != nil {
@@ -101,7 +103,7 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql by
 				loopChildItem = false
 			}
 		} else if v.ElementType == Element_Set {
-			if v.ElementItems != nil && len(v.ElementItems) > 0 && loopChildItem {
+			if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
 				var trim bytes.Buffer
 				trim, err = this.createFromElement(v.ElementItems, trim, param)
 				if err != nil {
@@ -126,22 +128,23 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql by
 			var tempSql bytes.Buffer
 			var datas = param[collection].Value
 			var collectionValue = reflect.ValueOf(datas)
-			if collectionValue.Len() > 0 {
-				for i := 0; i < collectionValue.Len(); i++ {
-					var dataItem = collectionValue.Index(i).Interface()
+			var collectionValueLen = collectionValue.Len()
+			if collectionValueLen > 0 {
+				for i := 0; i < collectionValueLen; i++ {
+					var collectionItem = collectionValue.Index(i)
 					var tempArgMap = make(map[string]SqlArg)
+					for k, v := range param {
+						tempArgMap[k] = v
+					}
 					tempArgMap[item] = SqlArg{
-						Value: dataItem,
-						Type:  collectionValue.Index(i).Type(),
+						Value: collectionItem.Interface(),
+						Type:  collectionItem.Type(),
 					}
 					tempArgMap[index] = SqlArg{
 						Value: index,
 						Type:  IntType,
 					}
-					for k, v := range param {
-						tempArgMap[k] = v
-					}
-					if v.ElementItems != nil && len(v.ElementItems) > 0 && loopChildItem {
+					if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
 						tempSql, err = this.createFromElement(v.ElementItems, tempSql, tempArgMap)
 						if err != nil {
 							return tempSql, err
@@ -160,7 +163,7 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql by
 			sql.Write(tempSql.Bytes())
 			loopChildItem = false
 		}
-		if v.ElementItems != nil && len(v.ElementItems) > 0 && loopChildItem {
+		if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
 			sql, err = this.createFromElement(v.ElementItems, sql, param)
 			if err != nil {
 				return sql, err
