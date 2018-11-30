@@ -16,6 +16,17 @@ GoMybatis 内部在初始化时反射分析mapper xml生成golang的func代码�
 go get github.com/zhuxiujia/GoMybatis
 go get github.com/go-sql-driver/mysql
 ```
+驱动支持
+```
+ Mysql: github.com/go-sql-driver/mysql
+ MyMysql: github.com/ziutek/mymysql/godrv
+ Postgres: github.com/lib/pq
+ Tidb: github.com/pingcap/tidb
+ SQLite: github.com/mattn/go-sqlite3
+ MsSql: github.com/denisenkom/go-mssqldb
+ MsSql: github.com/lunny/godbc
+ Oracle: github.com/mattn/go-oci8
+ ```
 mapper.go 文件案例
 ```
 //定义mapper文件的接口和结构体，也可以只定义结构体就行
