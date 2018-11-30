@@ -31,14 +31,14 @@ xml文件案例:
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ActivityMapperImpl">
-    <resultMap id="BaseResultMap" type="model.Activity">
-        <id column="id" property="id" jdbcType="VARCHAR"/>
-        <result column="name" property="name" jdbcType="VARCHAR"/>
-        <result column="pc_link" property="pcLink" jdbcType="VARCHAR"/>
-        <result column="h5_link" property="h5Link" jdbcType="VARCHAR"/>
-        <result column="remark" property="remark" jdbcType="VARCHAR"/>
-        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
-        <result column="delete_flag" property="deleteFlag" jdbcType="INTEGER"/>
+    <resultMap id="BaseResultMap" type="example.Activity">
+        <id column="id" property="id" goType="string"/>
+        <result column="name" property="name" goType="string"/>
+        <result column="pc_link" property="pcLink" goType="string"/>
+        <result column="h5_link" property="h5Link" goType="string"/>
+        <result column="remark" property="remark" goType="string"/>
+        <result column="create_time" property="createTime" goType="time.Time"/>
+        <result column="delete_flag" property="deleteFlag" goType="int"/>
     </resultMap>
     <!--SelectAll(result *[]Activity)error-->
     <select id="selectAll" resultMap="BaseResultMap">
