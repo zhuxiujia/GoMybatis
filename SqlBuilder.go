@@ -7,6 +7,7 @@ import (
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
 	"reflect"
 	"strings"
+	"log"
 )
 
 type SqlBuilder interface {
@@ -31,7 +32,7 @@ func (this GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml M
 	if err != nil {
 		return sql.String(), err
 	}
-	//log.Println("[GoMybatis] Preparing sql ==> ", sql.String())
+	log.Println("[GoMybatis] Preparing sql ==> ", sql.String())
 	return sql.String(), nil
 }
 
