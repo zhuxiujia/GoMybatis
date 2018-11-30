@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
-	"log"
 	"reflect"
 	"strings"
 )
@@ -32,7 +31,7 @@ func (this GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml M
 	if err != nil {
 		return sql.String(), err
 	}
-	log.Println("[GoMybatis] Preparing sql ==> ", sql.String())
+	//log.Println("[GoMybatis] Preparing sql ==> ", sql.String())
 	return sql.String(), nil
 }
 
@@ -52,7 +51,7 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql by
 			for index, expression := range andStrings {
 				//test表达式解析
 				var evaluateParameters = this.scanParamterMap(param, this.ExpressionTypeConvert)
-				expression = this.expressionToIfZeroExpression(evaluateParameters, expression)
+				expression = this.expressionToIfZeroExpression(expression, param)
 				evalExpression, err := govaluate.NewEvaluableExpression(expression)
 				if err != nil {
 					fmt.Println(err)
@@ -171,16 +170,14 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql by
 }
 
 //表达式 ''转换为 0
-func (this GoMybatisSqlBuilder) expressionToIfZeroExpression(evaluateParameters map[string]interface{}, expression string) string {
-	for k, v := range evaluateParameters {
-		if strings.Index(expression, k) != -1 {
-			var t = reflect.TypeOf(v)
-			if t.Kind() != reflect.String {
-				expression = strings.Replace(expression, `''`, `0`, -1)
-			}
+func (this GoMybatisSqlBuilder) expressionToIfZeroExpression(expression string, param map[string]SqlArg) string {
+	for k, v := range param {
+		if strings.Contains(expression, k) && v.Type.Kind() != reflect.String {
+			expression = strings.Replace(expression, `''`, `0`, -1)
 			return expression
 		}
 	}
+
 	return expression
 }
 
