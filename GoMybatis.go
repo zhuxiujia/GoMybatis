@@ -129,7 +129,7 @@ func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args [
 		if err != nil {
 			return err
 		}
-		err = decoder.Decode(results, lastArgValue.Interface())
+		err = decoder.Decode(nil,results, lastArgValue.Interface())
 		if err != nil {
 			return err
 		}

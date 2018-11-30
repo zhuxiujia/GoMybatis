@@ -9,15 +9,15 @@ import (
 )
 
 type SqlResultDecoder interface {
-	Decode(s []map[string][]byte, result interface{}) error
+	Decode(resultMap map[string]ResultProperty, s []map[string][]byte, result interface{}) error
 }
 
 type GoMybatisSqlResultDecoder struct {
 	SqlResultDecoder
 }
 
-func (this GoMybatisSqlResultDecoder) Decode(s []map[string][]byte, result interface{}) error {
-	if s == nil || result == nil {
+func (this GoMybatisSqlResultDecoder) Decode(resultMap map[string]ResultProperty, sourceArray []map[string][]byte, result interface{}) error {
+	if sourceArray == nil || result == nil {
 		return nil
 	}
 	var resultV = reflect.ValueOf(result)
@@ -29,7 +29,7 @@ func (this GoMybatisSqlResultDecoder) Decode(s []map[string][]byte, result inter
 	}
 
 	var renameMapArray = make([]map[string][]byte, 0)
-	for _, v := range s {
+	for _, v := range sourceArray {
 		var m = make(map[string][]byte)
 		for ik, iv := range v {
 			var repleaceName = strings.ToLower(strings.Replace(ik, "_", "", -1))
@@ -42,16 +42,16 @@ func (this GoMybatisSqlResultDecoder) Decode(s []map[string][]byte, result inter
 
 	if isBasicType {
 		//single basic type
-		for _, sItemMap := range s {
+		for _, sItemMap := range sourceArray {
 			if len(sItemMap) > 1 {
 				return errors.New("Unmarshal one data,but sql result size find > 1 !")
 			}
-			for _, value := range sItemMap {
+			for key, value := range sItemMap {
 				if value == nil || len(value) == 0 {
 					continue
 				}
 				var tItemTypeFieldTypeValue = reflect.New(resultV.Type())
-				var success = this.sqlBasicTypeConvert(resultV.Type(), value, tItemTypeFieldTypeValue.Elem())
+				var success = this.sqlBasicTypeConvert(key, resultMap, resultV.Type(), value, tItemTypeFieldTypeValue.Elem())
 				if success {
 					resultV.Set(tItemTypeFieldTypeValue.Elem())
 				}
@@ -59,11 +59,11 @@ func (this GoMybatisSqlResultDecoder) Decode(s []map[string][]byte, result inter
 		}
 	} else if resultV.Kind() == reflect.Struct {
 		//single struct
-		if len(s) > 1 {
+		if len(sourceArray) > 1 {
 			return errors.New("Unmarshal one data,but sql result size find > 1 !")
 		}
-		for index, sItemMap := range s {
-			var value = this.sqlStructConvert(resultT.Elem(), sItemMap, renameMapArray[index])
+		for index, sItemMap := range sourceArray {
+			var value = this.sqlStructConvert(resultMap, resultT.Elem(), sItemMap, renameMapArray[index])
 			resultV.Set(value)
 		}
 	} else if resultV.Kind() == reflect.Slice {
@@ -71,22 +71,22 @@ func (this GoMybatisSqlResultDecoder) Decode(s []map[string][]byte, result inter
 		var resultTItemType = resultT.Elem().Elem()
 		var isBasicTypeSlice = this.isGoBasicType(resultTItemType)
 		if isBasicTypeSlice {
-			for _, sItemMap := range s {
-				for _, value := range sItemMap {
+			for _, sItemMap := range sourceArray {
+				for key, value := range sItemMap {
 					if value == nil || len(value) == 0 {
 						continue
 					}
 					var tItemTypeFieldTypeValue = reflect.New(resultTItemType)
-					var success = this.sqlBasicTypeConvert(resultTItemType, value, tItemTypeFieldTypeValue.Elem())
+					var success = this.sqlBasicTypeConvert(key, resultMap, resultTItemType, value, tItemTypeFieldTypeValue.Elem())
 					if success {
 						resultV = reflect.Append(resultV, tItemTypeFieldTypeValue.Elem())
 					}
 				}
 			}
 		} else {
-			for index, sItemMap := range s {
+			for index, sItemMap := range sourceArray {
 				if resultTItemType.Kind() == reflect.Struct {
-					resultV = reflect.Append(resultV, this.sqlStructConvert(resultTItemType, sItemMap, renameMapArray[index]))
+					resultV = reflect.Append(resultV, this.sqlStructConvert(resultMap, resultTItemType, sItemMap, renameMapArray[index]))
 				}
 			}
 		}
@@ -94,18 +94,19 @@ func (this GoMybatisSqlResultDecoder) Decode(s []map[string][]byte, result inter
 		//map
 		var resultTItemType = resultT.Elem().Elem() //int,string,time.Time.....
 		var isBasicTypeSlice = this.isGoBasicType(resultTItemType)
-		if isBasicTypeSlice {
-			if len(s) > 1 {
+		var isInterface = resultTItemType.String() == "interface {}"
+		if isBasicTypeSlice || isInterface {
+			if len(sourceArray) > 1 {
 				return errors.New("Unmarshal one data,but sql result size find > 1 !")
 			}
-			for _, sItemMap := range s {
+			for _, sItemMap := range sourceArray {
 				var newResultV = reflect.MakeMap(resultT.Elem())
 				for key, value := range sItemMap {
 					if value == nil || len(value) == 0 {
 						continue
 					}
 					var tItemTypeFieldTypeValue = reflect.New(resultTItemType)
-					var success = this.sqlBasicTypeConvert(resultTItemType, value, tItemTypeFieldTypeValue.Elem())
+					var success = this.sqlBasicTypeConvert(key, resultMap, resultTItemType, value, tItemTypeFieldTypeValue.Elem())
 					if success {
 						//resultV = reflect.Append(resultV, tItemTypeFieldTypeValue.Elem())
 						newResultV.SetMapIndex(reflect.ValueOf(key), tItemTypeFieldTypeValue.Elem())
@@ -124,7 +125,7 @@ func (this GoMybatisSqlResultDecoder) Decode(s []map[string][]byte, result inter
 	return nil
 }
 
-func (this GoMybatisSqlResultDecoder) sqlStructConvert(resultTItemType reflect.Type, sItemMap map[string][]byte, renamedSItemMap map[string][]byte) reflect.Value {
+func (this GoMybatisSqlResultDecoder) sqlStructConvert(resultMap map[string]ResultProperty, resultTItemType reflect.Type, sItemMap map[string][]byte, renamedSItemMap map[string][]byte) reflect.Value {
 	if resultTItemType.Kind() == reflect.Struct {
 		var tItemTypeFieldTypeValue = reflect.New(resultTItemType)
 		for i := 0; i < resultTItemType.NumField(); i++ {
@@ -140,7 +141,7 @@ func (this GoMybatisSqlResultDecoder) sqlStructConvert(resultTItemType reflect.T
 					continue
 				}
 			}
-			this.sqlBasicTypeConvert(tItemTypeFieldType.Type, value, tItemTypeFieldTypeValue.Elem().Field(i))
+			this.sqlBasicTypeConvert(repleaceName, resultMap, tItemTypeFieldType.Type, value, tItemTypeFieldTypeValue.Elem().Field(i))
 		}
 		return tItemTypeFieldTypeValue.Elem()
 	} else {
@@ -148,7 +149,7 @@ func (this GoMybatisSqlResultDecoder) sqlStructConvert(resultTItemType reflect.T
 	}
 }
 
-func (this GoMybatisSqlResultDecoder) sqlBasicTypeConvert(tItemTypeFieldType reflect.Type, valueByte []byte, resultValue reflect.Value) bool {
+func (this GoMybatisSqlResultDecoder) basicTypeConvert(tItemTypeFieldType reflect.Type, valueByte []byte, resultValue reflect.Value) bool {
 	var value = string(valueByte)
 	if tItemTypeFieldType.Kind() == reflect.String {
 		resultValue.SetString(value)
@@ -188,6 +189,90 @@ func (this GoMybatisSqlResultDecoder) sqlBasicTypeConvert(tItemTypeFieldType ref
 	return true
 }
 
+func (this GoMybatisSqlResultDecoder) sqlBasicTypeConvert(clomnName string, resultMap map[string]ResultProperty, tItemTypeFieldType reflect.Type, valueByte []byte, resultValue reflect.Value) bool {
+	if tItemTypeFieldType.Kind() == reflect.String {
+		return this.basicTypeConvert(tItemTypeFieldType, valueByte, resultValue)
+	} else if tItemTypeFieldType.Kind() == reflect.Bool {
+		return this.basicTypeConvert(tItemTypeFieldType, valueByte, resultValue)
+	} else if tItemTypeFieldType.Kind() == reflect.Int || tItemTypeFieldType.Kind() == reflect.Int32 || tItemTypeFieldType.Kind() == reflect.Int64 {
+		return this.basicTypeConvert(tItemTypeFieldType, valueByte, resultValue)
+	} else if tItemTypeFieldType.Kind() == reflect.Uint || tItemTypeFieldType.Kind() == reflect.Uint8 || tItemTypeFieldType.Kind() == reflect.Uint16 || tItemTypeFieldType.Kind() == reflect.Uint32 || tItemTypeFieldType.Kind() == reflect.Uint64 {
+		return this.basicTypeConvert(tItemTypeFieldType, valueByte, resultValue)
+	} else if tItemTypeFieldType.Kind() == reflect.Float32 || tItemTypeFieldType.Kind() == reflect.Float64 {
+		return this.basicTypeConvert(tItemTypeFieldType, valueByte, resultValue)
+	} else if tItemTypeFieldType.String() == "time.Time" {
+		return this.basicTypeConvert(tItemTypeFieldType, valueByte, resultValue)
+	} else {
+		if resultMap != nil {
+			for _, v := range resultMap {
+				if strings.EqualFold(v.Column, clomnName) || strings.EqualFold(v.Property, clomnName) {
+					if v.GoType == "" {
+						return false
+					} else if strings.Contains(v.GoType, "string") {
+						tItemTypeFieldType = StringType
+						var newResultValue = reflect.New(tItemTypeFieldType)
+						if this.basicTypeConvert(tItemTypeFieldType, valueByte, newResultValue.Elem()) {
+							resultValue.Set(newResultValue.Elem())
+							return true
+						} else {
+							return false
+						}
+					} else if strings.Contains(v.GoType, "int") {
+						tItemTypeFieldType = Int64Type
+						var newResultValue = reflect.New(tItemTypeFieldType)
+						if this.basicTypeConvert(tItemTypeFieldType, valueByte, newResultValue.Elem()) {
+							resultValue.Set(newResultValue.Elem())
+							return true
+						} else {
+							return false
+						}
+					} else if strings.Contains(v.GoType, "uint") {
+						tItemTypeFieldType = Uint64Type
+						var newResultValue = reflect.New(tItemTypeFieldType)
+						if this.basicTypeConvert(tItemTypeFieldType, valueByte, newResultValue.Elem()) {
+							resultValue.Set(newResultValue.Elem())
+							return true
+						} else {
+							return false
+						}
+					} else if strings.Contains(v.GoType, "time.Time") {
+						tItemTypeFieldType = TimeType
+						var newResultValue = reflect.New(tItemTypeFieldType)
+						if this.basicTypeConvert(tItemTypeFieldType, valueByte, newResultValue.Elem()) {
+							resultValue.Set(newResultValue.Elem())
+							return true
+						} else {
+							return false
+						}
+					} else if strings.Contains(v.GoType, "float") {
+						tItemTypeFieldType = Float64Type
+						var newResultValue = reflect.New(tItemTypeFieldType)
+						if this.basicTypeConvert(tItemTypeFieldType, valueByte, newResultValue.Elem()) {
+							resultValue.Set(newResultValue.Elem())
+							return true
+						} else {
+							return false
+						}
+					} else if strings.Contains(v.GoType, "bool") {
+						tItemTypeFieldType = BoolType
+						var newResultValue = reflect.New(tItemTypeFieldType)
+						if this.basicTypeConvert(tItemTypeFieldType, valueByte, newResultValue.Elem()) {
+							resultValue.Set(newResultValue.Elem())
+							return true
+						} else {
+							return false
+						}
+					} else {
+						return false
+					}
+				}
+			}
+		}
+		return false
+	}
+	return true
+}
+
 func (this GoMybatisSqlResultDecoder) isGoBasicType(tItemTypeFieldType reflect.Type) bool {
 	if tItemTypeFieldType.Kind() == reflect.Bool ||
 		tItemTypeFieldType.Kind() == reflect.Int ||
@@ -205,15 +290,8 @@ func (this GoMybatisSqlResultDecoder) isGoBasicType(tItemTypeFieldType reflect.T
 		tItemTypeFieldType.Kind() == reflect.String {
 		return true
 	}
-	if tItemTypeFieldType.String() == "string" {
-	} else if tItemTypeFieldType.String() == "int" {
-	} else if tItemTypeFieldType.String() == "int32" {
-	} else if tItemTypeFieldType.String() == "int64" {
-	} else if tItemTypeFieldType.String() == "float32" {
-	} else if tItemTypeFieldType.String() == "float64" {
-	} else if tItemTypeFieldType.String() == "time.Time" {
-	} else {
-		return false
+	if tItemTypeFieldType.Kind() == reflect.Struct && tItemTypeFieldType.String() == "time.Time" {
+		return true
 	}
-	return true
+	return false
 }
