@@ -1,7 +1,6 @@
 package GoMybatis
 
 import (
-	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"net"
 	"net/rpc"
