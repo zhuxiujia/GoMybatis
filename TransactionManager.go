@@ -168,13 +168,17 @@ func (this DefaultTransationManager) DoAction(dto TransactionReqDTO, transcation
 		var err string
 		if e != nil {
 			err = e.Error()
+			return TransactionRspDTO{
+				TransactionId: dto.TransactionId,
+				Error:         err,
+			}
+		} else {
+			return TransactionRspDTO{
+				TransactionId: dto.TransactionId,
+				Exec:          *res,
+				Error:         err,
+			}
 		}
-		var TransactionRspDTO = TransactionRspDTO{
-			TransactionId: dto.TransactionId,
-			Exec:          *res,
-			Error:         err,
-		}
-		return TransactionRspDTO
 	} else {
 		log.Println("[TransactionManager] Query ", dto.Sql)
 		var res, e = (*transcationStatus.Transaction.Session).Query(dto.Sql)

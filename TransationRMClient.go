@@ -2,8 +2,8 @@ package GoMybatis
 
 import (
 	"errors"
-	"github.com/hashicorp/net-rpc-msgpackrpc"
 	"net/rpc"
+	"net/rpc/jsonrpc"
 )
 
 const ConnectError = "connection is shut down"
@@ -46,7 +46,7 @@ func (this *TransationRMClient) autoLink() (*rpc.Client, error) {
 		this.Client.Close()
 		this.Client = nil
 	}
-	return msgpackrpc.Dial("tcp", this.Addr)
+	return jsonrpc.Dial("tcp", this.Addr)
 }
 
 func (this *TransationRMClient) Call(arg TransactionReqDTO, result *TransactionRspDTO) error {

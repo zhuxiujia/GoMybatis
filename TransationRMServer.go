@@ -2,10 +2,10 @@ package GoMybatis
 
 import (
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/hashicorp/net-rpc-msgpackrpc"
 	"log"
 	"net"
 	"net/rpc"
+	"net/rpc/jsonrpc"
 )
 
 type TransationRMServer struct {
@@ -52,6 +52,6 @@ func ServerTcp(addr string, driverName, dataSourceName string) {
 		if e != nil {
 			continue
 		}
-		msgpackrpc.ServeConn(conn)
+		go jsonrpc.ServeConn(conn)
 	}
 }

@@ -2,13 +2,13 @@ package GoMybatis
 
 import (
 	"fmt"
-	"github.com/hashicorp/net-rpc-msgpackrpc"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"log"
 	"net"
 	"net/rpc"
 	"testing"
 	"time"
+	"net/rpc/jsonrpc"
 )
 
 //注意字段必须是导出
@@ -27,7 +27,7 @@ func TestMsgp(t *testing.T) {
 
 	go server()
 
-	var c, e = msgpackrpc.Dial("tcp", "127.0.0.1:1234")
+	var c, e = jsonrpc.Dial("tcp", "127.0.0.1:1234")
 	if e != nil {
 		fmt.Println(e)
 	}
@@ -61,6 +61,6 @@ func server() {
 		if e != nil {
 			continue
 		}
-		msgpackrpc.ServeConn(conn)
+		go jsonrpc.ServeConn(conn)
 	}
 }
