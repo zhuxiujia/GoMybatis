@@ -1,7 +1,7 @@
 # GoMybatis
 ![Image text](https://github.com/zhuxiujia/gomybatis.io/raw/master/docs/logo.png)
 # 网站地址
-https://zhuxiujia.github.io/gomybatis.io/#/
+https://zhuxiujia.github.io/gomybatis.io/assets/index.html
 # 优势
 GoMybatis 是根据java版 Mybatis3 的实现,基于Go标准库和github.com/Knetic/govaluate表达式及github.com/beevik/etree读取Xml解析,github.com/satori/go.uuid生成库 实现。
 GoMybatis 内部在初始化时反射分析mapper xml生成golang的func代码，默认支持绝大部分的Java版的mybatis标签和规范,
