@@ -1,5 +1,5 @@
 # GoMybatis
-![Image text](https://github.com/zhuxiujia/gomybatis.io/assets/vuetify.png)
+![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/vuetify.png)
 # 网站/文档地址
 https://zhuxiujia.github.io/gomybatis.io/
 # 优势
