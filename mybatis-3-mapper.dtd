@@ -46,7 +46,7 @@ type CDATA #REQUIRED
 <!ATTLIST parameter
 property CDATA #REQUIRED
 goType CDATA #IMPLIED
-jdbcType CDATA #IMPLIED
+<!--jdbcType CDATA #IMPLIED-->
 mode (IN | OUT | INOUT) #IMPLIED
 resultMap CDATA #IMPLIED
 scale CDATA #IMPLIED
@@ -85,7 +85,7 @@ typeHandler CDATA #IMPLIED
 <!ATTLIST idArg
 goType CDATA #IMPLIED
 column CDATA #IMPLIED
-jdbcType CDATA #IMPLIED
+<!--jdbcType CDATA #IMPLIED-->
 typeHandler CDATA #IMPLIED
 select CDATA #IMPLIED
 resultMap CDATA #IMPLIED
@@ -96,7 +96,7 @@ name CDATA #IMPLIED
 <!ATTLIST arg
 goType CDATA #IMPLIED
 column CDATA #IMPLIED
-jdbcType CDATA #IMPLIED
+<!--jdbcType CDATA #IMPLIED-->
 typeHandler CDATA #IMPLIED
 select CDATA #IMPLIED
 resultMap CDATA #IMPLIED
@@ -109,7 +109,7 @@ property CDATA #REQUIRED
 column CDATA #IMPLIED
 goType CDATA #IMPLIED
 ofType CDATA #IMPLIED
-jdbcType CDATA #IMPLIED
+<!--jdbcType CDATA #IMPLIED-->
 select CDATA #IMPLIED
 resultMap CDATA #IMPLIED
 typeHandler CDATA #IMPLIED
@@ -126,7 +126,7 @@ fetchType (lazy|eager) #IMPLIED
 property CDATA #REQUIRED
 column CDATA #IMPLIED
 goType CDATA #IMPLIED
-jdbcType CDATA #IMPLIED
+<!--jdbcType CDATA #IMPLIED-->
 select CDATA #IMPLIED
 resultMap CDATA #IMPLIED
 typeHandler CDATA #IMPLIED
@@ -142,7 +142,7 @@ fetchType (lazy|eager) #IMPLIED
 <!ATTLIST discriminator
 column CDATA #IMPLIED
 goType CDATA #REQUIRED
-jdbcType CDATA #IMPLIED
+<!--jdbcType CDATA #IMPLIED-->
 typeHandler CDATA #IMPLIED
 >
 
