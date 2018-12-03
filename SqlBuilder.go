@@ -11,7 +11,7 @@ import (
 )
 
 type SqlBuilder interface {
-	BuildSql(paramMap map[string]SqlArg, mapperXml MapperXml) (string, error)
+	BuildSql(paramMap map[string]SqlArg, mapperXml *MapperXml) (string, error)
 }
 
 type GoMybatisSqlBuilder struct {
@@ -26,7 +26,7 @@ func (this GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert,
 	return this
 }
 
-func (this GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml MapperXml) (string, error) {
+func (this GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml *MapperXml) (string, error) {
 	var sql bytes.Buffer
 	err := this.createFromElement(mapperXml.ElementItems, &sql, paramMap)
 	if err != nil {

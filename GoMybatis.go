@@ -62,7 +62,7 @@ func UseProxyMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFacto
 				return errors.New(`[GoMybatis] method params last param must be pointer!,method =` + method)
 			}
 		}
-		var mapperXml = *methodXmlMap[method]
+		var mapperXml = methodXmlMap[method]
 		var resultMap map[string]*ResultProperty
 		var resultMapId = mapperXml.Propertys["resultMap"]
 		if resultMapId != "" {
@@ -133,7 +133,7 @@ func findMapperXml(mapperTree map[string]*MapperXml, methodName string) *MapperX
 	return nil
 }
 
-func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, mapperXml MapperXml, resultMap map[string]*ResultProperty, lastArgValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder) error {
+func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, mapperXml *MapperXml, resultMap map[string]*ResultProperty, lastArgValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder) error {
 	//build sql string
 	var session *Session
 	var sql string
@@ -177,7 +177,7 @@ func closeSession(factory *SessionFactory, session *Session) {
 	(*session).Close()
 }
 
-func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml MapperXml, sqlBuilder SqlBuilder) (*Session, string, error) {
+func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlBuilder SqlBuilder) (*Session, string, error) {
 	var session *Session
 	var paramMap = make(map[string]SqlArg)
 	var tagArgsLen = len(tagArgs)

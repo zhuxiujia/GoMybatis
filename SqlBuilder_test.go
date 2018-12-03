@@ -58,7 +58,7 @@ func Test_SqlBuilder_Tps2(t *testing.T) {
 	defer utils.CountMethodTps(100000, time.Now(), "Test_SqlBuilder_Tps")
 	for i := 0; i < 100000; i++ {
 		//var sql, e =
-		builder.BuildSql(paramMap, mapperTree[0])
+		builder.BuildSql(paramMap, mapperTree["selectByCondition"])
 		//fmt.Println(sql, e)
 	}
 }
