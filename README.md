@@ -44,7 +44,7 @@ type ExampleActivityMapperImpl struct {
 xml文件案例:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://github.com/zhuxiujia/GoMybatis/blob/master/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://raw.githubusercontent.com/zhuxiujia/GoMybatis/master/mybatis-3-mapper.dtd">
 <mapper namespace="ActivityMapperImpl">
     <resultMap id="BaseResultMap" type="example.Activity">
         <id column="id" property="id" goType="string"/>
