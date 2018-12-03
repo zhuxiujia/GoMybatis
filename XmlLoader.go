@@ -27,12 +27,13 @@ type ElementItem struct {
 	ElementItems []ElementItem
 }
 
-//读取xml
-func LoadMapperXml(bytes []byte) (items []MapperXml) {
+//load xml from string data,return a map[elementId]*MapperXml
+func LoadMapperXml(bytes []byte) (items map[string]*MapperXml) {
 	doc := etree.NewDocument()
 	if err := doc.ReadFromBytes(bytes); err != nil {
 		panic(err)
 	}
+	items = make(map[string]*MapperXml)
 	root := doc.SelectElement(Element_Mapper)
 	for _, s := range root.ChildElements() {
 		var attrMap = attrToProperty(s.Attr)
@@ -42,11 +43,20 @@ func LoadMapperXml(bytes []byte) (items []MapperXml) {
 			s.Tag == Element_Update ||
 			s.Tag == Element_Select ||
 			s.Tag == Element_ResultMap {
-			items = append(items, MapperXml{
+			var elementID = attrMap[ID]
+			if elementID == "" {
+				panic("[GoMybatis] element Id can not be nil in xml! please check your xml!")
+			}
+			var oldItem = items[elementID]
+			if oldItem != nil {
+				panic("[GoMybatis] element Id can not repeat in xml! elementId=" + elementID)
+			}
+			var mapperXml = MapperXml{
 				Tag:          s.Tag,
-				Id:           attrMap[ID],
+				Id:           elementID,
 				ElementItems: elItems,
-			})
+			}
+			items[elementID] = &mapperXml
 		}
 	}
 	return items

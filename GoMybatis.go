@@ -74,7 +74,7 @@ func UseProxyMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFacto
 }
 
 //map[id]map[cloum]Property
-func makeResultMaps(xmls []MapperXml) map[string]map[string]*ResultProperty {
+func makeResultMaps(xmls map[string]*MapperXml) map[string]map[string]*ResultProperty {
 	var resultMaps = make(map[string]map[string]*ResultProperty)
 	for _, xmlItem := range xmls {
 		if xmlItem.Tag == "resultMap" {
@@ -94,7 +94,7 @@ func makeResultMaps(xmls []MapperXml) map[string]map[string]*ResultProperty {
 	return resultMaps
 }
 //return a map map[`method`]*MapperXml
-func makeMethodXmlMap(bean reflect.Value, mapperTree []MapperXml) map[string]*MapperXml {
+func makeMethodXmlMap(bean reflect.Value, mapperTree map[string]*MapperXml) map[string]*MapperXml {
 	if bean.Kind() == reflect.Ptr {
 		bean = bean.Elem()
 	}
@@ -123,11 +123,11 @@ func methodFieldCheck(methodType reflect.StructField) {
 	}
 }
 
-func findMapperXml(mapperTree []MapperXml, methodName string) *MapperXml {
+func findMapperXml(mapperTree map[string]*MapperXml, methodName string) *MapperXml {
 	for _, mapperXml := range mapperTree {
 		//exec sql,return data
 		if strings.EqualFold(mapperXml.Id, methodName) {
-			return &mapperXml
+			return mapperXml
 		}
 	}
 	return nil
