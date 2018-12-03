@@ -16,13 +16,13 @@ import (
 //参数中除了session指针外，为指针类型的皆为返回数据
 // 函数return必须为error 为返回错误信息
 type ExampleActivityMapperImpl struct {
-	SelectByIds       func(ids []string, result *[]Activity) error                                                            `mapperParams:"ids"`
+	SelectByIds       func(ids []string, result *[]Activity) error `mapperParams:"ids"`
 	SelectAll         func(result *[]Activity) error
 	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int, result *[]Activity) error `mapperParams:"name,startTime,endTime,page,size"`
-	UpdateById        func(session *GoMybatis.Session, arg Activity, result *int64) error //只要参数中包含有*GoMybatis.Session的类型，框架默认使用传入的session对象，用于自定义事务
+	UpdateById        func(session *GoMybatis.Session, arg Activity, result *int64) error                                     //只要参数中包含有*GoMybatis.Session的类型，框架默认使用传入的session对象，用于自定义事务
 	Insert            func(arg Activity, result *int64) error
-	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error                            `mapperParams:"name,startTime,endTime"`
-	DeleteById        func(id string, result *int64) error                                                                                   `mapperParams:"id"`
+	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error `mapperParams:"name,startTime,endTime"`
+	DeleteById        func(id string, result *int64) error                                         `mapperParams:"id"`
 }
 
 //初始化mapper文件和结构体
@@ -47,19 +47,19 @@ func InitMapperByLocalSession() ExampleActivityMapperImpl {
 	return exampleActivityMapperImpl
 }
 
-
 //插入
 func Test_inset(t *testing.T) {
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
 	var result int64
-	var err = exampleActivityMapperImpl.Insert(Activity{Id:"171",Name:"test_insret",DeleteFlag:1}, &result)
+	var err = exampleActivityMapperImpl.Insert(Activity{Id: "171", Name: "test_insret", DeleteFlag: 1}, &result)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("result=", result)
 }
+
 //修改
 //本地事务使用例子
 func Test_update(t *testing.T) {
@@ -76,18 +76,20 @@ func Test_update(t *testing.T) {
 		panic(e)
 	}
 }
+
 //删除
 func Test_delete(t *testing.T) {
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
 	var result int64
-	var err = exampleActivityMapperImpl.DeleteById("171",&result)
+	var err = exampleActivityMapperImpl.DeleteById("171", &result)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("result=", result)
 }
+
 //查询
 func Test_select(t *testing.T) {
 	//初始化mapper文件
