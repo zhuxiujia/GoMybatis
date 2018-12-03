@@ -8,7 +8,7 @@ GoMybatis 内部在初始化时反射分析mapper xml生成golang的func代码�
 ### 已支持绝大部分标签
 `<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<foreach><resultMap>`
 ### 已支持本地和远程事务,方便处于 单数据库(Mysql,postgresql)-分布式数据库（TiDB,cockroachdb...）过渡期间的微服务
-![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/docs/tx.png)
+![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/tx.png)
 
 ## 使用教程,
 ##### 代码文件请移步Github文件夹https://github.com/zhuxiujia/GoMybatis/tree/master/example
