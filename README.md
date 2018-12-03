@@ -1,14 +1,14 @@
 # GoMybatis
-![Image text](https://github.com/zhuxiujia/gomybatis.io/raw/master/docs/logo.png)
-# 网站地址
-https://zhuxiujia.github.io/gomybatis.io/assets/index.html
+![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/vuetify.png)
+# 官方网站-文档/介绍
+https://zhuxiujia.github.io/gomybatis.io/info.html
 # 优势
 GoMybatis 是根据java版 Mybatis3 的实现,基于Go标准库和github.com/Knetic/govaluate表达式及github.com/beevik/etree读取Xml解析,github.com/satori/go.uuid生成库 实现。
 GoMybatis 内部在初始化时反射分析mapper xml生成golang的func代码，默认支持绝大部分的Java版的mybatis标签和规范,
 ### 已支持绝大部分标签
 `<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<foreach><resultMap>`
 ### 已支持本地和远程事务,方便处于 单数据库(Mysql,postgresql)-分布式数据库（TiDB,cockroachdb...）过渡期间的微服务
-![Image text](https://github.com/zhuxiujia/gomybatis.io/raw/master/docs/tx.png)
+![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/tx.png)
 
 ## 使用教程,
 ##### 代码文件请移步Github文件夹https://github.com/zhuxiujia/GoMybatis/tree/master/example
