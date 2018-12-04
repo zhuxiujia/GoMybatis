@@ -1,8 +1,8 @@
 package GoMybatis
 
 import (
-	_ "github.com/go-sql-driver/mysql"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/zhuxiujia/GoMybatis/example"
 	"testing"
 )

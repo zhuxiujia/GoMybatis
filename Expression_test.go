@@ -29,14 +29,14 @@ func TestExpress(t *testing.T) {
 	fmt.Println(result)
 }
 
-func Test_split(t *testing.T)  {
+func Test_split(t *testing.T) {
 	var test = "a == 0 and a >= 0 or a < 0"
-	var ns= GoMybatisSqlBuilder{}.split(&test)
+	var ns = GoMybatisSqlBuilder{}.split(&test)
 
-	fmt.Println(test,ns)
+	fmt.Println(test, ns)
 }
 
-func Test_bind_string(t *testing.T)  {
+func Test_bind_string(t *testing.T) {
 	var activity = example.Activity{
 		Id:         "1",
 		DeleteFlag: 1,

@@ -3,15 +3,15 @@ package GoMybatis
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
 	"log"
 	"reflect"
 	"strings"
-	"fmt"
 )
 
 type SqlBuilder interface {
-	BuildSql(paramMap map[string]SqlArg, mapperXml *MapperXml) (string, error)
+	BuildSql(paramMap map[string]SqlArg, mapperXml *MapperXml, enableLog bool) (string, error)
 }
 
 type GoMybatisSqlBuilder struct {
@@ -26,7 +26,7 @@ func (this GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert,
 	return this
 }
 
-func (this GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml *MapperXml) (string, error) {
+func (this GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml *MapperXml, enableLog bool) (string, error) {
 	var sql bytes.Buffer
 	err := this.createFromElement(mapperXml.ElementItems, &sql, paramMap)
 	if err != nil {
@@ -34,7 +34,9 @@ func (this GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml *
 	}
 	var sqlStr = sql.String()
 	sql.Reset()
-	log.Println("[GoMybatis] Preparing sql ==> ", sqlStr)
+	if enableLog {
+		log.Println("[GoMybatis] Preparing sql ==> ", sqlStr)
+	}
 	return sqlStr, nil
 }
 

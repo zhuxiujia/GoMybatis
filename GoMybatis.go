@@ -93,6 +93,7 @@ func makeResultMaps(xmls map[string]*MapperXml) map[string]map[string]*ResultPro
 	}
 	return resultMaps
 }
+
 //return a map map[`method`]*MapperXml
 func makeMethodXmlMap(bean reflect.Value, mapperTree map[string]*MapperXml) map[string]*MapperXml {
 	if bean.Kind() == reflect.Ptr {
@@ -110,7 +111,7 @@ func makeMethodXmlMap(bean reflect.Value, mapperTree map[string]*MapperXml) map[
 			if mapperXml != nil {
 				methodXmlMap[fieldItem.Name] = mapperXml
 			} else {
-				panic("[GoMybatis] can not find method "+bean.Type().String() +"."+ fieldItem.Name + "() in xml !")
+				panic("[GoMybatis] can not find method " + bean.Type().String() + "." + fieldItem.Name + "() in xml !")
 			}
 		}
 	}
@@ -204,7 +205,7 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlB
 			}
 		}
 	}
-	result, err := sqlBuilder.BuildSql(paramMap, mapperXml)
+	result, err := sqlBuilder.BuildSql(paramMap, mapperXml, true)
 	return session, result, err
 }
 

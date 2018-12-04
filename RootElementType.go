@@ -9,5 +9,5 @@ const (
 	Element_Update    RootElementType = `update`
 	Element_Select    RootElementType = "select"
 
-	Element_bind   RootElementType = "bind"
+	Element_bind RootElementType = "bind"
 )

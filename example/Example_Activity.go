@@ -1,8 +1,8 @@
 package example
 
 import (
-	"time"
 	"fmt"
+	"time"
 )
 
 type Activity struct {

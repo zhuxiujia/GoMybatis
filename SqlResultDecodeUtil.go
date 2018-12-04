@@ -27,16 +27,10 @@ func (this GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultPropert
 	} else {
 		panic("[GoMybatis] Decode only support ptr value!")
 	}
-	var renameMapArray = make([]map[string][]byte, 0)
 	var sourceArrayLen = len(sourceArray)
-	for _, v := range sourceArray {
-		var m = make(map[string][]byte)
-		for ik, iv := range v {
-			var repleaceName = strings.ToLower(strings.Replace(ik, "_", "", -1))
-			m[repleaceName] = iv
-		}
-		renameMapArray = append(renameMapArray, m)
-	}
+
+	var renameMapArray = this.getRenameMapArray(sourceArray)
+
 	if this.isGoBasicType(resultV.Type()) {
 		//single basic type
 		if sourceArrayLen > 1 {
@@ -228,15 +222,14 @@ func (this GoMybatisSqlResultDecoder) isGoBasicType(tItemTypeFieldType reflect.T
 }
 
 func (this GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceArray []map[string][]byte, resultV reflect.Value, itemType reflect.Type, resultMap map[string]*ResultProperty, result interface{}) error {
+	if resultV.Type().Kind() == reflect.Slice && resultV.IsValid() {
+		resultV = reflect.MakeSlice(resultV.Type(), 0, 0)
+	} else if resultV.Type().Kind() == reflect.Map && resultV.IsValid() {
+		resultV = reflect.MakeMap(resultV.Type())
+	} else {
+
+	}
 	for _, sItemMap := range sourceArray {
-
-		if resultV.Type().Kind() == reflect.Slice {
-			resultV = reflect.MakeSlice(itemType, 0, 0)
-		} else if resultV.Type().Kind() == reflect.Map {
-			resultV = reflect.MakeMap(resultV.Type())
-		} else {
-
-		}
 		for key, value := range sItemMap {
 			if value == nil || len(value) == 0 {
 				continue
@@ -256,4 +249,17 @@ func (this GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceArray [
 	}
 	reflect.ValueOf(result).Elem().Set(resultV)
 	return nil
+}
+
+func (decoder GoMybatisSqlResultDecoder) getRenameMapArray(sourceArray []map[string][]byte) []map[string][]byte {
+	var renameMapArray = make([]map[string][]byte, 0)
+	for _, v := range sourceArray {
+		var m = make(map[string][]byte)
+		for ik, iv := range v {
+			var repleaceName = strings.ToLower(strings.Replace(ik, "_", "", -1))
+			m[repleaceName] = iv
+		}
+		renameMapArray = append(renameMapArray, m)
+	}
+	return renameMapArray
 }
