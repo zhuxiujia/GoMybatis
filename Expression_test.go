@@ -35,3 +35,22 @@ func Test_split(t *testing.T)  {
 
 	fmt.Println(test,ns)
 }
+
+func Test_bind_string(t *testing.T)  {
+	var activity = example.Activity{
+		Id:         "1",
+		DeleteFlag: 1,
+	}
+	var evaluateParameters = make(map[string]interface{})
+	evaluateParameters["activity"] = activity
+	var expression = "'%' + activity.Id + '%'"
+	evalExpression, err := govaluate.NewEvaluableExpression(expression)
+	if err != nil {
+		panic(err)
+	}
+	result, err := evalExpression.Evaluate(evaluateParameters)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(result)
+}
