@@ -11,12 +11,17 @@
         <result column="create_time" property="createTime" goType="time.Time"/>
         <result column="delete_flag" property="deleteFlag" goType="int"/>
     </resultMap>
+
     <!--List<Activity> selectByCondition(@Param("name") String name,@Param("startTime") Date startTime,@Param("endTime") Date endTime,@Param("index") Integer index,@Param("size") Integer size);-->
     <!-- 后台查询产品 -->
     <select id="selectByCondition" resultMap="BaseResultMap">
         select * from biz_activity where delete_flag=1
+        <bind name="pattern" value="'%' + name + '%'" />
         <if test="name != ''">
-            and name like concat('%',#{name},'%')
+            <!--可以使用bind标签 and name like #{pattern}-->
+            and name like #{pattern}
+            <!--可以使用默认 and name like concat('%',#{name},'%')-->
+            <!--and name like concat('%',#{name},'%')-->
         </if>
         <if test="startTime != ''">
             and create_time >= #{startTime}

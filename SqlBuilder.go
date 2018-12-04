@@ -7,6 +7,7 @@ import (
 	"log"
 	"reflect"
 	"strings"
+	"fmt"
 )
 
 type SqlBuilder interface {
@@ -43,7 +44,9 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 	}
 	for _, v := range itemTree {
 		var loopChildItem = true
-		if v.ElementType == Element_String {
+		if v.ElementType == Element_bind {
+			param = this.bindBindElementArg(param, v, this.SqlArgTypeConvert)
+		} else if v.ElementType == Element_String {
 			//string element
 			sql.WriteString(replaceArg(v.DataString, param, this.SqlArgTypeConvert))
 		} else if v.ElementType == Element_If {
@@ -168,6 +171,35 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 	return nil
 }
 
+func (this GoMybatisSqlBuilder) bindBindElementArg(args map[string]SqlArg, item ElementItem, typeConvert SqlArgTypeConvert) map[string]SqlArg {
+	var name = item.Propertys["name"]
+	var value = item.Propertys["value"]
+	if name == "" {
+		panic(`[GoMybatis] element <bind name = ""> name can not be nil!`)
+	}
+	if value == ""{
+		args[name] = SqlArg{
+			Value: fmt.Sprint(value),
+			Type:  StringType,
+		}
+		return args
+	}
+	evalExpression, err := govaluate.NewEvaluableExpression(value)
+	if err != nil {
+		return args
+	}
+	var evaluateParameters = this.scanParamterMap(args, this.ExpressionTypeConvert)
+	result, err := evalExpression.Evaluate(evaluateParameters)
+	if err != nil {
+		return args
+	}
+	args[name] = SqlArg{
+		Value: fmt.Sprint(result),
+		Type:  StringType,
+	}
+	return args
+}
+
 //表达式 ''转换为 0
 func (this GoMybatisSqlBuilder) expressionToIfZeroExpression(expression string, param map[string]SqlArg) string {
 	for k, v := range param {
@@ -231,6 +263,6 @@ func (this GoMybatisSqlBuilder) repleaceExpression(expression *string, param map
 
 	for _, expressionItem := range newStrings {
 		var NewExpression = this.expressionToIfZeroExpression(expressionItem, param)
-		*expression = strings.Replace(*expression,expressionItem,NewExpression,-1)
+		*expression = strings.Replace(*expression, expressionItem, NewExpression, -1)
 	}
 }
