@@ -231,6 +231,7 @@ func (this GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceArray [
 	for _, sItemMap := range sourceArray {
 
 		if resultV.Type().Kind() == reflect.Slice {
+			resultV = reflect.MakeSlice(itemType, 0, 0)
 		} else if resultV.Type().Kind() == reflect.Map {
 			resultV = reflect.MakeMap(resultV.Type())
 		} else {
