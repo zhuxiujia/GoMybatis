@@ -42,6 +42,8 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 	if this.SqlArgTypeConvert == nil || this.ExpressionTypeConvert == nil {
 		panic("[GoMybatis] GoMybatisSqlBuilder.SqlArgTypeConvert and GoMybatisSqlBuilder.ExpressionTypeConvert can not be nil!")
 	}
+	//test表达式参数map
+	var evaluateParameters map[string]interface{}
 	for _, v := range itemTree {
 		var loopChildItem = true
 		if v.ElementType == Element_bind {
@@ -53,11 +55,12 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 			//if element
 			var expression = v.Propertys[`test`]
 			this.repleaceExpression(&expression, param)
-			//test表达式解析
-			var evaluateParameters = this.scanParamterMap(param, this.ExpressionTypeConvert)
 			evalExpression, err := govaluate.NewEvaluableExpression(expression)
 			if err != nil {
 				return err
+			}
+			if evaluateParameters == nil {
+				evaluateParameters = this.expressParamterMap(param, this.ExpressionTypeConvert)
 			}
 			result, err := evalExpression.Evaluate(evaluateParameters)
 			if err != nil {
@@ -177,7 +180,7 @@ func (this GoMybatisSqlBuilder) bindBindElementArg(args map[string]SqlArg, item 
 	if name == "" {
 		panic(`[GoMybatis] element <bind name = ""> name can not be nil!`)
 	}
-	if value == ""{
+	if value == "" {
 		args[name] = SqlArg{
 			Value: fmt.Sprint(value),
 			Type:  StringType,
@@ -188,7 +191,7 @@ func (this GoMybatisSqlBuilder) bindBindElementArg(args map[string]SqlArg, item 
 	if err != nil {
 		return args
 	}
-	var evaluateParameters = this.scanParamterMap(args, this.ExpressionTypeConvert)
+	var evaluateParameters = this.expressParamterMap(args, this.ExpressionTypeConvert)
 	result, err := evalExpression.Evaluate(evaluateParameters)
 	if err != nil {
 		return args
@@ -213,7 +216,7 @@ func (this GoMybatisSqlBuilder) expressionToIfZeroExpression(expression string, 
 }
 
 //scan params
-func (this GoMybatisSqlBuilder) scanParamterMap(parameters map[string]SqlArg, typeConvert ExpressionTypeConvert) map[string]interface{} {
+func (this GoMybatisSqlBuilder) expressParamterMap(parameters map[string]SqlArg, typeConvert ExpressionTypeConvert) map[string]interface{} {
 	var newMap = make(map[string]interface{})
 	for k, obj := range parameters {
 		var value = obj.Value
@@ -221,6 +224,19 @@ func (this GoMybatisSqlBuilder) scanParamterMap(parameters map[string]SqlArg, ty
 			value = typeConvert.Convert(obj)
 		}
 		newMap[k] = value
+	}
+	return newMap
+}
+
+//scan params
+func (this GoMybatisSqlBuilder) sqlParamterMap(parameters map[string]SqlArg, typeConvert SqlArgTypeConvert) map[string]string {
+	var newMap = make(map[string]string)
+	for k, obj := range parameters {
+		var value = obj.Value
+		if typeConvert != nil {
+			value = typeConvert.Convert(obj)
+		}
+		newMap[k] = fmt.Sprint(value)
 	}
 	return newMap
 }
