@@ -9,7 +9,7 @@ import (
 //如果使用UseProxyMapperByEngine，则内建默认的SessionFactory
 var DefaultSessionFactory *SessionFactory
 
-func UseProxyMapperByEngine(bean interface{}, xml []byte, sqlEngine *SessionEngine) {
+func UseProxyMapperByEngine(bean interface{}, xml []byte, sqlEngine *SessionEngine, enableLog bool) {
 	v := reflect.ValueOf(bean)
 	if v.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
@@ -18,19 +18,19 @@ func UseProxyMapperByEngine(bean interface{}, xml []byte, sqlEngine *SessionEngi
 	if DefaultSessionFactory == nil {
 		DefaultSessionFactory = &factory
 	}
-	UseProxyMapper(v, xml, DefaultSessionFactory, GoMybatisSqlResultDecoder{}, GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{}))
+	UseProxyMapper(v, xml, DefaultSessionFactory, GoMybatisSqlResultDecoder{}, GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{}), enableLog)
 }
 
-func UseProxyMapperFromBean(bean interface{}, xml []byte, sessionFactory *SessionFactory, sqlResultDecoder SqlResultDecoder, sqlBuilder SqlBuilder) {
+func UseProxyMapperFromBean(bean interface{}, xml []byte, sessionFactory *SessionFactory, sqlResultDecoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) {
 	v := reflect.ValueOf(bean)
 	if v.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
-	UseProxyMapperFromValue(v, xml, sessionFactory, sqlResultDecoder, sqlBuilder)
+	UseProxyMapperFromValue(v, xml, sessionFactory, sqlResultDecoder, sqlBuilder, enableLog)
 }
 
-func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, sqlResultDecoder SqlResultDecoder, sqlBuilder SqlBuilder) {
-	UseProxyMapper(bean, xml, sessionFactory, sqlResultDecoder, sqlBuilder)
+func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, sqlResultDecoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) {
+	UseProxyMapper(bean, xml, sessionFactory, sqlResultDecoder, sqlBuilder, enableLog)
 }
 
 //例如
@@ -46,7 +46,7 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *Ses
 //func的基本类型的参数（例如string,int,time.Time,int64,float....）个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
 //func的结构体参数无需指定mapperParams的tag，框架会自动扫描它的属性，封装为map处理掉
 //使用UseProxyMapper函数设置代理后即可正常使用。
-func UseProxyMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, decoder SqlResultDecoder, sqlBuilder SqlBuilder) {
+func UseProxyMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) {
 	var mapperTree = LoadMapperXml(xml)
 	//make a map[method]xml
 	var methodXmlMap = makeMethodXmlMap(bean, mapperTree)
