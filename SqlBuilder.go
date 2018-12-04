@@ -3,7 +3,6 @@ package GoMybatis
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
 	"log"
 	"reflect"
@@ -49,36 +48,32 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 			sql.WriteString(replaceArg(v.DataString, param, this.SqlArgTypeConvert))
 		} else if v.ElementType == Element_If {
 			//if element
-			var test = v.Propertys[`test`]
-			var andStrings = strings.Split(test, ` and `)
-			for index, expression := range andStrings {
-				//test表达式解析
-				var evaluateParameters = this.scanParamterMap(param, this.ExpressionTypeConvert)
-				expression = this.expressionToIfZeroExpression(expression, param)
-				evalExpression, err := govaluate.NewEvaluableExpression(expression)
-				if err != nil {
-					fmt.Println(err)
-				}
-				result, err := evalExpression.Evaluate(evaluateParameters)
-				if err != nil {
-					var buffer bytes.Buffer
-					buffer.WriteString("[GoMybatis] <test `")
-					buffer.WriteString(expression)
-					buffer.WriteString(`> fail,`)
-					buffer.WriteString(err.Error())
-					err = errors.New(buffer.String())
-					return err
-				}
-				if result.(bool) {
-					//test表达式成立
-					if index == (len(andStrings) - 1) {
-						var reps = replaceArg(v.DataString, param, this.SqlArgTypeConvert)
-						sql.WriteString(reps)
-					}
-				} else {
-					loopChildItem = false
-					break
-				}
+			var expression = v.Propertys[`test`]
+			this.repleaceExpression(&expression, param)
+			//test表达式解析
+			var evaluateParameters = this.scanParamterMap(param, this.ExpressionTypeConvert)
+			evalExpression, err := govaluate.NewEvaluableExpression(expression)
+			if err != nil {
+				return err
+			}
+			result, err := evalExpression.Evaluate(evaluateParameters)
+			if err != nil {
+				var buffer bytes.Buffer
+				buffer.WriteString("[GoMybatis] <test `")
+				buffer.WriteString(expression)
+				buffer.WriteString(`> fail,`)
+				buffer.WriteString(err.Error())
+				err = errors.New(buffer.String())
+				return err
+			}
+			if result.(bool) {
+				//test > true,write sql string
+				var reps = replaceArg(v.DataString, param, this.SqlArgTypeConvert)
+				sql.WriteString(reps)
+			} else {
+				// test > fail ,end loop
+				loopChildItem = false
+				break
 			}
 		} else if v.ElementType == Element_Trim {
 			var prefix = v.Propertys[`prefix`]
@@ -196,4 +191,46 @@ func (this GoMybatisSqlBuilder) scanParamterMap(parameters map[string]SqlArg, ty
 		newMap[k] = value
 	}
 	return newMap
+}
+
+func (this GoMybatisSqlBuilder) split(str *string) (stringItems []string) {
+	if str == nil || *str == "" {
+		return nil
+	}
+	var andStrings = strings.Split(*str, " && ")
+	if andStrings == nil {
+		return nil
+	}
+	var newStrings []string
+	for _, v := range andStrings {
+		var orStrings = strings.Split(v, " || ")
+		if orStrings == nil {
+			continue
+		}
+		for _, orStr := range orStrings {
+			if newStrings == nil {
+				newStrings = make([]string, 0)
+			}
+			if orStr == "" {
+				continue
+			}
+			newStrings = append(newStrings, orStr)
+		}
+	}
+	return newStrings
+}
+
+//替换表达式中的值 and,or,参数 替换为实际值
+func (this GoMybatisSqlBuilder) repleaceExpression(expression *string, param map[string]SqlArg) {
+	if expression == nil || *expression == "" {
+		return
+	}
+	*expression = strings.Replace(*expression, ` and `, " && ", -1)
+	*expression = strings.Replace(*expression, ` or `, " || ", -1)
+	var newStrings = this.split(expression)
+
+	for _, expressionItem := range newStrings {
+		var NewExpression = this.expressionToIfZeroExpression(expressionItem, param)
+		*expression = strings.Replace(*expression,expressionItem,NewExpression,-1)
+	}
 }

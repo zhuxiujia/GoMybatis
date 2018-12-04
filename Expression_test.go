@@ -17,7 +17,7 @@ func TestExpress(t *testing.T) {
 
 	evaluateParameters["activity"] = activity
 
-	var expression = "activity.Id == '2'"
+	var expression = "activity.DeleteFlag == 1 or activity.DeleteFlag > 0 or activity.DeleteFlag ==0"
 	evalExpression, err := govaluate.NewEvaluableExpression(expression)
 	if err != nil {
 		panic(err)
@@ -27,4 +27,11 @@ func TestExpress(t *testing.T) {
 		panic(err)
 	}
 	fmt.Println(result)
+}
+
+func Test_split(t *testing.T)  {
+	var test = "a == 0 and a >= 0 or a < 0"
+	var ns= GoMybatisSqlBuilder{}.split(&test)
+
+	fmt.Println(test,ns)
 }
