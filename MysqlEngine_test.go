@@ -5,9 +5,10 @@ import (
 	"github.com/zhuxiujia/GoMybatis/example"
 	"testing"
 	"github.com/zhuxiujia/GoMybatis/utils"
+	"sync"
 )
 
-//假设Mysql 数据库查询时间为0，框架的并发数的性能
+//假设Mysql 数据库查询时间为0，框架单协程的并发数的性能
 func Test_One_Transcation_TPS(t *testing.T) {
 	//使用事务
 	session := Session(&TestSession{})
@@ -25,6 +26,31 @@ func Test_One_Transcation_TPS(t *testing.T) {
 			panic(err)
 		}
 	}
+}
+
+//假设Mysql 数据库查询时间为0，框架多个协程的并发数的性能
+func Test_One_Transcation_multiple_coroutine_TPS(t *testing.T) {
+	//使用事务
+	session := Session(&TestSession{})
+	//初始化mapper文件
+	var exampleActivityMapperImpl = InitMapperByLocalSession()
+	//使用mapper
+
+	////开始TPS测试
+	var total = 10000//总数，也是并发数
+
+	var waitGroup = sync.WaitGroup{}
+	waitGroup.Add(total)
+
+	defer utils.CountMethodTps(float64(total), time.Now(), "Test_One_Transcation_multiple_coroutine_TPS")
+	var results []example.Activity
+	for i := 0; i < total; i++ {
+		go func(wg *sync.WaitGroup) {
+			exampleActivityMapperImpl.SelectByCondition(&session, "", time.Time{}, time.Time{}, 0, 2000, &results)
+			wg.Done()
+		}(&waitGroup)
+	}
+	waitGroup.Wait()
 }
 
 //验证测试直接返回数据
