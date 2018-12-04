@@ -37,18 +37,22 @@ func Test_One_Transcation_multiple_coroutine_TPS(t *testing.T) {
 	//使用mapper
 
 	////开始TPS测试
-	var total = 10000//总数，也是并发数
-
+	var total = 100000    //总数
+	var goruntine = 1000 //并发数
 	var waitGroup = sync.WaitGroup{}
-	waitGroup.Add(total)
+	waitGroup.Add(goruntine)
 
 	defer utils.CountMethodTps(float64(total), time.Now(), "Test_One_Transcation_multiple_coroutine_TPS")
-	var results []example.Activity
-	for i := 0; i < total; i++ {
-		go func(wg *sync.WaitGroup) {
-			exampleActivityMapperImpl.SelectByCondition(&session, "", time.Time{}, time.Time{}, 0, 2000, &results)
-			wg.Done()
-		}(&waitGroup)
+
+	for i := 0; i < goruntine; i++ {
+		go func() {
+			var itemCount = total / goruntine
+			for f := 0; f < itemCount; f++ {
+				var results []example.Activity
+				exampleActivityMapperImpl.SelectByCondition(&session, "", time.Time{}, time.Time{}, 0, 2000, &results)
+			}
+			waitGroup.Done()
+		}()
 	}
 	waitGroup.Wait()
 }
@@ -158,6 +162,6 @@ func InitMapperByLocalSession() ExampleActivityMapperImpl {
     </select>`)
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	//设置对应的mapper xml文件,禁止输出日志
-	UseProxyMapperByEngine(&exampleActivityMapperImpl, bytes, engine,false)
+	UseProxyMapperByEngine(&exampleActivityMapperImpl, bytes, engine, false)
 	return exampleActivityMapperImpl
 }
