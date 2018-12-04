@@ -68,7 +68,7 @@ func UseProxyMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFacto
 		if resultMapId != "" {
 			resultMap = resultMaps[resultMapId]
 		}
-		return exeMethodByXml(sessionFactory, tagArgs, args, mapperXml, resultMap, lastArgValue, decoder, sqlBuilder)
+		return exeMethodByXml(sessionFactory, tagArgs, args, mapperXml, resultMap, lastArgValue, decoder, sqlBuilder, enableLog)
 	}
 	UseMapperValue(bean, proxyFunc)
 }
@@ -134,12 +134,12 @@ func findMapperXml(mapperTree map[string]*MapperXml, methodName string) *MapperX
 	return nil
 }
 
-func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, mapperXml *MapperXml, resultMap map[string]*ResultProperty, lastArgValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder) error {
+func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, mapperXml *MapperXml, resultMap map[string]*ResultProperty, lastArgValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) error {
 	//build sql string
 	var session *Session
 	var sql string
 	var err error
-	session, sql, err = buildSql(tagParamMap, args, mapperXml, sqlBuilder)
+	session, sql, err = buildSql(tagParamMap, args, mapperXml, sqlBuilder, enableLog)
 	if err != nil {
 		return err
 	}
@@ -178,7 +178,7 @@ func closeSession(factory *SessionFactory, session *Session) {
 	(*session).Close()
 }
 
-func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlBuilder SqlBuilder) (*Session, string, error) {
+func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlBuilder SqlBuilder, enableLog bool) (*Session, string, error) {
 	var session *Session
 	var paramMap = make(map[string]SqlArg)
 	var tagArgsLen = len(tagArgs)
@@ -205,7 +205,7 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlB
 			}
 		}
 	}
-	result, err := sqlBuilder.BuildSql(paramMap, mapperXml, true)
+	result, err := sqlBuilder.BuildSql(paramMap, mapperXml, enableLog)
 	return session, result, err
 }
 
