@@ -1,6 +1,9 @@
 package example
 
-import "time"
+import (
+	"time"
+	"fmt"
+)
 
 type Activity struct {
 	Id         string    `json:"id"`
@@ -11,4 +14,9 @@ type Activity struct {
 	Remark     string    `json:"remark"`
 	CreateTime time.Time `json:"createTime"`
 	DeleteFlag int       `json:"deleteFlag"`
+}
+
+func (this Activity) PrintName() string {
+	fmt.Println(this.Name)
+	return this.Name
 }
