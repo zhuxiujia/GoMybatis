@@ -10,8 +10,12 @@ GoMybatis 内部在初始化时反射分析mapper xml生成golang的func代码�
 ### 已支持本地和远程事务,方便处于 单数据库(Mysql,postgresql)-分布式数据库（TiDB,cockroachdb...）过渡期间的微服务
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/tx.png)
 
-## 使用教程,
-##### 代码文件请移步Github文件夹https://github.com/zhuxiujia/GoMybatis/tree/master/example
+
+
+## 使用教程
+
+> 示例源码https://github.com/zhuxiujia/GoMybatis/tree/master/example
+
 各种数据库驱动支持
 ```
  Mysql: github.com/go-sql-driver/mysql
