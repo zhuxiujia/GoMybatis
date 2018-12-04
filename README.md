@@ -100,6 +100,7 @@ func main() {
 ```
 
 ## TODO 期待功能
+-`<choose><when><otherwise>` 标签支持（进行中）</br>
 -`<sql><include>` 标签支持（进行中）</br>
 -针对于 GoLand 的xml生成插件,可以使用鼠标右键点击一键生成CRUD基础XML(待支持..)</br>
 
