@@ -47,7 +47,11 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 	for _, v := range itemTree {
 		var loopChildItem = true
 		if v.ElementType == Element_bind {
+			//bind,param args change!need update
 			param = this.bindBindElementArg(param, v, this.SqlArgTypeConvert)
+			if evaluateParameters != nil {
+				evaluateParameters = this.expressParamterMap(param, this.ExpressionTypeConvert)
+			}
 		} else if v.ElementType == Element_String {
 			//string element
 			sql.WriteString(replaceArg(v.DataString, param, this.SqlArgTypeConvert))
