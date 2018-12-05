@@ -9,12 +9,12 @@ import (
 	"time"
 )
 
-type MysqlEngine struct {
+type GoMybatisEngine struct {
 	SessionEngine
 	DB *sql.DB
 }
 
-func (this MysqlEngine) NewSession() *Session {
+func (this GoMybatisEngine) NewSession() *Session {
 	uuids, _ := uuid.NewV4()
 	var uuidstrig = uuids.String()
 	var mysqlLocalSession = LocalSession{
@@ -31,7 +31,7 @@ func Open(driverName, dataSourceName string) (*SessionEngine, error) {
 	if err != nil {
 		return nil, err
 	}
-	var mysqlEngine = MysqlEngine{
+	var mysqlEngine = GoMybatisEngine{
 		DB: db,
 	}
 	var engine = SessionEngine(mysqlEngine)
