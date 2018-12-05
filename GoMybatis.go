@@ -177,7 +177,7 @@ func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args [
 }
 
 func closeSession(factory *SessionFactory, session *Session) {
-	factory.CloseSession((*session).Id())
+	factory.Close((*session).Id())
 	(*session).Close()
 }
 
