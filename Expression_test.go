@@ -17,7 +17,7 @@ func TestExpress(t *testing.T) {
 
 	evaluateParameters["activity"] = activity
 
-	var expression = "activity.DeleteFlag == 1 or activity.DeleteFlag > 0 or activity.DeleteFlag ==0"
+	var expression = "activity.DeleteFlag == 1 || activity.DeleteFlag > 0 "
 	evalExpression, err := govaluate.NewEvaluableExpression(expression)
 	if err != nil {
 		panic(err)

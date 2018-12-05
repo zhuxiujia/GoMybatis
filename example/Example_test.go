@@ -49,6 +49,10 @@ func InitMapperByLocalSession() ExampleActivityMapperImpl {
 
 //插入
 func Test_inset(t *testing.T) {
+	if MysqlUri == "" || MysqlUri == "*"{
+		fmt.Println("no mysql config in project, you must set the mysql link!")
+		return
+	}
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
@@ -63,6 +67,10 @@ func Test_inset(t *testing.T) {
 //修改
 //本地事务使用例子
 func Test_update(t *testing.T) {
+	if MysqlUri == "" || MysqlUri == "*"{
+		fmt.Println("no mysql config in project, you must set the mysql link!")
+		return
+	}
 	//初始化mapper文件
 	exampleActivityMapperImpl := InitMapperByLocalSession()
 	var activityBean = Activity{
@@ -79,6 +87,10 @@ func Test_update(t *testing.T) {
 
 //删除
 func Test_delete(t *testing.T) {
+	if MysqlUri == "" || MysqlUri == "*"{
+		fmt.Println("no mysql config in project, you must set the mysql link!")
+		return
+	}
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
@@ -92,6 +104,10 @@ func Test_delete(t *testing.T) {
 
 //查询
 func Test_select(t *testing.T) {
+	if MysqlUri == "" || MysqlUri == "*"{
+		fmt.Println("no mysql config in project, you must set the mysql link!")
+		return
+	}
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
@@ -105,6 +121,10 @@ func Test_select(t *testing.T) {
 
 //本地GoMybatis使用例子
 func Test_ForEach(t *testing.T) {
+	if MysqlUri == "" || MysqlUri == "*"{
+		fmt.Println("no mysql config in project, you must set the mysql link!")
+		return
+	}
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
@@ -120,6 +140,10 @@ func Test_ForEach(t *testing.T) {
 
 //本地事务使用例子
 func Test_local_Transation(t *testing.T) {
+	if MysqlUri == "" || MysqlUri == "*"{
+		fmt.Println("no mysql config in project, you must set the mysql link!")
+		return
+	}
 	//初始化mapper文件
 	exampleActivityMapperImpl := InitMapperByLocalSession()
 	//使用事务
@@ -141,7 +165,10 @@ func Test_local_Transation(t *testing.T) {
 
 //远程事务示例，可用于分布式微服务(单数据库，多个微服务)
 func Test_Remote_Transation(t *testing.T) {
-
+	if MysqlUri == "" || MysqlUri == "*"{
+		fmt.Println("no mysql config in project, you must set the mysql link!")
+		return
+	}
 	//启动GoMybatis独立节点事务服务器，通过msgpackrpc调用(msgpack是一种多语言序列化格式，类似json但是速度快于go默认的gob编码)
 	var addr = "127.0.0.1:17235"
 	go GoMybatis.ServerTcp(addr, MysqlDriverName, MysqlUri)
