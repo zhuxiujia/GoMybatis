@@ -1,6 +1,8 @@
-# GoMybatis ![Image text](https://travis-ci.com/zhuxiujia/GoMybatis.svg?branch=master)
+# SQL mapper framework for Golang
+[![Build Status](https://travis-ci.com/zhuxiujia/GoMybatis.svg?branch=master)](https://travis-ci.com/zhuxiujia/GoMybatis)
+
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/vuetify.png)
-# 官方网站-文档/介绍
+# 官方网站/文档
 https://zhuxiujia.github.io/gomybatis.io/info.html
 # 优势
 GoMybatis 是根据java版 Mybatis3 的实现,基于Go标准库和github.com/Knetic/govaluate表达式及github.com/beevik/etree读取Xml解析,github.com/satori/go.uuid生成库 实现。
