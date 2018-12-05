@@ -5,8 +5,10 @@
 # 官方网站/文档
 https://zhuxiujia.github.io/gomybatis.io/info.html
 # 优势
-GoMybatis 是根据java版 Mybatis3 的实现,基于Go标准库和github.com/Knetic/govaluate表达式及github.com/beevik/etree读取Xml解析,github.com/satori/go.uuid生成库 实现。
-GoMybatis 内部在初始化时反射分析mapper xml生成golang的func代码，默认支持绝大部分的Java版的mybatis标签和规范,
+-高并发，假设数据库响应时间为0，在6核16Gpc上可框架可以压出 246982Tps,耗时仅仅0.4s
+-支持事务，session灵活插拔，兼容过渡期微服务
+-动态SQL，在xml中可灵活运用if判断，foreach遍历数组，resultMap,bind等等java框架Mybatis包含的实用功能
+-无需生成*.go等等中间代码，xml读取后可直接写入到自定义的Struct,Func属性中调用函数
 ### 已支持绝大部分标签
 `<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<foreach>,<resultMap>,<bind>`
 ### 已支持本地和远程事务,方便处于 单数据库(Mysql,postgresql)-分布式数据库（TiDB,cockroachdb...）过渡期间的微服务
