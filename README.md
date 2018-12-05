@@ -1,5 +1,5 @@
 # SQL mapper framework for Golang
-![Image text](https://travis-ci.com/zhuxiujia/GoMybatis.svg?branch=master)
+[![Build Status](https://travis-ci.com/zhuxiujia/GoMybatis.svg?branch=master)](https://travis-ci.com/zhuxiujia/GoMybatis)
 
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/vuetify.png)
 # 官方网站-文档/介绍
