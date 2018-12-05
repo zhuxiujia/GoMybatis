@@ -50,8 +50,12 @@ func (this *SessionFactory) GetSession(id string) *Session {
 	return this.SessionMap[id]
 }
 
+func (this *SessionFactory) SetSession(id string, session *Session) {
+	this.SessionMap[id] = session
+}
+
 func (this *SessionFactory) Close(id string) {
-	if this.SessionMap == nil{
+	if this.SessionMap == nil {
 		return
 	}
 	var s = this.SessionMap[id]
@@ -62,10 +66,10 @@ func (this *SessionFactory) Close(id string) {
 }
 
 func (this *SessionFactory) CloseAll(id string) {
-	if this.SessionMap == nil{
+	if this.SessionMap == nil {
 		return
 	}
-	for _,v:=range this.SessionMap{
+	for _, v := range this.SessionMap {
 		if v != nil {
 			(*v).Close()
 			this.SessionMap[id] = nil
