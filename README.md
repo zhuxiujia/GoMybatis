@@ -1,4 +1,4 @@
-# GoMybatis
+# GoMybatis ![Image text](https://travis-ci.com/zhuxiujia/GoMybatis.svg?branch=master)
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/vuetify.png)
 # 官方网站-文档/介绍
 https://zhuxiujia.github.io/gomybatis.io/info.html
