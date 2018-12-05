@@ -6,7 +6,6 @@ import (
 )
 
 type TransationRMSession struct {
-	Session
 	TransactionId string
 	OwnerId       string
 	Client        *TransationRMClient

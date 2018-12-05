@@ -7,7 +7,6 @@ import (
 
 //本地直连session
 type LocalSession struct {
-	Session
 	SessionId              string
 	db                     *sql.DB
 	stmt                   *sql.Stmt
