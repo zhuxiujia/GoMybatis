@@ -16,7 +16,7 @@ GoMybatis 内部在初始化时反射分析mapper xml生成golang的func代码�
 
 > 示例源码https://github.com/zhuxiujia/GoMybatis/tree/master/example
 
-各种数据库驱动支持
+支持数据库驱动
 ```
  Mysql: github.com/go-sql-driver/mysql
  MyMysql: github.com/ziutek/mymysql/godrv
