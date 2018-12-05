@@ -132,17 +132,9 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 			var open = v.Propertys[`open`]
 			var close = v.Propertys[`close`]
 			var separator = v.Propertys[`separator`]
-
-			if item == "" {
-				item = "item"
-			}
-			if index == "" {
-				index = "index"
-			}
 			if collection == "" {
 				panic(`[GoMybatis] collection value can not be "" in <foreach collection=""> !`)
 			}
-
 			var tempSql bytes.Buffer
 			var datas = param[collection].Value
 			var collectionValue = reflect.ValueOf(datas)
@@ -154,13 +146,17 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 					for k, v := range param {
 						tempArgMap[k] = v
 					}
-					tempArgMap[item] = SqlArg{
-						Value: collectionItem.Interface(),
-						Type:  collectionItem.Type(),
+					if item != "" {
+						tempArgMap[item] = SqlArg{
+							Value: collectionItem.Interface(),
+							Type:  collectionItem.Type(),
+						}
 					}
-					tempArgMap[index] = SqlArg{
-						Value: index,
-						Type:  IntType,
+					if index != "" {
+						tempArgMap[index] = SqlArg{
+							Value: index,
+							Type:  IntType,
+						}
 					}
 					if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
 						var err = this.createFromElement(v.ElementItems, &tempSql, tempArgMap)
