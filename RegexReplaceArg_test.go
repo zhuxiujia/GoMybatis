@@ -14,19 +14,20 @@ type TestBean struct {
 }
 type TestBeanChild struct {
 	Name string
-	Age  int
+	Age  *int
 }
 
 func Test_Access_Arg(t *testing.T) {
 
 	var param map[string]SqlArg
 	param = make(map[string]SqlArg)
-
+    var age= 11
+    fmt.Println("age=",age)
 	var bean = TestBean{
 		Name: "father",
 		Child: TestBeanChild{
 			Name: "child",
-			Age:  11,
+			Age:  &age,
 		},
 	}
 	param["bean"] = SqlArg{
@@ -34,7 +35,7 @@ func Test_Access_Arg(t *testing.T) {
 		Type:  reflect.TypeOf(bean),
 	}
 	defer utils.CountMethodUseTime(time.Now(), "Test_Access_Arg", time.Millisecond)
-	var string = "-----#{bean.Name}------#{bean.Child.age}---"
+	var string = "-----#{bean.Name}------#{bean.Child.Age}---"
 
 	for i := 0; i < 1; i++ {
 		var arg = replaceArg(string, param, GoMybatisSqlArgTypeConvert{})

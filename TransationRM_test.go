@@ -8,6 +8,10 @@ import (
 )
 
 func TestTransationRM(t *testing.T) {
+	if example.MysqlDriverName == "" || example.MysqlUri == "" || example.MysqlUri == "*"{
+		fmt.Println("no mysql config in project, you must set the mysql link!")
+		return
+	}
 	var addr = "127.0.0.1:17235"
 	go ServerTcp(addr, "mysql", example.MysqlUri) //事务服务器节点1
 

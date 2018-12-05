@@ -60,15 +60,27 @@ func getFeildInterface(repleaceStr string, arg SqlArg) SqlArg {
 		for index, fieldName := range spArr {
 			//包含子属性
 			if index > 0 {
-				var v = reflect.ValueOf(arg).FieldByName(upperFieldFirstName(fieldName))
-				if v.IsValid() {
-					panic(`[GoMybatis] access field ` + fieldName + " fail! please check you struct.Field !")
-				}
-				arg.Value = v.Interface()
+				var v = reflect.ValueOf(arg.Value).FieldByName(upperFieldFirstName(fieldName))
+				arg.Value = getRealValue(v)
 			}
 		}
 	}
 	return arg
+}
+
+func getRealValue(v reflect.Value) interface{} {
+	if v.Kind() == reflect.Ptr {
+		if v.IsNil() == false {
+			return getRealValue(v.Elem())
+		}
+		if v.IsNil() ==false && v.CanInterface() == true {
+			return v.Interface()
+		} else {
+			return ""
+		}
+	} else {
+		return v.Interface()
+	}
 }
 func upperFieldFirstName(fieldStr string) string {
 	if fieldStr != "" {
