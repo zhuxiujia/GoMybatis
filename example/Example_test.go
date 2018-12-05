@@ -147,7 +147,7 @@ func Test_local_Transation(t *testing.T) {
 	//初始化mapper文件
 	exampleActivityMapperImpl := InitMapperByLocalSession()
 	//使用事务
-	session := *GoMybatis.DefaultSessionFactory.NewSession()
+	session := *GoMybatis.DefaultSessionFactory.NewSession(GoMybatis.SessionType_Default,nil)
 	session.Begin() //开启事务
 	var activityBean = Activity{
 		Id:   "170",
@@ -169,20 +169,21 @@ func Test_Remote_Transation(t *testing.T) {
 		fmt.Println("no mysql config in project, you must set the mysql link!")
 		return
 	}
-	//启动GoMybatis独立节点事务服务器，通过msgpackrpc调用(msgpack是一种多语言序列化格式，类似json但是速度快于go默认的gob编码)
-	var addr = "127.0.0.1:17235"
-	go GoMybatis.ServerTcp(addr, MysqlDriverName, MysqlUri)
+	//启动GoMybatis独立节点事务服务器，通过rpc调用
+	var remoteAddr = "127.0.0.1:17235"
+	go GoMybatis.ServerTcp(remoteAddr, MysqlDriverName, MysqlUri)
 
-	var TransationRMClient = GoMybatis.TransationRMClient{
-		RetryTime: 3,
-		Addr:      addr,
-	}
-
-	//这里是关键，使用原程的transationRMSession（即Transation Resource Manager）替换LocalSession本地的session调用
-	var transationRMSession = *GoMybatis.TransationRMSession{}.New("", &TransationRMClient, GoMybatis.Transaction_Status_NO)
-
+	//开始使用
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
+
+	//关键，使用远程Session替换本地Session调用
+	transationRMSession := *GoMybatis.DefaultSessionFactory.NewSession(GoMybatis.SessionType_TransationRM,&GoMybatis.TransationRMClientConfig{
+		Addr:remoteAddr,
+		RetryTime:3,
+		TransactionId:"",
+		Status:GoMybatis.Transaction_Status_NO,
+	})
 
 	//开启远程事务
 	transationRMSession.Begin()

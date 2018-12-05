@@ -143,9 +143,12 @@ func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args [
 	if err != nil {
 		return err
 	}
+	if sessionFactory == nil && session == nil {
+		panic("[GoMybatis] exe sql need a SessionFactory or Session!")
+	}
 	//session
 	if session == nil {
-		session = sessionFactory.NewSession()
+		session = sessionFactory.NewSession(SessionType_Default,nil)
 		//not arg session,just close!
 		defer closeSession(sessionFactory, session)
 	}
