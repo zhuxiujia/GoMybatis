@@ -132,6 +132,17 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 			var open = v.Propertys[`open`]
 			var close = v.Propertys[`close`]
 			var separator = v.Propertys[`separator`]
+
+			if item == "" {
+				item = "item"
+			}
+			if index == "" {
+				index = "index"
+			}
+			if collection == "" {
+				panic(`[GoMybatis] collection value can not be "" in <foreach collection=""> !`)
+			}
+
 			var tempSql bytes.Buffer
 			var datas = param[collection].Value
 			var collectionValue = reflect.ValueOf(datas)
