@@ -213,7 +213,7 @@ func Test_choose(t *testing.T) {
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
 	var result []Activity
-	var err = exampleActivityMapperImpl.Choose(2, &result)
+	var err = exampleActivityMapperImpl.Choose(1, &result)
 	if err != nil {
 		panic(err)
 	}

@@ -42,7 +42,7 @@ func LoadMapperXml(bytes []byte) (items map[string]*MapperXml) {
 			s.Tag == Element_Delete ||
 			s.Tag == Element_Update ||
 			s.Tag == Element_Select ||
-			s.Tag == Element_ResultMap{
+			s.Tag == Element_ResultMap {
 			var elementID = attrMap[ID]
 			if elementID == "" {
 				panic("[GoMybatis] element Id can not be nil in xml! please check your xml!")
@@ -70,9 +70,9 @@ func attrToProperty(attrs []etree.Attr) map[string]string {
 	return m
 }
 
-func loop(element *etree.Element) []ElementItem {
+func loop(fatherElement *etree.Element) []ElementItem {
 	var els = make([]ElementItem, 0)
-	for _, el := range element.Child {
+	for _, el := range fatherElement.Child {
 		var typeString = reflect.ValueOf(el).Type().String()
 		if typeString == EtreeCharData {
 			var d = el.(*etree.CharData)
@@ -100,6 +100,7 @@ func loop(element *etree.Element) []ElementItem {
 				ElementItems: make([]ElementItem, 0),
 				Propertys:    attrToProperty(e.Attr),
 			}
+			elementRuleCheck(fatherElement, element)
 			if len(e.Child) > 0 {
 				var loopEls = loop(e)
 				for _, item := range loopEls {
@@ -110,4 +111,11 @@ func loop(element *etree.Element) []ElementItem {
 		}
 	}
 	return els
+}
+
+//标签上下级关系检查
+func elementRuleCheck(fatherElement *etree.Element, childElementItem ElementItem) {
+	if fatherElement.Tag != Element_choose && (childElementItem.ElementType == Element_when || childElementItem.ElementType == Element_otherwise) {
+		panic("[GoMybatis] find element <" + childElementItem.ElementType + "> not in <choose>!")
+	}
 }
