@@ -41,7 +41,7 @@ go get github.com/go-sql-driver/mysql
 实际使用mapper
 ```
 import (
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql" //使用mysql驱动，如果使用其他数据请选择对应的驱动
 	"fmt"
 	"github.com/zhuxiujia/GoMybatis"
 )
