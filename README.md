@@ -45,8 +45,8 @@ import (
 	"time"
 )
 
-//生产环境可以使用statikFS把xml文件打包进程序里
-//定义xml内容，建议以*Mapper.xml文件存于项目目录中,在编辑xml时就可享受GoLand等IDE渲染和智能提示。
+//定义xml内容，建议以*Mapper.xml文件存于项目目录中,在编辑xml时就可享受GoLand等IDE渲染和智能提示。生产环境可以使用statikFS把xml文件打包进程序里
+
 var xmlBytes = []byte(`
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
@@ -58,6 +58,7 @@ var xmlBytes = []byte(`
     </select>
 </mapper>
 `)
+
 type ExampleActivityMapperImpl struct {
 	SelectAll         func(result *[]Activity) error
 	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int, result *[]Activity) error `mapperParams:"name,startTime,endTime,page,size"`
