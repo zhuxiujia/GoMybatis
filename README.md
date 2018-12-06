@@ -45,8 +45,7 @@ import (
 	"fmt"
 	"github.com/zhuxiujia/GoMybatis"
 )
-//定义xml内容，建议以ActivityMapper.xml文件存于项目目录中,这样可以享受GoLand等ide渲染和智能提示。这里string直接定义
-//生产环境可以使用statikFS把xml文件打包进程序里
+//定义xml内容，建议以*Mapper.xml文件存于项目目录中,在编辑xml时就可享受GoLand等IDE渲染和智能提示。生产环境可以使用statikFS把xml文件打包进程序里
 var xmlBytes = []byte(`
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://raw.githubusercontent.com/zhuxiujia/GoMybatis/master/mybatis-3-mapper.dtd">
@@ -69,10 +68,9 @@ var xmlBytes = []byte(`
 
 
 //定义mapper文件的接口和结构体
-// 支持基本类型(int,string,time.Time,float...且需要指定参数名称`mapperParams:"name"以逗号隔开，且位置要和实际参数相同)
-//自定义结构体参数（属性必须大写）
+//结构体参数（属性须大写）基本类型(int,string,time.Time,float...需指定参数名称`mapperParams:"*"以逗号隔开，且位置要和实际参数相同)
 //参数中除了session指针外，为指针类型的皆为返回数据
-// 函数return必须为error 为返回错误信息
+//函数return必须为error 为返回错误信息
 type ExampleActivityMapperImpl struct {
 	SelectAll         func(result *[]Activity) error
 	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int, result *[]Activity) error `mapperParams:"name,startTime,endTime,page,size"`
