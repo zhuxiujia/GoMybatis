@@ -16,12 +16,7 @@ https://zhuxiujia.github.io/gomybatis.io/info.html
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/tx.png)
 
 
-
-## 使用教程
-
-> 示例源码https://github.com/zhuxiujia/GoMybatis/tree/master/example
-
-支持数据库驱动
+数据库驱动列表
 ```
  Mysql: github.com/go-sql-driver/mysql
  MyMysql: github.com/ziutek/mymysql/godrv
@@ -33,6 +28,11 @@ https://zhuxiujia.github.io/gomybatis.io/info.html
  Oracle: github.com/mattn/go-oci8
  CockroachDB(Postgres): github.com/lib/pq
  ```
+ 
+## 使用教程
+
+> 示例源码https://github.com/zhuxiujia/GoMybatis/tree/master/example
+
 设置好GoPath,用go get 命令下载GoMybatis和对应的数据库驱动
 ```
 go get github.com/zhuxiujia/GoMybatis
