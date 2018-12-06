@@ -40,8 +40,9 @@ go get github.com/go-sql-driver/mysql
 ```
 import (
 	_ "github.com/go-sql-driver/mysql" //使用mysql驱动，如果使用其他数据请选择对应的驱动
-	"fmt"
 	"github.com/zhuxiujia/GoMybatis"
+	"fmt"
+	"time"
 )
 //定义xml内容，建议以*Mapper.xml文件存于项目目录中,在编辑xml时就可享受GoLand等IDE渲染和智能提示。生产环境可以使用statikFS把xml文件打包进程序里
 var xmlBytes = []byte(`
@@ -83,7 +84,7 @@ func main() {
 	}
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	//挂载xml的逻辑到ExampleActivityMapperImpl中
-	GoMybatis.UseProxyMapperByEngine(&exampleActivityMapperImpl, xmlBytes, engine)
+	GoMybatis.UseProxyMapperByEngine(&exampleActivityMapperImpl, xmlBytes, engine,true)
 
 	//使用mapper
 	var result []Activity
