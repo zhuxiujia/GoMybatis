@@ -112,15 +112,15 @@
         SELECT * FROM biz_activity WHERE delete_flag=1
         <choose>
             <!--deleteFlag != 0-->
-            <when test="deleteFlag == 0 ">
-                AND delete_flag = #{deleteFlag}
+            <when test="deleteFlag < 0 ">
+                AND delete_flag = 0
             </when>
             <!--deleteFlag != 0-->
-            <when test="deleteFlag > 0'">
-                AND delete_flag > #{deleteFlag}
+            <when test="deleteFlag == 1'">
+                AND delete_flag == 1
             </when>
             <otherwise>
-                <![CDATA[ AND delete_flag < 0 ]]>
+                <![CDATA[ AND delete_flag = #{deleteFlag} < 0 ]]>
             </otherwise>
         </choose>
     </select>

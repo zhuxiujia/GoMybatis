@@ -23,7 +23,7 @@ type ExampleActivityMapperImpl struct {
 	Insert            func(arg Activity, result *int64) error
 	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error                            `mapperParams:"name,startTime,endTime"`
 	DeleteById        func(id string, result *int64) error                                                                    `mapperParams:"id"`
-	Choose            func(deleteFlag int, result *[]Activity) error                                             `mapperParams:"deleteFlag"`
+	Choose            func(deleteFlag int, result *[]Activity) error                                                          `mapperParams:"deleteFlag"`
 }
 
 //初始化mapper文件和结构体
@@ -204,7 +204,7 @@ func Test_Remote_Transation(t *testing.T) {
 	//transationRMSession.Rollback()
 }
 
-func Test_choose(t *testing.T)  {
+func Test_choose(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
 		fmt.Println("no mysql config in project, you must set the mysql link!")
 		return
