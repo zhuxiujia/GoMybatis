@@ -10,12 +10,11 @@ const ConnectError = "connection is shut down"
 const CallMethod = "TransationRMServer.Msg"
 
 type TransationRMClientConfig struct {
-	Addr string
-	RetryTime int
+	Addr          string
+	RetryTime     int
 	TransactionId string
-	Status Transaction_Status
+	Status        Transaction_Status
 }
-
 
 type RemoteSessionEngine struct {
 	SessionEngine

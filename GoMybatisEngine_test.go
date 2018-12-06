@@ -1,11 +1,11 @@
 package GoMybatis
 
 import (
-	"time"
 	"github.com/zhuxiujia/GoMybatis/example"
-	"testing"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"sync"
+	"testing"
+	"time"
 )
 
 //假设Mysql 数据库查询时间为0，框架单协程的并发数的性能
@@ -37,7 +37,7 @@ func Test_One_Transcation_multiple_coroutine_TPS(t *testing.T) {
 	//使用mapper
 
 	////开始TPS测试
-	var total = 100000    //总数
+	var total = 100000   //总数
 	var goruntine = 1000 //并发数
 	var waitGroup = sync.WaitGroup{}
 	waitGroup.Add(goruntine)

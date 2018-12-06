@@ -12,7 +12,7 @@ import (
 var manager DefaultTransationManager
 
 func TestManager(t *testing.T) {
-	if example.MysqlDriverName == "" || example.MysqlUri == "" || example.MysqlUri == "*"{
+	if example.MysqlDriverName == "" || example.MysqlUri == "" || example.MysqlUri == "*" {
 		fmt.Println("no mysql config in project, you must set the mysql link!")
 		return
 	}

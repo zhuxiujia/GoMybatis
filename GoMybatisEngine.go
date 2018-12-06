@@ -62,8 +62,8 @@ func OpenRemote(addr string, RetryTime int) (*SessionEngine, error) {
 //func的参数支持2种函数，第一种函数 基本参数个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
 //func的参数支持2种函数，第二种函数第一个参数必须为结构体(例如 arg model.User,该结构体的属性可以指定tag `json:"xxx"`为参数名称),最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
 //使用UseProxyMapper函数设置代理后即可正常使用。
-func UseProxyMapperBySessionEngine(bean interface{}, xml []byte, engine *SessionEngine,enableLog bool) {
-	UseProxyMapperByEngine(bean, xml, engine,enableLog)
+func UseProxyMapperBySessionEngine(bean interface{}, xml []byte, engine *SessionEngine, enableLog bool) {
+	UseProxyMapperByEngine(bean, xml, engine, enableLog)
 }
 
 //-------------------------------------------------------------工具

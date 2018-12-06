@@ -43,13 +43,13 @@ func InitMapperByLocalSession() ExampleActivityMapperImpl {
 	bytes, _ := ioutil.ReadAll(file)
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	//设置对应的mapper xml文件
-	GoMybatis.UseProxyMapperByEngine(&exampleActivityMapperImpl, bytes, engine,true)
+	GoMybatis.UseProxyMapperByEngine(&exampleActivityMapperImpl, bytes, engine, true)
 	return exampleActivityMapperImpl
 }
 
 //插入
 func Test_inset(t *testing.T) {
-	if MysqlUri == "" || MysqlUri == "*"{
+	if MysqlUri == "" || MysqlUri == "*" {
 		fmt.Println("no mysql config in project, you must set the mysql link!")
 		return
 	}
@@ -67,7 +67,7 @@ func Test_inset(t *testing.T) {
 //修改
 //本地事务使用例子
 func Test_update(t *testing.T) {
-	if MysqlUri == "" || MysqlUri == "*"{
+	if MysqlUri == "" || MysqlUri == "*" {
 		fmt.Println("no mysql config in project, you must set the mysql link!")
 		return
 	}
@@ -87,7 +87,7 @@ func Test_update(t *testing.T) {
 
 //删除
 func Test_delete(t *testing.T) {
-	if MysqlUri == "" || MysqlUri == "*"{
+	if MysqlUri == "" || MysqlUri == "*" {
 		fmt.Println("no mysql config in project, you must set the mysql link!")
 		return
 	}
@@ -104,7 +104,7 @@ func Test_delete(t *testing.T) {
 
 //查询
 func Test_select(t *testing.T) {
-	if MysqlUri == "" || MysqlUri == "*"{
+	if MysqlUri == "" || MysqlUri == "*" {
 		fmt.Println("no mysql config in project, you must set the mysql link!")
 		return
 	}
@@ -121,7 +121,7 @@ func Test_select(t *testing.T) {
 
 //本地GoMybatis使用例子
 func Test_ForEach(t *testing.T) {
-	if MysqlUri == "" || MysqlUri == "*"{
+	if MysqlUri == "" || MysqlUri == "*" {
 		fmt.Println("no mysql config in project, you must set the mysql link!")
 		return
 	}
@@ -140,14 +140,14 @@ func Test_ForEach(t *testing.T) {
 
 //本地事务使用例子
 func Test_local_Transation(t *testing.T) {
-	if MysqlUri == "" || MysqlUri == "*"{
+	if MysqlUri == "" || MysqlUri == "*" {
 		fmt.Println("no mysql config in project, you must set the mysql link!")
 		return
 	}
 	//初始化mapper文件
 	exampleActivityMapperImpl := InitMapperByLocalSession()
 	//使用事务
-	var session = GoMybatis.DefaultSessionFactory.NewSession(GoMybatis.SessionType_Default,nil)
+	var session = GoMybatis.DefaultSessionFactory.NewSession(GoMybatis.SessionType_Default, nil)
 	session.Begin() //开启事务
 	var activityBean = Activity{
 		Id:   "170",
@@ -165,7 +165,7 @@ func Test_local_Transation(t *testing.T) {
 
 //远程事务示例，可用于分布式微服务(单数据库，多个微服务)
 func Test_Remote_Transation(t *testing.T) {
-	if MysqlUri == "" || MysqlUri == "*"{
+	if MysqlUri == "" || MysqlUri == "*" {
 		fmt.Println("no mysql config in project, you must set the mysql link!")
 		return
 	}
@@ -178,11 +178,11 @@ func Test_Remote_Transation(t *testing.T) {
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 
 	//关键，使用远程Session替换本地Session调用
-	var transationRMSession = GoMybatis.DefaultSessionFactory.NewSession(GoMybatis.SessionType_TransationRM,&GoMybatis.TransationRMClientConfig{
-		Addr:remoteAddr,
-		RetryTime:3,
-		TransactionId:"",
-		Status:GoMybatis.Transaction_Status_NO,
+	var transationRMSession = GoMybatis.DefaultSessionFactory.NewSession(GoMybatis.SessionType_TransationRM, &GoMybatis.TransationRMClientConfig{
+		Addr:          remoteAddr,
+		RetryTime:     3,
+		TransactionId: "",
+		Status:        GoMybatis.Transaction_Status_NO,
 	})
 
 	//开启远程事务

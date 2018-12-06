@@ -73,7 +73,7 @@ func getRealValue(v reflect.Value) interface{} {
 		if v.IsNil() == false {
 			return getRealValue(v.Elem())
 		}
-		if v.IsNil() ==false && v.CanInterface() == true {
+		if v.IsNil() == false && v.CanInterface() == true {
 			return v.Interface()
 		} else {
 			return ""

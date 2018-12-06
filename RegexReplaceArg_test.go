@@ -21,8 +21,8 @@ func Test_Access_Arg(t *testing.T) {
 
 	var param map[string]SqlArg
 	param = make(map[string]SqlArg)
-    var age= 11
-    fmt.Println("age=",age)
+	var age = 11
+	fmt.Println("age=", age)
 	var bean = TestBean{
 		Name: "father",
 		Child: TestBeanChild{
