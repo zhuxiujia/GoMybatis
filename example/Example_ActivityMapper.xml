@@ -107,4 +107,19 @@
             <if test="deleteFlag != ''">#{deleteFlag},</if>
         </trim>
     </insert>
+
+    <select id="choose" resultMap="BaseResultMap">
+        SELECT * FROM biz_activity WHERE delete_flag=1
+        <choose>
+            <when test="name != ''">
+                AND name like #{name}
+            </when>
+            <when test="deleteFlag !=  ''">
+                AND delete_flag = #{deleteFlag}
+            </when>
+            <otherwise>
+               AND delete_flag=1
+            </otherwise>
+        </choose>
+    </select>
 </mapper>
