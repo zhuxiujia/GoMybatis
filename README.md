@@ -66,15 +66,12 @@ var xmlBytes = []byte(`
 </mapper>
 `)
 
-
-//定义mapper文件的接口和结构体
+//定义mapper文件的接口和结构体，func参数中除了Session外，为指针类型的皆为返回数据，函数return必须为error 为返回错误信息
 //结构体参数（属性须大写）基本类型(int,string,time.Time,float...需指定参数名称`mapperParams:"*"以逗号隔开，且位置要和实际参数相同)
-//参数中除了session指针外，为指针类型的皆为返回数据
-//函数return必须为error 为返回错误信息
 type ExampleActivityMapperImpl struct {
 	SelectAll         func(result *[]Activity) error
 	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int, result *[]Activity) error `mapperParams:"name,startTime,endTime,page,size"`
-	UpdateById        func(session *GoMybatis.Session, arg Activity, result *int64) error //只要参数中包含有*GoMybatis.Session的类型，框架默认使用传入的session对象，用于自定义事务
+	UpdateById        func(session *GoMybatis.Session, arg Activity, result *int64) error //只要参数中包含有*GoMybatis.Session的类型自定义事务
 	Insert            func(arg Activity, result *int64) error
 	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error                            `mapperParams:"name,startTime,endTime"`
 }
