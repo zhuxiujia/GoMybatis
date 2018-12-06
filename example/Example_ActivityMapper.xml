@@ -120,7 +120,7 @@
                 AND delete_flag == 1
             </when>
             <otherwise>
-                <![CDATA[ AND delete_flag = #{deleteFlag} < 0 ]]>
+                <![CDATA[ AND delete_flag = #{deleteFlag}]]>
             </otherwise>
         </choose>
     </select>
