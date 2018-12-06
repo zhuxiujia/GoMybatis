@@ -42,7 +42,7 @@ func LoadMapperXml(bytes []byte) (items map[string]*MapperXml) {
 			s.Tag == Element_Delete ||
 			s.Tag == Element_Update ||
 			s.Tag == Element_Select ||
-			s.Tag == Element_ResultMap {
+			s.Tag == Element_ResultMap{
 			var elementID = attrMap[ID]
 			if elementID == "" {
 				panic("[GoMybatis] element Id can not be nil in xml! please check your xml!")

@@ -48,6 +48,7 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 	var evaluateParameters map[string]interface{}
 	for _, v := range itemTree {
 		var loopChildItem = true
+		var breakChildItem = false
 		switch v.ElementType {
 		case Element_bind:
 			//bind,param args change!need update
@@ -63,25 +64,11 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 		case Element_If:
 			//if element
 			var expression = v.Propertys[`test`]
-			this.repleaceExpression(&expression, param)
-			evalExpression, err := govaluate.NewEvaluableExpression(expression)
+			var result, err = this.doIfElement(&expression, param, evaluateParameters)
 			if err != nil {
 				return err
 			}
-			if evaluateParameters == nil {
-				evaluateParameters = this.expressParamterMap(param, this.ExpressionTypeConvert)
-			}
-			result, err := evalExpression.Evaluate(evaluateParameters)
-			if err != nil {
-				var buffer bytes.Buffer
-				buffer.WriteString("[GoMybatis] <test `")
-				buffer.WriteString(expression)
-				buffer.WriteString(`> fail,`)
-				buffer.WriteString(err.Error())
-				err = errors.New(buffer.String())
-				return err
-			}
-			if result.(bool) {
+			if result {
 				//test > true,write sql string
 				var reps = replaceArg(v.DataString, param, this.SqlArgTypeConvert)
 				sql.WriteString(reps)
@@ -184,20 +171,54 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 			loopChildItem = false
 			break
 		case Element_choose:
-			sql.WriteString(replaceArg(v.DataString, param, this.SqlArgTypeConvert))
-
+			//read when and otherwise
+			var temp bytes.Buffer
+			var err = this.createFromElement(v.ElementItems, &temp, param)
+			if err != nil {
+				return err
+			}
+			sql.Write(temp.Bytes())
 			loopChildItem = false
 			break
 		case Element_when:
-
+			//if element
+			var expression = v.Propertys[`test`]
+			var result, err = this.doIfElement(&expression, param, evaluateParameters)
+			if err != nil {
+				return err
+			}
+			if result {
+				//test > true,write sql string
+				var reps = replaceArg(v.DataString, param, this.SqlArgTypeConvert)
+				sql.WriteString(reps)
+				if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
+					var err = this.createFromElement(v.ElementItems, sql, param)
+					if err != nil {
+						return err
+					}
+				}
+				breakChildItem = true
+			} else {
+				// test > fail ,end loop
+				loopChildItem = false
+				break
+			}
 			break
 		case Element_otherwise:
-
+			if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
+				var err = this.createFromElement(v.ElementItems, sql, param)
+				if err != nil {
+					return err
+				}
+			}
+			breakChildItem = true
 			break
 		default:
 			panic("[GoMybatis] find not support element! " + v.ElementType)
 		}
-
+		if breakChildItem {
+			break
+		}
 		if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
 			var err = this.createFromElement(v.ElementItems, sql, param)
 			if err != nil {
@@ -206,6 +227,28 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 		}
 	}
 	return nil
+}
+
+func (this GoMybatisSqlBuilder) doIfElement(expression *string, param map[string]SqlArg, evaluateParameters map[string]interface{}) (bool, error) {
+	this.repleaceExpression(expression, param)
+	evalExpression, err := govaluate.NewEvaluableExpression(*expression)
+	if err != nil {
+		return false, err
+	}
+	if evaluateParameters == nil {
+		evaluateParameters = this.expressParamterMap(param, this.ExpressionTypeConvert)
+	}
+	result, err := evalExpression.Evaluate(evaluateParameters)
+	if err != nil {
+		var buffer bytes.Buffer
+		buffer.WriteString("[GoMybatis] <test `")
+		buffer.WriteString(*expression)
+		buffer.WriteString(`> fail,`)
+		buffer.WriteString(err.Error())
+		err = errors.New(buffer.String())
+		return false, err
+	}
+	return result.(bool), nil
 }
 
 func (this GoMybatisSqlBuilder) bindBindElementArg(args map[string]SqlArg, item ElementItem, typeConvert SqlArgTypeConvert) map[string]SqlArg {

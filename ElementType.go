@@ -3,12 +3,20 @@ package GoMybatis
 type ElementType = string
 
 const (
-	Element_String  = "string"
-	Element_If      = `if`
-	Element_Trim    = "trim"
-	Element_Foreach = "foreach"
-	Element_Set     = "set"
-	Element_choose = "choose"
-	Element_when = "when"
-	Element_otherwise = "otherwise"
+	Element_ResultMap ElementType = "resultMap"
+	Element_Insert    ElementType = "insert"
+	Element_Delete    ElementType = "delete"
+	Element_Update    ElementType = `update`
+	Element_Select    ElementType = "select"
+
+	Element_bind ElementType = "bind"
+
+	Element_String    ElementType = "string"
+	Element_If        ElementType = `if`
+	Element_Trim      ElementType = "trim"
+	Element_Foreach   ElementType = "foreach"
+	Element_Set       ElementType = "set"
+	Element_choose    ElementType = "choose"
+	Element_when      ElementType = "when"
+	Element_otherwise ElementType = "otherwise"
 )

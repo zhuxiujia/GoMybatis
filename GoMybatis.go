@@ -205,9 +205,11 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlB
 				Type:  arg.Type(),
 			}
 		} else {
-			paramMap[DefaultOneArg] = SqlArg{
-				Value: argInterface,
-				Type:  arg.Type(),
+			if arg.Kind() != reflect.Ptr{
+				paramMap[DefaultOneArg] = SqlArg{
+					Value: argInterface,
+					Type:  arg.Type(),
+				}
 			}
 		}
 	}
