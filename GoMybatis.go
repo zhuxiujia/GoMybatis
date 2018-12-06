@@ -190,11 +190,8 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlB
 	var tagArgsLen = len(tagArgs)
 	for argIndex, arg := range args {
 		var argInterface = arg.Interface()
-		if arg.Kind() == reflect.Ptr {
-			if argInterface != nil && arg.Type().String() == GoMybatis_Session_Ptr {
-				//指针，则退出
-				session = *(argInterface.(*Session))
-			}
+		if arg.Kind() == reflect.Ptr && argInterface != nil && arg.Type().String() == GoMybatis_Session_Ptr {
+			session = *(argInterface.(*Session))
 			continue
 		} else if argInterface != nil && arg.Kind() == reflect.Interface && arg.Type().String() == GoMybatis_Session {
 			session = argInterface.(Session)
