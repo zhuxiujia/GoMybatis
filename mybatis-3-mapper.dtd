@@ -45,7 +45,7 @@ type CDATA #REQUIRED
 <!ELEMENT parameter EMPTY>
 <!ATTLIST parameter
 property CDATA #REQUIRED
-goType CDATA #IMPLIED
+langType CDATA #IMPLIED
 <!--jdbcType CDATA #IMPLIED-->
 mode (IN | OUT | INOUT) #IMPLIED
 resultMap CDATA #IMPLIED
@@ -66,7 +66,7 @@ autoMapping (true|false) #IMPLIED
 <!ELEMENT id EMPTY>
 <!ATTLIST id
 property CDATA #IMPLIED
-goType CDATA #IMPLIED
+langType CDATA #IMPLIED
 column CDATA #IMPLIED
 <!--jdbcType CDATA #IMPLIED-->
 typeHandler CDATA #IMPLIED
@@ -75,7 +75,7 @@ typeHandler CDATA #IMPLIED
 <!ELEMENT result EMPTY>
 <!ATTLIST result
 property CDATA #IMPLIED
-goType CDATA #IMPLIED
+langType CDATA #IMPLIED
 column CDATA #IMPLIED
 <!--jdbcType CDATA #IMPLIED-->
 typeHandler CDATA #IMPLIED
@@ -83,7 +83,7 @@ typeHandler CDATA #IMPLIED
 
 <!ELEMENT idArg EMPTY>
 <!ATTLIST idArg
-goType CDATA #IMPLIED
+langType CDATA #IMPLIED
 column CDATA #IMPLIED
 <!--jdbcType CDATA #IMPLIED-->
 typeHandler CDATA #IMPLIED
@@ -94,7 +94,7 @@ name CDATA #IMPLIED
 
 <!ELEMENT arg EMPTY>
 <!ATTLIST arg
-goType CDATA #IMPLIED
+langType CDATA #IMPLIED
 column CDATA #IMPLIED
 <!--jdbcType CDATA #IMPLIED-->
 typeHandler CDATA #IMPLIED
@@ -107,7 +107,7 @@ name CDATA #IMPLIED
 <!ATTLIST collection
 property CDATA #REQUIRED
 column CDATA #IMPLIED
-goType CDATA #IMPLIED
+langType CDATA #IMPLIED
 ofType CDATA #IMPLIED
 <!--jdbcType CDATA #IMPLIED-->
 select CDATA #IMPLIED
@@ -125,7 +125,7 @@ fetchType (lazy|eager) #IMPLIED
 <!ATTLIST association
 property CDATA #REQUIRED
 column CDATA #IMPLIED
-goType CDATA #IMPLIED
+langType CDATA #IMPLIED
 <!--jdbcType CDATA #IMPLIED-->
 select CDATA #IMPLIED
 resultMap CDATA #IMPLIED
@@ -141,7 +141,7 @@ fetchType (lazy|eager) #IMPLIED
 <!ELEMENT discriminator (case+)>
 <!ATTLIST discriminator
 column CDATA #IMPLIED
-goType CDATA #REQUIRED
+langType CDATA #REQUIRED
 <!--jdbcType CDATA #IMPLIED-->
 typeHandler CDATA #IMPLIED
 >

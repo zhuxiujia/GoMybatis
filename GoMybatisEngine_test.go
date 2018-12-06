@@ -132,12 +132,12 @@ func InitMapperByLocalSession() ExampleActivityMapperImpl {
 <mapper>
     <resultMap id="BaseResultMap" type="example.Activity">
         <id column="id" property="id"/>
-        <result column="name" property="name" goType="string"/>
-        <result column="pc_link" property="pcLink" goType="string"/>
-        <result column="h5_link" property="h5Link" goType="string"/>
-        <result column="remark" property="remark" goType="string"/>
-        <result column="create_time" property="createTime" goType="time.Time"/>
-        <result column="delete_flag" property="deleteFlag" goType="int"/>
+        <result column="name" property="name" langType="string"/>
+        <result column="pc_link" property="pcLink" langType="string"/>
+        <result column="h5_link" property="h5Link" langType="string"/>
+        <result column="remark" property="remark" langType="string"/>
+        <result column="create_time" property="createTime" langType="time.Time"/>
+        <result column="delete_flag" property="deleteFlag" langType="int"/>
     </resultMap>
 
     <!--List<Activity> selectByCondition(@Param("name") String name,@Param("startTime") Date startTime,@Param("endTime") Date endTime,@Param("index") Integer index,@Param("size") Integer size);-->
