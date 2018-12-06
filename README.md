@@ -39,13 +39,14 @@ go get github.com/go-sql-driver/mysql
 实际使用mapper
 ```
 import (
-	_ "github.com/go-sql-driver/mysql" //使用mysql驱动，如果使用其他数据请选择对应的驱动
+	_ "github.com/go-sql-driver/mysql" //导入mysql驱动
 	"github.com/zhuxiujia/GoMybatis"
 	"fmt"
 	"time"
 )
-//定义xml内容，建议以*Mapper.xml文件存于项目目录中,在编辑xml时就可享受GoLand等IDE渲染和智能提示。
+
 //生产环境可以使用statikFS把xml文件打包进程序里
+//定义xml内容，建议以*Mapper.xml文件存于项目目录中,在编辑xml时就可享受GoLand等IDE渲染和智能提示。
 var xmlBytes = []byte(`
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
@@ -69,21 +70,21 @@ var xmlBytes = []byte(`
 type ExampleActivityMapperImpl struct {
 	SelectAll         func(result *[]Activity) error
 	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int, result *[]Activity) error `mapperParams:"name,startTime,endTime,page,size"`
-	UpdateById        func(session *GoMybatis.Session, arg Activity, result *int64) error //参数中包含*GoMybatis.Session的为事务
+	UpdateById        func(session *GoMybatis.Session, arg Activity, result *int64) error //*GoMybatis.Session为事务
 	Insert            func(arg Activity, result *int64) error
 	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error                            `mapperParams:"name,startTime,endTime"`
 }
 
 func main() {
 	var err error
-	//mysql链接格式为 用户名:密码@(数据库链接地址:端口)/数据库名称,这里用*号代替
-	//例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
+	//Mysql链接格式 用户名:密码@(数据库链接地址:端口)/数据库名称,如root:123456@(***.com:3306)/test
 	engine, err := GoMybatis.Open("mysql", "*?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		panic(err.Error())
 	}
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
-	//挂载xml的逻辑到ExampleActivityMapperImpl中
+	
+	//挂载xml逻辑到ExampleActivityMapperImpl
 	GoMybatis.UseProxyMapperByEngine(&exampleActivityMapperImpl, xmlBytes, engine,true)
 
 	//使用mapper
