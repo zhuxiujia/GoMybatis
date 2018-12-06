@@ -111,14 +111,16 @@
     <select id="choose" resultMap="BaseResultMap">
         SELECT * FROM biz_activity WHERE delete_flag=1
         <choose>
-            <when test="name != ''">
-                AND name like #{name}
-            </when>
-            <when test="deleteFlag !=  ''">
+            <!--deleteFlag != 0-->
+            <when test="deleteFlag == 0 ">
                 AND delete_flag = #{deleteFlag}
             </when>
+            <!--deleteFlag != 0-->
+            <when test="deleteFlag > 0'">
+                AND delete_flag > #{deleteFlag}
+            </when>
             <otherwise>
-               AND delete_flag=1
+                <![CDATA[ AND delete_flag < 0 ]]>
             </otherwise>
         </choose>
     </select>

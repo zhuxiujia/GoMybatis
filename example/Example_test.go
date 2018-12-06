@@ -23,7 +23,7 @@ type ExampleActivityMapperImpl struct {
 	Insert            func(arg Activity, result *int64) error
 	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error                            `mapperParams:"name,startTime,endTime"`
 	DeleteById        func(id string, result *int64) error                                                                    `mapperParams:"id"`
-	Choose            func(name string, deleteFlag int, result *[]Activity) error                                             `mapperParams:"name,deleteFlag"`
+	Choose            func(deleteFlag int, result *[]Activity) error                                             `mapperParams:"deleteFlag"`
 }
 
 //初始化mapper文件和结构体
@@ -213,7 +213,7 @@ func Test_choose(t *testing.T)  {
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
 	var result []Activity
-	var err = exampleActivityMapperImpl.Choose("", 1, &result)
+	var err = exampleActivityMapperImpl.Choose(1, &result)
 	if err != nil {
 		panic(err)
 	}
