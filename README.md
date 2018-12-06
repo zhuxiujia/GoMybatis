@@ -31,7 +31,7 @@ https://zhuxiujia.github.io/gomybatis.io/info.html
  MsSql: github.com/denisenkom/go-mssqldb
  MsSql: github.com/lunny/godbc
  Oracle: github.com/mattn/go-oci8
- CockroachDB: github.com/lib/pq
+ CockroachDB(Postgres): github.com/lib/pq
  ```
 设置好GoPath,用go get 命令下载GoMybatis和对应的数据库驱动
 ```
