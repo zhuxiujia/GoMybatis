@@ -89,7 +89,7 @@ func main() {
 		panic(err.Error())
 	}
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
-	//挂载mapper xml内容
+	//挂载xml的逻辑到ExampleActivityMapperImpl中
 	GoMybatis.UseProxyMapperByEngine(&exampleActivityMapperImpl, xmlBytes, engine)
 
 	//使用mapper
