@@ -14,7 +14,7 @@ type GoMybatisEngine struct {
 	DB *sql.DB
 }
 
-func (this GoMybatisEngine) NewSession() *Session {
+func (this GoMybatisEngine) NewSession() Session {
 	uuids, _ := uuid.NewV4()
 	var uuidstrig = uuids.String()
 	var mysqlLocalSession = LocalSession{
@@ -22,7 +22,7 @@ func (this GoMybatisEngine) NewSession() *Session {
 		db:        this.DB,
 	}
 	var session = Session(&mysqlLocalSession)
-	return &session
+	return session
 }
 
 //打开一个本地引擎

@@ -27,10 +27,10 @@ func (this RemoteSessionEngine) New(Client *TransationRMClient) RemoteSessionEng
 	return this
 }
 
-func (this *RemoteSessionEngine) NewSession() *Session {
+func (this *RemoteSessionEngine) NewSession() Session {
 	var TransationSession = TransationRMSession{Client: this.Client}
 	var session = Session(&TransationSession)
-	return &session
+	return session
 }
 
 type TransationRMClient struct {

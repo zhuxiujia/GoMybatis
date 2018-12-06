@@ -136,7 +136,7 @@ func findMapperXml(mapperTree map[string]*MapperXml, methodName string) *MapperX
 
 func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, mapperXml *MapperXml, resultMap map[string]*ResultProperty, lastArgValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) error {
 	//build sql string
-	var session *Session
+	var session Session
 	var sql string
 	var err error
 	session, sql, err = buildSql(tagParamMap, args, mapperXml, sqlBuilder, enableLog)
@@ -148,7 +148,7 @@ func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args [
 	}
 	//session
 	if session == nil {
-		session = sessionFactory.NewSession(SessionType_Default,nil)
+		session = sessionFactory.NewSession(SessionType_Default, nil)
 		//not arg session,just close!
 		defer closeSession(sessionFactory, session)
 	}
@@ -156,7 +156,7 @@ func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args [
 	//do CRUD
 	if mapperXml.Tag == Element_Select && haveLastReturnValue {
 		//is select and have return value
-		results, err := (*session).Query(sql)
+		results, err := session.Query(sql)
 		if err != nil {
 			return err
 		}
@@ -165,7 +165,7 @@ func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args [
 			return err
 		}
 	} else {
-		var res, err = (*session).Exec(sql)
+		var res, err = session.Exec(sql)
 		if err != nil {
 			return err
 		}
@@ -176,22 +176,28 @@ func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args [
 	return nil
 }
 
-func closeSession(factory *SessionFactory, session *Session) {
-	factory.Close((*session).Id())
-	(*session).Close()
+func closeSession(factory *SessionFactory, session Session) {
+	if session == nil {
+		return
+	}
+	factory.Close(session.Id())
+	session.Close()
 }
 
-func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlBuilder SqlBuilder, enableLog bool) (*Session, string, error) {
-	var session *Session
+func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlBuilder SqlBuilder, enableLog bool) (Session, string, error) {
+	var session Session
 	var paramMap = make(map[string]SqlArg)
 	var tagArgsLen = len(tagArgs)
 	for argIndex, arg := range args {
 		var argInterface = arg.Interface()
 		if arg.Kind() == reflect.Ptr {
-			if arg.Type().String() == GoMybatis_Session {
+			if argInterface != nil && arg.Type().String() == GoMybatis_Session_Ptr {
 				//指针，则退出
-				session = argInterface.(*Session)
+				session = *(argInterface.(*Session))
 			}
+			continue
+		} else if argInterface != nil && arg.Kind() == reflect.Interface && arg.Type().String() == GoMybatis_Session {
+			session = argInterface.(Session)
 			continue
 		}
 		if arg.Kind() == reflect.Struct && arg.Type().String() != GoMybatis_Time {

@@ -11,7 +11,7 @@ func (this SessionFactory) New(Engine *SessionEngine) SessionFactory {
 	return this
 }
 
-func (this *SessionFactory) NewSession(sessionType SessionType, config *TransationRMClientConfig) *Session {
+func (this *SessionFactory) NewSession(sessionType SessionType, config *TransationRMClientConfig) Session {
 	if this.SessionMap == nil || this.Engine == nil {
 		panic("[GoMybatis] SessionFactory not init! you must call method SessionFactory.New(*)")
 	}
@@ -20,14 +20,13 @@ func (this *SessionFactory) NewSession(sessionType SessionType, config *Transati
 	case SessionType_Default:
 		var session = (*this.Engine).NewSession()
 		var factorySession = SessionFactorySession{
-			Session: *session,
+			Session: session,
 			Factory: this,
 		}
 		newSession = Session(&factorySession)
 		break
 	case SessionType_Local:
-		var session = (*this.Engine).NewSession()
-		newSession = *session
+		newSession = (*this.Engine).NewSession()
 		break
 	case SessionType_TransationRM:
 		if config == nil {
@@ -43,7 +42,7 @@ func (this *SessionFactory) NewSession(sessionType SessionType, config *Transati
 		panic("[GoMybatis] newSession() must have a SessionType!")
 	}
 	this.SessionMap[newSession.Id()] = &newSession
-	return &newSession
+	return newSession
 }
 
 func (this *SessionFactory) GetSession(id string) *Session {

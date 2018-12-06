@@ -17,7 +17,7 @@ type TransactionStatus struct {
 
 type Transaction struct {
 	Id      string
-	Session *Session
+	Session Session
 }
 
 func (this *TransactionStatus) Rollback() error {
@@ -26,7 +26,7 @@ func (this *TransactionStatus) Rollback() error {
 	}
 	this.IsCompleted = true
 	defer this.Flush() //close session
-	return (*this.Transaction.Session).Rollback()
+	return this.Transaction.Session.Rollback()
 }
 
 func (this *TransactionStatus) Commit() error {
@@ -35,7 +35,7 @@ func (this *TransactionStatus) Commit() error {
 	}
 	this.IsCompleted = true
 	defer this.Flush() //close session
-	return (*this.Transaction.Session).Commit()
+	return this.Transaction.Session.Commit()
 }
 
 func (this *TransactionStatus) Begin() error {
@@ -43,12 +43,12 @@ func (this *TransactionStatus) Begin() error {
 		return errors.New("[TransactionManager] can not Begin() a old Transaction!")
 	}
 	this.IsNewTransaction = false
-	return (*this.Transaction.Session).Begin()
+	return this.Transaction.Session.Begin()
 }
 
 func (this *TransactionStatus) Flush() {
 	if this.Transaction != nil && this.Transaction.Session != nil {
-		(*this.Transaction.Session).Close()
+		this.Transaction.Session.Close()
 		this.Transaction.Session = nil
 		this.Transaction = nil
 	}

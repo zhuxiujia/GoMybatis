@@ -99,7 +99,7 @@ func (this DefaultTransationManager) DoTransaction(dto TransactionReqDTO) Transa
 	var err error
 
 	transcationStatus, err = this.GetTransaction(nil, dto.TransactionId, dto.OwnerId)
-	dto.TransactionId = (*transcationStatus.Transaction.Session).Id()
+	dto.TransactionId = transcationStatus.Transaction.Session.Id()
 	if err != nil {
 		return TransactionRspDTO{
 			TransactionId: dto.TransactionId,
@@ -164,7 +164,7 @@ func (this DefaultTransationManager) DoAction(dto TransactionReqDTO, transcation
 	}
 	if dto.ActionType == ActionType_Exec {
 		log.Println("[TransactionManager] Exec ", dto.Sql)
-		var res, e = (*transcationStatus.Transaction.Session).Exec(dto.Sql)
+		var res, e = transcationStatus.Transaction.Session.Exec(dto.Sql)
 		var err string
 		if e != nil {
 			err = e.Error()
@@ -181,7 +181,7 @@ func (this DefaultTransationManager) DoAction(dto TransactionReqDTO, transcation
 		}
 	} else {
 		log.Println("[TransactionManager] Query ", dto.Sql)
-		var res, e = (*transcationStatus.Transaction.Session).Query(dto.Sql)
+		var res, e = transcationStatus.Transaction.Session.Query(dto.Sql)
 		var err string
 		if e != nil {
 			err = e.Error()

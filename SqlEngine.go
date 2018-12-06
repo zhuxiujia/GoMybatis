@@ -17,5 +17,5 @@ type Session interface {
 
 //产生session的引擎
 type SessionEngine interface {
-	NewSession() *Session
+	NewSession() Session
 }

@@ -147,7 +147,7 @@ func Test_local_Transation(t *testing.T) {
 	//初始化mapper文件
 	exampleActivityMapperImpl := InitMapperByLocalSession()
 	//使用事务
-	session := *GoMybatis.DefaultSessionFactory.NewSession(GoMybatis.SessionType_Default,nil)
+	var session = GoMybatis.DefaultSessionFactory.NewSession(GoMybatis.SessionType_Default,nil)
 	session.Begin() //开启事务
 	var activityBean = Activity{
 		Id:   "170",
@@ -178,7 +178,7 @@ func Test_Remote_Transation(t *testing.T) {
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 
 	//关键，使用远程Session替换本地Session调用
-	transationRMSession := *GoMybatis.DefaultSessionFactory.NewSession(GoMybatis.SessionType_TransationRM,&GoMybatis.TransationRMClientConfig{
+	var transationRMSession = GoMybatis.DefaultSessionFactory.NewSession(GoMybatis.SessionType_TransationRM,&GoMybatis.TransationRMClientConfig{
 		Addr:remoteAddr,
 		RetryTime:3,
 		TransactionId:"",

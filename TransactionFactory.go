@@ -12,10 +12,10 @@ func (this TransactionFactory) New(SessionFactory *SessionFactory) TransactionFa
 }
 
 func (this *TransactionFactory) GetTransactionStatus(transactionId string) *TransactionStatus {
-	var Session *Session
+	var Session Session
 	if transactionId == "" {
 		Session = this.SessionFactory.NewSession(SessionType_Default,nil)
-		transactionId = (*Session).Id()
+		transactionId = Session.Id()
 	}
 	var result = this.TransactionStatuss[transactionId]
 	if result == nil {
