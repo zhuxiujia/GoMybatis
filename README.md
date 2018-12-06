@@ -52,17 +52,8 @@ var xmlBytes = []byte(`
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "https://raw.githubusercontent.com/zhuxiujia/GoMybatis/master/mybatis-3-mapper.dtd">
 <mapper namespace="ActivityMapperImpl">
-    <resultMap id="BaseResultMap" type="example.Activity">
-        <id column="id" property="id" langType="string"/>
-        <result column="name" property="name" langType="string"/>
-        <result column="pc_link" property="pcLink" langType="string"/>
-        <result column="h5_link" property="h5Link" langType="string"/>
-        <result column="remark" property="remark" langType="string"/>
-        <result column="create_time" property="createTime" langType="time.Time"/>
-        <result column="delete_flag" property="deleteFlag" langType="int"/>
-    </resultMap>
     <!--SelectAll(result *[]Activity)error-->
-    <select id="selectAll" resultMap="BaseResultMap">
+    <select id="selectAll">
         select * from biz_activity where delete_flag=1 order by create_time desc
     </select>
 </mapper>
