@@ -184,7 +184,9 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 			loopChildItem = false
 			break
 		case Element_choose:
+			sql.WriteString(replaceArg(v.DataString, param, this.SqlArgTypeConvert))
 
+			loopChildItem = false
 			break
 		case Element_when:
 
