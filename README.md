@@ -5,7 +5,7 @@
 # 官方网站/文档
 https://zhuxiujia.github.io/gomybatis.io/info.html
 # 优势
--支持9种数据库以上(理论上支持mysql和pg的协议都支持)
+-支持9种数据库以上(理论上支持mysql和pg的协议以及支持(标准库"database/sql")都支持)
 -高并发，假设数据库响应时间为0，在6核16Gpc上可框架可以压出 246982Tps,耗时仅仅0.4s<br>
 -支持事务，session灵活插拔，兼容过渡期微服务<br>
 -动态SQL，在xml中可灵活运用if判断，foreach遍历数组，resultMap,bind等等java框架Mybatis包含的实用功能<br>
