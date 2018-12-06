@@ -22,7 +22,8 @@ func (this TransationRMServer) Msg(arg TransactionReqDTO, result *TransactionRsp
 	return nil
 }
 
-func ServerTcp(addr string, driverName, dataSourceName string) {
+//开启一个事务节点
+func ServerTransationTcp(addr string, driverName, dataSourceName string) {
 	transationRMServer := new(TransationRMServer)
 
 	engine, err := Open(driverName, dataSourceName)

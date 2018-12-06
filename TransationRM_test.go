@@ -13,7 +13,7 @@ func TestTransationRM(t *testing.T) {
 		return
 	}
 	var addr = "127.0.0.1:17235"
-	go ServerTcp(addr, "mysql", example.MysqlUri) //事务服务器节点1
+	go ServerTransationTcp(addr, "mysql", example.MysqlUri) //事务服务器节点1
 
 	var TransationRMClient = TransationRMClient{
 		RetryTime: 3,

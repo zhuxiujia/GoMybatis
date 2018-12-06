@@ -172,7 +172,7 @@ func Test_Remote_Transation(t *testing.T) {
 	}
 	//启动GoMybatis独立节点事务服务器，通过rpc调用
 	var remoteAddr = "127.0.0.1:17235"
-	go GoMybatis.ServerTcp(remoteAddr, MysqlDriverName, MysqlUri)
+	go GoMybatis.ServerTransationTcp(remoteAddr, MysqlDriverName, MysqlUri)
 
 	//开始使用
 	//初始化mapper文件
