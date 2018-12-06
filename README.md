@@ -50,9 +50,17 @@ type ExampleActivityMapperImpl struct {
 	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error                            `mapperParams:"name,startTime,endTime"`
 }
 ```
+实际使用mapper
+```
 
-xml文件案例:
-```xml
+import (
+	_ "github.com/go-sql-driver/mysql"
+	"fmt"
+	"github.com/zhuxiujia/GoMybatis"
+)
+
+//定义xml内容，建议以ActivityMapper.xml文件存于项目目录中,这样可以享受GoLand等ide渲染和智能提示。这里简单实用string直接定义
+var xmlBytes = []byte(`
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://raw.githubusercontent.com/zhuxiujia/GoMybatis/master/mybatis-3-mapper.dtd">
 <mapper namespace="ActivityMapperImpl">
@@ -70,42 +78,24 @@ xml文件案例:
         select * from biz_activity where delete_flag=1 order by create_time desc
     </select>
 </mapper>
-```
-实际使用mapper
-```
-import (
-	_ "github.com/go-sql-driver/mysql"
-	"testing"
-	"time"
-	"os"
-	"fmt"
-	"io/ioutil"
-	"github.com/zhuxiujia/GoMybatis"
-)
+`)
+
 func main() {
-  var err error
-  	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
-  	engine, err := GoMybatis.Open("mysql", "*?charset=utf8&parseTime=True&loc=Local") //此处请按格式填写你的mysql链接，这里用*号代替
-  	if err != nil {
-  		panic(err.Error())
-  	}
-  
-  	file, err := os.Open("Example_ActivityMapper.xml")
-  	if err != nil {
-  		panic(err)
-  	}
-  	defer file.Close()
-  
-  	bytes, _ := ioutil.ReadAll(file)
-  	var exampleActivityMapperImpl ExampleActivityMapperImpl
-  	//设置对应的mapper xml文件
-  	GoMybatis.UseProxyMapperByEngine(&exampleActivityMapperImpl, bytes, engine)
-  
-  	//使用mapper
-  	var result []Activity
-  	exampleActivityMapperImpl.SelectAll(&result)
-  
-  	fmt.Println(result)
+	var err error
+	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
+	engine, err := GoMybatis.Open("mysql", "*?charset=utf8&parseTime=True&loc=Local") //此处请按格式填写你的mysql链接，这里用*号代替
+	if err != nil {
+		panic(err.Error())
+	}
+	var exampleActivityMapperImpl ExampleActivityMapperImpl
+	//挂载mapper xml内容
+	GoMybatis.UseProxyMapperByEngine(&exampleActivityMapperImpl, xmlBytes, engine)
+
+	//使用mapper
+	var result []Activity
+	exampleActivityMapperImpl.SelectAll(&result)
+
+	fmt.Println(result)
 }
 ```
 
