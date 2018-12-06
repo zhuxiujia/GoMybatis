@@ -48,16 +48,19 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 	var evaluateParameters map[string]interface{}
 	for _, v := range itemTree {
 		var loopChildItem = true
-		if v.ElementType == Element_bind {
+		switch v.ElementType {
+		case Element_bind:
 			//bind,param args change!need update
 			param = this.bindBindElementArg(param, v, this.SqlArgTypeConvert)
 			if evaluateParameters != nil {
 				evaluateParameters = this.expressParamterMap(param, this.ExpressionTypeConvert)
 			}
-		} else if v.ElementType == Element_String {
+			break
+		case Element_String:
 			//string element
 			sql.WriteString(replaceArg(v.DataString, param, this.SqlArgTypeConvert))
-		} else if v.ElementType == Element_If {
+			break
+		case Element_If:
 			//if element
 			var expression = v.Propertys[`test`]
 			this.repleaceExpression(&expression, param)
@@ -87,7 +90,8 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 				loopChildItem = false
 				break
 			}
-		} else if v.ElementType == Element_Trim {
+			break
+		case Element_Trim:
 			var prefix = v.Propertys[`prefix`]
 			var suffix = v.Propertys[`suffix`]
 			var suffixOverrides = v.Propertys[`suffixOverrides`]
@@ -109,7 +113,8 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 				sql.Write(newBuffer.Bytes())
 				loopChildItem = false
 			}
-		} else if v.ElementType == Element_Set {
+			break
+		case Element_Set:
 			if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
 				var trim bytes.Buffer
 				var err = this.createFromElement(v.ElementItems, &trim, param)
@@ -125,7 +130,8 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 				sql.Write(trim.Bytes())
 				loopChildItem = false
 			}
-		} else if v.ElementType == Element_Foreach {
+			break
+		case Element_Foreach:
 			var collection = v.Propertys[`collection`]
 			var index = v.Propertys[`index`]
 			var item = v.Propertys[`item`]
@@ -176,7 +182,20 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 			tempSql.WriteString(tempSqlString)
 			sql.Write(tempSql.Bytes())
 			loopChildItem = false
+			break
+		case Element_choose:
+
+			break
+		case Element_when:
+
+			break
+		case Element_otherwise:
+
+			break
+		default:
+			panic("[GoMybatis] find not support element! " + v.ElementType)
 		}
+
 		if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
 			var err = this.createFromElement(v.ElementItems, sql, param)
 			if err != nil {
