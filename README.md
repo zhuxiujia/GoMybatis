@@ -38,27 +38,13 @@ https://zhuxiujia.github.io/gomybatis.io/info.html
 go get github.com/zhuxiujia/GoMybatis
 go get github.com/go-sql-driver/mysql
 ```
-mapper.go 文件案例
-```
-//定义mapper文件的接口和结构体，也可以只定义结构体就行
-//mapper.go文件 函数参数（自定义结构体参数（属性必须大写），为指针类型的返回数据,*GoMybatis.Session作为该sql执行的session） error 为返回错误
-type ExampleActivityMapperImpl struct {
-	SelectAll         func(result *[]Activity) error
-	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int, result *[]Activity) error `mapperParams:"name,startTime,endTime,page,size"`
-	UpdateById        func(session *GoMybatis.Session, arg Activity, result *int64) error //只要参数中包含有*GoMybatis.Session的类型，框架默认使用传入的session对象，用于自定义事务
-	Insert            func(arg Activity, result *int64) error
-	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error                            `mapperParams:"name,startTime,endTime"`
-}
-```
 实际使用mapper
 ```
-
 import (
 	_ "github.com/go-sql-driver/mysql"
 	"fmt"
 	"github.com/zhuxiujia/GoMybatis"
 )
-
 //定义xml内容，建议以ActivityMapper.xml文件存于项目目录中,这样可以享受GoLand等ide渲染和智能提示。这里string直接定义
 //生产环境可以使用statikFS把xml文件打包进程序里
 var xmlBytes = []byte(`
@@ -80,6 +66,20 @@ var xmlBytes = []byte(`
     </select>
 </mapper>
 `)
+
+
+//定义mapper文件的接口和结构体
+// 支持基本类型(int,string,time.Time,float...且需要指定参数名称`mapperParams:"name"以逗号隔开，且位置要和实际参数相同)
+//自定义结构体参数（属性必须大写）
+//参数中除了session指针外，为指针类型的皆为返回数据
+// 函数return必须为error 为返回错误信息
+type ExampleActivityMapperImpl struct {
+	SelectAll         func(result *[]Activity) error
+	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int, result *[]Activity) error `mapperParams:"name,startTime,endTime,page,size"`
+	UpdateById        func(session *GoMybatis.Session, arg Activity, result *int64) error //只要参数中包含有*GoMybatis.Session的类型，框架默认使用传入的session对象，用于自定义事务
+	Insert            func(arg Activity, result *int64) error
+	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error                            `mapperParams:"name,startTime,endTime"`
+}
 
 func main() {
 	var err error
