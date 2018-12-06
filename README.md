@@ -87,8 +87,8 @@ func main() {
 }
 ```
 
-## TODO 期待功能路线（PS 希望同学们踊跃提出创新性功能~~）
--在线编辑SQL支持,可以在系统上线后即时动态修改xml中的SQL逻辑（进行中）</br>
--`<sql><include>` 标签支持（进行中）</br>
--针对于GoLand 的xml生成器,可以一键生成基本的CRUD(待支持..)</br>
+## TODO （进行中）期待功能路线
+-在线编辑SQL支持,可以在系统上线后修改xml中的SQL逻辑并生效</br>
+-`<sql><include>` 标签支持</br>
+-针对于GoLand 的xml生成器,可以一键生成基本的CRUD</br>
 
