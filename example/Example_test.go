@@ -15,7 +15,7 @@ import (
 //自定义结构体参数（属性必须大写）
 //参数中除了session指针外，为指针类型的皆为返回数据
 // 函数return必须为error 为返回错误信息
-type ExampleActivityMapperImpl struct {
+type ExampleActivityMapper struct {
 	SelectByIds       func(ids []string, result *[]Activity) error                                                            `mapperParams:"ids"`
 	SelectAll         func(result *[]Activity) error
 	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int, result *[]Activity) error `mapperParams:"name,startTime,endTime,page,size"`
@@ -27,7 +27,7 @@ type ExampleActivityMapperImpl struct {
 }
 
 //初始化mapper文件和结构体
-func InitMapperByLocalSession() ExampleActivityMapperImpl {
+func InitMapperByLocalSession() ExampleActivityMapper {
 	var err error
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
 	engine, err := GoMybatis.Open("mysql", MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
@@ -42,10 +42,10 @@ func InitMapperByLocalSession() ExampleActivityMapperImpl {
 	defer file.Close()
 
 	bytes, _ := ioutil.ReadAll(file)
-	var exampleActivityMapperImpl ExampleActivityMapperImpl
+	var exampleActivityMapper ExampleActivityMapper
 	//设置对应的mapper xml文件
-	GoMybatis.UseProxyMapperByEngine(&exampleActivityMapperImpl, bytes, engine, true)
-	return exampleActivityMapperImpl
+	GoMybatis.UseProxyMapperByEngine(&exampleActivityMapper, bytes, engine, true)
+	return exampleActivityMapper
 }
 
 //插入
@@ -55,10 +55,10 @@ func Test_inset(t *testing.T) {
 		return
 	}
 	//初始化mapper文件
-	var exampleActivityMapperImpl = InitMapperByLocalSession()
+	var exampleActivityMapper = InitMapperByLocalSession()
 	//使用mapper
 	var result int64
-	var err = exampleActivityMapperImpl.Insert(Activity{Id: "171", Name: "test_insret", DeleteFlag: 1}, &result)
+	var err = exampleActivityMapper.Insert(Activity{Id: "171", Name: "test_insret", DeleteFlag: 1}, &result)
 	if err != nil {
 		panic(err)
 	}
