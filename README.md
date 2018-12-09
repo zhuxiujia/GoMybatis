@@ -60,7 +60,7 @@ var xmlBytes = []byte(`
 `)
 
 type ExampleActivityMapperImpl struct {
-     SelectAll         func() ([]Activity,error)
+     SelectAll  func() ([]Activity, error)
 }
 
 func main() {
