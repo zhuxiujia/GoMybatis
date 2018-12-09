@@ -11,7 +11,7 @@ type TagArg struct {
 }
 
 // UseService 可写入每个函数代理方法
-func UseMapper(mapper interface{}, proxyFunc func(method string, args []reflect.Value, tagArgs []TagArg) error) {
+func UseMapper(mapper interface{}, proxyFunc func(method string, args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
 	v := reflect.ValueOf(mapper)
 	if v.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
@@ -20,11 +20,11 @@ func UseMapper(mapper interface{}, proxyFunc func(method string, args []reflect.
 }
 
 // UseService 可写入每个函数代理方法
-func UseMapperValue(mapperValue reflect.Value, proxyFunc func(method string, args []reflect.Value, tagArgs []TagArg) error) {
+func UseMapperValue(mapperValue reflect.Value, proxyFunc func(method string, args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
 	buildMapper(mapperValue, proxyFunc)
 }
 
-func buildMapper(v reflect.Value, proxyFunc func(method string, args []reflect.Value, tagArgs []TagArg) error) {
+func buildMapper(v reflect.Value, proxyFunc func(method string, args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
@@ -58,7 +58,7 @@ func buildMapper(v reflect.Value, proxyFunc func(method string, args []reflect.V
 	}
 }
 
-func buildRemoteMethod(f reflect.Value, ft reflect.Type, sf reflect.StructField, proxyFunc func(method string, args []reflect.Value, tagArgs []TagArg) error) {
+func buildRemoteMethod(f reflect.Value, ft reflect.Type, sf reflect.StructField, proxyFunc func(method string, args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
 	var params []string
 	var mapperParams = sf.Tag.Get(`mapperParams`)
 	if mapperParams != `` {
@@ -78,8 +78,11 @@ func buildRemoteMethod(f reflect.Value, ft reflect.Type, sf reflect.StructField,
 		}
 	}
 	var fn = func(args []reflect.Value) (results []reflect.Value) {
-		err := proxyFunc(sf.Name, args, tagArgs)
-		return append(results, reflect.ValueOf(&err).Elem())
+		proxyResults := proxyFunc(sf.Name, args, tagArgs)
+		for _, returnV := range proxyResults {
+			results = append(results, returnV)
+		}
+		return results
 	}
 	if f.Kind() == reflect.Ptr {
 		fp := reflect.New(ft)

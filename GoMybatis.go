@@ -1,7 +1,6 @@
 package GoMybatis
 
 import (
-	"errors"
 	"reflect"
 	"strings"
 )
@@ -38,7 +37,7 @@ func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine *SessionE
 //	Insert            func(arg Activity, result *int64) error
 //	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error `mapperParams:"name,startTime,endTime"`
 //}
-//func的基本类型的参数（例如string,int,time.Time,int64,float....）个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
+//func的基本类型的参数（例如string,int,time.Time,int64,float....）个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，返回值必须有error
 //func的结构体参数无需指定mapperParams的tag，框架会自动扫描它的属性，封装为map处理掉
 //使用WriteMapper函数设置代理后即可正常使用。
 func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) {
@@ -46,26 +45,84 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 	//make a map[method]xml
 	var methodXmlMap = makeMethodXmlMap(bean, mapperTree)
 	var resultMaps = makeResultMaps(mapperTree)
-	var proxyFunc = func(method string, args []reflect.Value, tagArgs []TagArg) error {
-		var lastArgsIndex = len(args) - 1
-		var argsLen = len(args)
-		var lastArgValue *reflect.Value = nil
-		if argsLen != 0 && args[lastArgsIndex].Kind() == reflect.Ptr {
-			lastArgValue = &args[lastArgsIndex]
-			if lastArgValue.Kind() != reflect.Ptr {
-				//最后一个参数必须为指针，或者不传任何参数
-				return errors.New(`[GoMybatis] method params last param must be pointer!,method =` + method)
-			}
+	var returnTypeMap = makeReturnTypeMap(bean)
+	var proxyFunc = func(method string, args []reflect.Value, tagArgs []TagArg) []reflect.Value {
+		var returnValue *reflect.Value = nil
+		var returnType = returnTypeMap[method]
+
+		if returnType == nil {
+			panic("[GoMybatis] struct have no return values!")
 		}
+
+		if returnType.ReturnOutType != nil {
+			var returnV = reflect.New(*returnType.ReturnOutType)
+			switch (*returnType.ReturnOutType).Kind() {
+			case reflect.Map:
+				returnV.Elem().Set(reflect.MakeMap(*returnType.ReturnOutType))
+			case reflect.Slice:
+				returnV.Elem().Set(reflect.MakeSlice(*returnType.ReturnOutType, 0, 0))
+			}
+			returnValue = &returnV
+		}
+
 		var mapperXml = methodXmlMap[method]
 		var resultMap map[string]*ResultProperty
 		var resultMapId = mapperXml.Propertys[Element_ResultMap]
 		if resultMapId != "" {
 			resultMap = resultMaps[resultMapId]
 		}
-		return exeMethodByXml(sessionFactory, tagArgs, args, mapperXml, resultMap, lastArgValue, decoder, sqlBuilder, enableLog)
+
+		var e = exeMethodByXml(sessionFactory, tagArgs, args, mapperXml, resultMap, returnValue, decoder, sqlBuilder, enableLog)
+
+		var returnValues = make([]reflect.Value, returnType.NumOut)
+		for index, _ := range returnValues {
+			if index == returnType.ReturnIndex {
+				if returnValue != nil {
+					returnValues[index] = (*returnValue).Elem()
+				}
+			} else {
+				if e != nil {
+					returnValues[index] = reflect.New(*returnType.ErrorType)
+					returnValues[index].Elem().Set(reflect.ValueOf(e))
+					returnValues[index] = returnValues[index].Elem()
+				} else {
+					returnValues[index] = reflect.Zero(*returnType.ErrorType)
+				}
+			}
+		}
+		return returnValues
 	}
 	UseMapperValue(bean, proxyFunc)
+}
+
+func makeReturnTypeMap(value reflect.Value) (returnMap map[string]*ReturnType) {
+	returnMap = make(map[string]*ReturnType)
+	var proxyType = value.Elem().Type()
+	for i := 0; i < proxyType.NumField(); i++ {
+		var funcType = proxyType.Field(i).Type
+		var key = proxyType.Field(i).Name
+		var numOut = funcType.NumOut()
+		if numOut > 2 {
+			panic("[GoMybatis] func num out must = 1 or = 2")
+		}
+		for f := 0; f < numOut; f++ {
+			var outType = funcType.Out(f)
+			var returnType = returnMap[key]
+			if returnType == nil {
+				returnMap[key] = &ReturnType{
+					ReturnIndex: -1,
+					NumOut:      numOut,
+				}
+			}
+			if outType.String() != "error" {
+				returnMap[key].ReturnIndex = f
+				returnMap[key].ReturnOutType = &outType
+			} else {
+				returnMap[key].ErrorType = &outType
+			}
+		}
+	}
+	return returnMap
 }
 
 //map[id]map[cloum]Property
@@ -114,8 +171,18 @@ func makeMethodXmlMap(bean reflect.Value, mapperTree map[string]*MapperXml) map[
 }
 
 func methodFieldCheck(methodType reflect.StructField) {
-	if methodType.Type.NumOut() != 1 {
-		panic("[GoMybatis] method field must be return one 'error' type!")
+	if methodType.Type.NumOut() < 1 {
+		panic("[GoMybatis] method " + methodType.Name + "() must be return a 'error' type!")
+	}
+	var errorTypeNum = 0
+	for i := 0; i < methodType.Type.NumOut(); i++ {
+		var outType = methodType.Type.Out(i)
+		if outType.Kind() == reflect.Interface && outType.String() == "error" {
+			errorTypeNum++
+		}
+	}
+	if errorTypeNum != 1 {
+		panic("[GoMybatis] method " + methodType.Name + "() must be return a 'error' type!")
 	}
 }
 
@@ -129,7 +196,7 @@ func findMapperXml(mapperTree map[string]*MapperXml, methodName string) *MapperX
 	return nil
 }
 
-func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, mapperXml *MapperXml, resultMap map[string]*ResultProperty, lastArgValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) error {
+func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, mapperXml *MapperXml, resultMap map[string]*ResultProperty, returnValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) error {
 	//build sql string
 	var session Session
 	var sql string
@@ -147,7 +214,7 @@ func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args [
 		//not arg session,just close!
 		defer closeSession(sessionFactory, session)
 	}
-	var haveLastReturnValue = lastArgValue != nil && (*lastArgValue).IsNil() == false
+	var haveLastReturnValue = returnValue != nil && (*returnValue).IsNil() == false
 	//do CRUD
 	if mapperXml.Tag == Element_Select && haveLastReturnValue {
 		//is select and have return value
@@ -155,7 +222,7 @@ func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args [
 		if err != nil {
 			return err
 		}
-		err = decoder.Decode(resultMap, results, lastArgValue.Interface())
+		err = decoder.Decode(resultMap, results, returnValue.Interface())
 		if err != nil {
 			return err
 		}
@@ -165,7 +232,7 @@ func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args [
 			return err
 		}
 		if haveLastReturnValue {
-			lastArgValue.Elem().SetInt(res.RowsAffected)
+			returnValue.Elem().SetInt(res.RowsAffected)
 		}
 	}
 	return nil
@@ -185,7 +252,7 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlB
 	var tagArgsLen = len(tagArgs)
 	for argIndex, arg := range args {
 		var argInterface = arg.Interface()
-		if arg.Kind() == reflect.Ptr && argInterface != nil && arg.Type().String() == GoMybatis_Session_Ptr {
+		if arg.Kind() == reflect.Ptr && arg.IsNil() == false && argInterface != nil && arg.Type().String() == GoMybatis_Session_Ptr {
 			session = *(argInterface.(*Session))
 			continue
 		} else if argInterface != nil && arg.Kind() == reflect.Interface && arg.Type().String() == GoMybatis_Session {

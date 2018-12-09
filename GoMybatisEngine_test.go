@@ -1,6 +1,7 @@
 package GoMybatis
 
 import (
+	"fmt"
 	"github.com/zhuxiujia/GoMybatis/example"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"sync"
@@ -19,9 +20,8 @@ func Test_One_Transcation_TPS(t *testing.T) {
 	//开始TPS测试
 	var total = 100000
 	defer utils.CountMethodTps(float64(total), time.Now(), "Test_One_Transcation_TPS")
-	var results []example.Activity
 	for i := 0; i < total; i++ {
-		var err = exampleActivityMapperImpl.SelectByCondition(&session, "", time.Time{}, time.Time{}, 0, 2000, &results)
+		var _, err = exampleActivityMapperImpl.SelectByCondition(&session, "", time.Time{}, time.Time{}, 0, 2000)
 		if err != nil {
 			panic(err)
 		}
@@ -48,8 +48,7 @@ func Test_One_Transcation_multiple_coroutine_TPS(t *testing.T) {
 		go func() {
 			var itemCount = total / goruntine
 			for f := 0; f < itemCount; f++ {
-				var results []example.Activity
-				exampleActivityMapperImpl.SelectByCondition(&session, "", time.Time{}, time.Time{}, 0, 2000, &results)
+				exampleActivityMapperImpl.SelectByCondition(&session, "", time.Time{}, time.Time{}, 0, 2000)
 			}
 			waitGroup.Done()
 		}()
@@ -66,11 +65,11 @@ func Test_Transcation(t *testing.T) {
 	//使用mapper
 
 	//开始TPS测试
-	var results []example.Activity
-	var err = exampleActivityMapperImpl.SelectByCondition(&session, "", time.Time{}, time.Time{}, 0, 2000, &results)
+	var results, err = exampleActivityMapperImpl.SelectByCondition(&session, "", time.Time{}, time.Time{}, 0, 2000)
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(results)
 }
 
 type TestSession struct {
@@ -111,10 +110,10 @@ func (this *TestSession) Close() {
 //定义mapper文件的接口和结构体
 // 支持基本类型(int,string,time.Time,float...且需要指定参数名称`mapperParams:"name"以逗号隔开，且位置要和实际参数相同)
 //自定义结构体参数（属性必须大写）
-//参数中除了session指针外，为指针类型的皆为返回数据
+//参数中除了session指针外，为指针类型的皆为数据
 // 函数return必须为error 为返回错误信息
 type ExampleActivityMapperImpl struct {
-	SelectByCondition func(session *Session, name string, startTime time.Time, endTime time.Time, page int, size int, result *[]example.Activity) error `mapperParams:"session,name,startTime,endTime,page,size"`
+	SelectByCondition func(session *Session, name string, startTime time.Time, endTime time.Time, page int, size int) ([]example.Activity, error) `mapperParams:"session,name,startTime,endTime,page,size"`
 }
 
 //初始化mapper文件和结构体
