@@ -103,12 +103,12 @@ func makeReturnTypeMap(value reflect.Value) (returnMap map[string]*ReturnType) {
 		var funcName = proxyType.Field(i).Name
 		var numOut = funcType.NumOut()
 		if numOut > 2 || numOut == 0 {
-			panic("[GoMybatis] func '" + funcName + "' num out must = 1 or = 2,and have return a 'error'!")
+			panic("[GoMybatis] func '" + funcName + "()' return num out must = 1 or = 2!")
 		}
 		for f := 0; f < numOut; f++ {
 			var outType = funcType.Out(f)
-			if outType.Kind() == reflect.Ptr {
-				panic("[GoMybatis] func '" + funcName + "' return can not be a 'ptr'!")
+			if outType.Kind() == reflect.Ptr || (outType.Kind() == reflect.Interface && outType.String() != "error") {
+				panic("[GoMybatis] func '" + funcName + "()' return '" + outType.String() + "' can not be a 'ptr' or 'interface'!")
 			}
 			var returnType = returnMap[funcName]
 			if returnType == nil {
@@ -122,7 +122,7 @@ func makeReturnTypeMap(value reflect.Value) (returnMap map[string]*ReturnType) {
 				returnMap[funcName].ReturnOutType = &outType
 			} else {
 				if returnMap[funcName].ErrorType != nil {
-					panic("[GoMybatis] func '" + funcName + "' num out must = 1 or = 2,and have return a 'error'!")
+					panic("[GoMybatis] func '" + funcName + "()' must only return one 'error'!")
 				}
 				returnMap[funcName].ErrorType = &outType
 			}
