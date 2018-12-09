@@ -102,11 +102,14 @@ func makeReturnTypeMap(value reflect.Value) (returnMap map[string]*ReturnType) {
 		var funcType = proxyType.Field(i).Type
 		var key = proxyType.Field(i).Name
 		var numOut = funcType.NumOut()
-		if numOut > 2 {
-			panic("[GoMybatis] func num out must = 1 or = 2")
+		if numOut > 2 || numOut == 0 {
+			panic("[GoMybatis] func num out must = 1 or = 2,and have return a error!")
 		}
 		for f := 0; f < numOut; f++ {
 			var outType = funcType.Out(f)
+			if outType.Kind() == reflect.Ptr {
+				panic("[GoMybatis] func return can not be a ptr!")
+			}
 			var returnType = returnMap[key]
 			if returnType == nil {
 				returnMap[key] = &ReturnType{
