@@ -27,7 +27,6 @@ import (
 	"net"
 	"time"
 
-	. "gopkg.in/check.v1"
 )
 
 type faultyReader struct {

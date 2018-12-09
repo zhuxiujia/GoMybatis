@@ -24,7 +24,6 @@ package uuid
 import (
 	"bytes"
 
-	. "gopkg.in/check.v1"
 )
 
 type codecTestSuite struct{}

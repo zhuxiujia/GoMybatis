@@ -111,9 +111,9 @@
     <select id="choose" resultMap="BaseResultMap">
         SELECT * FROM biz_activity
         <choose>
-            <when test="deleteFlag > 1"> WHERE delete_flag > 1 </when>
-            <when test="deleteFlag == 1"> WHERE delete_flag = 1 </when>
-            <otherwise> WHERE delete_flag = #{deleteFlag} </otherwise>
+            <when test="deleteFlag > 1">WHERE delete_flag > 1</when>
+            <when test="deleteFlag == 1">WHERE delete_flag = 1</when>
+            <otherwise>WHERE delete_flag = #{deleteFlag}</otherwise>
         </choose>
     </select>
 </mapper>

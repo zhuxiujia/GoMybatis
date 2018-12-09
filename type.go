@@ -23,7 +23,7 @@ type SQLType struct {
 }
 
 const (
-	UNKNOW_TYPE = iota
+	UNKNOW_TYPE  = iota
 	TEXT_TYPE
 	BLOB_TYPE
 	TIME_TYPE

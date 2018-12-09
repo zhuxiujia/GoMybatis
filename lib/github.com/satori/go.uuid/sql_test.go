@@ -21,10 +21,6 @@
 
 package uuid
 
-import (
-	. "gopkg.in/check.v1"
-)
-
 type sqlTestSuite struct{}
 
 var _ = Suite(&sqlTestSuite{})
