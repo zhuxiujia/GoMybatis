@@ -60,11 +60,7 @@ var xmlBytes = []byte(`
 `)
 
 type ExampleActivityMapperImpl struct {
-	SelectAll         func(result *[]Activity) error
-	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int, result *[]Activity) error `mapperParams:"name,startTime,endTime,page,size"`
-	UpdateById        func(session *GoMybatis.Session, arg Activity, result *int64) error //*GoMybatis.Session为事务
-	Insert            func(arg Activity, result *int64) error
-	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error                            `mapperParams:"name,startTime,endTime"`
+     SelectAll         func() ([]Activity,error)
 }
 
 func main() {
