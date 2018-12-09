@@ -38,7 +38,7 @@ type UUID [Size]byte
 
 // UUID versions
 const (
-	_  byte = iota
+	_ byte = iota
 	V1
 	V2
 	V3
@@ -48,7 +48,7 @@ const (
 
 // UUID layout variants.
 const (
-	VariantNCS       byte = iota
+	VariantNCS byte = iota
 	VariantRFC4122
 	VariantMicrosoft
 	VariantFuture
