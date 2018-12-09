@@ -76,8 +76,8 @@ func main() {
 	}
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	
-	//挂载xml逻辑到ExampleActivityMapperImpl
-	GoMybatis.UseProxyMapperByEngine(&exampleActivityMapperImpl, xmlBytes, engine,true)
+	//加载xml实现逻辑到ExampleActivityMapperImpl
+	GoMybatis.WriteMapperPtrByEngine(&exampleActivityMapperImpl, xmlBytes, engine,true)
 
 	//使用mapper
 	var result []Activity

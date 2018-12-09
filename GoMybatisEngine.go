@@ -38,43 +38,15 @@ func Open(driverName, dataSourceName string) (*SessionEngine, error) {
 	return &engine, nil
 }
 
-//打开一个本地引擎
-func OpenRemote(addr string, RetryTime int) (*SessionEngine, error) {
-	var TransationRMClient = TransationRMClient{
-		RetryTime: RetryTime,
-		Addr:      addr,
-	}
-	var engine = RemoteSessionEngine{}.New(&TransationRMClient)
-	var sessionEngine = SessionEngine(&engine)
-	return &sessionEngine, nil
-}
-
-//bean 工厂，根据xml配置创建函数,并且动态代理到你定义的struct func里
-//bean 参数必须为指针类型,指向你定义的struct
-//你定义的struct必须有可导出的func属性,例如：
-//type MyUserMapperImpl struct {
-//	UserMapper                                                 `mapperPath:"/mapper/user/UserMapper.xml"`
-//	SelectById    func(id string, result *model.User) error    `mapperParams:"id"`
-//	SelectByPhone func(id string, phone string, result *model.User) error `mapperParams:"id,phone"`
-//	DeleteById    func(id string, result *int64) error         `mapperParams:"id"`
-//	Insert        func(arg model.User, result *int64) error
-//}
-//func的参数支持2种函数，第一种函数 基本参数个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
-//func的参数支持2种函数，第二种函数第一个参数必须为结构体(例如 arg model.User,该结构体的属性可以指定tag `json:"xxx"`为参数名称),最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
-//使用UseProxyMapper函数设置代理后即可正常使用。
-func UseProxyMapperBySessionEngine(bean interface{}, xml []byte, engine *SessionEngine, enableLog bool) {
-	UseProxyMapperByEngine(bean, xml, engine, enableLog)
-}
-
 //-------------------------------------------------------------工具
 
-func rows2maps(rows *sql.Rows) (resultsSlice []map[string][]byte, err error) {
+func (this *GoMybatisEngine)rows2maps(rows *sql.Rows) (resultsSlice []map[string][]byte, err error) {
 	fields, err := rows.Columns()
 	if err != nil {
 		return nil, err
 	}
 	for rows.Next() {
-		result, err := row2map(rows, fields)
+		result, err := this.row2map(rows, fields)
 		if err != nil {
 			return nil, err
 		}
@@ -83,7 +55,7 @@ func rows2maps(rows *sql.Rows) (resultsSlice []map[string][]byte, err error) {
 	return resultsSlice, nil
 }
 
-func row2map(rows *sql.Rows, fields []string) (resultsMap map[string][]byte, err error) {
+func (this *GoMybatisEngine)row2map(rows *sql.Rows, fields []string) (resultsMap map[string][]byte, err error) {
 	result := make(map[string][]byte)
 	scanResultContainers := make([]interface{}, len(fields))
 	for i := 0; i < len(fields); i++ {
@@ -102,7 +74,7 @@ func row2map(rows *sql.Rows, fields []string) (resultsMap map[string][]byte, err
 			continue
 		}
 
-		if data, err := value2Bytes(&rawValue); err == nil {
+		if data, err := this.value2Bytes(&rawValue); err == nil {
 			result[key] = data
 		} else {
 			return nil, err // !nashtsai! REVIEW, should return err or just error log?
@@ -110,15 +82,15 @@ func row2map(rows *sql.Rows, fields []string) (resultsMap map[string][]byte, err
 	}
 	return result, nil
 }
-func value2Bytes(rawValue *reflect.Value) ([]byte, error) {
-	str, err := value2String(rawValue)
+func (this *GoMybatisEngine)value2Bytes(rawValue *reflect.Value) ([]byte, error) {
+	str, err := this.value2String(rawValue)
 	if err != nil {
 		return nil, err
 	}
 	return []byte(str), nil
 }
 
-func value2String(rawValue *reflect.Value) (str string, err error) {
+func (this *GoMybatisEngine)value2String(rawValue *reflect.Value) (str string, err error) {
 	aa := reflect.TypeOf((*rawValue).Interface())
 	vv := reflect.ValueOf((*rawValue).Interface())
 	switch aa.Kind() {

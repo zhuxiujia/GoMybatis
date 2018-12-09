@@ -9,31 +9,28 @@ import (
 //如果使用UseProxyMapperByEngine，则内建默认的SessionFactory
 var DefaultSessionFactory *SessionFactory
 
-func UseProxyMapperByEngine(bean interface{}, xml []byte, sqlEngine *SessionEngine, enableLog bool) {
-	v := reflect.ValueOf(bean)
-	if v.Kind() != reflect.Ptr {
+//根据sessionEngine写入到mapperPtr
+func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine *SessionEngine, enableLog bool) {
+	if value.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
-	var factory = SessionFactory{}.New(sqlEngine)
+	var factory = SessionFactory{}.New(sessionEngine)
 	if DefaultSessionFactory == nil {
 		DefaultSessionFactory = &factory
 	}
-	UseProxyMapper(v, xml, DefaultSessionFactory, GoMybatisSqlResultDecoder{}, GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{}), enableLog)
+	WriteMapper(value, xml, DefaultSessionFactory, GoMybatisSqlResultDecoder{}, GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{}), enableLog)
 }
 
-func UseProxyMapperFromBean(bean interface{}, xml []byte, sessionFactory *SessionFactory, sqlResultDecoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) {
-	v := reflect.ValueOf(bean)
+//根据sessionEngine写入到mapperPtr
+func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine *SessionEngine, enableLog bool) {
+	v := reflect.ValueOf(ptr)
 	if v.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
-	UseProxyMapperFromValue(v, xml, sessionFactory, sqlResultDecoder, sqlBuilder, enableLog)
+	WriteMapperByEngine(v, xml, sessionEngine, enableLog)
 }
 
-func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, sqlResultDecoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) {
-	UseProxyMapper(bean, xml, sessionFactory, sqlResultDecoder, sqlBuilder, enableLog)
-}
-
-//例如
+//写入方法内容，例如
 //type ExampleActivityMapperImpl struct {
 //	SelectAll         func(result *[]Activity) error
 //	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int, result *[]Activity) error `mapperParams:"name,startTime,endTime,page,size"`
@@ -41,12 +38,10 @@ func UseProxyMapperFromValue(bean reflect.Value, xml []byte, sessionFactory *Ses
 //	Insert            func(arg Activity, result *int64) error
 //	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error `mapperParams:"name,startTime,endTime"`
 //}
-//bean 工厂，根据xml配置创建函数,并且动态代理到你定义的struct func里
-//bean 参数必须为reflect.Value
 //func的基本类型的参数（例如string,int,time.Time,int64,float....）个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，最后一个参数必须为返回数据类型的指针(例如result *model.User)，返回值为error
 //func的结构体参数无需指定mapperParams的tag，框架会自动扫描它的属性，封装为map处理掉
-//使用UseProxyMapper函数设置代理后即可正常使用。
-func UseProxyMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) {
+//使用WriteMapper函数设置代理后即可正常使用。
+func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) {
 	var mapperTree = LoadMapperXml(xml)
 	//make a map[method]xml
 	var methodXmlMap = makeMethodXmlMap(bean, mapperTree)
@@ -205,7 +200,7 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlB
 				Type:  arg.Type(),
 			}
 		} else {
-			if arg.Kind() != reflect.Ptr{
+			if arg.Kind() != reflect.Ptr {
 				paramMap[DefaultOneArg] = SqlArg{
 					Value: argInterface,
 					Type:  arg.Type(),

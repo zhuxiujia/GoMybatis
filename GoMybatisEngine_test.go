@@ -162,6 +162,6 @@ func InitMapperByLocalSession() ExampleActivityMapperImpl {
     </select>`)
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	//设置对应的mapper xml文件,禁止输出日志
-	UseProxyMapperByEngine(&exampleActivityMapperImpl, bytes, engine, false)
+	WriteMapperToPtrByEngine(&exampleActivityMapperImpl, bytes, engine, false)
 	return exampleActivityMapperImpl
 }
