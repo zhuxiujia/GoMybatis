@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-//如果使用UseProxyMapperByEngine，则内建默认的SessionFactory
+//如果使用WriteMapperByEngine()，则内建默认的SessionFactory
 var DefaultSessionFactory *SessionFactory
 
 //根据sessionEngine写入到mapperPtr
