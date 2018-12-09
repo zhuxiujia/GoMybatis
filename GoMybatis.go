@@ -59,7 +59,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 		}
 		var mapperXml = methodXmlMap[method]
 		var resultMap map[string]*ResultProperty
-		var resultMapId = mapperXml.Propertys["resultMap"]
+		var resultMapId = mapperXml.Propertys[Element_ResultMap]
 		if resultMapId != "" {
 			resultMap = resultMaps[resultMapId]
 		}
@@ -72,7 +72,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 func makeResultMaps(xmls map[string]*MapperXml) map[string]map[string]*ResultProperty {
 	var resultMaps = make(map[string]map[string]*ResultProperty)
 	for _, xmlItem := range xmls {
-		if xmlItem.Tag == "resultMap" {
+		if xmlItem.Tag == Element_ResultMap {
 			var resultPropertyMap = make(map[string]*ResultProperty)
 			for _, elementItem := range xmlItem.ElementItems {
 				var property = ResultProperty{
