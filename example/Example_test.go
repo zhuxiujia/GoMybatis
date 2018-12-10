@@ -19,12 +19,11 @@ type ExampleActivityMapper struct {
 	SelectByIds       func(ids []string) ([]Activity, error)                                                            `mapperParams:"ids"`
 	SelectAll         func() ([]Activity, error)
 	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int) ([]Activity, error) `mapperParams:"name,startTime,endTime,page,size"`
-	//参数中包含有*GoMybatis.Session的类型，用于自定义事务
-	UpdateById       func(session *GoMybatis.Session, arg Activity) (int64, error)
-	Insert           func(arg Activity) (int64, error)
-	CountByCondition func(name string, startTime time.Time, endTime time.Time) (int, error) `mapperParams:"name,startTime,endTime"`
-	DeleteById       func(id string) (int64, error)                                         `mapperParams:"id"`
-	Choose           func(deleteFlag int) ([]Activity, error)                               `mapperParams:"deleteFlag"`
+	UpdateById        func(session *GoMybatis.Session, arg Activity) (int64, error) //参数中包含有*GoMybatis.Session的类型，用于自定义事务
+	Insert            func(arg Activity) (int64, error)
+	CountByCondition  func(name string, startTime time.Time, endTime time.Time) (int, error)                            `mapperParams:"name,startTime,endTime"`
+	DeleteById        func(id string) (int64, error)                                                                    `mapperParams:"id"`
+	Choose            func(deleteFlag int) ([]Activity, error)                                                          `mapperParams:"deleteFlag"`
 }
 
 //初始化mapper文件和结构体
