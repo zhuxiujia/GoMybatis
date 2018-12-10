@@ -41,6 +41,7 @@ func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine *SessionE
 //func的结构体参数无需指定mapperParams的tag，框架会自动扫描它的属性，封装为map处理掉
 //使用WriteMapper函数设置代理后即可正常使用。
 func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) {
+	beanCheck(bean)
 	var mapperTree = LoadMapperXml(xml)
 	//make a map[method]xml
 	var methodXmlMap = makeMethodXmlMap(bean, mapperTree)
@@ -80,6 +81,29 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 		return buildReturnValues(returnType, returnValue, e)
 	}
 	UseMapperValue(bean, proxyFunc)
+}
+
+//check beans
+func beanCheck(value reflect.Value) {
+	var t = value.Type()
+	if value.Kind() == reflect.Ptr {
+		value = value.Elem()
+		t = value.Type()
+	}
+	for i := 0; i < t.NumField(); i++ {
+		var fieldItem = t.Field(i)
+		var argsLen = fieldItem.Type.NumIn() //参数长度，除session参数外。
+		var customLen = 0
+		for argIndex := 0; argIndex < fieldItem.Type.NumIn(); argIndex++ {
+			var inType = fieldItem.Type.In(argIndex)
+			if isCustomStruct(inType) {
+				customLen++
+			}
+		}
+		if argsLen > 1 && customLen > 1 {
+			panic(`[GoMybats] ` + fieldItem.Name + ` must add tag "mapperParams:"*,*..."`)
+		}
+	}
 }
 
 func buildReturnValues(returnType *ReturnType, returnValue *reflect.Value, e error) []reflect.Value {
@@ -263,6 +287,9 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlB
 	var session Session
 	var paramMap = make(map[string]SqlArg)
 	var tagArgsLen = len(tagArgs)
+	var argsLen = len(args) //参数长度，除session参数外。
+	var customLen = 0
+	var customIndex = -1
 	for argIndex, arg := range args {
 		var argInterface = arg.Interface()
 		if arg.Kind() == reflect.Ptr && arg.IsNil() == false && argInterface != nil && arg.Type().String() == GoMybatis_Session_Ptr {
@@ -272,31 +299,51 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlB
 			session = argInterface.(Session)
 			continue
 		}
-		if arg.Kind() == reflect.Struct && arg.Type().String() != GoMybatis_Time {
-			paramMap = scanStructArgFields(argInterface, nil)
-		} else if tagArgsLen > 0 && argIndex < tagArgsLen && tagArgs[argIndex].Name != "" && argInterface != nil {
+		if isCustomStruct(arg.Type()) {
+			customLen++
+			customIndex = argIndex
+		}
+		if arg.Type().String() == GoMybatis_Session_Ptr || arg.Type().String() == GoMybatis_Session {
+			if argsLen > 0 {
+				argsLen--
+			}
+			if tagArgsLen > 0 {
+				tagArgsLen --
+			}
+		}
+		if tagArgsLen > 0 && argIndex < tagArgsLen && tagArgs[argIndex].Name != "" {
 			paramMap[tagArgs[argIndex].Name] = SqlArg{
 				Value: argInterface,
 				Type:  arg.Type(),
 			}
 		} else {
-			if arg.Kind() != reflect.Ptr {
-				paramMap[DefaultOneArg] = SqlArg{
-					Value: argInterface,
-					Type:  arg.Type(),
-				}
+			paramMap[DefaultOneArg] = SqlArg{
+				Value: argInterface,
+				Type:  arg.Type(),
 			}
 		}
 	}
+	if customLen == 1 && customIndex != -1 {
+		//只有一个结构体参数，需要展开它的成员变量 加入到map
+		paramMap = scanStructArgFields(args[customIndex], nil)
+	}
+
 	result, err := sqlBuilder.BuildSql(paramMap, mapperXml, enableLog)
 	return session, result, err
 }
 
 //scan params
-func scanStructArgFields(arg interface{}, typeConvert func(arg interface{}) interface{}) map[string]SqlArg {
+func scanStructArgFields(v reflect.Value, typeConvert func(arg interface{}) interface{}) map[string]SqlArg {
+	var t = v.Type()
 	parameters := make(map[string]SqlArg)
-	v := reflect.ValueOf(arg)
-	t := reflect.TypeOf(arg)
+	if v.Kind() == reflect.Ptr {
+		if v.IsNil() == true {
+			return parameters
+		}
+		//为指针，解引用
+		v = v.Elem()
+		t = t.Elem()
+	}
 	if t.Kind() != reflect.Struct {
 		panic(`[GoMybatis] the scanParamterBean() arg is not a struct type!,type =` + t.String())
 	}
@@ -320,4 +367,12 @@ func scanStructArgFields(arg interface{}, typeConvert func(arg interface{}) inte
 		}
 	}
 	return parameters
+}
+
+func isCustomStruct(value reflect.Type) bool {
+	if value.Kind() == reflect.Struct && value.String() != GoMybatis_Time && value.String() != GoMybatis_Time_Ptr {
+		return true
+	} else {
+		return false
+	}
 }

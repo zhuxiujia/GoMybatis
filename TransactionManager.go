@@ -56,21 +56,24 @@ func (this DefaultTransationManager) New(SessionFactory *SessionFactory, Transac
 }
 
 func (this DefaultTransationManager) GetTransaction(def *TransactionDefinition, transactionId string, OwnerId string) (*TransactionStatus, error) {
-	//if transactionId == "" {
-	//	return nil, errors.New("[TransactionManager] transactionId =" + transactionId + " transations is nil!")
-	//}
+	if transactionId == "" {
+		return nil, errors.New("[TransactionManager] transactionId =" + transactionId + " transations is nil!")
+	}
 	if def == nil {
 		var d = TransactionDefinition{}.Default()
 		def = &d
 	}
-	var transationStatus = this.TransactionFactory.GetTransactionStatus(transactionId)
+	var transationStatus, err = this.TransactionFactory.GetTransactionStatus(transactionId)
+	if err != nil {
+		return nil, err
+	}
 	if def.PropagationBehavior == PROPAGATION_REQUIRED {
 		//todo doBegin
 		if transationStatus.IsNewTransaction {
 			//新事务，则调用begin
 			transationStatus.OwnerId = OwnerId
 			var err = transationStatus.Begin()
-			if err != nil {
+			if err == nil {
 				if def.Timeout != 0 {
 					//transation out of time,default not set out of time
 					//事务超时,时间大于0则启动超时机制
@@ -84,12 +87,20 @@ func (this DefaultTransationManager) GetTransaction(def *TransactionDefinition, 
 }
 
 func (this DefaultTransationManager) Commit(transactionId string) error {
-	var transactions = this.TransactionFactory.GetTransactionStatus(transactionId)
+	var transactions, err = this.TransactionFactory.GetTransactionStatus(transactionId)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 	return transactions.Commit()
 }
 
 func (this DefaultTransationManager) Rollback(transactionId string) error {
-	var transactions = this.TransactionFactory.GetTransactionStatus(transactionId)
+	var transactions, err = this.TransactionFactory.GetTransactionStatus(transactionId)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 	return transactions.Rollback()
 }
 
@@ -99,14 +110,25 @@ func (this DefaultTransationManager) DoTransaction(dto TransactionReqDTO) Transa
 	var err error
 
 	transcationStatus, err = this.GetTransaction(nil, dto.TransactionId, dto.OwnerId)
-	dto.TransactionId = transcationStatus.Transaction.Session.Id()
+	if transcationStatus == nil || transcationStatus.Transaction == nil || transcationStatus.Transaction.Session == nil {
+		return TransactionRspDTO{
+			TransactionId: dto.TransactionId,
+			Error:         "Transaction does not exist,id=" + dto.TransactionId,
+		}
+	}
 	if err != nil {
 		return TransactionRspDTO{
 			TransactionId: dto.TransactionId,
 			Error:         err.Error(),
 		}
 	}
-	log.Println("[TransactionManager] transactionId=", dto.TransactionId)
+	if err != nil {
+		return TransactionRspDTO{
+			TransactionId: dto.TransactionId,
+			Error:         err.Error(),
+		}
+	}
+	log.Println("[TransactionManager] do transactionId=", dto.TransactionId,",sessionId=",transcationStatus.Transaction.Session.Id())
 
 	if dto.Status == Transaction_Status_NO {
 		defer transcationStatus.Flush() //关闭
@@ -123,7 +145,12 @@ func (this DefaultTransationManager) DoTransaction(dto TransactionReqDTO) Transa
 					Error:         err.Error(),
 				}
 			}
-			this.TransactionFactory.GetTransactionStatus(dto.TransactionId).Flush()
+			var transaction, err = this.TransactionFactory.GetTransactionStatus(dto.TransactionId)
+			if err != nil {
+				log.Println(err)
+			} else {
+				transaction.Flush()
+			}
 		}
 	} else if dto.Status == Transaction_Status_Rollback {
 		defer transcationStatus.Flush() //关闭，//PROPAGATION_REQUIRED 情况下 子事务 可关闭
@@ -163,7 +190,7 @@ func (this DefaultTransationManager) DoAction(dto TransactionReqDTO, transcation
 		return TransactionRspDTO
 	}
 	if dto.ActionType == ActionType_Exec {
-		log.Println("[TransactionManager] Exec ", dto.Sql)
+		log.Println("[TransactionManager] TransactionId:",dto.TransactionId,",Exec:", dto.Sql)
 		var res, e = transcationStatus.Transaction.Session.Exec(dto.Sql)
 		var err string
 		if e != nil {

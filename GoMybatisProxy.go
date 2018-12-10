@@ -59,23 +59,28 @@ func buildMapper(v reflect.Value, proxyFunc func(method string, args []reflect.V
 }
 
 func buildRemoteMethod(f reflect.Value, ft reflect.Type, sf reflect.StructField, proxyFunc func(method string, args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
-	var params []string
+	var tagParams []string
 	var mapperParams = sf.Tag.Get(`mapperParams`)
 	if mapperParams != `` {
-		params = strings.Split(mapperParams, `,`)
+		tagParams = strings.Split(mapperParams, `,`)
 	}
-	if len(params) > ft.NumIn() {
-		panic(`[GoMybatisProxy] method fail! the tag "mapperParams" length can not > arg length! filed=` + ft.String())
+	var tagParamsLen = len(tagParams)
+	if tagParamsLen > ft.NumIn() {
+		panic(`[GoMybatisProxy] method fail! the tag "mapperParams" length can not > arg length ! filed=` + sf.Name)
 	}
 	var tagArgs = make([]TagArg, 0)
-	if len(params) != 0 {
-		for index, v := range params {
+	if tagParamsLen != 0 {
+		for index, v := range tagParams {
 			var tagArg = TagArg{
 				Index: index,
 				Name:  v,
 			}
 			tagArgs = append(tagArgs, tagArg)
 		}
+	}
+	var tagArgsLen = len(tagArgs)
+	if tagArgsLen > 0 && ft.NumIn() != tagArgsLen {
+		panic(`[GoMybatisProxy] method fail! the tag "mapperParams" length  != args length ! filed = ` + sf.Name)
 	}
 	var fn = func(args []reflect.Value) (results []reflect.Value) {
 		proxyResults := proxyFunc(sf.Name, args, tagArgs)
@@ -91,5 +96,5 @@ func buildRemoteMethod(f reflect.Value, ft reflect.Type, sf reflect.StructField,
 	} else {
 		f.Set(reflect.MakeFunc(ft, fn))
 	}
-	params = nil
+	tagParams = nil
 }

@@ -11,14 +11,11 @@ func (this TransactionFactory) New(SessionFactory *SessionFactory) TransactionFa
 	return this
 }
 
-func (this *TransactionFactory) GetTransactionStatus(transactionId string) *TransactionStatus {
+func (this *TransactionFactory) GetTransactionStatus(transactionId string) (*TransactionStatus, error) {
 	var Session Session
-	if transactionId == "" {
-		Session = this.SessionFactory.NewSession(SessionType_Default, nil)
-		transactionId = Session.Id()
-	}
 	var result = this.TransactionStatuss[transactionId]
 	if result == nil {
+		Session = this.SessionFactory.NewSession(SessionType_Default, nil)
 		var transaction = Transaction{
 			Id:      transactionId,
 			Session: Session,
@@ -30,7 +27,7 @@ func (this *TransactionFactory) GetTransactionStatus(transactionId string) *Tran
 		result = &transactionStatus
 		this.TransactionStatuss[transactionId] = result
 	}
-	return result
+	return result, nil
 }
 
 func (this *TransactionFactory) SetTransactionStatus(transactionId string, transaction *TransactionStatus) {
@@ -44,7 +41,7 @@ func (this *TransactionFactory) Append(transactionId string, transaction Transac
 	if transactionId == "" {
 		return
 	}
-	var old = this.GetTransactionStatus(transactionId)
+	var old,_ = this.GetTransactionStatus(transactionId)
 	if old != nil {
 		this.SetTransactionStatus(transactionId, old)
 	}
