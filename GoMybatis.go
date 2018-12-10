@@ -54,6 +54,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 			panic("[GoMybatis] struct have no return values!")
 		}
 
+		//build return Type
 		if returnType.ReturnOutType != nil {
 			var returnV = reflect.New(*returnType.ReturnOutType)
 			switch (*returnType.ReturnOutType).Kind() {
@@ -65,6 +66,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 			returnValue = &returnV
 		}
 
+		//resultMaps
 		var mapperXml = methodXmlMap[method]
 		var resultMap map[string]*ResultProperty
 		var resultMapId = mapperXml.Propertys[Element_ResultMap]
@@ -72,27 +74,32 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 			resultMap = resultMaps[resultMapId]
 		}
 
+		//exe sql
 		var e = exeMethodByXml(sessionFactory, tagArgs, args, mapperXml, resultMap, returnValue, decoder, sqlBuilder, enableLog)
 
-		var returnValues = make([]reflect.Value, returnType.NumOut)
-		for index, _ := range returnValues {
-			if index == returnType.ReturnIndex {
-				if returnValue != nil {
-					returnValues[index] = (*returnValue).Elem()
-				}
-			} else {
-				if e != nil {
-					returnValues[index] = reflect.New(*returnType.ErrorType)
-					returnValues[index].Elem().Set(reflect.ValueOf(e))
-					returnValues[index] = returnValues[index].Elem()
-				} else {
-					returnValues[index] = reflect.Zero(*returnType.ErrorType)
-				}
-			}
-		}
-		return returnValues
+		return buildReturnValues(returnType, returnValue, e)
 	}
 	UseMapperValue(bean, proxyFunc)
+}
+
+func buildReturnValues(returnType *ReturnType, returnValue *reflect.Value, e error) []reflect.Value {
+	var returnValues = make([]reflect.Value, returnType.NumOut)
+	for index, _ := range returnValues {
+		if index == returnType.ReturnIndex {
+			if returnValue != nil {
+				returnValues[index] = (*returnValue).Elem()
+			}
+		} else {
+			if e != nil {
+				returnValues[index] = reflect.New(*returnType.ErrorType)
+				returnValues[index].Elem().Set(reflect.ValueOf(e))
+				returnValues[index] = returnValues[index].Elem()
+			} else {
+				returnValues[index] = reflect.Zero(*returnType.ErrorType)
+			}
+		}
+	}
+	return returnValues
 }
 
 func makeReturnTypeMap(value reflect.Value) (returnMap map[string]*ReturnType) {
