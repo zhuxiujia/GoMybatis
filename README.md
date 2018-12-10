@@ -60,7 +60,7 @@ var xmlBytes = []byte(`
 `)
 
 type ExampleActivityMapperImpl struct {
-     SelectAll         func() ([]Activity,error)
+     SelectAll  func() ([]Activity, error)
 }
 
 func main() {
@@ -68,7 +68,7 @@ func main() {
 	//Mysql链接格式 用户名:密码@(数据库链接地址:端口)/数据库名称,如root:123456@(***.com:3306)/test
 	engine, err := GoMybatis.Open("mysql", "*?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
-		panic(err.Error())
+	   panic(err)
 	}
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	
@@ -76,9 +76,10 @@ func main() {
 	GoMybatis.WriteMapperPtrByEngine(&exampleActivityMapperImpl, xmlBytes, engine,true)
 
 	//使用mapper
-	var result []Activity
-	exampleActivityMapperImpl.SelectAll(&result)
-
+	result, err := exampleActivityMapperImpl.SelectAll(&result)
+        if err != nil {
+	   panic(err)
+	}
 	fmt.Println(result)
 }
 ```
