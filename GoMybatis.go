@@ -1,6 +1,7 @@
 package GoMybatis
 
 import (
+	"bytes"
 	"reflect"
 	"strings"
 )
@@ -86,16 +87,21 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 //check beans
 func beanCheck(value reflect.Value) {
 	var t = value.Type()
-	if value.Kind() == reflect.Ptr {
-		value = value.Elem()
-		t = value.Type()
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
 	}
 	for i := 0; i < t.NumField(); i++ {
 		var fieldItem = t.Field(i)
+		if fieldItem.Type.Kind() != reflect.Func {
+			continue
+		}
 		var argsLen = fieldItem.Type.NumIn() //参数长度，除session参数外。
 		var customLen = 0
 		for argIndex := 0; argIndex < fieldItem.Type.NumIn(); argIndex++ {
 			var inType = fieldItem.Type.In(argIndex)
+			if inType.Kind() == reflect.Ptr && inType.String() != GoMybatis_Session_Ptr {
+				panic(`[GoMybats] ` + fieldItem.Name + `() arg = ` + inType.String() + ` can not be a ptr ! must delete '*'!`)
+			}
 			if isCustomStruct(inType) {
 				customLen++
 			}
@@ -132,6 +138,11 @@ func makeReturnTypeMap(value reflect.Value) (returnMap map[string]*ReturnType) {
 	for i := 0; i < proxyType.NumField(); i++ {
 		var funcType = proxyType.Field(i).Type
 		var funcName = proxyType.Field(i).Name
+
+		if funcType.Kind() != reflect.Func {
+			continue
+		}
+
 		var numOut = funcType.NumOut()
 		if numOut > 2 || numOut == 0 {
 			panic("[GoMybatis] func '" + funcName + "()' return num out must = 1 or = 2!")
@@ -185,31 +196,38 @@ func makeResultMaps(xmls map[string]*MapperXml) map[string]map[string]*ResultPro
 
 //return a map map[`method`]*MapperXml
 func makeMethodXmlMap(bean reflect.Value, mapperTree map[string]*MapperXml) map[string]*MapperXml {
-	if bean.Kind() == reflect.Ptr {
-		bean = bean.Elem()
+	var beanType = bean.Type()
+	if beanType.Kind() == reflect.Ptr {
+		beanType = beanType.Elem()
 	}
 
 	var methodXmlMap = make(map[string]*MapperXml)
-	var totalField = bean.Type().NumField()
+	var totalField = beanType.NumField()
 	for i := 0; i < totalField; i++ {
-		var fieldItem = bean.Type().Field(i)
+		var fieldItem = beanType.Field(i)
 		if fieldItem.Type.Kind() == reflect.Func {
 			//field must be func
-			methodFieldCheck(fieldItem)
+			methodFieldCheck(&beanType, &fieldItem)
 			var mapperXml = findMapperXml(mapperTree, fieldItem.Name)
 			if mapperXml != nil {
 				methodXmlMap[fieldItem.Name] = mapperXml
 			} else {
-				panic("[GoMybatis] can not find method " + bean.Type().String() + "." + fieldItem.Name + "() in xml !")
+				panic("[GoMybatis] can not find method " + beanType.String() + "." + fieldItem.Name + "() in xml !")
 			}
 		}
 	}
 	return methodXmlMap
 }
 
-func methodFieldCheck(methodType reflect.StructField) {
+func methodFieldCheck(beanType *reflect.Type, methodType *reflect.StructField) {
 	if methodType.Type.NumOut() < 1 {
-		panic("[GoMybatis] method " + methodType.Name + "() must be return a 'error' type!")
+		var buffer bytes.Buffer
+		buffer.WriteString("[GoMybatis] bean ")
+		buffer.WriteString((*beanType).Name())
+		buffer.WriteString(".")
+		buffer.WriteString(methodType.Name)
+		buffer.WriteString("() must be return a 'error' type!")
+		panic(buffer.String())
 	}
 	var errorTypeNum = 0
 	for i := 0; i < methodType.Type.NumOut(); i++ {
@@ -219,7 +237,13 @@ func methodFieldCheck(methodType reflect.StructField) {
 		}
 	}
 	if errorTypeNum != 1 {
-		panic("[GoMybatis] method " + methodType.Name + "() must be return a 'error' type!")
+		var buffer bytes.Buffer
+		buffer.WriteString("[GoMybatis] bean ")
+		buffer.WriteString((*beanType).Name())
+		buffer.WriteString(".")
+		buffer.WriteString(methodType.Name)
+		buffer.WriteString("() must be return a 'error' type!")
+		panic(buffer.String())
 	}
 }
 
@@ -308,7 +332,7 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlB
 				argsLen--
 			}
 			if tagArgsLen > 0 {
-				tagArgsLen --
+				tagArgsLen--
 			}
 		}
 		if tagArgsLen > 0 && argIndex < tagArgsLen && tagArgs[argIndex].Name != "" {

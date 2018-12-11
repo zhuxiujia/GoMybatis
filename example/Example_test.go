@@ -16,14 +16,14 @@ import (
 //返回中必须有error
 // 函数return必须为error 为返回错误信息
 type ExampleActivityMapper struct {
-	SelectByIds       func(ids []string) ([]Activity, error)                                                            `mapperParams:"ids"`
+	SelectByIds       func(ids []string) ([]Activity, error)                                                             `mapperParams:"ids"`
 	SelectAll         func() ([]Activity, error)
 	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int) ([]Activity, error) `mapperParams:"name,startTime,endTime,page,size"`
 	UpdateById        func(session *GoMybatis.Session, arg Activity) (int64, error) //参数中包含有*GoMybatis.Session的类型，用于自定义事务
 	Insert            func(arg Activity) (int64, error)
-	CountByCondition  func(name string, startTime time.Time, endTime time.Time) (int, error)                            `mapperParams:"name,startTime,endTime"`
-	DeleteById        func(id string) (int64, error)                                                                    `mapperParams:"id"`
-	Choose            func(deleteFlag int) ([]Activity, error)                                                          `mapperParams:"deleteFlag"`
+	CountByCondition  func(name string, startTime time.Time, endTime time.Time) (int, error)                             `mapperParams:"name,startTime,endTime"`
+	DeleteById        func(id string) (int64, error)                                                                     `mapperParams:"id"`
+	Choose            func(deleteFlag int) ([]Activity, error)                                                           `mapperParams:"deleteFlag"`
 }
 
 //初始化mapper文件和结构体
@@ -57,7 +57,7 @@ func Test_inset(t *testing.T) {
 	//初始化mapper文件
 	var exampleActivityMapper = InitMapperByLocalSession()
 	//使用mapper
-	var result, err = exampleActivityMapper.Insert(Activity{Id: "171", Name: "test_insret", DeleteFlag: 1})
+	var result, err = exampleActivityMapper.Insert(Activity{Id: "171", Name: "test_insret", CreateTime: time.Now(), DeleteFlag: 1})
 	if err != nil {
 		panic(err)
 	}

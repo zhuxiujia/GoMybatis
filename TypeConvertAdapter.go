@@ -21,41 +21,54 @@ type SqlArgTypeConvert interface {
 	Convert(arg SqlArg) string
 }
 
+//表达式类型转换器
 type GoMybatisExpressionTypeConvert struct {
 	ExpressionTypeConvert
 }
 
+//表达式类型转换器
 func (this GoMybatisExpressionTypeConvert) Convert(arg SqlArg) interface{} {
-	if arg.Type.Kind() == reflect.Struct && arg.Type.String() == Adapter_DateType {
-		return arg.Value.(time.Time).Nanosecond()
+	if arg.Type.Kind() == reflect.Struct && arg.Type.String() == Adapter_DateType{
+			return arg.Value.(time.Time).Nanosecond()
 	}
 	return arg.Value
 }
 
+//Sql内容类型转换器
 type GoMybatisSqlArgTypeConvert struct {
 	SqlArgTypeConvert
 }
 
+//Sql内容类型转换器
 func (this GoMybatisSqlArgTypeConvert) Convert(arg SqlArg) string {
-	if arg.Value == nil {
-		return ""
+	var argValue = arg.Value
+	var argType = arg.Type
+	if argValue == nil {
+		return "''"
 	}
-	if arg.Type.Kind() == reflect.Struct && arg.Type.String() == Adapter_DateType {
-		arg.Value = arg.Value.(time.Time).Format(Adapter_FormateDate)
-	}
-	if arg.Type.Kind() == reflect.Bool {
-		if arg.Value.(bool) {
-			arg.Value = strconv.FormatBool(true)
+	switch argType.Kind() {
+	case reflect.Bool:
+		if argValue.(bool) {
+			argValue = strconv.FormatBool(true)
 		} else {
-			arg.Value = strconv.FormatBool(false)
+			argValue = strconv.FormatBool(false)
 		}
-	}
-	if arg.Type.Kind() == reflect.String {
+		break
+	case reflect.String:
 		var argStr bytes.Buffer
 		argStr.WriteString(`'`)
 		argStr.WriteString(this.toString(&arg))
 		argStr.WriteString(`'`)
 		return argStr.String()
+	case reflect.Struct:
+		if argType.String() == Adapter_DateType{
+			var argStr bytes.Buffer
+			argStr.WriteString(`'`)
+			argStr.WriteString(argValue.(time.Time).Format(Adapter_FormateDate))
+			argStr.WriteString(`'`)
+			return argStr.String()
+		}
+		break
 	}
 	return this.toString(&arg)
 }

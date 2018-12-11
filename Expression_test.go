@@ -15,7 +15,7 @@ func TestExpress(t *testing.T) {
 
 	var evaluateParameters = make(map[string]interface{})
 
-	evaluateParameters["activity"] = activity
+	evaluateParameters["activity"] = &activity
 
 	var expression = "activity.DeleteFlag == 1 || activity.DeleteFlag > 0 "
 	evalExpression, err := govaluate.NewEvaluableExpression(expression)
