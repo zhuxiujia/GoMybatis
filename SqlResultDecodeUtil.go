@@ -36,50 +36,50 @@ func (this GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultPropert
 		if sourceArrayLen > 1 {
 			return errors.New("[GoMybatis] Decode one data,but sql result size find > 1 !")
 		}
-		this.convertToBasicTypeCollection(sourceArray, resultV, resultV.Type(), resultMap, result)
-		return nil
-	}
-	switch resultV.Kind() {
-	case reflect.Struct:
-		//single struct
-		if sourceArrayLen > 1 {
-			return errors.New("[GoMybatis] Decode one data,but sql result size find > 1 !")
-		}
-		for index, sItemMap := range sourceArray {
-			var value = this.sqlStructConvert(resultMap, resultT.Elem(), sItemMap, renameMapArray[index])
-			resultV.Set(value)
-		}
-		break
-	case reflect.Slice:
-		//slice
-		var resultTItemType = resultT.Elem().Elem()
-		var isBasicTypeSlice = this.isGoBasicType(resultTItemType)
-		if isBasicTypeSlice {
-			this.convertToBasicTypeCollection(sourceArray, resultV, resultTItemType, resultMap, result)
-		} else {
-			for index, sItemMap := range sourceArray {
-				if resultTItemType.Kind() == reflect.Struct {
-					resultV = reflect.Append(resultV, this.sqlStructConvert(resultMap, resultTItemType, sItemMap, renameMapArray[index]))
-				}
-			}
-		}
-		break
-	case reflect.Map:
-		//map
-		var resultTItemType = resultT.Elem().Elem() //int,string,time.Time.....
-		var isBasicTypeSlice = this.isGoBasicType(resultTItemType)
-		var isInterface = resultTItemType.String() == "interface {}"
-		if isBasicTypeSlice || isInterface {
+		this.convertToBasicTypeCollection(sourceArray, resultV, resultV.Type(), resultMap)
+	}else{
+		switch resultV.Kind() {
+		case reflect.Struct:
+			//single struct
 			if sourceArrayLen > 1 {
 				return errors.New("[GoMybatis] Decode one data,but sql result size find > 1 !")
 			}
-			this.convertToBasicTypeCollection(sourceArray, resultV, resultTItemType, resultMap, result)
-		} else {
-			panic("[GoMybatis] Decode result type only support map[string]interface{} and map[string]*struct{}!")
+			for index, sItemMap := range sourceArray {
+				var value = this.sqlStructConvert(resultMap, resultT.Elem(), sItemMap, renameMapArray[index])
+				resultV.Set(value)
+			}
+			break
+		case reflect.Slice:
+			//slice
+			var resultTItemType = resultT.Elem().Elem()
+			var isBasicTypeSlice = this.isGoBasicType(resultTItemType)
+			if isBasicTypeSlice {
+				this.convertToBasicTypeCollection(sourceArray, resultV, resultTItemType, resultMap)
+			} else {
+				for index, sItemMap := range sourceArray {
+					if resultTItemType.Kind() == reflect.Struct {
+						resultV = reflect.Append(resultV, this.sqlStructConvert(resultMap, resultTItemType, sItemMap, renameMapArray[index]))
+					}
+				}
+			}
+			break
+		case reflect.Map:
+			//map
+			var resultTItemType = resultT.Elem().Elem() //int,string,time.Time.....
+			var isBasicTypeSlice = this.isGoBasicType(resultTItemType)
+			var isInterface = resultTItemType.String() == "interface {}"
+			if isBasicTypeSlice || isInterface {
+				if sourceArrayLen > 1 {
+					return errors.New("[GoMybatis] Decode one data,but sql result size find > 1 !")
+				}
+				this.convertToBasicTypeCollection(sourceArray, resultV, resultTItemType, resultMap)
+			} else {
+				panic("[GoMybatis] Decode result type only support map[string]interface{} and map[string]*struct{}!")
+			}
+			break
+		default:
+			panic("[GoMybatis] Decode result type only support slice and map")
 		}
-		break
-	default:
-		panic("[GoMybatis] Decode result type only support slice and map")
 	}
 	reflect.ValueOf(result).Elem().Set(resultV)
 	return nil
@@ -222,7 +222,7 @@ func (this GoMybatisSqlResultDecoder) isGoBasicType(tItemTypeFieldType reflect.T
 	return false
 }
 
-func (this GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceArray []map[string][]byte, resultV reflect.Value, itemType reflect.Type, resultMap map[string]*ResultProperty, result interface{}) {
+func (this GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceArray []map[string][]byte, resultV reflect.Value, itemType reflect.Type, resultMap map[string]*ResultProperty) {
 	if resultV.Type().Kind() == reflect.Slice && resultV.IsValid() {
 		resultV = reflect.MakeSlice(resultV.Type(), 0, 0)
 	} else if resultV.Type().Kind() == reflect.Map && resultV.IsValid() {

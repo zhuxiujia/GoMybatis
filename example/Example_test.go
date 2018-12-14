@@ -75,7 +75,7 @@ func Test_update(t *testing.T) {
 	exampleActivityMapperImpl := InitMapperByLocalSession()
 	var activityBean = Activity{
 		Id:   "171",
-		Name: "rs168-8",
+		Name: "rs168",
 	}
 	var updateNum, e = exampleActivityMapperImpl.UpdateById(nil, activityBean) //sessionId 有值则使用已经创建的session，否则新建一个session
 	fmt.Println("updateNum=", updateNum)
