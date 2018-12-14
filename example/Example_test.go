@@ -116,6 +116,24 @@ func Test_select(t *testing.T) {
 	fmt.Println("result=", result)
 }
 
+
+//查询
+func Test_count(t *testing.T) {
+	if MysqlUri == "" || MysqlUri == "*" {
+		fmt.Println("no mysql config in project, you must set the mysql link!")
+		return
+	}
+	//初始化mapper文件
+	var exampleActivityMapperImpl = InitMapperByLocalSession()
+	//使用mapper
+	var result, err = exampleActivityMapperImpl.CountByCondition("", time.Time{}, time.Time{})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("result=", result)
+}
+
+
 //本地GoMybatis使用例子
 func Test_ForEach(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {

@@ -37,6 +37,7 @@ func (this GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultPropert
 			return errors.New("[GoMybatis] Decode one data,but sql result size find > 1 !")
 		}
 		this.convertToBasicTypeCollection(sourceArray, resultV, resultV.Type(), resultMap, result)
+		return nil
 	}
 	switch resultV.Kind() {
 	case reflect.Struct:
