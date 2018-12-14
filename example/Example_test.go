@@ -51,7 +51,7 @@ func InitMapperByLocalSession() ExampleActivityMapper {
 //插入
 func Test_inset(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no mysql config in project, you must set the mysql link!")
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
 	//初始化mapper文件
@@ -68,7 +68,7 @@ func Test_inset(t *testing.T) {
 //本地事务使用例子
 func Test_update(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no mysql config in project, you must set the mysql link!")
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
 	//初始化mapper文件
@@ -87,7 +87,7 @@ func Test_update(t *testing.T) {
 //删除
 func Test_delete(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no mysql config in project, you must set the mysql link!")
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
 	//初始化mapper文件
@@ -103,7 +103,7 @@ func Test_delete(t *testing.T) {
 //查询
 func Test_select(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no mysql config in project, you must set the mysql link!")
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
 	//初始化mapper文件
@@ -120,7 +120,7 @@ func Test_select(t *testing.T) {
 //查询
 func Test_count(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no mysql config in project, you must set the mysql link!")
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
 	//初始化mapper文件
@@ -137,7 +137,7 @@ func Test_count(t *testing.T) {
 //本地GoMybatis使用例子
 func Test_ForEach(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no mysql config in project, you must set the mysql link!")
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
 	//初始化mapper文件
@@ -154,7 +154,7 @@ func Test_ForEach(t *testing.T) {
 //本地事务使用例子
 func Test_local_Transation(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no mysql config in project, you must set the mysql link!")
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
 	//初始化mapper文件
@@ -178,7 +178,7 @@ func Test_local_Transation(t *testing.T) {
 //远程事务示例，可用于分布式微服务(单数据库，多个微服务)
 func Test_Remote_Transation(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no mysql config in project, you must set the mysql link!")
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
 	//启动GoMybatis独立节点事务服务器，通过rpc调用
@@ -216,7 +216,7 @@ func Test_Remote_Transation(t *testing.T) {
 
 func Test_choose(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no mysql config in project, you must set the mysql link!")
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
 	//初始化mapper文件
