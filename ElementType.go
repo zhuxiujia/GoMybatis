@@ -19,4 +19,5 @@ const (
 	Element_choose    ElementType = "choose"
 	Element_when      ElementType = "when"
 	Element_otherwise ElementType = "otherwise"
+	Element_where     ElementType = "where"
 )

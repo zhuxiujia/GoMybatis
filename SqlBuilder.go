@@ -83,22 +83,9 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 			var suffix = v.Propertys[`suffix`]
 			var suffixOverrides = v.Propertys[`suffixOverrides`]
 			var prefixOverrides = v.Propertys[`prefixOverrides`]
-			if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
-				var tempTrimSql bytes.Buffer
-				var err = this.createFromElement(v.ElementItems, &tempTrimSql, param)
-				if err != nil {
-					return err
-				}
-				var tempTrimSqlString = strings.Trim(strings.Trim(strings.Trim(tempTrimSql.String(), " "), suffixOverrides), prefixOverrides)
-				var newBuffer bytes.Buffer
-				newBuffer.WriteString(` `)
-				newBuffer.WriteString(prefix)
-				newBuffer.WriteString(` `)
-				newBuffer.WriteString(tempTrimSqlString)
-				newBuffer.WriteString(` `)
-				newBuffer.WriteString(suffix)
-				sql.Write(newBuffer.Bytes())
-				loopChildItem = false
+			var err = this.elementTrim(&loopChildItem, v.ElementItems, param, prefix, suffix, prefixOverrides, suffixOverrides, sql)
+			if err != nil {
+				return err
 			}
 			break
 		case Element_Set:
@@ -133,7 +120,7 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 			var collectionValue = reflect.ValueOf(datas)
 			var collectionValueLen = collectionValue.Len()
 			if collectionValueLen == 0 {
-               continue
+				continue
 			}
 			for i := 0; i < collectionValueLen; i++ {
 				var collectionItem = collectionValue.Index(i)
@@ -213,6 +200,16 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 				}
 			}
 			breakChildItem = true
+			break
+		case Element_where:
+			var prefix = "where"
+			var suffix = ""
+			var prefixOverrides = "and |or |And |Or "
+			var suffixOverrides = ""
+			var err = this.elementTrim(&loopChildItem, v.ElementItems, param, prefix, suffix, prefixOverrides, suffixOverrides, sql)
+			if err != nil {
+				return err
+			}
 			break
 		default:
 			panic("[GoMybatis] find not support element! " + v.ElementType)
@@ -359,4 +356,42 @@ func (this GoMybatisSqlBuilder) repleaceExpression(expression *string, param map
 		var NewExpression = this.expressionToIfZeroExpression(expressionItem, param)
 		*expression = strings.Replace(*expression, expressionItem, NewExpression, -1)
 	}
+}
+
+//trim处理element
+func (this GoMybatisSqlBuilder) elementTrim(loopChildItem *bool, items []ElementItem, param map[string]SqlArg, prefix string, suffix string, prefixOverrides string, suffixOverrides string, sql *bytes.Buffer) error {
+	if *loopChildItem && items != nil && len(items) > 0 {
+		var tempTrimSql bytes.Buffer
+		var err = this.createFromElement(items, &tempTrimSql, param)
+		if err != nil {
+			return err
+		}
+		var tempTrimSqlString = strings.Trim(tempTrimSql.String(), " ")
+		if prefixOverrides != "" {
+			var prefixOverridesArray = strings.Split(prefixOverrides, "|")
+			if len(prefixOverridesArray) > 0 {
+				for _, v := range prefixOverridesArray {
+					tempTrimSqlString = strings.TrimPrefix(tempTrimSqlString, v)
+				}
+			}
+		}
+		if suffixOverrides != "" {
+			var suffixOverrideArray = strings.Split(suffixOverrides, "|")
+			if len(suffixOverrideArray) > 0 {
+				for _, v := range suffixOverrideArray {
+					tempTrimSqlString = strings.TrimSuffix(tempTrimSqlString, v)
+				}
+			}
+		}
+		var newBuffer bytes.Buffer
+		newBuffer.WriteString(` `)
+		newBuffer.WriteString(prefix)
+		newBuffer.WriteString(` `)
+		newBuffer.WriteString(tempTrimSqlString)
+		newBuffer.WriteString(` `)
+		newBuffer.WriteString(suffix)
+		sql.Write(newBuffer.Bytes())
+		*loopChildItem = false
+	}
+	return nil
 }

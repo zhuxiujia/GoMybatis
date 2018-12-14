@@ -16,14 +16,14 @@ import (
 //返回中必须有error
 // 函数return必须为error 为返回错误信息
 type ExampleActivityMapper struct {
-	SelectByIds       func(ids []string) ([]Activity, error)                                                             `mapperParams:"ids"`
+	SelectByIds       func(ids []string) ([]Activity, error)                                                            `mapperParams:"ids"`
 	SelectAll         func() ([]Activity, error)
 	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int) ([]Activity, error) `mapperParams:"name,startTime,endTime,page,size"`
 	UpdateById        func(session *GoMybatis.Session, arg Activity) (int64, error) //参数中包含有*GoMybatis.Session的类型，用于自定义事务
 	Insert            func(arg Activity) (int64, error)
-	CountByCondition  func(name string, startTime time.Time, endTime time.Time) (int, error)                             `mapperParams:"name,startTime,endTime"`
-	DeleteById        func(id string) (int64, error)                                                                     `mapperParams:"id"`
-	Choose            func(deleteFlag int) ([]Activity, error)                                                           `mapperParams:"deleteFlag"`
+	CountByCondition  func(name string, startTime time.Time, endTime time.Time) (int, error)                            `mapperParams:"name,startTime,endTime"`
+	DeleteById        func(id string) (int64, error)                                                                    `mapperParams:"id"`
+	Choose            func(deleteFlag int) ([]Activity, error)                                                          `mapperParams:"deleteFlag"`
 }
 
 //初始化mapper文件和结构体
@@ -109,13 +109,12 @@ func Test_select(t *testing.T) {
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
-	var result, err = exampleActivityMapperImpl.SelectByCondition("", time.Time{}, time.Time{}, 0, 2000)
+	var result, err = exampleActivityMapperImpl.SelectByCondition("注册", time.Time{}, time.Time{}, 0, 2000)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("result=", result)
 }
-
 
 //查询
 func Test_count(t *testing.T) {
@@ -133,7 +132,6 @@ func Test_count(t *testing.T) {
 	fmt.Println("result=", result)
 }
 
-
 //本地GoMybatis使用例子
 func Test_ForEach(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
@@ -143,7 +141,7 @@ func Test_ForEach(t *testing.T) {
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
-	var ids = []string{"1","2"}
+	var ids = []string{"1", "2"}
 	var result, err = exampleActivityMapperImpl.SelectByIds(ids)
 	if err != nil {
 		panic(err)
