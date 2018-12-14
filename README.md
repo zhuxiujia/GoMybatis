@@ -89,3 +89,4 @@ func main() {
 -`<sql><include>` 标签支持</br>
 -针对于GoLand 的xml生成器,可以一键生成基本的CRUD</br>
 
+## 喜欢的老铁欢迎在右上角点下 star 关注和支持我们哈
