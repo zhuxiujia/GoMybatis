@@ -125,7 +125,7 @@ func Test_ForEach(t *testing.T) {
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
-	var ids = []string{"170"}
+	var ids = []string{"1","2"}
 	var result, err = exampleActivityMapperImpl.SelectByIds(ids)
 	if err != nil {
 		panic(err)

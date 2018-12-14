@@ -132,42 +132,43 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 			var datas = param[collection].Value
 			var collectionValue = reflect.ValueOf(datas)
 			var collectionValueLen = collectionValue.Len()
-			if collectionValueLen > 0 {
-				for i := 0; i < collectionValueLen; i++ {
-					var collectionItem = collectionValue.Index(i)
-					var tempArgMap = make(map[string]SqlArg)
-					for k, v := range param {
-						tempArgMap[k] = v
+			if collectionValueLen == 0 {
+               continue
+			}
+			for i := 0; i < collectionValueLen; i++ {
+				var collectionItem = collectionValue.Index(i)
+				var tempArgMap = make(map[string]SqlArg)
+				for k, v := range param {
+					tempArgMap[k] = v
+				}
+				if item != "" {
+					tempArgMap[item] = SqlArg{
+						Value: collectionItem.Interface(),
+						Type:  collectionItem.Type(),
 					}
-					if item != "" {
-						tempArgMap[item] = SqlArg{
-							Value: collectionItem.Interface(),
-							Type:  collectionItem.Type(),
-						}
+				}
+				if index != "" {
+					tempArgMap[index] = SqlArg{
+						Value: index,
+						Type:  IntType,
 					}
-					if index != "" {
-						tempArgMap[index] = SqlArg{
-							Value: index,
-							Type:  IntType,
-						}
+				}
+				if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
+					var err = this.createFromElement(v.ElementItems, &tempSql, tempArgMap)
+					if err != nil {
+						return err
 					}
-					if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
-						var err = this.createFromElement(v.ElementItems, &tempSql, tempArgMap)
-						if err != nil {
-							return err
-						}
-					}
+					tempSql.WriteString(separator)
 				}
 			}
 			var newTempSql bytes.Buffer
+			var tempSqlString = strings.Trim(strings.Trim(tempSql.String(), " "), separator)
 			newTempSql.WriteString(open)
-			newTempSql.Write(tempSql.Bytes())
+			newTempSql.WriteString(tempSqlString)
 			newTempSql.WriteString(close)
-			var tempSqlString = strings.Trim(strings.Trim(newTempSql.String(), " "), separator)
+
 			tempSql.Reset()
-			tempSql.WriteString(` `)
-			tempSql.WriteString(tempSqlString)
-			sql.Write(tempSql.Bytes())
+			sql.Write(newTempSql.Bytes())
 			loopChildItem = false
 			break
 		case Element_choose:

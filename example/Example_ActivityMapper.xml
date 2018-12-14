@@ -63,8 +63,7 @@
     <select id="selectByIds">
         select * from biz_activity
         where delete_flag = 1
-        and id in
-        <foreach collection="ids" item="item" index="index" open="(" close=")">
+        <foreach separator="," collection="ids" item="item" index="index" open=" and id in (" close=")">
             #{item}
         </foreach>
     </select>
