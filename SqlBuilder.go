@@ -204,7 +204,7 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 		case Element_where:
 			var prefix = "where"
 			var suffix = ""
-			var prefixOverrides = "and |or |And |Or "
+			var prefixOverrides = "and |or |And |Or |AND |OR "
 			var suffixOverrides = ""
 			var err = this.elementTrim(&loopChildItem, v.ElementItems, param, prefix, suffix, prefixOverrides, suffixOverrides, sql)
 			if err != nil {
