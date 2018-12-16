@@ -7,6 +7,9 @@ import (
 	"strings"
 )
 
+var defaultArgRegex, _ = regexp.Compile("\\$\\{[^}]*\\}")
+var sqlArgRegex, _ = regexp.Compile("\\#\\{[^}]*\\}")
+
 //替换参数
 func replaceArg(data string, parameters map[string]SqlArg, typeConvert SqlArgTypeConvert) string {
 	if data == "" {
@@ -27,9 +30,6 @@ func replaceArg(data string, parameters map[string]SqlArg, typeConvert SqlArgTyp
 	}
 	return data
 }
-
-var defaultArgRegex, _ = regexp.Compile("\\$\\{[^}]*\\}")
-var sqlArgRegex, _ = regexp.Compile("\\#\\{[^}]*\\}")
 
 func replace(startChar string, regex *regexp.Regexp, data string, typeConvert SqlArgTypeConvert, arg map[string]SqlArg) string {
 	var findStrs = regex.FindAllString(data, -1)
