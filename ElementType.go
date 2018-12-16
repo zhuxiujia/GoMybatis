@@ -3,6 +3,7 @@ package GoMybatis
 type ElementType = string
 
 const (
+	//root elements
 	Element_ResultMap ElementType = "resultMap"
 	Element_Insert    ElementType = "insert"
 	Element_Delete    ElementType = "delete"
@@ -10,8 +11,8 @@ const (
 	Element_Select    ElementType = "select"
 	Element_Sql       ElementType = "sql"
 
-	Element_bind ElementType = "bind"
-
+	//child elements
+	Element_bind      ElementType = "bind"
 	Element_String    ElementType = "string"
 	Element_If        ElementType = `if`
 	Element_Trim      ElementType = "trim"
