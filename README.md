@@ -8,7 +8,7 @@ https://zhuxiujia.github.io/gomybatis.io/info.html
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-多种数据库支持</a><br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-高并发</a>，假设数据库响应时间为0，在6核16Gpc上可框架可以压出 246982Tps,耗时仅仅0.4s<br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-支持事务</a>，session灵活插拔，兼容过渡期微服务<br>
-<a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-动态SQL</a>，在xml中可灵活运用if判断，foreach遍历数组，resultMap,bind等等java框架Mybatis包含的实用功能`<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<where>,<foreach>,<resultMap>,<bind>,<choose><when><otherwise>`<br>
+<a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-动态SQL</a>，在xml中可灵活运用if判断，foreach遍历数组，resultMap,bind等等java框架Mybatis包含的实用功能`<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<where>,<foreach>,<resultMap>,<bind>,<choose><when><otherwise>,<sql><include>`<br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-无需go generate生成*.go等中间代码</a>，xml读取后可直接写入到自定义的Struct,Func属性中调用函数<br>
 ### 已支持本地和远程事务,方便处于 单数据库(Mysql,postgresql)-分布式数据库（TiDB,cockroachdb...）过渡期间的微服务
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/tx.png)
@@ -86,7 +86,6 @@ func main() {
 
 ## TODO （进行中）期待功能路线
 -在线编辑SQL支持,可以在系统上线后修改xml中的SQL逻辑并生效</br>
--`<sql><include>` 标签支持</br>
 -针对于GoLand 的xml生成器,可以一键生成基本的CRUD</br>
 
 ## 喜欢的老铁欢迎在右上角点下 star 关注和支持我们哈
