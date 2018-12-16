@@ -18,7 +18,6 @@
         -->
         <!ELEMENT mapper (cache-ref | cache | resultMap* | parameterMap* | sql* | insert* | update* | delete* | select* )+>
         <!ATTLIST mapper
-                namespace CDATA #IMPLIED
                 >
 
         <!ELEMENT cache-ref EMPTY>
@@ -56,7 +55,6 @@
         <!ELEMENT resultMap (constructor?,id*,result*,association*,collection*, discriminator?)>
         <!ATTLIST resultMap
                 id CDATA #REQUIRED
-                type CDATA #REQUIRED
                 extends CDATA #IMPLIED
                 autoMapping (true|false) #IMPLIED
                 >
@@ -172,16 +170,16 @@
                 parameterType CDATA #IMPLIED
                 resultMap CDATA #IMPLIED
                 resultType CDATA #IMPLIED
-                resultSetType (FORWARD_ONLY | SCROLL_INSENSITIVE | SCROLL_SENSITIVE) #IMPLIED
-                statementType (STATEMENT|PREPARED|CALLABLE) #IMPLIED
+                
+               
                 fetchSize CDATA #IMPLIED
                 timeout CDATA #IMPLIED
                 flushCache (true|false) #IMPLIED
                 useCache (true|false) #IMPLIED
-                databaseId CDATA #IMPLIED
+                
                 lang CDATA #IMPLIED
-                resultOrdered (true|false) #IMPLIED
-                resultSets CDATA #IMPLIED
+                
+                
                 >
 
         <!ELEMENT insert (#PCDATA | selectKey | include | trim | where | set | foreach | choose | if | bind)*>
@@ -191,22 +189,22 @@
                 parameterType CDATA #IMPLIED
                 timeout CDATA #IMPLIED
                 flushCache (true|false) #IMPLIED
-                statementType (STATEMENT|PREPARED|CALLABLE) #IMPLIED
-                keyProperty CDATA #IMPLIED
+               
+                
                 useGeneratedKeys (true|false) #IMPLIED
-                keyColumn CDATA #IMPLIED
-                databaseId CDATA #IMPLIED
+                
+                
                 lang CDATA #IMPLIED
                 >
 
         <!ELEMENT selectKey (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST selectKey
                 resultType CDATA #IMPLIED
-                statementType (STATEMENT|PREPARED|CALLABLE) #IMPLIED
-                keyProperty CDATA #IMPLIED
-                keyColumn CDATA #IMPLIED
+               
+                
+                
                 order (BEFORE|AFTER) #IMPLIED
-                databaseId CDATA #IMPLIED
+                
                 >
 
         <!ELEMENT update (#PCDATA | selectKey | include | trim | where | set | foreach | choose | if | bind)*>
@@ -216,11 +214,11 @@
                 parameterType CDATA #IMPLIED
                 timeout CDATA #IMPLIED
                 flushCache (true|false) #IMPLIED
-                statementType (STATEMENT|PREPARED|CALLABLE) #IMPLIED
-                keyProperty CDATA #IMPLIED
+               
+                
                 useGeneratedKeys (true|false) #IMPLIED
-                keyColumn CDATA #IMPLIED
-                databaseId CDATA #IMPLIED
+                
+                
                 lang CDATA #IMPLIED
                 >
 
@@ -231,8 +229,8 @@
                 parameterType CDATA #IMPLIED
                 timeout CDATA #IMPLIED
                 flushCache (true|false) #IMPLIED
-                statementType (STATEMENT|PREPARED|CALLABLE) #IMPLIED
-                databaseId CDATA #IMPLIED
+               
+                
                 lang CDATA #IMPLIED
                 >
 
@@ -253,7 +251,7 @@
         <!ATTLIST sql
                 id CDATA #REQUIRED
                 lang CDATA #IMPLIED
-                databaseId CDATA #IMPLIED
+                
                 >
 
         <!ELEMENT trim (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
