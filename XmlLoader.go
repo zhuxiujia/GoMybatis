@@ -83,8 +83,10 @@ func includeElementReplace(xml *ElementItem, xmlMap *map[string]*MapperXml) bool
 		if mapperXml == nil {
 			panic(`[GoMybatis] xml <includ refid="` + refid + `"> element can not find !`)
 		}
-		(*xml).ElementItems = mapperXml.ElementItems
-		changed = true
+		if xml != nil {
+			(*xml).ElementItems = mapperXml.ElementItems
+			changed = true
+		}
 	}
 	if xml.ElementItems != nil {
 		for index, v := range xml.ElementItems {
