@@ -12,18 +12,20 @@ import (
 
 //定义mapper文件的接口和结构体
 // 支持基本类型(int,string,time.Time,float...且需要指定参数名称`mapperParams:"name"以逗号隔开，且位置要和实际参数相同)
+//参数中包含有*GoMybatis.Session的类型，用于自定义事务
 //自定义结构体参数（属性必须大写）
 //返回中必须有error
 // 函数return必须为error 为返回错误信息
 type ExampleActivityMapper struct {
-	SelectByIds       func(ids []string) ([]Activity, error)                                                            `mapperParams:"ids"`
+	SelectByIds       func(ids []string) ([]Activity, error) `mapperParams:"ids"`
 	SelectAll         func() ([]Activity, error)
 	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int) ([]Activity, error) `mapperParams:"name,startTime,endTime,page,size"`
-	UpdateById        func(session *GoMybatis.Session, arg Activity) (int64, error) //参数中包含有*GoMybatis.Session的类型，用于自定义事务
+	UpdateById        func(session *GoMybatis.Session, arg Activity) (int64, error)
 	Insert            func(arg Activity) (int64, error)
-	CountByCondition  func(name string, startTime time.Time, endTime time.Time) (int, error)                            `mapperParams:"name,startTime,endTime"`
-	DeleteById        func(id string) (int64, error)                                                                    `mapperParams:"id"`
-	Choose            func(deleteFlag int) ([]Activity, error)                                                          `mapperParams:"deleteFlag"`
+	CountByCondition  func(name string, startTime time.Time, endTime time.Time) (int, error) `mapperParams:"name,startTime,endTime"`
+	DeleteById        func(id string) (int64, error)                                         `mapperParams:"id"`
+	Choose            func(deleteFlag int) ([]Activity, error)                               `mapperParams:"deleteFlag"`
+	SelectLinks       func(column string) ([]Activity, error)                                `mapperParams:"column"`
 }
 
 //初始化mapper文件和结构体
@@ -221,6 +223,22 @@ func Test_choose(t *testing.T) {
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
 	var result, err = exampleActivityMapperImpl.Choose(1)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("result=", result)
+}
+
+//查询
+func Test_include_sql(t *testing.T) {
+	if MysqlUri == "" || MysqlUri == "*" {
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		return
+	}
+	//初始化mapper文件
+	var exampleActivityMapperImpl = InitMapperByLocalSession()
+	//使用mapper
+	var result, err = exampleActivityMapperImpl.SelectLinks("name")
 	if err != nil {
 		panic(err)
 	}

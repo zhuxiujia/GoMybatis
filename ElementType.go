@@ -8,6 +8,7 @@ const (
 	Element_Delete    ElementType = "delete"
 	Element_Update    ElementType = `update`
 	Element_Select    ElementType = "select"
+	Element_Sql       ElementType = "sql"
 
 	Element_bind ElementType = "bind"
 
@@ -20,4 +21,5 @@ const (
 	Element_when      ElementType = "when"
 	Element_otherwise ElementType = "otherwise"
 	Element_where     ElementType = "where"
+	Element_Include   ElementType = "include"
 )

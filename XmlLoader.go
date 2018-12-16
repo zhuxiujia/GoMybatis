@@ -42,7 +42,8 @@ func LoadMapperXml(bytes []byte) (items map[string]*MapperXml) {
 			s.Tag == Element_Delete ||
 			s.Tag == Element_Update ||
 			s.Tag == Element_Select ||
-			s.Tag == Element_ResultMap {
+			s.Tag == Element_ResultMap ||
+			s.Tag == Element_Sql {
 			var elementID = attrMap[ID]
 			if elementID == "" {
 				panic("[GoMybatis] element Id can not be nil in xml! please check your xml!")
@@ -59,7 +60,41 @@ func LoadMapperXml(bytes []byte) (items map[string]*MapperXml) {
 			items[elementID] = &mapperXml
 		}
 	}
+	for itemsIndex, mapperXml := range items {
+		for key, v := range mapperXml.ElementItems {
+			var isChanged = includeElementReplace(&v, &items)
+			if isChanged {
+				mapperXml.ElementItems[key] = v
+			}
+		}
+		items[itemsIndex] = mapperXml
+	}
 	return items
+}
+
+func includeElementReplace(xml *ElementItem, xmlMap *map[string]*MapperXml) bool {
+	var changed = false
+	if xml.ElementType == Element_Include {
+		var refid = xml.Propertys["refid"]
+		if refid == "" {
+			panic(`[GoMybatis] xml <includ refid=""> 'refid' can not be ""`)
+		}
+		var mapperXml = (*xmlMap)[refid]
+		if mapperXml == nil {
+			panic(`[GoMybatis] xml <includ refid="` + refid + `"> element can not find !`)
+		}
+		(*xml).ElementItems = mapperXml.ElementItems
+		changed = true
+	}
+	if xml.ElementItems != nil {
+		for index, v := range xml.ElementItems {
+			var isChanged = includeElementReplace(&v, xmlMap)
+			if isChanged {
+				xml.ElementItems[index] = v
+			}
+		}
+	}
+	return changed
 }
 
 func attrToProperty(attrs []etree.Attr) map[string]string {

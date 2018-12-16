@@ -11,7 +11,6 @@
         <result column="create_time" property="createTime" langType="time.Time"/>
         <result column="delete_flag" property="deleteFlag" langType="int"/>
     </resultMap>
-
     <!--List<Activity> selectByCondition(@Param("name") String name,@Param("startTime") Date startTime,@Param("endTime") Date endTime,@Param("index") Integer index,@Param("size") Integer size);-->
     <!-- 后台查询产品 -->
     <select id="selectByCondition" resultMap="BaseResultMap">
@@ -112,5 +111,17 @@
             <when test="deleteFlag == 1">WHERE delete_flag = 1</when>
             <otherwise>WHERE delete_flag = #{deleteFlag}</otherwise>
         </choose>
+    </select>
+
+    <sql id="links">
+        pc_link,h5_link
+        <!--不启用TypeConvert的话，使用${} 而不是 #{}-->
+        <if test="column != ''">,${column}</if>
+    </sql>
+
+    <select id="selectLinks">
+        select
+        <include refid="links"/>
+        from biz_activity where delete_flag = 1
     </select>
 </mapper>

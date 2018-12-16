@@ -1,6 +1,7 @@
 package GoMybatis
 
 import (
+	"fmt"
 	"reflect"
 	"regexp"
 	"strings"
@@ -12,21 +13,29 @@ func replaceArg(data string, parameters map[string]SqlArg, typeConvert SqlArgTyp
 		return data
 	}
 	var defaultValue = parameters[DefaultOneArg]
+	//replace default value
 	if defaultValue.Value != nil {
 		var str = typeConvert.Convert(defaultValue)
-		data = re.ReplaceAllString(data, str)
+		data = sqlArgRegex.ReplaceAllString(data, str)
 	}
-	data = repleace(data, typeConvert, parameters)
+	//replace arg data
+	if strings.Index(data, `#`) != -1 {
+		data = replace(`#{`, sqlArgRegex, data, typeConvert, parameters)
+	}
+	if strings.Index(data, `$`) != -1 {
+		data = replace(`${`, defaultArgRegex, data, nil, parameters)
+	}
 	return data
 }
 
-var re, _ = regexp.Compile("\\#\\{[^}]*\\}")
+var defaultArgRegex, _ = regexp.Compile("\\$\\{[^}]*\\}")
+var sqlArgRegex, _ = regexp.Compile("\\#\\{[^}]*\\}")
 
-func repleace(data string, typeConvert SqlArgTypeConvert, arg map[string]SqlArg) string {
-	var findStrs = re.FindAllString(data, -1)
+func replace(startChar string, regex *regexp.Regexp, data string, typeConvert SqlArgTypeConvert, arg map[string]SqlArg) string {
+	var findStrs = regex.FindAllString(data, -1)
 	var repleaceStr = ""
 	for _, findStr := range findStrs {
-		repleaceStr = strings.Replace(findStr, `#{`, "", -1)
+		repleaceStr = strings.Replace(findStr, startChar, "", -1)
 		repleaceStr = strings.Replace(repleaceStr, "}", "", -1)
 		if strings.Contains(repleaceStr, ",") {
 			repleaceStr = strings.Split(repleaceStr, ",")[0]
@@ -43,13 +52,23 @@ func repleaceChildFeild(data string, repleaceStr string, findStr string, typeCon
 	if len(spArr) > 0 {
 		var objStr = spArr[0]
 		var fieldValue = getFeildInterface(repleaceStr, arg[objStr])
-		var repleaceStr = typeConvert.Convert(fieldValue)
-		data = strings.Replace(data, findStr, repleaceStr, -1)
+		if typeConvert != nil {
+			var repleaceStr = typeConvert.Convert(fieldValue)
+			data = strings.Replace(data, findStr, repleaceStr, -1)
+		} else {
+			var repleaceStr = fmt.Sprint(fieldValue.Value)
+			data = strings.Replace(data, findStr, repleaceStr, -1)
+		}
 		spArr = nil
 		objStr = ""
 	} else {
-		repleaceStr = typeConvert.Convert(arg[repleaceStr])
-		data = strings.Replace(data, findStr, repleaceStr, -1)
+		if typeConvert != nil {
+			repleaceStr = typeConvert.Convert(arg[repleaceStr])
+			data = strings.Replace(data, findStr, repleaceStr, -1)
+		} else {
+			repleaceStr = fmt.Sprint(arg[repleaceStr])
+			data = strings.Replace(data, findStr, repleaceStr, -1)
+		}
 		return data
 	}
 	return data

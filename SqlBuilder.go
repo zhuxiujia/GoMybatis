@@ -207,6 +207,9 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 				return err
 			}
 			break
+		case Element_Include:
+			//include have child elements,just break
+			break
 		default:
 			panic("[GoMybatis] find not support element! " + v.ElementType)
 		}
