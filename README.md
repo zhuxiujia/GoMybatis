@@ -5,7 +5,7 @@
 # 官方网站/文档
 https://zhuxiujia.github.io/gomybatis.io/info.html
 # 优势
-<a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-高并发</a>，假设数据库响应时间为0，在6核16Gpc上可框架可以压出 246982Tps,耗时仅仅0.4s<br>
+<a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-高并发</a>，假设数据库响应时间为0，在6核16GB PC上框架每秒事务数可达246982Tps/s,耗时仅仅0.4s<br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-事务</a>，session灵活插拔，兼容过渡期微服务<br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-动态SQL</a>，在xml中可灵活运用if判断，foreach遍历数组，resultMap,bind等等java框架Mybatis包含的实用功能`<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<where>,<foreach>,<resultMap>,<bind>,<choose><when><otherwise>,<sql><include>`<br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-多数据库支持Mysql,Postgres,Tidb,SQLite,Oracle....等等更多</a><br>
