@@ -83,7 +83,7 @@ func main() {
 	fmt.Println(result)
 }
 ```
-
+## 请及时关注版本，及时升级版本(新的功能，bug修复)
 ## TODO 期待功能路线（预览功能,可能会更改）
 -在线编辑SQL支持,可以在系统上线后修改xml中的SQL逻辑并生效</br>
 -针对于GoLand 的xml生成器,可以一键生成基本的CRUD</br>
