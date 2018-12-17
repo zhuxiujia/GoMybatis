@@ -22,7 +22,7 @@ type TestResult struct {
 	Bool    bool
 }
 
-//解码基本数据集
+//解码基本数据-int,string,time.Time...
 func Test_Convert_Basic_Type(t *testing.T) {
 	var resMap = make(map[string][]byte)
 	resMap["Amount1"] = []byte("1908")
