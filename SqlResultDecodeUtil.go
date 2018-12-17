@@ -35,9 +35,11 @@ func (this GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultPropert
 		//single basic type
 		if sourceArrayLen > 1 {
 			return errors.New("[GoMybatis] Decode one data,but sql result size find > 1 !")
+		} else if sourceArrayLen == 1 && len(sourceArray[0]) > 1 {
+			return errors.New("[GoMybatis] Decode one data,but sql result size find > 1 !")
 		}
-		this.convertToBasicTypeCollection(sourceArray, resultV, resultV.Type(), resultMap)
-	}else{
+		this.convertToBasicTypeCollection(sourceArray, &resultV, resultV.Type(), resultMap)
+	} else {
 		switch resultV.Kind() {
 		case reflect.Struct:
 			//single struct
@@ -54,7 +56,7 @@ func (this GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultPropert
 			var resultTItemType = resultT.Elem().Elem()
 			var isBasicTypeSlice = this.isGoBasicType(resultTItemType)
 			if isBasicTypeSlice {
-				this.convertToBasicTypeCollection(sourceArray, resultV, resultTItemType, resultMap)
+				this.convertToBasicTypeCollection(sourceArray, &resultV, resultTItemType, resultMap)
 			} else {
 				for index, sItemMap := range sourceArray {
 					if resultTItemType.Kind() == reflect.Struct {
@@ -72,7 +74,7 @@ func (this GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultPropert
 				if sourceArrayLen > 1 {
 					return errors.New("[GoMybatis] Decode one data,but sql result size find > 1 !")
 				}
-				this.convertToBasicTypeCollection(sourceArray, resultV, resultTItemType, resultMap)
+				this.convertToBasicTypeCollection(sourceArray, &resultV, resultTItemType, resultMap)
 			} else {
 				panic("[GoMybatis] Decode result type only support map[string]interface{} and map[string]*struct{}!")
 			}
@@ -222,11 +224,11 @@ func (this GoMybatisSqlResultDecoder) isGoBasicType(tItemTypeFieldType reflect.T
 	return false
 }
 
-func (this GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceArray []map[string][]byte, resultV reflect.Value, itemType reflect.Type, resultMap map[string]*ResultProperty) {
+func (this GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceArray []map[string][]byte, resultV *reflect.Value, itemType reflect.Type, resultMap map[string]*ResultProperty) {
 	if resultV.Type().Kind() == reflect.Slice && resultV.IsValid() {
-		resultV = reflect.MakeSlice(resultV.Type(), 0, 0)
+		*resultV = reflect.MakeSlice(resultV.Type(), 0, 0)
 	} else if resultV.Type().Kind() == reflect.Map && resultV.IsValid() {
-		resultV = reflect.MakeMap(resultV.Type())
+		*resultV = reflect.MakeMap(resultV.Type())
 	} else {
 
 	}
@@ -239,7 +241,7 @@ func (this GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceArray [
 			var success = this.sqlBasicTypeConvert(key, resultMap, itemType, value, tItemTypeFieldTypeValue.Elem())
 			if success {
 				if resultV.Type().Kind() == reflect.Slice {
-					resultV = reflect.Append(resultV, tItemTypeFieldTypeValue.Elem())
+					*resultV = reflect.Append(*resultV, tItemTypeFieldTypeValue.Elem())
 				} else if resultV.Type().Kind() == reflect.Map {
 					resultV.SetMapIndex(reflect.ValueOf(key), tItemTypeFieldTypeValue.Elem())
 				} else {

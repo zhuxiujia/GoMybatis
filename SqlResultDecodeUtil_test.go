@@ -22,7 +22,79 @@ type TestResult struct {
 	Bool    bool
 }
 
-func Test_convert(t *testing.T) {
+//解码基本数据集
+func Test_Convert_Basic_Type(t *testing.T) {
+	var resMap = make(map[string][]byte)
+	resMap["Amount1"] = []byte("1908")
+	var resMapArray = make([]map[string][]byte, 0)
+	resMapArray = append(resMapArray, resMap)
+
+	var intResult int
+	var error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &intResult)
+	if error != nil {
+		panic(error)
+	}
+	fmt.Println("Test_Convert_Basic_Type,int=", intResult)
+
+	var stringResult string
+	error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &stringResult)
+	if error != nil {
+		panic(error)
+	}
+	fmt.Println("Test_Convert_Basic_Type,string=", stringResult)
+
+	var floatResult float64
+	error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &floatResult)
+	if error != nil {
+		panic(error)
+	}
+	fmt.Println("Test_Convert_Basic_Type,float=", floatResult)
+
+	resMap = make(map[string][]byte)
+	resMap["Date"] = []byte(time.Now().Format(time.RFC3339))
+	resMapArray = make([]map[string][]byte, 0)
+	resMapArray = append(resMapArray, resMap)
+	var timeResult time.Time
+	error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &timeResult)
+	if error != nil {
+		panic(error)
+	}
+	fmt.Println("Test_Convert_Basic_Type,time=", timeResult)
+}
+
+//解码数组
+func Test_Convert_Slice(t *testing.T) {
+	var resMap = make(map[string][]byte)
+	resMap["Amount1"] = []byte("1908")
+	resMap["Amount2"] = []byte("1901")
+	var resMapArray = make([]map[string][]byte, 0)
+	resMapArray = append(resMapArray, resMap)
+
+	var result []int
+	var error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &result)
+	if error != nil {
+		panic(error)
+	}
+	fmt.Println("Test_Convert_Basic_Type", result)
+}
+
+//解码map
+func Test_Convert_Map(t *testing.T) {
+	var resMap = make(map[string][]byte)
+	resMap["Amount1"] = []byte("1908")
+	resMap["Amount2"] = []byte("1901")
+	var resMapArray = make([]map[string][]byte, 0)
+	resMapArray = append(resMapArray, resMap)
+
+	var result map[string]int
+	var error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &result)
+	if error != nil {
+		panic(error)
+	}
+	fmt.Println("Test_Convert_Basic_Type", result)
+}
+
+func Test_convert_struct(t *testing.T) {
 	var GoMybatisSqlResultDecoder = GoMybatisSqlResultDecoder{}
 	var res = make([]map[string][]byte, 0)
 
@@ -44,7 +116,7 @@ func Test_convert(t *testing.T) {
 	var result TestResult
 	GoMybatisSqlResultDecoder.Decode(nil, res, &result)
 
-	fmt.Println(result)
+	fmt.Println("Test_convert_struct", result)
 }
 
 func Test_Ignore_Case_Underscores(t *testing.T) {
@@ -69,7 +141,7 @@ func Test_Ignore_Case_Underscores(t *testing.T) {
 	var result TestResult
 	GoMybatisSqlResultDecoder.Decode(nil, res, &result)
 
-	fmt.Println(result)
+	fmt.Println("Test_Ignore_Case_Underscores", result)
 }
 
 func Test_Ignore_Case_Underscores_Tps(t *testing.T) {
@@ -146,5 +218,5 @@ func Test_Decode_Interface(t *testing.T) {
 	var result map[string]interface{}
 	GoMybatisSqlResultDecoder{}.Decode(resultMap, res, &result)
 
-	fmt.Println(result)
+	fmt.Println("Test_Decode_Interface", result)
 }
