@@ -29,7 +29,7 @@ type ExampleActivityMapper struct {
 }
 
 //初始化mapper文件和结构体
-func InitMapperByLocalSession() ExampleActivityMapper {
+func InitMapperByLocalSession() *ExampleActivityMapper {
 	var err error
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
 	engine, err := GoMybatis.Open("mysql", MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
@@ -47,7 +47,7 @@ func InitMapperByLocalSession() ExampleActivityMapper {
 	var exampleActivityMapper ExampleActivityMapper
 	//设置对应的mapper xml文件
 	GoMybatis.WriteMapperPtrByEngine(&exampleActivityMapper, bytes, engine, true)
-	return exampleActivityMapper
+	return &exampleActivityMapper
 }
 
 //插入
