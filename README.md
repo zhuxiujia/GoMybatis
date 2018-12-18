@@ -10,6 +10,8 @@ https://zhuxiujia.github.io/gomybatis.io/info.html
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-动态SQL</a>，在xml中可灵活运用if判断，foreach遍历数组，resultMap,bind等等java框架Mybatis包含的实用功能`<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<where>,<foreach>,<resultMap>,<bind>,<choose><when><otherwise>,<sql><include>`<br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-多数据库支持Mysql,Postgres,Tidb,SQLite,Oracle....等等更多</a><br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-基于反射动态代理,无需go generate生成*.go等中间代码</a>，xml读取后可直接写入到自定义的Struct,Func属性中调用函数<br>
+<a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-在线编辑xml逻辑，急速开发，方便调试，在线修改 (敬请期待)<br>
+![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/xml_editor.png)
 ### 已支持本地和远程事务,方便处于 单数据库(Mysql,postgresql)-分布式数据库（TiDB,cockroachdb...）过渡期间的微服务
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/tx.png)
 
@@ -86,5 +88,4 @@ func main() {
 ## 请及时关注版本，及时升级版本(新的功能，bug修复)
 ## TODO 期待功能路线（预览功能,可能会更改）
 -在线WebUI后台界面，可在线编辑SQL和xml文件,可以在系统上线后动态修改xml中的SQL逻辑并生效(进行中,敬请期待哦~)</br>
-![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/xml_editor.png)
 ## 喜欢的老铁欢迎在右上角点下 star 关注和支持我们哈
