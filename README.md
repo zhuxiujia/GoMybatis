@@ -86,4 +86,5 @@ func main() {
 ## 请及时关注版本，及时升级版本(新的功能，bug修复)
 ## TODO 期待功能路线（预览功能,可能会更改）
 -在线WebUI后台界面，可在线编辑SQL和xml文件,可以在系统上线后动态修改xml中的SQL逻辑并生效(进行中,敬请期待哦~)</br>
+![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/xml_editor.png)
 ## 喜欢的老铁欢迎在右上角点下 star 关注和支持我们哈
