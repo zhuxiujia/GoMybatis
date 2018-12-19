@@ -8,17 +8,20 @@ import (
 	"time"
 )
 
+//
 type SqlResultDecoder interface {
-	//resultMap == in xml resultMap element
-	Decode(resultMap map[string]*ResultProperty, dbData []map[string][]byte, decodeResult interface{}) error
+	//resultMap = in xml resultMap element
+	//dbData = select the SqlResult
+	//decodeResultPtr = need decode result type
+	Decode(resultMap map[string]*ResultProperty, SqlResult []map[string][]byte, decodeResultPtr interface{}) error
 }
 
 type GoMybatisSqlResultDecoder struct {
 	SqlResultDecoder
 }
 
-func (this GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultProperty, dbData []map[string][]byte, result interface{}) error {
-	if dbData == nil || result == nil {
+func (this GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultProperty, sqlResult []map[string][]byte, result interface{}) error {
+	if sqlResult == nil || result == nil {
 		return nil
 	}
 	var resultV = reflect.ValueOf(result)
@@ -28,26 +31,26 @@ func (this GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultPropert
 	} else {
 		panic("[GoMybatis] Decode only support ptr value!")
 	}
-	var dbDataLen = len(dbData)
+	var sqlResultLen = len(sqlResult)
 
-	var renameMapArray = this.getRenameMapArray(dbData)
+	var renameMapArray = this.getRenameMapArray(sqlResult)
 
 	if this.isGoBasicType(resultV.Type()) {
 		//single basic type
-		if dbDataLen > 1 {
+		if sqlResultLen > 1 {
 			return errors.New("[GoMybatis] Decode one result,but find database result size find > 1 !")
-		} else if dbDataLen == 1 && len(dbData[0]) > 1 {
+		} else if sqlResultLen == 1 && len(sqlResult[0]) > 1 {
 			return errors.New("[GoMybatis] Decode one result,but find database result size find > 1 !")
 		}
-		this.convertToBasicTypeCollection(dbData, &resultV, resultV.Type(), resultMap)
+		this.convertToBasicTypeCollection(sqlResult, &resultV, resultV.Type(), resultMap)
 	} else {
 		switch resultV.Kind() {
 		case reflect.Struct:
 			//single struct
-			if dbDataLen > 1 {
+			if sqlResultLen > 1 {
 				return errors.New("[GoMybatis] Decode one result,but find database result size find > 1 !")
 			}
-			for index, sItemMap := range dbData {
+			for index, sItemMap := range sqlResult {
 				var value = this.sqlStructConvert(resultMap, resultT.Elem(), sItemMap, renameMapArray[index])
 				resultV.Set(value)
 			}
@@ -57,9 +60,9 @@ func (this GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultPropert
 			var resultTItemType = resultT.Elem().Elem()
 			var isBasicTypeSlice = this.isGoBasicType(resultTItemType)
 			if isBasicTypeSlice {
-				this.convertToBasicTypeCollection(dbData, &resultV, resultTItemType, resultMap)
+				this.convertToBasicTypeCollection(sqlResult, &resultV, resultTItemType, resultMap)
 			} else {
-				for index, sItemMap := range dbData {
+				for index, sItemMap := range sqlResult {
 					if resultTItemType.Kind() == reflect.Struct {
 						resultV = reflect.Append(resultV, this.sqlStructConvert(resultMap, resultTItemType, sItemMap, renameMapArray[index]))
 					} else if resultTItemType.Kind() == reflect.Map {
@@ -71,7 +74,7 @@ func (this GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultPropert
 						var isBasicTypeSlice = this.isGoBasicType(resultTItemType)
 						var isInterface = resultTItemType.String() == "interface {}"
 						if isBasicTypeSlice && isInterface == false {
-							this.convertToBasicTypeCollection(dbData, &valueV, resultTItemType, resultMap)
+							this.convertToBasicTypeCollection(sqlResult, &valueV, resultTItemType, resultMap)
 							resultV = reflect.Append(resultV, valueV)
 						} else {
 							panic("[GoMybatis] Decode result type not support " + resultTItemType.String() + "!")
@@ -88,10 +91,10 @@ func (this GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultPropert
 			var isBasicTypeSlice = this.isGoBasicType(resultTItemType)
 			var isInterface = resultTItemType.String() == "interface {}"
 			if isBasicTypeSlice && isInterface == false {
-				if dbDataLen > 1 {
+				if sqlResultLen > 1 {
 					return errors.New("[GoMybatis] Decode one result,but find database result size find > 1!")
 				}
-				this.convertToBasicTypeCollection(dbData, &resultV, resultTItemType, resultMap)
+				this.convertToBasicTypeCollection(sqlResult, &resultV, resultTItemType, resultMap)
 			} else {
 				panic("[GoMybatis] Decode result type not support map[string]interface{}!")
 			}
