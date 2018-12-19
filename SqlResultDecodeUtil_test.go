@@ -225,7 +225,7 @@ func Test_Decode_Interface(t *testing.T) {
 		Property: "amount_2",
 		GoType:   "string",
 	}
-	var result map[string]interface{}
+	var result map[string]string
 	GoMybatisSqlResultDecoder{}.Decode(resultMap, res, &result)
 
 	fmt.Println("Test_Decode_Interface", result)
