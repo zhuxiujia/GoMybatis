@@ -75,7 +75,7 @@ func Test_Convert_Slice(t *testing.T) {
 	if error != nil {
 		panic(error)
 	}
-	fmt.Println("Test_Convert_Basic_Type", result)
+	fmt.Println("Test_Convert_Slice", result)
 }
 
 //解码map
@@ -86,12 +86,22 @@ func Test_Convert_Map(t *testing.T) {
 	var resMapArray = make([]map[string][]byte, 0)
 	resMapArray = append(resMapArray, resMap)
 
-	var result map[string]int
+
+	var result map[string]string
 	var error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &result)
 	if error != nil {
 		panic(error)
 	}
-	fmt.Println("Test_Convert_Basic_Type", result)
+	fmt.Println("Test_Convert_Map", result)
+
+	resMapArray = append(resMapArray, resMap)
+
+	var resultMapArray []map[string]string
+	error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &resultMapArray)
+	if error != nil {
+		panic(error)
+	}
+	fmt.Println("Test_Convert_Map", resultMapArray)
 }
 
 func Test_convert_struct(t *testing.T) {
@@ -215,7 +225,7 @@ func Test_Decode_Interface(t *testing.T) {
 		Property: "amount_2",
 		GoType:   "string",
 	}
-	var result map[string]interface{}
+	var result map[string]string
 	GoMybatisSqlResultDecoder{}.Decode(resultMap, res, &result)
 
 	fmt.Println("Test_Decode_Interface", result)
