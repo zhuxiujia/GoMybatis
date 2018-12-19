@@ -18,7 +18,7 @@ import (
 // 函数return必须为error 为返回错误信息
 type ExampleActivityMapper struct {
 	SelectByIds       func(ids []string) ([]Activity, error) `mapperParams:"ids"`
-	SelectAll         func() ([]Activity, error)
+	SelectAll         func() ([]map[string]string, error)
 	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int) ([]Activity, error) `mapperParams:"name,startTime,endTime,page,size"`
 	UpdateById        func(session *GoMybatis.Session, arg Activity) (int64, error)
 	Insert            func(arg Activity) (int64, error)
@@ -112,6 +112,22 @@ func Test_select(t *testing.T) {
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
 	var result, err = exampleActivityMapperImpl.SelectByCondition("注册", time.Time{}, time.Time{}, 0, 2000)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("result=", result)
+}
+
+//查询
+func Test_select_all(t *testing.T) {
+	if MysqlUri == "" || MysqlUri == "*" {
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		return
+	}
+	//初始化mapper文件
+	var exampleActivityMapperImpl = InitMapperByLocalSession()
+	//使用mapper
+	var result, err = exampleActivityMapperImpl.SelectAll()
 	if err != nil {
 		panic(err)
 	}
