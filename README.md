@@ -48,37 +48,36 @@ import (
 )
 
 //定义xml内容，建议以*Mapper.xml文件存于项目目录中,在编辑xml时就可享受GoLand等IDE渲染和智能提示。生产环境可以使用statikFS把xml文件打包进程序里
-
 var xmlBytes = []byte(`
+
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "https://raw.githubusercontent.com/zhuxiujia/GoMybatis/master/mybatis-3-mapper.dtd">
 <mapper namespace="ActivityMapperImpl">
-    <!--SelectAll(result *[]Activity)error-->
     <select id="selectAll">
         select * from biz_activity where delete_flag=1 order by create_time desc
     </select>
 </mapper>
+
 `)
 
-type ExampleActivityMapperImpl struct {
-     SelectAll  func() ([]Activity, error)
+type ExampleActivityMapper struct {
+     SelectAll  func() ([]Activity, error) //例子：搜索所有Activity记录，返回数组
 }
 
 func main() {
 	var err error
-	//Mysql链接格式 用户名:密码@(数据库链接地址:端口)/数据库名称,如root:123456@(***.com:3306)/test
+	//初始化：Mysql链接， 用户名:密码@(数据库链接地址:端口)/数据库名称,如root:123456@(***.com:3306)/test
 	engine, err := GoMybatis.Open("mysql", "*?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 	   panic(err)
 	}
-	var exampleActivityMapperImpl ExampleActivityMapperImpl
-	
-	//加载xml实现逻辑到ExampleActivityMapperImpl
-	GoMybatis.WriteMapperPtrByEngine(&exampleActivityMapperImpl, xmlBytes, engine,true)
+	var exampleActivityMapper ExampleActivityMapper
+	//初始化：加载xml逻辑
+	GoMybatis.WriteMapperPtrByEngine(&exampleActivityMapper, xmlBytes, engine,true)
 
-	//使用mapper
-	result, err := exampleActivityMapperImpl.SelectAll(&result)
+	//代码中使用mapper：
+	result, err := exampleActivityMapper.SelectAll(&result)
         if err != nil {
 	   panic(err)
 	}
