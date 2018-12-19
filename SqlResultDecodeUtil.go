@@ -75,8 +75,8 @@ func (this GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultPropert
 						} else {
 							panic("[GoMybatis] Decode result type not support map[string]interface{}!")
 						}
-					}else {
-						panic("[GoMybatis] Decode result type not support "+resultTItemType.String()+"!")
+					} else {
+						panic("[GoMybatis] Decode result type not support " + resultTItemType.String() + "!")
 					}
 				}
 			}
@@ -109,6 +109,12 @@ func (this GoMybatisSqlResultDecoder) sqlStructConvert(resultMap map[string]*Res
 		for i := 0; i < resultTItemType.NumField(); i++ {
 			var tItemTypeFieldType = resultTItemType.Field(i)
 			var repleaceName = tItemTypeFieldType.Name
+
+			if !this.isGoBasicType(tItemTypeFieldType.Type) {
+				//not basic type,continue
+				continue
+			}
+
 			var value = sItemMap[repleaceName]
 			if value == nil || len(value) == 0 {
 				//renamed
