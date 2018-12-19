@@ -73,7 +73,7 @@ func (this GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultPropert
 							this.convertToBasicTypeCollection(sourceArray, &valueV, resultTItemType, resultMap)
 							resultV = reflect.Append(resultV, valueV)
 						} else {
-							panic("[GoMybatis] Decode result type not support map[string]interface{}!")
+							panic("[GoMybatis] Decode result type not support " + resultTItemType.String() + "!")
 						}
 					} else {
 						panic("[GoMybatis] Decode result type not support " + resultTItemType.String() + "!")
