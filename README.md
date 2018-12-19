@@ -53,7 +53,7 @@ var xmlBytes = []byte(`
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "https://raw.githubusercontent.com/zhuxiujia/GoMybatis/master/mybatis-3-mapper.dtd">
-<mapper namespace="ActivityMapperImpl">
+<mapper>
     <select id="selectAll">
         select * from biz_activity where delete_flag=1 order by create_time desc
     </select>
