@@ -3,6 +3,7 @@ package GoMybatis
 import (
 	"bytes"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
+	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
 	"strings"
 )
@@ -29,6 +30,7 @@ type ElementItem struct {
 
 //load xml from string data,return a map[elementId]*MapperXml
 func LoadMapperXml(bytes []byte) (items map[string]*MapperXml) {
+	utils.FixTestExpressionSymbol(&bytes)
 	doc := etree.NewDocument()
 	if err := doc.ReadFromBytes(bytes); err != nil {
 		panic(err)
