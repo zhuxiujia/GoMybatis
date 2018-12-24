@@ -3,59 +3,8 @@ package GoMybatis
 import (
 	"reflect"
 	"sort"
-	"strings"
 	"time"
 )
-
-const (
-	POSTGRES = "postgres"
-	SQLITE   = "sqlite3"
-	MYSQL    = "mysql"
-	MSSQL    = "mssql"
-	ORACLE   = "oracle"
-)
-
-// xorm SQL types
-type SQLType struct {
-	Name           string
-	DefaultLength  int
-	DefaultLength2 int
-}
-
-const (
-	UNKNOW_TYPE  = iota
-	TEXT_TYPE
-	BLOB_TYPE
-	TIME_TYPE
-	NUMERIC_TYPE
-)
-
-func (s *SQLType) IsType(st int) bool {
-	if t, ok := SqlTypes[s.Name]; ok && t == st {
-		return true
-	}
-	return false
-}
-
-func (s *SQLType) IsText() bool {
-	return s.IsType(TEXT_TYPE)
-}
-
-func (s *SQLType) IsBlob() bool {
-	return s.IsType(BLOB_TYPE)
-}
-
-func (s *SQLType) IsTime() bool {
-	return s.IsType(TIME_TYPE)
-}
-
-func (s *SQLType) IsNumeric() bool {
-	return s.IsType(NUMERIC_TYPE)
-}
-
-func (s *SQLType) IsJson() bool {
-	return s.Name == Json || s.Name == Jsonb
-}
 
 var (
 	Bit       = "BIT"
@@ -111,60 +60,6 @@ var (
 
 	Json  = "JSON"
 	Jsonb = "JSONB"
-
-	SqlTypes = map[string]int{
-		Bit:       NUMERIC_TYPE,
-		TinyInt:   NUMERIC_TYPE,
-		SmallInt:  NUMERIC_TYPE,
-		MediumInt: NUMERIC_TYPE,
-		Int:       NUMERIC_TYPE,
-		Integer:   NUMERIC_TYPE,
-		BigInt:    NUMERIC_TYPE,
-
-		Enum:  TEXT_TYPE,
-		Set:   TEXT_TYPE,
-		Json:  TEXT_TYPE,
-		Jsonb: TEXT_TYPE,
-
-		Char:       TEXT_TYPE,
-		Varchar:    TEXT_TYPE,
-		NVarchar:   TEXT_TYPE,
-		TinyText:   TEXT_TYPE,
-		Text:       TEXT_TYPE,
-		NText:      TEXT_TYPE,
-		MediumText: TEXT_TYPE,
-		LongText:   TEXT_TYPE,
-		Uuid:       TEXT_TYPE,
-		Clob:       TEXT_TYPE,
-		SysName:    TEXT_TYPE,
-
-		Date:       TIME_TYPE,
-		DateTime:   TIME_TYPE,
-		Time:       TIME_TYPE,
-		TimeStamp:  TIME_TYPE,
-		TimeStampz: TIME_TYPE,
-
-		Decimal: NUMERIC_TYPE,
-		Numeric: NUMERIC_TYPE,
-		Real:    NUMERIC_TYPE,
-		Float:   NUMERIC_TYPE,
-		Double:  NUMERIC_TYPE,
-
-		Binary:    BLOB_TYPE,
-		VarBinary: BLOB_TYPE,
-
-		TinyBlob:         BLOB_TYPE,
-		Blob:             BLOB_TYPE,
-		MediumBlob:       BLOB_TYPE,
-		LongBlob:         BLOB_TYPE,
-		Bytea:            BLOB_TYPE,
-		UniqueIdentifier: BLOB_TYPE,
-
-		Bool: NUMERIC_TYPE,
-
-		Serial:    NUMERIC_TYPE,
-		BigSerial: NUMERIC_TYPE,
-	}
 
 	intTypes  = sort.StringSlice{"*int", "*int16", "*int32", "*int8"}
 	uintTypes = sort.StringSlice{"*uint", "*uint16", "*uint32", "*uint8"}
@@ -244,68 +139,3 @@ var (
 
 	PtrTimeType = reflect.PtrTo(TimeType)
 )
-
-// Type2SQLType generate SQLType acorrding Go's type
-func Type2SQLType(t reflect.Type) (st SQLType) {
-	switch k := t.Kind(); k {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32:
-		st = SQLType{Int, 0, 0}
-	case reflect.Int64, reflect.Uint64:
-		st = SQLType{BigInt, 0, 0}
-	case reflect.Float32:
-		st = SQLType{Float, 0, 0}
-	case reflect.Float64:
-		st = SQLType{Double, 0, 0}
-	case reflect.Complex64, reflect.Complex128:
-		st = SQLType{Varchar, 64, 0}
-	case reflect.Array, reflect.Slice, reflect.Map:
-		if t.Elem() == reflect.TypeOf(c_BYTE_DEFAULT) {
-			st = SQLType{Blob, 0, 0}
-		} else {
-			st = SQLType{Text, 0, 0}
-		}
-	case reflect.Bool:
-		st = SQLType{Bool, 0, 0}
-	case reflect.String:
-		st = SQLType{Varchar, 255, 0}
-	case reflect.Struct:
-		if t.ConvertibleTo(TimeType) {
-			st = SQLType{DateTime, 0, 0}
-		} else {
-			// TODO need to handle association struct
-			st = SQLType{Text, 0, 0}
-		}
-	case reflect.Ptr:
-		st = Type2SQLType(t.Elem())
-	default:
-		st = SQLType{Text, 0, 0}
-	}
-	return
-}
-
-// default sql type change to go types
-func SQLType2Type(st SQLType) reflect.Type {
-	name := strings.ToUpper(st.Name)
-	switch name {
-	case Bit, TinyInt, SmallInt, MediumInt, Int, Integer, Serial:
-		return reflect.TypeOf(1)
-	case BigInt, BigSerial:
-		return reflect.TypeOf(int64(1))
-	case Float, Real:
-		return reflect.TypeOf(float32(1))
-	case Double:
-		return reflect.TypeOf(float64(1))
-	case Char, Varchar, NVarchar, TinyText, Text, NText, MediumText, LongText, Enum, Set, Uuid, Clob, SysName:
-		return reflect.TypeOf("")
-	case TinyBlob, Blob, LongBlob, Bytea, Binary, MediumBlob, VarBinary, UniqueIdentifier:
-		return reflect.TypeOf([]byte{})
-	case Bool:
-		return reflect.TypeOf(true)
-	case DateTime, Date, Time, TimeStamp, TimeStampz:
-		return reflect.TypeOf(c_TIME_DEFAULT)
-	case Decimal, Numeric:
-		return reflect.TypeOf("")
-	default:
-		return reflect.TypeOf("")
-	}
-}
