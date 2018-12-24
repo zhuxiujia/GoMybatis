@@ -2,69 +2,8 @@ package GoMybatis
 
 import (
 	"reflect"
-	"sort"
 	"time"
 )
-
-var (
-	Bit       = "BIT"
-	TinyInt   = "TINYINT"
-	SmallInt  = "SMALLINT"
-	MediumInt = "MEDIUMINT"
-	Int       = "INT"
-	Integer   = "INTEGER"
-	BigInt    = "BIGINT"
-
-	Enum = "ENUM"
-	Set  = "SET"
-
-	Char             = "CHAR"
-	Varchar          = "VARCHAR"
-	NVarchar         = "NVARCHAR"
-	TinyText         = "TINYTEXT"
-	Text             = "TEXT"
-	NText            = "NTEXT"
-	Clob             = "CLOB"
-	MediumText       = "MEDIUMTEXT"
-	LongText         = "LONGTEXT"
-	Uuid             = "UUID"
-	UniqueIdentifier = "UNIQUEIDENTIFIER"
-	SysName          = "SYSNAME"
-
-	Date       = "DATE"
-	DateTime   = "DATETIME"
-	Time       = "TIME"
-	TimeStamp  = "TIMESTAMP"
-	TimeStampz = "TIMESTAMPZ"
-
-	Decimal = "DECIMAL"
-	Numeric = "NUMERIC"
-
-	Real   = "REAL"
-	Float  = "FLOAT"
-	Double = "DOUBLE"
-
-	Binary     = "BINARY"
-	VarBinary  = "VARBINARY"
-	TinyBlob   = "TINYBLOB"
-	Blob       = "BLOB"
-	MediumBlob = "MEDIUMBLOB"
-	LongBlob   = "LONGBLOB"
-	Bytea      = "BYTEA"
-
-	Bool    = "BOOL"
-	Boolean = "BOOLEAN"
-
-	Serial    = "SERIAL"
-	BigSerial = "BIGSERIAL"
-
-	Json  = "JSON"
-	Jsonb = "JSONB"
-
-	intTypes  = sort.StringSlice{"*int", "*int16", "*int32", "*int8"}
-	uintTypes = sort.StringSlice{"*uint", "*uint16", "*uint32", "*uint8"}
-)
-
 // !nashtsai! treat following var as interal const values, these are used for reflect.TypeOf comparison
 var (
 	c_EMPTY_STRING       string
