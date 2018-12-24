@@ -230,3 +230,33 @@ func Test_Decode_Interface(t *testing.T) {
 
 	fmt.Println("Test_Decode_Interface", result)
 }
+
+
+func Benchmark_Ignore_Case_Underscores(b *testing.B) {
+	b.StopTimer()
+	var GoMybatisSqlResultDecoder = GoMybatisSqlResultDecoder{}
+	var res = make([]map[string][]byte, 0)
+
+	var resMap = make(map[string][]byte)
+	resMap["name"] = []byte("xiao ming")
+	resMap["Amount_1"] = []byte("1908.1")
+	resMap["amount_2"] = []byte("1908.444")
+	resMap["age_1"] = []byte("1908")
+	resMap["age_2"] = []byte("1908")
+	resMap["age_3"] = []byte("1908")
+	resMap["age_4"] = []byte("1908")
+	resMap["age_5"] = []byte("1908")
+	resMap["age_6"] = []byte("1908")
+	resMap["age_7"] = []byte("1908")
+	resMap["age_8"] = []byte("1908")
+	resMap["Bool"] = []byte("1")
+	res = append(res, resMap)
+
+	var result TestResult
+
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		GoMybatisSqlResultDecoder.Decode(nil, res, &result)
+	}
+
+}
