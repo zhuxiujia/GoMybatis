@@ -9,7 +9,6 @@ import (
 	"time"
 )
 
-
 //假设Mysql 数据库查询时间为0，框架单协程的Benchmark性能
 func Benchmark_One_Transcation(b *testing.B) {
 	b.StopTimer()
@@ -38,8 +37,11 @@ func Benchmark_One_Transcation_multiple_coroutine(b *testing.B) {
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
 	////开始TPS测试
-	var total = b.N   //总数
+	var total = b.N      //总数
 	var goruntine = 1000 //并发数
+	if total <= 1 {
+		goruntine = 1
+	}
 	var waitGroup = sync.WaitGroup{}
 	waitGroup.Add(goruntine)
 
