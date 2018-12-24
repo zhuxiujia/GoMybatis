@@ -12,11 +12,11 @@ type TransationRMServer struct {
 }
 
 func (this TransationRMServer) Msg(arg TransactionReqDTO, result *TransactionRspDTO) (err error) {
-	//defer func() {
-	//	if err := recover(); err != nil {
-	//		log.Println("[TransationRMServer]work failed:", err)
-	//	}
-	//}()
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println("[TransationRMServer]work failed:", err)
+		}
+	}()
 	var rsp = this.DefaultTransationManager.DoTransaction(arg)
 	*result = rsp
 	return nil
