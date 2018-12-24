@@ -1,4 +1,5 @@
 # SQL mapper framework for Golang
+[![Go Report Card](https://goreportcard.com/badge/github.com/zhuxiujia/GoMybatis)](https://goreportcard.com/report/github.com/zhuxiujia/GoMybatis)
 [![Build Status](https://travis-ci.com/zhuxiujia/GoMybatis.svg?branch=master)](https://travis-ci.com/zhuxiujia/GoMybatis)
 
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/vuetify.png)
