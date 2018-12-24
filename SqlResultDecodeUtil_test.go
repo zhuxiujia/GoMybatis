@@ -32,21 +32,21 @@ func Test_Convert_Basic_Type(t *testing.T) {
 	var intResult int
 	var error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &intResult)
 	if error != nil {
-		panic(error)
+		t.Fatal(error)
 	}
 	fmt.Println("Test_Convert_Basic_Type,int=", intResult)
 
 	var stringResult string
 	error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &stringResult)
 	if error != nil {
-		panic(error)
+		t.Fatal(error)
 	}
 	fmt.Println("Test_Convert_Basic_Type,string=", stringResult)
 
 	var floatResult float64
 	error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &floatResult)
 	if error != nil {
-		panic(error)
+		t.Fatal(error)
 	}
 	fmt.Println("Test_Convert_Basic_Type,float=", floatResult)
 
@@ -57,7 +57,7 @@ func Test_Convert_Basic_Type(t *testing.T) {
 	var timeResult time.Time
 	error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &timeResult)
 	if error != nil {
-		panic(error)
+		t.Fatal(error)
 	}
 	fmt.Println("Test_Convert_Basic_Type,time=", timeResult)
 }
@@ -73,7 +73,7 @@ func Test_Convert_Slice(t *testing.T) {
 	var result []int
 	var error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &result)
 	if error != nil {
-		panic(error)
+		t.Fatal(error)
 	}
 	fmt.Println("Test_Convert_Slice", result)
 }
@@ -90,7 +90,7 @@ func Test_Convert_Map(t *testing.T) {
 	var result map[string]string
 	var error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &result)
 	if error != nil {
-		panic(error)
+		t.Fatal(error)
 	}
 	fmt.Println("Test_Convert_Map", result)
 
@@ -99,7 +99,7 @@ func Test_Convert_Map(t *testing.T) {
 	var resultMapArray []map[string]string
 	error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &resultMapArray)
 	if error != nil {
-		panic(error)
+		t.Fatal(error)
 	}
 	fmt.Println("Test_Convert_Map", resultMapArray)
 }

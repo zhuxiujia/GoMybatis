@@ -23,7 +23,7 @@ func Test_One_Transcation_TPS(t *testing.T) {
 	for i := 0; i < total; i++ {
 		var _, err = exampleActivityMapperImpl.SelectByCondition(&session, "", time.Time{}, time.Time{}, 0, 2000)
 		if err != nil {
-			panic(err)
+			t.Fatal(err)
 		}
 	}
 }
@@ -67,7 +67,7 @@ func Test_Transcation(t *testing.T) {
 	//开始TPS测试
 	var results, err = exampleActivityMapperImpl.SelectByCondition(&session, "", time.Time{}, time.Time{}, 0, 2000)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	fmt.Println(results)
 }

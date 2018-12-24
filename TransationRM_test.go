@@ -29,18 +29,18 @@ func TestTransationRM(t *testing.T) {
 
 	e = transationRMServerSession.Begin()
 	if e != nil {
-		panic(e)
+		t.Fatal(e)
 	}
 
 	result, e := transationRMServerSession.Exec("UPDATE `test`.`biz_activity` SET `name`='rs168-10' WHERE `id`='170';")
 	if e != nil {
-		panic(e)
+		t.Fatal(e)
 	}
 
 	fmt.Println(result)
 
 	e = transationRMServerSession.Commit()
 	if e != nil {
-		panic(e)
+		t.Fatal(e)
 	}
 }

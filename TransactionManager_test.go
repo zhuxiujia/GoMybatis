@@ -19,7 +19,7 @@ func TestManager(t *testing.T) {
 	}
 	engine, err := Open(example.MysqlDriverName, example.MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	var SessionFactory = SessionFactory{}.New(engine)
 	var TransactionFactory = TransactionFactory{}.New(&SessionFactory)
@@ -33,7 +33,7 @@ func TestManager(t *testing.T) {
 	}
 	err=TestOrderService.Transform(utils.CreateUUID(), "20181023162632152fd236d6877ff4", "20180926172013b85403d3715d46ed", 100)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 }
 

@@ -20,11 +20,11 @@ func TestExpress(t *testing.T) {
 	var expression = "activity.DeleteFlag == 1 || activity.DeleteFlag > 0 "
 	evalExpression, err := govaluate.NewEvaluableExpression(expression)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	result, err := evalExpression.Evaluate(evaluateParameters)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	fmt.Println(result)
 }
@@ -46,11 +46,11 @@ func Test_bind_string(t *testing.T) {
 	var expression = "'%' + activity.Id + '%'"
 	evalExpression, err := govaluate.NewEvaluableExpression(expression)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	result, err := evalExpression.Evaluate(evaluateParameters)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	fmt.Println(result)
 }

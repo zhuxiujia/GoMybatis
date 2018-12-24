@@ -7,10 +7,13 @@ import (
 )
 
 func Test_Adapter(t *testing.T) {
-	var a bool
-	var s = GoMybatisExpressionTypeConvert{}.Convert(SqlArg{
+	var a = true
+	var convertResult = GoMybatisExpressionTypeConvert{}.Convert(SqlArg{
 		Value: a,
 		Type:  reflect.TypeOf(a),
 	})
-	fmt.Println(s)
+	if convertResult != true{
+		t.Fatal(`Test_Adapter fail convertResult != true`)
+	}
+	fmt.Println(convertResult)
 }

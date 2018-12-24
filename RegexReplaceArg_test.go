@@ -37,8 +37,9 @@ func Test_Access_Arg(t *testing.T) {
 	defer utils.CountMethodUseTime(time.Now(), "Test_Access_Arg", time.Millisecond)
 	var string = "-----#{bean.Name}------#{bean.Child.Age}---"
 
-	for i := 0; i < 1; i++ {
-		var arg = replaceArg(string, param, GoMybatisSqlArgTypeConvert{})
-		fmt.Println(arg)
+	var arg = replaceArg(string, param, GoMybatisSqlArgTypeConvert{})
+	if arg != "-----father------11---"{
+		t.Fatal("replaceArgFail")
 	}
+	fmt.Println(arg)
 }
