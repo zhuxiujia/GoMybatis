@@ -32,7 +32,6 @@ func Benchmark_One_Transcation(b *testing.B) {
 //假设Mysql 数据库查询时间为0，框架多个协程的并发数的性能
 func Benchmark_One_Transcation_multiple_coroutine(b *testing.B) {
 	b.StopTimer()
-	b.N=100000
 	//使用事务
 	session := Session(&TestSession{})
 	//初始化mapper文件
