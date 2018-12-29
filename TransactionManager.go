@@ -14,6 +14,21 @@ const (
 	Transaction_Status_Rollback                           //回滚事务
 )
 
+func (status Transaction_Status)ToString() string {
+	switch status {
+	case Transaction_Status_NO:
+		return "Transaction_Status_NO"
+	case Transaction_Status_Prepare:
+		return "Transaction_Status_Prepare"
+	case Transaction_Status_Commit:
+		return "Transaction_Status_Commit"
+	case Transaction_Status_Rollback:
+		return "Transaction_Status_Rollback"
+	default:
+		return "not init Transaction_Status!"
+	}
+}
+
 type ActionType int
 
 const (
@@ -128,7 +143,7 @@ func (this DefaultTransationManager) DoTransaction(dto TransactionReqDTO) Transa
 			Error:         err.Error(),
 		}
 	}
-	log.Println("[TransactionManager] do transactionId=", dto.TransactionId,",sessionId=",transcationStatus.Transaction.Session.Id())
+	log.Println("[TransactionManager] do transactionId=", dto.TransactionId,",sessionId=",transcationStatus.Transaction.Session.Id(),"status=",dto.Status.ToString())
 
 	if dto.Status == Transaction_Status_NO {
 		defer transcationStatus.Flush() //关闭

@@ -58,8 +58,7 @@ func (this *TransationRMSession) Commit() error {
 func (this *TransationRMSession) Begin() error {
 	this.Status = Transaction_Status_Prepare
 	var result TransactionRspDTO
-	var err = this.Client.Call(TransactionReqDTO{Status: this.Status, ActionType: ActionType_Exec, OwnerId: this.OwnerId}, &result)
-	this.TransactionId = result.TransactionId
+	var err = this.Client.Call(TransactionReqDTO{Status: this.Status, TransactionId: this.TransactionId, ActionType: ActionType_Exec, OwnerId: this.OwnerId}, &result)
 	return err
 }
 
