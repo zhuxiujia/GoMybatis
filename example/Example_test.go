@@ -4,7 +4,6 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/zhuxiujia/GoMybatis"
-	"github.com/zhuxiujia/GoMybatis/utils"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -210,7 +209,7 @@ func Test_Remote_Transation(t *testing.T) {
 	var transationRMSession = GoMybatis.DefaultSessionFactory.NewSession(GoMybatis.SessionType_TransationRM, &GoMybatis.TransationRMClientConfig{
 		Addr:          remoteAddr,
 		RetryTime:     3,
-		TransactionId: utils.CreateUUID(),
+		TransactionId: "12345678",
 		Status:        GoMybatis.Transaction_Status_NO,
 	})
 
