@@ -64,4 +64,10 @@ func (this *TransationRMSession) Begin() error {
 }
 
 func (this *TransationRMSession) Close() {
+	if this.Status == Transaction_Status_Prepare {
+		this.Rollback()
+	}
+	if this.Client != nil {
+		this.Client.Close()
+	}
 }
