@@ -41,7 +41,7 @@ func (this *TransactionFactory) Append(transactionId string, transaction Transac
 	if transactionId == "" {
 		return
 	}
-	var old,_ = this.GetTransactionStatus(transactionId)
+	var old, _ = this.GetTransactionStatus(transactionId)
 	if old != nil {
 		this.SetTransactionStatus(transactionId, old)
 	}

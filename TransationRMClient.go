@@ -79,8 +79,8 @@ func (this *TransationRMClient) Call(arg TransactionReqDTO, result *TransactionR
 	return error
 }
 
-func (this *TransationRMClient) Close() error{
-	if this.Client!=nil{
+func (this *TransationRMClient) Close() error {
+	if this.Client != nil {
 		return this.Client.Close()
 	}
 	return nil

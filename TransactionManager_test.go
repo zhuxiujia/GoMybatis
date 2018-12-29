@@ -1,13 +1,13 @@
 package GoMybatis
 
 import (
+	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/zhuxiujia/GoMybatis/example"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"strconv"
 	"testing"
-	"errors"
 )
 
 var manager DefaultTransationManager
@@ -31,7 +31,7 @@ func TestManager(t *testing.T) {
 		TestPropertyServiceA: TestPropertyServiceA,
 		TestPropertyServiceB: TestPropertyServiceB,
 	}
-	err=TestOrderService.Transform(utils.CreateUUID(), "20181023162632152fd236d6877ff4", "20180926172013b85403d3715d46ed", 100)
+	err = TestOrderService.Transform(utils.CreateUUID(), "20181023162632152fd236d6877ff4", "20180926172013b85403d3715d46ed", 100)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,10 +51,10 @@ func (TestPropertyServiceA) Add(transactionId string, id string, amt int) error 
 		Sql:           sql,
 	}
 	var result = manager.DoTransaction(dto)
-	fmt.Println(dto.TransactionId,result.Exec)
+	fmt.Println(dto.TransactionId, result.Exec)
 	dto.Status = Transaction_Status_Commit
 	rspDTO := manager.DoTransaction(dto) //commit
-	if rspDTO.Error!=""{
+	if rspDTO.Error != "" {
 		return errors.New(rspDTO.Error)
 	}
 	return nil
@@ -74,10 +74,10 @@ func (TestPropertyServiceB) Reduce(transactionId string, id string, amt int) err
 		Sql:           sql,
 	}
 	var result = manager.DoTransaction(dto)
-	fmt.Println(dto.TransactionId,result.Exec)
+	fmt.Println(dto.TransactionId, result.Exec)
 	dto.Status = Transaction_Status_Commit
 	rspDTO := manager.DoTransaction(dto) //commit
-	if rspDTO.Error!=""{
+	if rspDTO.Error != "" {
 		return errors.New(rspDTO.Error)
 	}
 	return nil
@@ -99,8 +99,8 @@ func (this TestOrderService) Transform(transactionId string, outid string, inId 
 		Sql:           "",
 	}
 	rspDTO := manager.DoTransaction(dto) //开启事务
-    if rspDTO.Error!=""{
-    	return errors.New(rspDTO.Error)
+	if rspDTO.Error != "" {
+		return errors.New(rspDTO.Error)
 	}
 	//事务id=2018092d6172014a2a4c8a949f1004623,已存在的事务不可提交commit，只能提交状态rollback和Pause
 	var e1 = this.TestPropertyServiceB.Reduce(transactionId, outid, amount)
@@ -109,8 +109,8 @@ func (this TestOrderService) Transform(transactionId string, outid string, inId 
 	}
 
 	dto.Status = Transaction_Status_Rollback
-	rspDTO=manager.DoTransaction(dto)
-	if rspDTO.Error!=""{
+	rspDTO = manager.DoTransaction(dto)
+	if rspDTO.Error != "" {
 		return errors.New(rspDTO.Error)
 	}
 	//事务id=2018092d6172014a2a4c8a949f1004623,已存在的事务不可提交commit，只能提交状态rollback和Pause
@@ -122,8 +122,8 @@ func (this TestOrderService) Transform(transactionId string, outid string, inId 
 	//manager.Rollback(transactionId)
 	//事务id=2018092d6172014a2a4c8a949f1004623,原始事务可提交commit,rollback和Pause
 	dto.Status = Transaction_Status_Commit
-	rspDTO=manager.DoTransaction(dto)
-	if rspDTO.Error!=""{
+	rspDTO = manager.DoTransaction(dto)
+	if rspDTO.Error != "" {
 		return errors.New(rspDTO.Error)
 	}
 	return nil

@@ -7,64 +7,64 @@ package govaluate
 type OperatorSymbol int
 
 const (
-	VALUE   OperatorSymbol = iota
-	LITERAL 
-	NOOP    
-	EQ      
-	NEQ     
-	GT      
-	LT      
-	GTE     
-	LTE     
-	REQ     
-	NREQ    
-	IN      
+	VALUE OperatorSymbol = iota
+	LITERAL
+	NOOP
+	EQ
+	NEQ
+	GT
+	LT
+	GTE
+	LTE
+	REQ
+	NREQ
+	IN
 
-	AND 
-	OR  
+	AND
+	OR
 
-	PLUS           
-	MINUS          
-	BITWISE_AND    
-	BITWISE_OR     
-	BITWISE_XOR    
-	BITWISE_LSHIFT 
-	BITWISE_RSHIFT 
-	MULTIPLY       
-	DIVIDE         
-	MODULUS        
-	EXPONENT       
+	PLUS
+	MINUS
+	BITWISE_AND
+	BITWISE_OR
+	BITWISE_XOR
+	BITWISE_LSHIFT
+	BITWISE_RSHIFT
+	MULTIPLY
+	DIVIDE
+	MODULUS
+	EXPONENT
 
-	NEGATE      
-	INVERT      
-	BITWISE_NOT 
+	NEGATE
+	INVERT
+	BITWISE_NOT
 
-	TERNARY_TRUE  
-	TERNARY_FALSE 
-	COALESCE      
+	TERNARY_TRUE
+	TERNARY_FALSE
+	COALESCE
 
-	FUNCTIONAL 
-	ACCESS     
-	SEPARATE   
+	FUNCTIONAL
+	ACCESS
+	SEPARATE
 )
 
 type operatorPrecedence int
 
 const (
-	noopPrecedence           operatorPrecedence = iota
-	valuePrecedence          
-	functionalPrecedence     
-	prefixPrecedence         
-	exponentialPrecedence    
-	additivePrecedence       
-	bitwisePrecedence        
-	bitwiseShiftPrecedence   
-	multiplicativePrecedence 
-	comparatorPrecedence     
-	ternaryPrecedence        
-	logicalAndPrecedence     
-	logicalOrPrecedence      
-	separatePrecedence       
+	noopPrecedence operatorPrecedence = iota
+	valuePrecedence
+	functionalPrecedence
+	prefixPrecedence
+	exponentialPrecedence
+	additivePrecedence
+	bitwisePrecedence
+	bitwiseShiftPrecedence
+	multiplicativePrecedence
+	comparatorPrecedence
+	ternaryPrecedence
+	logicalAndPrecedence
+	logicalOrPrecedence
+	separatePrecedence
 )
 
 func findOperatorPrecedenceForSymbol(symbol OperatorSymbol) operatorPrecedence {

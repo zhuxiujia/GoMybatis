@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"time"
 )
+
 // !nashtsai! treat following var as interal const values, these are used for reflect.TypeOf comparison
 var (
 	c_EMPTY_STRING       string

@@ -28,8 +28,8 @@ type GoMybatisExpressionTypeConvert struct {
 
 //表达式类型转换器
 func (this GoMybatisExpressionTypeConvert) Convert(arg SqlArg) interface{} {
-	if arg.Type.Kind() == reflect.Struct && arg.Type.String() == Adapter_DateType{
-			return arg.Value.(time.Time).Nanosecond()
+	if arg.Type.Kind() == reflect.Struct && arg.Type.String() == Adapter_DateType {
+		return arg.Value.(time.Time).Nanosecond()
 	}
 	return arg.Value
 }
@@ -61,7 +61,7 @@ func (this GoMybatisSqlArgTypeConvert) Convert(arg SqlArg) string {
 		argStr.WriteString(`'`)
 		return argStr.String()
 	case reflect.Struct:
-		if argType.String() == Adapter_DateType{
+		if argType.String() == Adapter_DateType {
 			var argStr bytes.Buffer
 			argStr.WriteString(`'`)
 			argStr.WriteString(argValue.(time.Time).Format(Adapter_FormateDate))

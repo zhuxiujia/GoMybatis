@@ -8,7 +8,7 @@ import (
 )
 
 func TestTransationRM(t *testing.T) {
-	if example.ExampleDriverName == "" || example.MysqlUri == "" || example.MysqlUri == "*" {
+	if example.MysqlUri == "" || example.MysqlUri == "*" {
 		fmt.Println("no mysql config in project, you must set the mysql link!")
 		return
 	}

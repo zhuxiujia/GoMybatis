@@ -86,7 +86,6 @@ func Test_Convert_Map(t *testing.T) {
 	var resMapArray = make([]map[string][]byte, 0)
 	resMapArray = append(resMapArray, resMap)
 
-
 	var result map[string]string
 	var error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &result)
 	if error != nil {
@@ -230,7 +229,6 @@ func Test_Decode_Interface(t *testing.T) {
 
 	fmt.Println("Test_Decode_Interface", result)
 }
-
 
 func Benchmark_Ignore_Case_Underscores(b *testing.B) {
 	b.StopTimer()

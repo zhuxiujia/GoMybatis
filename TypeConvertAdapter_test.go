@@ -12,7 +12,7 @@ func Test_Adapter(t *testing.T) {
 		Value: a,
 		Type:  reflect.TypeOf(a),
 	})
-	if convertResult != true{
+	if convertResult != true {
 		t.Fatal(`Test_Adapter fail convertResult != true`)
 	}
 	fmt.Println(convertResult)

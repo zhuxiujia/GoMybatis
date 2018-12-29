@@ -38,7 +38,7 @@ func Test_Access_Arg(t *testing.T) {
 	var string = "-----#{bean.Name}------#{bean.Child.Age}---"
 
 	var arg = replaceArg(string, param, GoMybatisSqlArgTypeConvert{})
-	if arg != "-----father------11---"{
+	if arg != "-----father------11---" {
 		t.Fatal("replaceArgFail")
 	}
 	fmt.Println(arg)

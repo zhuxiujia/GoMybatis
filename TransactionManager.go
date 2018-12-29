@@ -14,7 +14,7 @@ const (
 	Transaction_Status_Rollback                           //回滚事务
 )
 
-func (status Transaction_Status)ToString() string {
+func (status Transaction_Status) ToString() string {
 	switch status {
 	case Transaction_Status_NO:
 		return "Transaction_Status_NO"
@@ -143,7 +143,7 @@ func (this DefaultTransationManager) DoTransaction(dto TransactionReqDTO) Transa
 			Error:         err.Error(),
 		}
 	}
-	log.Println("[TransactionManager] do transactionId=", dto.TransactionId,",sessionId=",transcationStatus.Transaction.Session.Id(),"status=",dto.Status.ToString())
+	log.Println("[TransactionManager] do transactionId=", dto.TransactionId, ",sessionId=", transcationStatus.Transaction.Session.Id(), "status=", dto.Status.ToString())
 
 	if dto.Status == Transaction_Status_NO {
 		defer transcationStatus.Flush() //关闭
@@ -205,7 +205,7 @@ func (this DefaultTransationManager) DoAction(dto TransactionReqDTO, transcation
 		return TransactionRspDTO
 	}
 	if dto.ActionType == ActionType_Exec {
-		log.Println("[TransactionManager] TransactionId:",dto.TransactionId,",Exec:", dto.Sql)
+		log.Println("[TransactionManager] TransactionId:", dto.TransactionId, ",Exec:", dto.Sql)
 		var res, e = transcationStatus.Transaction.Session.Exec(dto.Sql)
 		var err string
 		if e != nil {
