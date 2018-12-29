@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+
 //定义mapper文件的接口和结构体
 // 支持基本类型(int,string,time.Time,float...且需要指定参数名称`mapperParams:"name"以逗号隔开，且位置要和实际参数相同)
 //参数中包含有*GoMybatis.Session的类型，用于自定义事务
