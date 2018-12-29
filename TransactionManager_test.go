@@ -13,11 +13,11 @@ import (
 var manager DefaultTransationManager
 
 func TestManager(t *testing.T) {
-	if example.MysqlDriverName == "" || example.MysqlUri == "" || example.MysqlUri == "*" {
+	if example.ExampleDriverName == "" || example.MysqlUri == "" || example.MysqlUri == "*" {
 		fmt.Println("no mysql config in project, you must set the mysql link!")
 		return
 	}
-	engine, err := Open(example.MysqlDriverName, example.MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
+	engine, err := Open(example.ExampleDriverName, example.MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
 	if err != nil {
 		t.Fatal(err)
 	}
