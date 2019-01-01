@@ -10,7 +10,6 @@ import (
 	"time"
 )
 
-
 //定义mapper文件的接口和结构体
 // 支持基本类型(int,string,time.Time,float...且需要指定参数名称`mapperParams:"name"以逗号隔开，且位置要和实际参数相同)
 //参数中包含有*GoMybatis.Session的类型，用于自定义事务
@@ -18,7 +17,8 @@ import (
 //返回中必须有error
 // 函数return必须为error 为返回错误信息
 type ExampleActivityMapper struct {
-	SelectByIds       func(ids []string) ([]Activity, error) `mapperParams:"ids"`
+	SelectByIds       func(ids []string) ([]Activity, error)       `mapperParams:"ids"`
+	SelectByIdMaps    func(ids map[int]string) ([]Activity, error) `mapperParams:"ids"`
 	SelectAll         func() ([]map[string]string, error)
 	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int) ([]Activity, error) `mapperParams:"name,startTime,endTime,page,size"`
 	UpdateById        func(session *GoMybatis.Session, arg Activity) (int64, error)
@@ -162,6 +162,23 @@ func Test_ForEach(t *testing.T) {
 	//使用mapper
 	var ids = []string{"1", "2"}
 	var result, err = exampleActivityMapperImpl.SelectByIds(ids)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("result=", result)
+}
+
+//本地GoMybatis使用例子
+func Test_ForEach_Map(t *testing.T) {
+	if MysqlUri == "" || MysqlUri == "*" {
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		return
+	}
+	//初始化mapper文件
+	var exampleActivityMapperImpl = InitMapperByLocalSession()
+	//使用mapper
+	var ids = map[int]string{1: "165", 2: "166"}
+	var result, err = exampleActivityMapperImpl.SelectByIdMaps(ids)
 	if err != nil {
 		panic(err)
 	}

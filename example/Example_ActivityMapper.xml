@@ -64,6 +64,16 @@
             #{item}
         </foreach>
     </select>
+    <select id="selectByIdMaps">
+        select * from biz_activity
+        where delete_flag = 1
+        <foreach separator="," collection="ids" item="item" index="index" open=" and id in (" close=")">
+            #{item}
+        </foreach>
+        <foreach separator="," collection="ids" item="item" index="index" open=" and delete_flag in (" close=")">
+            #{index}
+        </foreach>
+    </select>
     <update id="deleteById">
         update biz_activity
         set delete_flag = 0

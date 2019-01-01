@@ -6,7 +6,6 @@ import "time"
 //此处请按格式填写你的mysql链接，这里用*号代替
 const MysqlUri = "*"
 
-
 //定义数据库模型
 //例子：Activity 活动数据
 type Activity struct {
@@ -19,4 +18,3 @@ type Activity struct {
 	CreateTime time.Time `json:"createTime"`
 	DeleteFlag int       `json:"deleteFlag"`
 }
-

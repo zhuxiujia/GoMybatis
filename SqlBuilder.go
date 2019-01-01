@@ -118,35 +118,74 @@ func (this GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *b
 			var tempSql bytes.Buffer
 			var datas = param[collection].Value
 			var collectionValue = reflect.ValueOf(datas)
+			if collectionValue.Kind() != reflect.Slice && collectionValue.Kind() != reflect.Map {
+				panic(`[GoMybatis] collection value must be a slice or map !`)
+			}
 			var collectionValueLen = collectionValue.Len()
 			if collectionValueLen == 0 {
 				continue
 			}
-			for i := 0; i < collectionValueLen; i++ {
-				var collectionItem = collectionValue.Index(i)
-				var tempArgMap = make(map[string]SqlArg)
-				for k, v := range param {
-					tempArgMap[k] = v
+			switch collectionValue.Kind() {
+			case reflect.Map:
+				var mapKeys = collectionValue.MapKeys()
+				var collectionKeyLen = len(mapKeys)
+				if collectionKeyLen == 0 {
+					continue
 				}
-				if item != "" {
-					tempArgMap[item] = SqlArg{
-						Value: collectionItem.Interface(),
-						Type:  collectionItem.Type(),
+				for _, keyValue := range mapKeys {
+					var key = keyValue.Interface()
+					var collectionItem = collectionValue.MapIndex(keyValue)
+					var tempArgMap = make(map[string]SqlArg) //temp parameter Map
+					for k, v := range param {
+						tempArgMap[k] = v
 					}
-				}
-				if index != "" {
+					if item != "" {
+						tempArgMap[item] = SqlArg{
+							Value: collectionItem.Interface(),
+							Type:  collectionItem.Type(),
+						}
+					}
 					tempArgMap[index] = SqlArg{
-						Value: index,
-						Type:  IntType,
+						Value: key,
+						Type:  keyValue.Type(),
+					}
+					if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
+						var err = this.createFromElement(v.ElementItems, &tempSql, tempArgMap)
+						if err != nil {
+							return err
+						}
+						tempSql.WriteString(separator)
 					}
 				}
-				if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
-					var err = this.createFromElement(v.ElementItems, &tempSql, tempArgMap)
-					if err != nil {
-						return err
+				break
+			case reflect.Slice:
+				for i := 0; i < collectionValueLen; i++ {
+					var collectionItem = collectionValue.Index(i)
+					var tempArgMap = make(map[string]SqlArg) //temp parameter Map
+					for k, v := range param {
+						tempArgMap[k] = v
 					}
-					tempSql.WriteString(separator)
+					if item != "" {
+						tempArgMap[item] = SqlArg{
+							Value: collectionItem.Interface(),
+							Type:  collectionItem.Type(),
+						}
+					}
+					if index != "" {
+						tempArgMap[index] = SqlArg{
+							Value: index,
+							Type:  IntType,
+						}
+					}
+					if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
+						var err = this.createFromElement(v.ElementItems, &tempSql, tempArgMap)
+						if err != nil {
+							return err
+						}
+						tempSql.WriteString(separator)
+					}
 				}
+				break
 			}
 			var newTempSql bytes.Buffer
 			var tempSqlString = strings.Trim(strings.Trim(tempSql.String(), " "), separator)
