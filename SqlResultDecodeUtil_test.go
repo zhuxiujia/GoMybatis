@@ -258,3 +258,42 @@ func Benchmark_Ignore_Case_Underscores(b *testing.B) {
 	}
 
 }
+
+func TestGoMybatisSqlResultDecoder_Decode(t *testing.T) {
+	var GoMybatisSqlResultDecoder = GoMybatisSqlResultDecoder{}
+	var res = make([]map[string][]byte, 0)
+	var resMap = make(map[string][]byte)
+	resMap["name"] = []byte("xiao ming")
+	resMap["Amount_1"] = []byte("1908.1")
+	resMap["amount_2"] = []byte("1908.444")
+	resMap["age_1"] = []byte("1908")
+	resMap["age_2"] = []byte("1908")
+	resMap["age_3"] = []byte("1908")
+	resMap["age_4"] = []byte("1908")
+	resMap["age_5"] = []byte("1908")
+	resMap["age_6"] = []byte("1908")
+	resMap["age_7"] = []byte("1908")
+	resMap["age_8"] = []byte("1908")
+	resMap["Bool"] = []byte("1")
+	res = append(res, resMap)
+	var result TestResult
+	var err = GoMybatisSqlResultDecoder.Decode(nil, res, &result)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Name == "" ||
+		result.Amount1 == 0 ||
+		result.Amount2 == 0 ||
+		result.Age1 == 0 ||
+		result.Age2 == 0 ||
+		result.Age3 == 0 ||
+		result.Age4 == 0 ||
+		result.Age5 == 0 ||
+		result.Age6 == 0 ||
+		result.Age7 == 0 ||
+		result.Age8 == 0 ||
+		result.Bool == false {
+      t.Fatal("TestGoMybatisSqlResultDecoder_Decode fail,result not decoded!")
+	}
+	fmt.Println(result)
+}
