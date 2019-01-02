@@ -201,21 +201,35 @@ func TestGoMybatisSqlBuilder_BuildSql(t *testing.T) {
 	var mapper = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper>
-    <!--List<Activity> selectByCondition(@Param("name") String name,@Param("startTime") Date startTime,@Param("endTime") Date endTime,@Param("index") Integer index,@Param("size") Integer size);-->
-    <!-- 后台查询产品 -->
-    <select id="selectByCondition">
-        select * from biz_activity where delete_flag=1
-        <if test="name != ''">
-            and name like concat('%',#{name},'%')
-        </if>
-        <if test="startTime != ''">
-            and create_time >= #{startTime}
-        </if>
-        <if test="endTime != ''">
-            and create_time &lt;= #{endTime}
-        </if>
-        order by create_time desc
-        <if test="page >= 0 and size != 0">limit #{page}, #{size}</if>
+    <resultMap id="BaseResultMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name" langType="string"/>
+        <result column="pc_link" property="pcLink" langType="string"/>
+        <result column="h5_link" property="h5Link" langType="string"/>
+        <result column="remark" property="remark" langType="string"/>
+        <result column="create_time" property="createTime" langType="time.Time"/>
+        <result column="delete_flag" property="deleteFlag" langType="int"/>
+    </resultMap>
+    <select id="selectByCondition" resultMap="BaseResultMap">
+        <bind name="pattern" value="'%' + name + '%'"/>
+        select * from biz_activity
+        <where>
+            <if test="name != ''">
+                and name like #{pattern}
+            </if>
+            <if test="startTime != ''">and create_time >= #{startTime}</if>
+            <if test="endTime != ''">and create_time &lt;= #{endTime}</if>
+        </where>
+        order by 
+        <trim prefix="" suffix="" suffixOverrides=",">
+            <if test="name != ''">name,</if>
+        </trim>
+        desc
+        <choose>
+            <when test="page < 1">limit 3</when>
+            <when test="page > 1">limit 2</when>
+            <otherwise>limit 1</otherwise>
+        </choose>
     </select>
 </mapper>`
 	var mapperTree = LoadMapperXml([]byte(mapper))
@@ -223,7 +237,7 @@ func TestGoMybatisSqlBuilder_BuildSql(t *testing.T) {
 	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{})
 	var paramMap = make(map[string]SqlArg)
 	paramMap["name"] = SqlArg{
-		Value: "",
+		Value: "name",
 		Type:  reflect.TypeOf(""),
 	}
 	paramMap["startTime"] = SqlArg{
