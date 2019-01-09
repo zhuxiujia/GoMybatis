@@ -15,7 +15,7 @@ https://zhuxiujia.github.io/gomybatis.io/info.html
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-动态SQL</a>，在xml中可灵活运用if判断，foreach遍历数组，resultMap,bind等等java框架Mybatis包含的实用功能`<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<where>,<foreach>,<resultMap>,<bind>,<choose><when><otherwise>,<sql><include>`<br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-多数据库支持Mysql,Postgres,Tidb,SQLite,Oracle....等等更多</a><br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-基于反射动态代理,无需go generate生成*.go等中间代码</a>，xml读取后可直接写入到自定义的Struct,Func属性中调用函数<br>
-### 已支持本地和远程事务,方便处于 单数据库(Mysql,postgresql)-分布式数据库（TiDB,cockroachdb...）过渡期间的微服务
+### 通过远程代理处理事务支持  处于 单数据库(Mysql,postgresql)-分布式数据库（TiDB,cockroachdb...）过渡期间的微服务
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/tx.png)
 
 
@@ -90,5 +90,6 @@ func main() {
 ```
 ## 请及时关注版本，及时升级版本(新的功能，bug修复)
 ## TODO 期待功能路线（预览功能,可能会更改）
+-乐观锁支持</br>
 -针对GoLand和IDEA的xml生成插件，右键一键生成CRUD代码(进行中,敬请期待哦~)</br>
 ## 喜欢的老铁欢迎在右上角点下 star 关注和支持我们哈
