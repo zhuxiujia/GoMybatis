@@ -12,6 +12,7 @@ func FixTestExpressionSymbol(bytes *[]byte) {
 	for _, findStr := range findStrs {
 		var newStr = string(findStr)
 		newStr = strings.Replace(newStr, "<", "&lt;", -1)
+		newStr = strings.Replace(newStr, ">", "&gt;", -1)
 		byteStr = strings.Replace(byteStr, findStr, newStr, -1)
 	}
 	*bytes = []byte(byteStr)
@@ -21,7 +22,7 @@ var testRegex *regexp.Regexp
 
 func getTestRegex() *regexp.Regexp {
 	if testRegex == nil {
-		testRegex, _ = regexp.Compile(`test=".*<.*"`)
+		testRegex, _ = regexp.Compile(`test=".*"`)
 	}
 	return testRegex
 }
