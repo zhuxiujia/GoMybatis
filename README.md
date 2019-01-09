@@ -42,7 +42,7 @@ go get github.com/zhuxiujia/GoMybatis
 go get github.com/go-sql-driver/mysql
 ```
 实际使用mapper
-```
+```go
 import (
 	_ "github.com/go-sql-driver/mysql" //导入mysql驱动
 	"github.com/zhuxiujia/GoMybatis"
