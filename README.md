@@ -10,11 +10,11 @@
 # 官方网站/文档
 https://zhuxiujia.github.io/gomybatis.io/info.html
 # 优势
-<a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-高并发</a>，假设数据库响应时间为0，在6核16GB PC上框架每秒事务数可达246982Tps/s,耗时仅仅0.4s<br>
-<a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-事务</a>，session灵活插拔，兼容过渡期微服务<br>
+<a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-协程高并发</a>，假设数据库响应时间为0，在6核16GB PC上框架每秒事务数可达246982Tps/s,耗时仅仅0.4s<br>
+<a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-事务支持</a>，session灵活插拔，兼容过渡期微服务<br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-动态SQL</a>，在xml中可灵活运用if判断，foreach遍历数组，resultMap,bind等等java框架Mybatis包含的实用功能`<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<where>,<foreach>,<resultMap>,<bind>,<choose><when><otherwise>,<sql><include>`<br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-多数据库支持Mysql,Postgres,Tidb,SQLite,Oracle....等等更多</a><br>
-<a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-基于反射动态代理,无需go generate生成*.go等中间代码</a>，xml读取后可直接写入到自定义的Struct,Func属性中调用函数<br>
+<a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-快速上手</a>基于反射动态代理,无需go generate生成*.go等中间代码，xml读取后可直接调用函数<br>
 ### 通过远程代理处理事务支持  处于 单数据库(Mysql,postgresql)-分布式数据库（TiDB,cockroachdb...）过渡期间的微服务
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/tx.png)
 
