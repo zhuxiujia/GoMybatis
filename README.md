@@ -89,6 +89,7 @@ func main() {
 }
 ```
 ## 请及时关注版本，及时升级版本(新的功能，bug修复)
-## TODO 期待功能路线（预览功能,可能会更改）
--针对GoLand和IDEA的xml生成插件，右键一键生成CRUD代码(进行中,敬请期待哦~)</br>
+## TODO 期待功能路线（预览特性,有可能会更改）
+-Elasticsearch SQL支持，以sql的形式查询大数据搜索引擎</br>
+-针对GoLand和IDEA的xml生成插件，右键一键生成CRUD代码</br>
 ## 喜欢的老铁欢迎在右上角点下 star 关注和支持我们哈
