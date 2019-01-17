@@ -1,9 +1,5 @@
 package govaluate
 
-import (
-	"errors"
-)
-
 /*
 	Parameters is a collection of named parameters that can be used by an EvaluableExpression to retrieve parameters
 	when an expression tries to use them.
@@ -19,13 +15,12 @@ type Parameters interface {
 type MapParameters map[string]interface{}
 
 func (p MapParameters) Get(name string) (interface{}, error) {
+	value, _ := p[name]
 
-	value, found := p[name]
-
-	if !found {
-		errorMessage := "No parameter '" + name + "' found."
-		return nil, errors.New(errorMessage)
-	}
+	//if !found {
+	//	errorMessage := "No parameter '" + name + "' found."
+	//	return nil, errors.New(errorMessage)
+	//}
 
 	return value, nil
 }
