@@ -15,6 +15,7 @@ var DUMMY_PARAMETERS = MapParameters(map[string]interface{}{})
 	are an expression that can be evaluated down into a single value.
 */
 type EvaluableExpression struct {
+
 	/*
 		Represents the query format used to output dates. Typically only used when creating SQL or Mongo queries from an expression.
 		Defaults to the complete ISO8601 format, including nanoseconds.

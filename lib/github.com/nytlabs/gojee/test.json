@@ -1,0 +1,123 @@
+{
+    "#_k__": 1,
+    "int": 5,
+    "two": 2,
+    "float": 5.5,
+    "float_str": "5.123131",
+    "string": "hello world",
+    "bool": false,
+    "nil": null,
+    "empty": [],
+    "a": {
+        "b": {
+            "c": [{
+                "d": {
+                    "e": 0
+                }
+            }, {
+                "d": {
+                    "e": 1
+                }
+            }, {
+                "d": {
+                    "e": 2
+                }
+            }]
+        }
+    },
+    "arrayObj": [{
+        "val": 2,
+        "name": "foo",
+        "bool": false,
+        "sameStr": "all",
+        "sameNum": 10,
+        "hasKey": true,
+        "nil": null,
+        "array": [
+            1,
+            2,
+            3
+        ],
+        "nested": [{
+            "id": "foo",
+            "no": "zoo"
+        }]
+    }, {
+        "val": 2.5,
+        "name": "bar",
+        "bool": true,
+        "sameStr": "all",
+        "sameNum": 10,
+        "nil": null,
+        "array": [
+            1,
+            2,
+            3
+        ],
+        "nested": [{
+            "id": "zof",
+            "no": "fum"
+        }]
+    }, {
+        "val": 10,
+        "name": "baz",
+        "bool": false,
+        "sameStr": "all",
+        "sameNum": 10,
+        "nil": null,
+        "array": [
+            7,
+            8,
+            9
+        ],
+        "nested": [{
+            "id": "zif",
+            "no": "zaf"
+        }]
+    }],
+    "escape.key": {
+        "nested": {
+            "foo.bar": "baz"
+        }
+    },
+    "nested": {
+        "foo": {
+            "zip": "zap"
+        },
+        "baz": [
+            1,
+            2,
+            3
+        ]
+    },
+    "arrayInt": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+    ],
+    "arrayFloat": [
+        1.1,
+        2.2,
+        3.3,
+        4.4,
+        5.5,
+        6.6,
+        7.7,
+        8.8,
+        9.9,
+        10
+    ],
+    "arrayString": [
+        "yellow",
+        "purple",
+        "red",
+        "green"
+    ]
+}

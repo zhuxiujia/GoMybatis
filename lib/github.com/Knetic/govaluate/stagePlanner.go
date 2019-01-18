@@ -535,7 +535,7 @@ func findTypeChecks(symbol OperatorSymbol) typeChecks {
 			left: isBool,
 		}
 
-		// unchecked cases
+	// unchecked cases
 	case EQ:
 		fallthrough
 	case NEQ:
