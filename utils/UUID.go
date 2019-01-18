@@ -1,12 +1,12 @@
 package utils
 
 import (
-	"github.com/satori/go.uuid"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/google/uuid"
 )
 
 func CreateUUID() string {
 	// 创建
-	u1, _ := uuid.NewV4()
-	var uuidString = u1.String()
+	uuid := uuid.New()
+	var uuidString = uuid.String()
 	return uuidString
 }

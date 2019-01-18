@@ -2,7 +2,7 @@ package GoMybatis
 
 import (
 	"database/sql"
-	"github.com/zhuxiujia/GoMybatis/lib/github.com/satori/go.uuid"
+	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
 type GoMybatisEngine struct {
@@ -11,10 +11,9 @@ type GoMybatisEngine struct {
 }
 
 func (this GoMybatisEngine) NewSession() Session {
-	uuids, _ := uuid.NewV4()
-	var uuidstrig = uuids.String()
+	uuid := utils.CreateUUID()
 	var mysqlLocalSession = LocalSession{
-		SessionId: uuidstrig,
+		SessionId: uuid,
 		db:        this.DB,
 	}
 	var session = Session(&mysqlLocalSession)
