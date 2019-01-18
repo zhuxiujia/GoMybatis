@@ -3,7 +3,6 @@ package GoMybatis
 import (
 	"bytes"
 	"fmt"
-	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"log"
 	"reflect"
@@ -18,11 +17,13 @@ type GoMybatisSqlBuilder struct {
 	SqlBuilder
 	ExpressionTypeConvert ExpressionTypeConvert
 	SqlArgTypeConvert     SqlArgTypeConvert
+	ExpressionEngine      ExpressionEngine
 }
 
-func (this GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert, SqlArgTypeConvert SqlArgTypeConvert) GoMybatisSqlBuilder {
+func (this GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert, SqlArgTypeConvert SqlArgTypeConvert,expressionEngine ExpressionEngine) GoMybatisSqlBuilder {
 	this.ExpressionTypeConvert = ExpressionTypeConvert
 	this.SqlArgTypeConvert = SqlArgTypeConvert
+	this.ExpressionEngine = expressionEngine
 	return this
 }
 
@@ -267,21 +268,21 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 
 func (this *GoMybatisSqlBuilder) doIfElement(expression *string, param map[string]SqlArg, evaluateParameters map[string]interface{}) (bool, error) {
 	this.repleaceExpression(expression, param)
-	evalExpression, err := govaluate.NewEvaluableExpression(*expression)
+	evalExpression, err := this.ExpressionEngine.Lexer(*expression)
 	if err != nil {
 		return false, err
 	}
 	if evaluateParameters == nil {
 		evaluateParameters = this.expressParamterMap(param, this.ExpressionTypeConvert)
 	}
-	result, err := evalExpression.Evaluate(evaluateParameters)
+	result, err := this.ExpressionEngine.Eval(evalExpression, evaluateParameters, 0)
 	if err != nil {
 		var buffer bytes.Buffer
 		buffer.WriteString("[GoMybatis] <test `")
 		buffer.WriteString(*expression)
 		buffer.WriteString(`> fail,`)
 		buffer.WriteString(err.Error())
-		err = utils.NewError("SqlBuilder",buffer.String())
+		err = utils.NewError("SqlBuilder", buffer.String())
 		return false, err
 	}
 	return result.(bool), nil
@@ -300,12 +301,12 @@ func (this *GoMybatisSqlBuilder) bindBindElementArg(args map[string]SqlArg, item
 		}
 		return args
 	}
-	evalExpression, err := govaluate.NewEvaluableExpression(value)
+	evalExpression, err := this.ExpressionEngine.Lexer(value)
 	if err != nil {
 		return args
 	}
 	var evaluateParameters = this.expressParamterMap(args, this.ExpressionTypeConvert)
-	result, err := evalExpression.Evaluate(evaluateParameters)
+	result, err := this.ExpressionEngine.Eval(evalExpression, evaluateParameters, 0)
 	if err != nil {
 		return args
 	}

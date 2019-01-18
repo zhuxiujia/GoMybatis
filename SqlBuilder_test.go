@@ -156,28 +156,6 @@ func Test_reflect_tps(t *testing.T) {
 
 }
 
-func TestExpress(t *testing.T) {
-	var activity = example.Activity{
-		Id:         "1",
-		DeleteFlag: 1,
-	}
-
-	var evaluateParameters = make(map[string]interface{})
-
-	evaluateParameters["activity"] = &activity
-
-	var expression = "activity.DeleteFlag == 1 || activity.DeleteFlag > 0 "
-	evalExpression, err := govaluate.NewEvaluableExpression(expression)
-	if err != nil {
-		t.Fatal(err)
-	}
-	result, err := evalExpression.Evaluate(evaluateParameters)
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Println(result)
-}
-
 func Test_bind_string(t *testing.T) {
 	var activity = example.Activity{
 		Id:         "1",
