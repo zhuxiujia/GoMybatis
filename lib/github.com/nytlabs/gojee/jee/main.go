@@ -3,7 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/nytlabs/gojee"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/nytlabs/gojee"
+
 	"io/ioutil"
 	"os"
 )

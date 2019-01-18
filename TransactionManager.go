@@ -1,7 +1,7 @@
 package GoMybatis
 
 import (
-	"errors"
+	"github.com/zhuxiujia/GoMybatis/utils"
 	"log"
 )
 
@@ -72,7 +72,7 @@ func (this DefaultTransationManager) New(SessionFactory *SessionFactory, Transac
 
 func (this DefaultTransationManager) GetTransaction(def *TransactionDefinition, transactionId string, OwnerId string) (*TransactionStatus, error) {
 	if transactionId == "" {
-		return nil, errors.New("[TransactionManager] transactionId =" + transactionId + " transations is nil!")
+		return nil, utils.NewError("TransactionManager"," transactionId =" + transactionId + " transations is nil!")
 	}
 	if def == nil {
 		var d = TransactionDefinition{}.Default()
@@ -177,7 +177,7 @@ func (this DefaultTransationManager) DoTransaction(dto TransactionReqDTO) Transa
 			}
 		}
 	} else {
-		err = errors.New("[TransactionManager] arg have no action!")
+		err = utils.NewError("TransactionManager"," arg have no action!")
 	}
 	var errString = ""
 	if err != nil {

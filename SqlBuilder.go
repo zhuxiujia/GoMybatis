@@ -2,9 +2,9 @@ package GoMybatis
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
+	"github.com/zhuxiujia/GoMybatis/utils"
 	"log"
 	"reflect"
 	"strings"
@@ -281,7 +281,7 @@ func (this *GoMybatisSqlBuilder) doIfElement(expression *string, param map[strin
 		buffer.WriteString(*expression)
 		buffer.WriteString(`> fail,`)
 		buffer.WriteString(err.Error())
-		err = errors.New(buffer.String())
+		err = utils.NewError("SqlBuilder",buffer.String())
 		return false, err
 	}
 	return result.(bool), nil

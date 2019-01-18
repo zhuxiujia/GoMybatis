@@ -1,7 +1,7 @@
 package GoMybatis
 
 import (
-	"errors"
+	"github.com/zhuxiujia/GoMybatis/utils"
 	"net/rpc"
 	"net/rpc/jsonrpc"
 )
@@ -62,7 +62,7 @@ func (this *TransationRMClient) Call(arg TransactionReqDTO, result *TransactionR
 		if this.Addr != "" {
 			this.Link(this.Addr)
 		} else {
-			error = errors.New("[TransationRMClient] link have no addr!")
+			error = utils.NewError("TransationRMClient"," link have no addr!")
 			return error
 		}
 	}

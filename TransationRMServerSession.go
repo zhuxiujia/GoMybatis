@@ -1,7 +1,6 @@
 package GoMybatis
 
 import (
-	"errors"
 	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
@@ -29,7 +28,7 @@ func (this *TransationRMSession) Query(sqlorArgs string) ([]map[string][]byte, e
 	var result TransactionRspDTO
 	var error = this.Client.Call(TransactionReqDTO{Status: this.Status, TransactionId: this.TransactionId, Sql: sqlorArgs, ActionType: ActionType_Query, OwnerId: this.OwnerId}, &result)
 	if error == nil && result.Error != "" {
-		error = errors.New(result.Error)
+		error = utils.NewError("TransationRMSession",result.Error)
 	}
 	return result.Query, error
 }
@@ -38,7 +37,7 @@ func (this *TransationRMSession) Exec(sqlorArgs string) (*Result, error) {
 	var result TransactionRspDTO
 	var error = this.Client.Call(TransactionReqDTO{Status: this.Status, TransactionId: this.TransactionId, Sql: sqlorArgs, ActionType: ActionType_Exec, OwnerId: this.OwnerId}, &result)
 	if error == nil && result.Error != "" {
-		error = errors.New(result.Error)
+		error = utils.NewError("TransationRMSession",result.Error)
 	}
 	return &result.Exec, error
 }
