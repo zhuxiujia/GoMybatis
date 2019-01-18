@@ -28,6 +28,28 @@ func TestExpress(t *testing.T) {
 	fmt.Println(result)
 }
 
+func TestExpressionEngineGovaluateTakeValue(t *testing.T)  {
+	var activity = example.Activity{
+		Id:         "1",
+		DeleteFlag: 1,
+	}
+	var engine = ExpressionEngineGovaluate{}
+	var evaluateParameters = make(map[string]interface{})
+
+	evaluateParameters["activity"] = &activity
+
+	var expression = "activity.DeleteFlag"
+	evalExpression, err := engine.Lexer(expression)
+	if err != nil {
+		t.Fatal(err)
+	}
+	result, err := engine.Eval(evalExpression,evaluateParameters,0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(result)
+}
+
 func BenchmarkExpress(b *testing.B) {
 	b.StopTimer()
 	var activity = example.Activity{

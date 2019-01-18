@@ -56,6 +56,18 @@ func TestExpressionEngineJee_Eval_null(t *testing.T) {
 	fmt.Println(result)
 }
 
+func TestExpressionEngineJeeTakeValue(t *testing.T)  {
+	var m = make(map[string]interface{})
+	m["a"] = 1
+	var engine = ExpressionEngineJee{}
+	var lexer, _ = engine.Lexer(".a")
+	var result, error = engine.Eval(lexer, m, JeeOperation_Marshal_Map)
+	if error != nil {
+		t.Fatal(error)
+	}
+	fmt.Println(result)
+}
+
 func BenchmarkExpressionEngineJee_Eval(b *testing.B) {
 	b.StopTimer()
 	var m = make(map[string]interface{})
