@@ -19,7 +19,7 @@ func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine *Session
 	if DefaultSessionFactory == nil {
 		DefaultSessionFactory = &factory
 	}
-	WriteMapper(value, xml, DefaultSessionFactory, GoMybatisSqlResultDecoder{}, GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{}, &ExpressionEngineGovaluate{}), enableLog)
+	WriteMapper(value, xml, DefaultSessionFactory, GoMybatisSqlResultDecoder{}, GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{}, &ExpressionEngineJee{}), enableLog)
 }
 
 //根据sessionEngine写入到mapperPtr
@@ -43,7 +43,7 @@ func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine *SessionE
 //func的结构体参数无需指定mapperParams的tag，框架会自动扫描它的属性，封装为map处理掉
 //使用WriteMapper函数设置代理后即可正常使用。
 func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) {
-	beanCheck(bean)
+	beanCheck(bean,sqlBuilder)
 	var mapperTree = LoadMapperXml(xml)
 	//make a map[method]xml
 	var methodXmlMap = makeMethodXmlMap(bean, mapperTree)
@@ -86,7 +86,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 }
 
 //check beans
-func beanCheck(value reflect.Value) {
+func beanCheck(value reflect.Value,builder SqlBuilder) {
 	var t = value.Type()
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
@@ -100,7 +100,7 @@ func beanCheck(value reflect.Value) {
 		var customLen = 0
 		for argIndex := 0; argIndex < fieldItem.Type.NumIn(); argIndex++ {
 			var inType = fieldItem.Type.In(argIndex)
-			if inType.Kind() == reflect.Ptr && inType.String() != GoMybatis_Session_Ptr {
+			if builder.ExpressionEngine().Name()=="ExpressionEngineGovaluate" && inType.Kind() == reflect.Ptr && inType.String() != GoMybatis_Session_Ptr {
 				panic(`[GoMybats] ` + fieldItem.Name + `() arg = ` + inType.String() + ` can not be a ptr ! must delete '*'!`)
 			}
 			if isCustomStruct(inType) {

@@ -292,7 +292,7 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 }
 
 func (this *GoMybatisSqlBuilder) doIfElement(expression *string, param map[string]SqlArg, evaluateParameters map[string]interface{}) (bool, error) {
-	this.repleaceExpression(expression, param)
+	//this.repleaceExpression(expression, param)
 	evalExpression, err := this.expressionEngine.Lexer(*expression)
 	if err != nil {
 		return false, err
@@ -337,18 +337,6 @@ func (this *GoMybatisSqlBuilder) bindBindElementArg(args map[string]SqlArg, item
 	return args
 }
 
-//表达式 ''转换为 0
-func (this *GoMybatisSqlBuilder) expressionToIfZeroExpression(expression string, param map[string]SqlArg) string {
-	for k, v := range param {
-		if strings.Contains(expression, k) && v.Type.Kind() != reflect.String {
-			expression = strings.Replace(expression, `''`, `0`, -1)
-			return expression
-		}
-	}
-
-	return expression
-}
-
 //scan params
 func (this *GoMybatisSqlBuilder) expressParamterMap(parameters map[string]SqlArg, typeConvert ExpressionTypeConvert) map[string]interface{} {
 	var newMap = make(map[string]interface{})
@@ -375,47 +363,7 @@ func (this *GoMybatisSqlBuilder) sqlParamterMap(parameters map[string]SqlArg, ty
 	return newMap
 }
 
-func (this *GoMybatisSqlBuilder) split(str *string) (stringItems []string) {
-	if str == nil || *str == "" {
-		return nil
-	}
-	var andStrings = strings.Split(*str, " && ")
-	if andStrings == nil {
-		return nil
-	}
-	var newStrings []string
-	for _, v := range andStrings {
-		var orStrings = strings.Split(v, " || ")
-		if orStrings == nil {
-			continue
-		}
-		for _, orStr := range orStrings {
-			if newStrings == nil {
-				newStrings = make([]string, 0)
-			}
-			if orStr == "" {
-				continue
-			}
-			newStrings = append(newStrings, orStr)
-		}
-	}
-	return newStrings
-}
 
-//替换表达式中的值 and,or,参数 替换为实际值
-func (this *GoMybatisSqlBuilder) repleaceExpression(expression *string, param map[string]SqlArg) {
-	if expression == nil || *expression == "" {
-		return
-	}
-	*expression = strings.Replace(*expression, ` and `, " && ", -1)
-	*expression = strings.Replace(*expression, ` or `, " || ", -1)
-	var newStrings = this.split(expression)
-
-	for _, expressionItem := range newStrings {
-		var NewExpression = this.expressionToIfZeroExpression(expressionItem, param)
-		*expression = strings.Replace(*expression, expressionItem, NewExpression, -1)
-	}
-}
 
 //trim处理element
 func (this *GoMybatisSqlBuilder) elementTrim(loopChildItem *bool, items []ElementItem, param map[string]SqlArg, prefix string, suffix string, prefixOverrides string, suffixOverrides string, sql *bytes.Buffer) error {
