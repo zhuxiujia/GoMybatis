@@ -11,19 +11,31 @@ import (
 
 type SqlBuilder interface {
 	BuildSql(paramMap map[string]SqlArg, mapperXml *MapperXml, enableLog bool) (string, error)
+	ExpressionEngine() ExpressionEngine
+	SqlArgTypeConvert() SqlArgTypeConvert
+	ExpressionTypeConvert() ExpressionTypeConvert
 }
 
 type GoMybatisSqlBuilder struct {
-	SqlBuilder
-	ExpressionTypeConvert ExpressionTypeConvert
-	SqlArgTypeConvert     SqlArgTypeConvert
-	ExpressionEngine      ExpressionEngine
+	expressionTypeConvert ExpressionTypeConvert
+	sqlArgTypeConvert     SqlArgTypeConvert
+	expressionEngine      ExpressionEngine
+}
+
+func (this GoMybatisSqlBuilder) ExpressionEngine() ExpressionEngine {
+	return this.expressionEngine
+}
+func (this GoMybatisSqlBuilder) SqlArgTypeConvert() SqlArgTypeConvert {
+	return this.sqlArgTypeConvert
+}
+func (this GoMybatisSqlBuilder) ExpressionTypeConvert() ExpressionTypeConvert {
+	return this.expressionTypeConvert
 }
 
 func (this GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert, SqlArgTypeConvert SqlArgTypeConvert, expressionEngine ExpressionEngine) GoMybatisSqlBuilder {
-	this.ExpressionTypeConvert = ExpressionTypeConvert
-	this.SqlArgTypeConvert = SqlArgTypeConvert
-	this.ExpressionEngine = expressionEngine
+	this.expressionTypeConvert = ExpressionTypeConvert
+	this.sqlArgTypeConvert = SqlArgTypeConvert
+	this.expressionEngine = expressionEngine
 	return this
 }
 
@@ -55,15 +67,15 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 		switch v.ElementType {
 		case Element_bind:
 			//bind,param args change!need update
-			sqlArgMap = this.bindBindElementArg(sqlArgMap, v, this.SqlArgTypeConvert)
+			sqlArgMap = this.bindBindElementArg(sqlArgMap, v, this.sqlArgTypeConvert)
 			defaultArgMap = this.makeArgInterfaceMap(sqlArgMap)
 			if evaluateParameters != nil {
-				evaluateParameters = this.expressParamterMap(sqlArgMap, this.ExpressionTypeConvert)
+				evaluateParameters = this.expressParamterMap(sqlArgMap, this.expressionTypeConvert)
 			}
 			break
 		case Element_String:
 			//string element
-			var replaceSql, err = replaceArg(v.DataString, defaultArgMap, this.SqlArgTypeConvert, this.ExpressionEngine)
+			var replaceSql, err = replaceArg(v.DataString, defaultArgMap, this.sqlArgTypeConvert, this.expressionEngine)
 			if err != nil {
 				return err
 			}
@@ -78,7 +90,7 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 			}
 			if result {
 				//test > true,write sql string
-				var replaceSql, err = replaceArg(v.DataString, defaultArgMap, this.SqlArgTypeConvert, this.ExpressionEngine)
+				var replaceSql, err = replaceArg(v.DataString, defaultArgMap, this.sqlArgTypeConvert, this.expressionEngine)
 				if err != nil {
 					return err
 				}
@@ -227,7 +239,7 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 			}
 			if result {
 				//test > true,write sql string
-				var replaceSql, err = replaceArg(v.DataString, defaultArgMap, this.SqlArgTypeConvert, this.ExpressionEngine)
+				var replaceSql, err = replaceArg(v.DataString, defaultArgMap, this.sqlArgTypeConvert, this.expressionEngine)
 				if err != nil {
 					return err
 				}
@@ -281,14 +293,14 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 
 func (this *GoMybatisSqlBuilder) doIfElement(expression *string, param map[string]SqlArg, evaluateParameters map[string]interface{}) (bool, error) {
 	this.repleaceExpression(expression, param)
-	evalExpression, err := this.ExpressionEngine.Lexer(*expression)
+	evalExpression, err := this.expressionEngine.Lexer(*expression)
 	if err != nil {
 		return false, err
 	}
 	if evaluateParameters == nil {
-		evaluateParameters = this.expressParamterMap(param, this.ExpressionTypeConvert)
+		evaluateParameters = this.expressParamterMap(param, this.expressionTypeConvert)
 	}
-	result, err := this.ExpressionEngine.Eval(evalExpression, evaluateParameters, 0)
+	result, err := this.expressionEngine.Eval(evalExpression, evaluateParameters, 0)
 	if err != nil {
 		err = utils.NewError("SqlBuilder", "[GoMybatis] <test `", *expression, `> fail,`, err.Error())
 		return false, err
@@ -309,12 +321,12 @@ func (this *GoMybatisSqlBuilder) bindBindElementArg(args map[string]SqlArg, item
 		}
 		return args
 	}
-	evalExpression, err := this.ExpressionEngine.Lexer(value)
+	evalExpression, err := this.expressionEngine.Lexer(value)
 	if err != nil {
 		return args
 	}
-	var evaluateParameters = this.expressParamterMap(args, this.ExpressionTypeConvert)
-	result, err := this.ExpressionEngine.Eval(evalExpression, evaluateParameters, 0)
+	var evaluateParameters = this.expressParamterMap(args, this.expressionTypeConvert)
+	result, err := this.expressionEngine.Eval(evalExpression, evaluateParameters, 0)
 	if err != nil {
 		return args
 	}

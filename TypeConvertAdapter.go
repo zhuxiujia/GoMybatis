@@ -23,7 +23,6 @@ type SqlArgTypeConvert interface {
 
 //表达式类型转换器
 type GoMybatisExpressionTypeConvert struct {
-	ExpressionTypeConvert
 }
 
 //表达式类型转换器
@@ -36,7 +35,6 @@ func (this GoMybatisExpressionTypeConvert) Convert(arg SqlArg) interface{} {
 
 //Sql内容类型转换器
 type GoMybatisSqlArgTypeConvert struct {
-	SqlArgTypeConvert
 }
 
 //Sql内容类型转换器

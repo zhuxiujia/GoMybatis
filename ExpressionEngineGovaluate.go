@@ -5,6 +5,9 @@ import "github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
 type ExpressionEngineGovaluate struct {
 }
 
+func (this *ExpressionEngineGovaluate) Name() string {
+	return "ExpressionEngineGovaluate"
+}
 //编译一个表达式
 //参数：lexerArg 表达式内容
 //返回：interface{} 编译结果,error 错误

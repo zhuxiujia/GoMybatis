@@ -3,6 +3,8 @@ package GoMybatis
 //q：为什么要拆分表达式编译和执行步骤？优化性能，如果需要可以缓存表达式编译结果，执行表达式时不需要重复编译
 //表达式引擎接口
 type ExpressionEngine interface {
+	//引擎名称
+	Name() string
 	//编译一个表达式
 	//参数：lexerArg 表达式内容
 	//返回：interface{} 编译结果,error 错误

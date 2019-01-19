@@ -19,6 +19,10 @@ const (
 type ExpressionEngineJee struct {
 }
 
+func (this *ExpressionEngineJee) Name() string {
+	return "ExpressionEngineJee"
+}
+
 //编译一个表达式
 //参数：lexerArg 表达式内容
 //返回：interface{} 编译结果,error 错误
@@ -33,6 +37,7 @@ func (this *ExpressionEngineJee) Lexer(lexerArg string) (interface{}, error) {
 	}
 	return tree, nil
 }
+
 //执行一个表达式
 //参数：lexerResult=编译结果，arg=参数
 //返回：执行结果，错误
@@ -58,7 +63,7 @@ func (this *ExpressionEngineJee) Eval(compileResult interface{}, arg interface{}
 		}
 		break
 	default:
-		return nil, utils.NewError("ExpressionEngineJee", "unknow operation value = ",operation,"!")
+		return nil, utils.NewError("ExpressionEngineJee", "unknow operation value = ", operation, "!")
 	}
 	result, err := jee.Eval(compileResult.(*jee.TokenTree), jeeMsg)
 	if err != nil {
