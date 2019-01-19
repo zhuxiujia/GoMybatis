@@ -243,7 +243,7 @@ func buildTree(tokens []*Token) (*TokenTree, error) {
 
 	// first pass:
 	// take care of quantities, funcs, keys.
-	for _, t := range tokens {
+	for index, t := range tokens {
 
 		item := &TokenTree{
 			Value:  t.Value,
@@ -282,6 +282,14 @@ func buildTree(tokens []*Token) (*TokenTree, error) {
 			case "null":
 				item.Value = nil
 			default:
+				var itemString = fmt.Sprint(item.Value)
+				var itemStringFirstChar = string(itemString[:1])
+				if itemStringFirstChar != "." {
+					t.Value = "." + itemString
+					t.Type = KEY
+					tokens[index] = t
+					return buildTree(tokens)
+				}
 				return nil, errors.New(fmt.Sprintf("unexpected token: %s", item.Value))
 			}
 		}

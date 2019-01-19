@@ -20,7 +20,7 @@ type ExampleActivityMapper struct {
 	SelectByIds       func(ids []string) ([]Activity, error)       `mapperParams:"ids"`
 	SelectByIdMaps    func(ids map[int]string) ([]Activity, error) `mapperParams:"ids"`
 	SelectAll         func() ([]map[string]string, error)
-	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int) ([]Activity, error) `mapperParams:"name,startTime,endTime,page,size"`
+	SelectByCondition func(name *string, startTime *time.Time, endTime *time.Time, page *int, size *int) ([]Activity, error) `mapperParams:"name,startTime,endTime,page,size"`
 	UpdateById        func(session *GoMybatis.Session, arg Activity) (int64, error)
 	Insert            func(arg Activity) (int64, error)
 	CountByCondition  func(name string, startTime time.Time, endTime time.Time) (int, error) `mapperParams:"name,startTime,endTime"`
@@ -104,7 +104,9 @@ func Test_select(t *testing.T) {
 		return
 	}
 	//使用mapper
-	var result, err = exampleActivityMapper.SelectByCondition("注册", time.Time{}, time.Time{}, 0, 2000)
+	name := "注册"
+
+	var result, err = exampleActivityMapper.SelectByCondition(&name, nil,nil,nil,nil)
 	if err != nil {
 		panic(err)
 	}

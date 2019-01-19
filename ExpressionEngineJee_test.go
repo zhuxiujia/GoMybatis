@@ -50,20 +50,26 @@ func TestExpressionEngineJee_Eval_null(t *testing.T) {
 	var m = make(map[string]interface{})
 	m["a"] = 1
 	var engine = ExpressionEngineJee{}
-	var lexer, _ = engine.Lexer(".a == null")
-	var result, error = engine.Eval(lexer, m, JeeOperation_Marshal_Map)
+	var lexer, error = engine.Lexer("a == null")
+	if error != nil {
+		t.Fatal(error)
+	}
+	result, error := engine.Eval(lexer, m, JeeOperation_Marshal_Map)
 	if error != nil {
 		t.Fatal(error)
 	}
 	fmt.Println(result)
 }
 
-func TestExpressionEngineJeeTakeValue(t *testing.T)  {
+func TestExpressionEngineJeeTakeValue(t *testing.T) {
 	var m = make(map[string]interface{})
 	m["a"] = 1
 	var engine = ExpressionEngineJee{}
-	var lexer, _ = engine.Lexer(".a")
-	var result, error = engine.Eval(lexer, m, JeeOperation_Marshal_Map)
+	var lexer, error = engine.Lexer(".a")
+	if error != nil {
+		t.Fatal(error)
+	}
+	result, error := engine.Eval(lexer, m, JeeOperation_Marshal_Map)
 	if error != nil {
 		t.Fatal(error)
 	}
@@ -79,8 +85,11 @@ func BenchmarkExpressionEngineJee_Eval(b *testing.B) {
 	//start
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		var lexer, _ = engine.Lexer(".a == null")
-		var result, error = engine.Eval(lexer, m, JeeOperation_Marshal_Map)
+		var lexer, error = engine.Lexer(".a == null")
+		if error != nil {
+			b.Fatal(error)
+		}
+		result, error := engine.Eval(lexer, m, JeeOperation_Marshal_Map)
 		if error != nil {
 			b.Fatal(error)
 		}
@@ -90,16 +99,19 @@ func BenchmarkExpressionEngineJee_Eval(b *testing.B) {
 	}
 }
 
-func TestTpsExpressionEngineJee(t *testing.T)  {
+func TestTpsExpressionEngineJee(t *testing.T) {
 	var m = make(map[string]interface{})
 	m["a"] = nil
 	var engine = ExpressionEngineJee{}
 
 	//start
-	defer utils.CountMethodTps(100000,time.Now(),"ExpressionEngineGovaluate")
+	defer utils.CountMethodTps(100000, time.Now(), "ExpressionEngineGovaluate")
 	for i := 0; i < 100000; i++ {
-		var lexer, _ = engine.Lexer(".a == null")
-		var result, error = engine.Eval(lexer, m, JeeOperation_Marshal_Map)
+		var lexer, error = engine.Lexer(".a == null")
+		if error != nil {
+			t.Fatal(error)
+		}
+		result, error := engine.Eval(lexer, m, JeeOperation_Marshal_Map)
 		if error != nil {
 			t.Fatal(error)
 		}
