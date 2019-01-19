@@ -192,21 +192,17 @@ func InitMapperByLocalSession() ExampleActivityMapperImpl {
     <!-- 后台查询产品 -->
     <select id="selectByCondition" resultMap="BaseResultMap">
         select * from biz_activity where delete_flag=1
-        <bind name="pattern" value="'%' + name + '%'" />
-        <if test="name != ''">
-            <!--可以使用bind标签 and name like #{pattern}-->
-            and name like #{pattern}
-            <!--可以使用默认 and name like concat('%',#{name},'%')-->
-            <!--and name like concat('%',#{name},'%')-->
+        <if test="name != nil">
+            and name like #{'%' + name + '%'}
         </if>
-        <if test="startTime != ''">
+        <if test="startTime != nil">
             and create_time >= #{startTime}
         </if>
-        <if test="endTime != ''">
+        <if test="endTime != nil">
             and create_time &lt;= #{endTime}
         </if>
         order by create_time desc
-        <if test="page >= 0 and size != 0">limit #{page}, #{size}</if>
+        <if test="page != nil and size != nil">limit #{page}, #{size}</if>
     </select>`)
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	//设置对应的mapper xml文件,禁止输出日志

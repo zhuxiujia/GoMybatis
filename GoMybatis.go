@@ -19,7 +19,7 @@ func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine *Session
 	if DefaultSessionFactory == nil {
 		DefaultSessionFactory = &factory
 	}
-	WriteMapper(value, xml, DefaultSessionFactory, GoMybatisSqlResultDecoder{}, GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{}, &ExpressionEngineJee{}), enableLog)
+	WriteMapper(value, xml, DefaultSessionFactory, GoMybatisSqlResultDecoder{}, GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{}, &ExpressionEngineExpr{}), enableLog)
 }
 
 //根据sessionEngine写入到mapperPtr

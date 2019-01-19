@@ -106,7 +106,7 @@ func Test_SqlBuilder_Tps(t *testing.T) {
 </mapper>`
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
-	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{},&ExpressionEngineGovaluate{})
+	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{},&ExpressionEngineExpr{})
 	var paramMap = make(map[string]SqlArg)
 	paramMap["name"] = SqlArg{
 		Value: "",
