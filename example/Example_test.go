@@ -30,7 +30,9 @@ type ExampleActivityMapper struct {
 }
 
 //初始化mapper文件和结构体
-func InitMapperByLocalSession() *ExampleActivityMapper {
+var exampleActivityMapper = ExampleActivityMapper{}
+
+func init() {
 	var err error
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
 	engine, err := GoMybatis.Open("mysql", MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
@@ -45,10 +47,8 @@ func InitMapperByLocalSession() *ExampleActivityMapper {
 	defer file.Close()
 
 	bytes, _ := ioutil.ReadAll(file)
-	var exampleActivityMapper ExampleActivityMapper
 	//设置对应的mapper xml文件
 	GoMybatis.WriteMapperPtrByEngine(&exampleActivityMapper, bytes, engine, true)
-	return &exampleActivityMapper
 }
 
 //插入
@@ -57,8 +57,6 @@ func Test_inset(t *testing.T) {
 		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
-	//初始化mapper文件
-	var exampleActivityMapper = InitMapperByLocalSession()
 	//使用mapper
 	var result, err = exampleActivityMapper.Insert(Activity{Id: "171", Name: "test_insret", CreateTime: time.Now(), DeleteFlag: 1})
 	if err != nil {
@@ -74,13 +72,11 @@ func Test_update(t *testing.T) {
 		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
-	//初始化mapper文件
-	exampleActivityMapperImpl := InitMapperByLocalSession()
 	var activityBean = Activity{
 		Id:   "171",
 		Name: "rs168",
 	}
-	var updateNum, e = exampleActivityMapperImpl.UpdateById(nil, activityBean) //sessionId 有值则使用已经创建的session，否则新建一个session
+	var updateNum, e = exampleActivityMapper.UpdateById(nil, activityBean) //sessionId 有值则使用已经创建的session，否则新建一个session
 	fmt.Println("updateNum=", updateNum)
 	if e != nil {
 		panic(e)
@@ -93,10 +89,8 @@ func Test_delete(t *testing.T) {
 		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
-	//初始化mapper文件
-	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
-	var result, err = exampleActivityMapperImpl.DeleteById("171")
+	var result, err = exampleActivityMapper.DeleteById("171")
 	if err != nil {
 		panic(err)
 	}
@@ -109,10 +103,8 @@ func Test_select(t *testing.T) {
 		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
-	//初始化mapper文件
-	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
-	var result, err = exampleActivityMapperImpl.SelectByCondition("注册", time.Time{}, time.Time{}, 0, 2000)
+	var result, err = exampleActivityMapper.SelectByCondition("注册", time.Time{}, time.Time{}, 0, 2000)
 	if err != nil {
 		panic(err)
 	}
@@ -125,10 +117,8 @@ func Test_select_all(t *testing.T) {
 		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
-	//初始化mapper文件
-	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
-	var result, err = exampleActivityMapperImpl.SelectAll()
+	var result, err = exampleActivityMapper.SelectAll()
 	if err != nil {
 		panic(err)
 	}
@@ -141,10 +131,8 @@ func Test_count(t *testing.T) {
 		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
-	//初始化mapper文件
-	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
-	var result, err = exampleActivityMapperImpl.CountByCondition("", time.Time{}, time.Time{})
+	var result, err = exampleActivityMapper.CountByCondition("", time.Time{}, time.Time{})
 	if err != nil {
 		panic(err)
 	}
@@ -157,11 +145,9 @@ func Test_ForEach(t *testing.T) {
 		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
-	//初始化mapper文件
-	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
 	var ids = []string{"1", "2"}
-	var result, err = exampleActivityMapperImpl.SelectByIds(ids)
+	var result, err = exampleActivityMapper.SelectByIds(ids)
 	if err != nil {
 		panic(err)
 	}
@@ -174,11 +160,9 @@ func Test_ForEach_Map(t *testing.T) {
 		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
-	//初始化mapper文件
-	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
 	var ids = map[int]string{1: "165", 2: "166"}
-	var result, err = exampleActivityMapperImpl.SelectByIdMaps(ids)
+	var result, err = exampleActivityMapper.SelectByIdMaps(ids)
 	if err != nil {
 		panic(err)
 	}
@@ -191,8 +175,6 @@ func Test_local_Transation(t *testing.T) {
 		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
-	//初始化mapper文件
-	exampleActivityMapperImpl := InitMapperByLocalSession()
 	//使用事务
 	var session = GoMybatis.DefaultSessionFactory.NewSession(GoMybatis.SessionType_Default, nil)
 	session.Begin() //开启事务
@@ -200,7 +182,7 @@ func Test_local_Transation(t *testing.T) {
 		Id:   "170",
 		Name: "rs168-8",
 	}
-	var updateNum, e = exampleActivityMapperImpl.UpdateById(&session, activityBean) //sessionId 有值则使用已经创建的session，否则新建一个session
+	var updateNum, e = exampleActivityMapper.UpdateById(&session, activityBean) //sessionId 有值则使用已经创建的session，否则新建一个session
 	fmt.Println("updateNum=", updateNum)
 	if e != nil {
 		panic(e)
@@ -220,9 +202,6 @@ func Test_Remote_Transation(t *testing.T) {
 	go GoMybatis.ServerTransationTcp(remoteAddr, "mysql", MysqlUri)
 
 	//开始使用
-	//初始化mapper文件
-	var exampleActivityMapperImpl = InitMapperByLocalSession()
-
 	//关键，使用远程Session替换本地Session调用
 	var transationRMSession = GoMybatis.DefaultSessionFactory.NewSession(GoMybatis.SessionType_TransationRM, &GoMybatis.TransationRMClientConfig{
 		Addr:          remoteAddr,
@@ -238,7 +217,7 @@ func Test_Remote_Transation(t *testing.T) {
 		Id:   "170",
 		Name: "rs168-11",
 	}
-	var _, err = exampleActivityMapperImpl.UpdateById(&transationRMSession, activityBean)
+	var _, err = exampleActivityMapper.UpdateById(&transationRMSession, activityBean)
 	if err != nil {
 		panic(err)
 	}
@@ -255,10 +234,8 @@ func Test_choose(t *testing.T) {
 		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
-	//初始化mapper文件
-	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
-	var result, err = exampleActivityMapperImpl.Choose(1)
+	var result, err = exampleActivityMapper.Choose(1)
 	if err != nil {
 		panic(err)
 	}
@@ -271,10 +248,8 @@ func Test_include_sql(t *testing.T) {
 		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
-	//初始化mapper文件
-	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
-	var result, err = exampleActivityMapperImpl.SelectLinks("name")
+	var result, err = exampleActivityMapper.SelectLinks("name")
 	if err != nil {
 		panic(err)
 	}
