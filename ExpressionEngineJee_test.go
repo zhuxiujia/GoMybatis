@@ -2,7 +2,9 @@ package GoMybatis
 
 import (
 	"fmt"
+	"github.com/zhuxiujia/GoMybatis/utils"
 	"testing"
+	"time"
 )
 
 func TestExpressionEngineJee_Eval(t *testing.T) {
@@ -88,4 +90,21 @@ func BenchmarkExpressionEngineJee_Eval(b *testing.B) {
 	}
 }
 
+func TestTpsExpressionEngineJee(t *testing.T)  {
+	var m = make(map[string]interface{})
+	m["a"] = nil
+	var engine = ExpressionEngineJee{}
 
+	//start
+	defer utils.CountMethodTps(100000,time.Now(),"ExpressionEngineGovaluate")
+	for i := 0; i < 100000; i++ {
+		var lexer, _ = engine.Lexer(".a == null")
+		var result, error = engine.Eval(lexer, m, JeeOperation_Marshal_Map)
+		if error != nil {
+			t.Fatal(error)
+		}
+		if result == nil {
+			t.Fatal("eval fail")
+		}
+	}
+}
