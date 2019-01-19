@@ -93,7 +93,7 @@ func main() {
 <table border="1">
      <tr>
         <td>表达式引擎</td>
-        <td>支持指针参数</td>
+        <td>是否支持指针参数</td>
         <td>执行效率</td>
         <td>表达式功能</td>
     </tr>
