@@ -2,6 +2,7 @@ package GoMybatis
 
 import (
 	"bytes"
+	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
 	"strings"
 )
@@ -18,7 +19,7 @@ func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine *Session
 	if DefaultSessionFactory == nil {
 		DefaultSessionFactory = &factory
 	}
-	WriteMapper(value, xml, DefaultSessionFactory, GoMybatisSqlResultDecoder{}, GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{},&ExpressionEngineGovaluate{}), enableLog)
+	WriteMapper(value, xml, DefaultSessionFactory, GoMybatisSqlResultDecoder{}, GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{}, &ExpressionEngineGovaluate{}), enableLog)
 }
 
 //根据sessionEngine写入到mapperPtr
@@ -336,10 +337,15 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlB
 			}
 		}
 		if tagArgsLen > 0 && argIndex < tagArgsLen && tagArgs[argIndex].Name != "" {
-			paramMap[tagArgs[argIndex].Name] = SqlArg{
+			var sqlArg = SqlArg{
 				Value: argInterface,
 				Type:  arg.Type(),
 			}
+			//插入2份参数，兼容大小写不敏感的参数
+			var lowerKey = utils.LowerFieldFirstName(tagArgs[argIndex].Name)
+			var upperKey = utils.UpperFieldFirstName(tagArgs[argIndex].Name)
+			paramMap[lowerKey] = sqlArg
+			paramMap[upperKey] = sqlArg
 		} else {
 			paramMap[DefaultOneArg] = SqlArg{
 				Value: argInterface,

@@ -20,7 +20,7 @@ type GoMybatisSqlBuilder struct {
 	ExpressionEngine      ExpressionEngine
 }
 
-func (this GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert, SqlArgTypeConvert SqlArgTypeConvert,expressionEngine ExpressionEngine) GoMybatisSqlBuilder {
+func (this GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert, SqlArgTypeConvert SqlArgTypeConvert, expressionEngine ExpressionEngine) GoMybatisSqlBuilder {
 	this.ExpressionTypeConvert = ExpressionTypeConvert
 	this.SqlArgTypeConvert = SqlArgTypeConvert
 	this.ExpressionEngine = expressionEngine
@@ -41,10 +41,12 @@ func (this GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml *
 	return sqlStr, nil
 }
 
-func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *bytes.Buffer, param map[string]SqlArg) error {
+func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *bytes.Buffer, sqlArgMap map[string]SqlArg) error {
 	if this.SqlArgTypeConvert == nil || this.ExpressionTypeConvert == nil {
 		panic("[GoMybatis] GoMybatisSqlBuilder.SqlArgTypeConvert and GoMybatisSqlBuilder.ExpressionTypeConvert can not be nil!")
 	}
+	//默认的map[string]interface{}
+	var defaultArgMap = this.makeArgInterfaceMap(sqlArgMap)
 	//test表达式参数map
 	var evaluateParameters map[string]interface{}
 	for _, v := range itemTree {
@@ -53,26 +55,34 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 		switch v.ElementType {
 		case Element_bind:
 			//bind,param args change!need update
-			param = this.bindBindElementArg(param, v, this.SqlArgTypeConvert)
+			sqlArgMap = this.bindBindElementArg(sqlArgMap, v, this.SqlArgTypeConvert)
+			defaultArgMap = this.makeArgInterfaceMap(sqlArgMap)
 			if evaluateParameters != nil {
-				evaluateParameters = this.expressParamterMap(param, this.ExpressionTypeConvert)
+				evaluateParameters = this.expressParamterMap(sqlArgMap, this.ExpressionTypeConvert)
 			}
 			break
 		case Element_String:
 			//string element
-			sql.WriteString(replaceArg(v.DataString, param, this.SqlArgTypeConvert))
+			var replaceSql, err = replaceArg(v.DataString, defaultArgMap, this.SqlArgTypeConvert, this.ExpressionEngine)
+			if err != nil {
+				return err
+			}
+			sql.WriteString(replaceSql)
 			break
 		case Element_If:
 			//if element
 			var expression = v.Propertys[`test`]
-			var result, err = this.doIfElement(&expression, param, evaluateParameters)
+			var result, err = this.doIfElement(&expression, sqlArgMap, evaluateParameters)
 			if err != nil {
 				return err
 			}
 			if result {
 				//test > true,write sql string
-				var reps = replaceArg(v.DataString, param, this.SqlArgTypeConvert)
-				sql.WriteString(reps)
+				var replaceSql, err = replaceArg(v.DataString, defaultArgMap, this.SqlArgTypeConvert, this.ExpressionEngine)
+				if err != nil {
+					return err
+				}
+				sql.WriteString(replaceSql)
 			} else {
 				// test > fail ,end loop
 				loopChildItem = false
@@ -84,7 +94,7 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 			var suffix = v.Propertys[`suffix`]
 			var suffixOverrides = v.Propertys[`suffixOverrides`]
 			var prefixOverrides = v.Propertys[`prefixOverrides`]
-			var err = this.elementTrim(&loopChildItem, v.ElementItems, param, prefix, suffix, prefixOverrides, suffixOverrides, sql)
+			var err = this.elementTrim(&loopChildItem, v.ElementItems, sqlArgMap, prefix, suffix, prefixOverrides, suffixOverrides, sql)
 			if err != nil {
 				return err
 			}
@@ -92,7 +102,7 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 		case Element_Set:
 			if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
 				var trim bytes.Buffer
-				var err = this.createFromElement(v.ElementItems, &trim, param)
+				var err = this.createFromElement(v.ElementItems, &trim, sqlArgMap)
 				if err != nil {
 					return err
 				}
@@ -117,7 +127,7 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 				panic(`[GoMybatis] collection value can not be "" in <foreach collection=""> !`)
 			}
 			var tempSql bytes.Buffer
-			var datas = param[collection].Value
+			var datas = sqlArgMap[collection].Value
 			var collectionValue = reflect.ValueOf(datas)
 			if collectionValue.Kind() != reflect.Slice && collectionValue.Kind() != reflect.Map {
 				panic(`[GoMybatis] collection value must be a slice or map !`)
@@ -137,7 +147,7 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 					var key = keyValue.Interface()
 					var collectionItem = collectionValue.MapIndex(keyValue)
 					var tempArgMap = make(map[string]SqlArg) //temp parameter Map
-					for k, v := range param {
+					for k, v := range sqlArgMap {
 						tempArgMap[k] = v
 					}
 					if item != "" {
@@ -163,7 +173,7 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 				for i := 0; i < collectionValueLen; i++ {
 					var collectionItem = collectionValue.Index(i)
 					var tempArgMap = make(map[string]SqlArg) //temp parameter Map
-					for k, v := range param {
+					for k, v := range sqlArgMap {
 						tempArgMap[k] = v
 					}
 					if item != "" {
@@ -201,7 +211,7 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 		case Element_choose:
 			//read when and otherwise
 			var temp bytes.Buffer
-			var err = this.createFromElement(v.ElementItems, &temp, param)
+			var err = this.createFromElement(v.ElementItems, &temp, sqlArgMap)
 			if err != nil {
 				return err
 			}
@@ -211,16 +221,19 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 		case Element_when:
 			//if element
 			var expression = v.Propertys[`test`]
-			var result, err = this.doIfElement(&expression, param, evaluateParameters)
+			var result, err = this.doIfElement(&expression, sqlArgMap, evaluateParameters)
 			if err != nil {
 				return err
 			}
 			if result {
 				//test > true,write sql string
-				var reps = replaceArg(v.DataString, param, this.SqlArgTypeConvert)
-				sql.WriteString(reps)
+				var replaceSql, err = replaceArg(v.DataString, defaultArgMap, this.SqlArgTypeConvert, this.ExpressionEngine)
+				if err != nil {
+					return err
+				}
+				sql.WriteString(replaceSql)
 				if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
-					var err = this.createFromElement(v.ElementItems, sql, param)
+					var err = this.createFromElement(v.ElementItems, sql, sqlArgMap)
 					if err != nil {
 						return err
 					}
@@ -234,7 +247,7 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 			break
 		case Element_otherwise:
 			if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
-				var err = this.createFromElement(v.ElementItems, sql, param)
+				var err = this.createFromElement(v.ElementItems, sql, sqlArgMap)
 				if err != nil {
 					return err
 				}
@@ -242,7 +255,7 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 			breakChildItem = true
 			break
 		case Element_where:
-			var err = this.elementTrim(&loopChildItem, v.ElementItems, param, DefaultWhereElement_Prefix, "", DefaultWhereElement_PrefixOverrides, "", sql)
+			var err = this.elementTrim(&loopChildItem, v.ElementItems, sqlArgMap, DefaultWhereElement_Prefix, "", DefaultWhereElement_PrefixOverrides, "", sql)
 			if err != nil {
 				return err
 			}
@@ -257,7 +270,7 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 			break
 		}
 		if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
-			var err = this.createFromElement(v.ElementItems, sql, param)
+			var err = this.createFromElement(v.ElementItems, sql, sqlArgMap)
 			if err != nil {
 				return err
 			}
@@ -277,12 +290,7 @@ func (this *GoMybatisSqlBuilder) doIfElement(expression *string, param map[strin
 	}
 	result, err := this.ExpressionEngine.Eval(evalExpression, evaluateParameters, 0)
 	if err != nil {
-		var buffer bytes.Buffer
-		buffer.WriteString("[GoMybatis] <test `")
-		buffer.WriteString(*expression)
-		buffer.WriteString(`> fail,`)
-		buffer.WriteString(err.Error())
-		err = utils.NewError("SqlBuilder", buffer.String())
+		err = utils.NewError("SqlBuilder", "[GoMybatis] <test `", *expression, `> fail,`, err.Error())
 		return false, err
 	}
 	return result.(bool), nil
@@ -433,4 +441,14 @@ func (this *GoMybatisSqlBuilder) elementTrim(loopChildItem *bool, items []Elemen
 		*loopChildItem = false
 	}
 	return nil
+}
+
+func (this *GoMybatisSqlBuilder) makeArgInterfaceMap(args map[string]SqlArg) map[string]interface{} {
+	var m = make(map[string]interface{})
+	if args != nil {
+		for k, v := range args {
+			m[k] = v.Value
+		}
+	}
+	return m
 }
