@@ -39,8 +39,14 @@ func canBeNumber(val interface{}) bool {
 	return false
 }
 
-func equal(left, right interface{}) bool {
-	if isNumber(left) && canBeNumber(right) {
+func equal(left interface{}, right interface{}) bool {
+	lv := reflect.ValueOf(left)
+	lv=GetDeepPtr(lv)
+	rv := reflect.ValueOf(right)
+	rv=GetDeepPtr(rv)
+	if lv.IsValid() == false && rv.IsValid() == false {
+		return true
+	} else if isNumber(left) && canBeNumber(right) {
 		right, _ := cast(right)
 		return left == right
 	} else if canBeNumber(left) && isNumber(right) {
@@ -50,6 +56,17 @@ func equal(left, right interface{}) bool {
 		return reflect.DeepEqual(left, right)
 	}
 }
+
+func GetDeepPtr(v reflect.Value) reflect.Value {
+	if v.IsValid() && v.Kind() == reflect.Ptr {
+		v = v.Elem()
+		if v.IsValid() && v.Kind() == reflect.Ptr{
+			GetDeepPtr(v)
+		}
+	}
+	return v
+}
+
 
 func extract(val interface{}, i interface{}) (interface{}, bool) {
 	v := reflect.ValueOf(val)

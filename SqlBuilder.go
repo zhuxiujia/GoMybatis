@@ -84,7 +84,7 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 		case Element_If:
 			//if element
 			var expression = v.Propertys[`test`]
-			var result, err = this.doIfElement(&expression, sqlArgMap, evaluateParameters)
+			var result, err = this.doIfElement(expression, sqlArgMap, evaluateParameters)
 			if err != nil {
 				return err
 			}
@@ -233,7 +233,7 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 		case Element_when:
 			//if element
 			var expression = v.Propertys[`test`]
-			var result, err = this.doIfElement(&expression, sqlArgMap, evaluateParameters)
+			var result, err = this.doIfElement(expression, sqlArgMap, evaluateParameters)
 			if err != nil {
 				return err
 			}
@@ -291,18 +291,18 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 	return nil
 }
 
-func (this *GoMybatisSqlBuilder) doIfElement(expression *string, param map[string]SqlArg, evaluateParameters map[string]interface{}) (bool, error) {
+func (this *GoMybatisSqlBuilder) doIfElement(expression string, param map[string]SqlArg, evaluateParameters map[string]interface{}) (bool, error) {
 	//this.repleaceExpression(expression, param)
-	evalExpression, err := this.expressionEngine.Lexer(*expression)
+	ifElementevalExpression, err := this.expressionEngine.Lexer(expression)
 	if err != nil {
 		return false, err
 	}
 	if evaluateParameters == nil {
 		evaluateParameters = this.expressParamterMap(param, this.expressionTypeConvert)
 	}
-	result, err := this.expressionEngine.Eval(evalExpression, evaluateParameters, 0)
+	result, err := this.expressionEngine.Eval(ifElementevalExpression, evaluateParameters, 0)
 	if err != nil {
-		err = utils.NewError("SqlBuilder", "[GoMybatis] <test `", *expression, `> fail,`, err.Error())
+		err = utils.NewError("SqlBuilder", "[GoMybatis] <test `", expression, `> fail,`, err.Error())
 		return false, err
 	}
 	return result.(bool), nil
@@ -321,12 +321,12 @@ func (this *GoMybatisSqlBuilder) bindBindElementArg(args map[string]SqlArg, item
 		}
 		return args
 	}
-	evalExpression, err := this.expressionEngine.Lexer(value)
+	bindEvalExpression, err := this.expressionEngine.Lexer(value)
 	if err != nil {
 		return args
 	}
 	var evaluateParameters = this.expressParamterMap(args, this.expressionTypeConvert)
-	result, err := this.expressionEngine.Eval(evalExpression, evaluateParameters, 0)
+	result, err := this.expressionEngine.Eval(bindEvalExpression, evaluateParameters, 0)
 	if err != nil {
 		return args
 	}

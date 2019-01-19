@@ -15,6 +15,7 @@ https://zhuxiujia.github.io/gomybatis.io/info.html
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-动态SQL</a>，在xml中可灵活运用if判断，foreach遍历数组，resultMap,bind等等java框架Mybatis包含的实用功能`<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<where>,<foreach>,<resultMap>,<bind>,<choose><when><otherwise>,<sql><include>`<br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-多数据库支持Mysql,Postgres,Tidb,SQLite,Oracle....等等更多</a><br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-快速上手</a>基于反射动态代理,无需go generate生成*.go等中间代码，xml读取后可直接调用函数<br>
+<a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-接口化设计扩展性好</a>面向接口及设计模式，扩展性和替换性好<br>
 ### 通过远程代理处理事务支持  处于 单数据库(Mysql,postgresql)-分布式数据库（TiDB,cockroachdb...）过渡期间的微服务
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/tx.png)
 
@@ -88,6 +89,35 @@ func main() {
 	fmt.Println(result)
 }
 ```
+## v2019.1.19 新增了 github.com/nylabs/gojee 引擎（改进了原作者源码取消了开头的"."符号,例如.a.b变成 a.b）和 github.com/antonmedv/expr 表达式引擎（改进了原作者源码指针的bug,加入字符串相加操作例如'a'+'b'）
+<table border="1">
+     <tr>
+        <td>表达式引擎</td>
+        <td>支持指针参数</td>
+        <td>执行效率</td>
+        <td>表达式功能</td>
+    </tr>
+    <tr>
+         <td>github.com/antonmedv/expr</td>
+         <td>支持null和nil和指针</td>
+         <td>实测比govaluate快一半以上</td>
+         <td>一般</td>
+    </tr>
+    <tr>
+          <td>github.com/nylabs/gojee</td>
+          <td>支持null和指针</td>
+          <td>实测缓慢-因为每次都有json序列化和反序列化操作</td>
+          <td>多</td>
+    </tr>
+    <tr>
+           <td>github.com/Knetic/govaluate</td>
+           <td>不支持null和nil和指针</td>
+           <td>中等速度</td>
+           <td>一般</td>
+    </tr>
+</table>
+为了执行效率 框架默认使用 github.com/antonmedv/expr作为默认选项，你也可以自定义调用GoMybatis.WriteMapper()参数中SqlBuilder的参数自行选择加入ExpressionEngine
+
 ## 请及时关注版本，及时升级版本(新的功能，bug修复)
 ## TODO 期待功能路线（预览特性,有可能会更改）
 -针对GoLand和IDEA的xml生成插件，右键一键生成CRUD代码</br>
