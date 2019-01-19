@@ -283,12 +283,18 @@ func buildTree(tokens []*Token) (*TokenTree, error) {
 				item.Value = nil
 			default:
 				var itemString = fmt.Sprint(item.Value)
-				var itemStringFirstChar = string(itemString[:1])
-				if itemStringFirstChar != "." {
-					t.Value = "." + itemString
-					t.Type = KEY
-					tokens[index] = t
-					return buildTree(tokens)
+				if len(itemString) >= 1 {
+					var itemStringFirstChar = string(itemString[:1])
+					if itemStringFirstChar != "." {
+						// have . is key
+						t.Value = "." + itemString
+						t.Type = KEY
+						tokens[index] = t
+						return buildTree(tokens)
+					} else {
+						// have key . bug not find!
+						return nil, errors.New(fmt.Sprintf("unexpected token: %s", string(itemString[1:])))
+					}
 				}
 				return nil, errors.New(fmt.Sprintf("unexpected token: %s", item.Value))
 			}
