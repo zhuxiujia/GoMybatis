@@ -54,8 +54,8 @@ func (this GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml *
 }
 
 func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *bytes.Buffer, sqlArgMap map[string]SqlArg) error {
-	if this.SqlArgTypeConvert == nil || this.ExpressionTypeConvert == nil {
-		panic("[GoMybatis] GoMybatisSqlBuilder.SqlArgTypeConvert and GoMybatisSqlBuilder.ExpressionTypeConvert can not be nil!")
+	if this.sqlArgTypeConvert == nil || this.expressionTypeConvert == nil {
+		panic("[GoMybatis] GoMybatisSqlBuilder.sqlArgTypeConvert and GoMybatisSqlBuilder.expressionTypeConvert can not be nil!")
 	}
 	//默认的map[string]interface{}
 	var defaultArgMap = this.makeArgInterfaceMap(sqlArgMap)
