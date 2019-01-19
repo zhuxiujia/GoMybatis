@@ -95,24 +95,28 @@ func main() {
         <td>表达式引擎</td>
         <td>是否支持指针参数/null/nil</td>
         <td>执行效率</td>
+	<td>and or 命令性能损耗</td>
         <td>表达式功能</td>
     </tr>
     <tr>
          <td>https://github.com/antonmedv/expr</td>
          <td>支持null和nil和指针</td>
          <td>实测比govaluate快一半以上</td>
+	 <td>还行</td>
          <td>一般</td>
     </tr>
     <tr>
           <td>https://github.com/nylabs/gojee</td>
           <td>支持null和指针</td>
           <td>实测缓慢-因为每次都有json序列化和反序列化操作</td>
+	  <td>大</td>
           <td>多</td>
     </tr>
     <tr>
            <td>https://github.com/Knetic/govaluate</td>
            <td>不支持null和nil和指针</td>
            <td>中等速度</td>
+	   <td>一般</td>
            <td>一般</td>
     </tr>
 </table>
