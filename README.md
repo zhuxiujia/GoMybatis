@@ -90,7 +90,7 @@ func main() {
 	fmt.Println(result)
 }
 ```
-## v2019.1.19 新增了 github.com/nylabs/gojee 引擎（改进了原作者源码取消了开头的"."符号,例如.a.b变成 a.b）和 github.com/antonmedv/expr 表达式引擎（改进了原作者源码指针的bug,加入字符串相加操作例如'a'+'b'）
+## v2019.1.19 新增了gojee引擎（改进了原作者源码取消了开头的"."符号,例如.a.b变成 a.b）和expr表达式引擎（改进了原作者源码指针的bug,加入字符串相加操作例如'a'+'b'）
 https://github.com/zhuxiujia/GoMybatis/tree/master/lib/github.com/antonmedv/expr
 https://github.com/zhuxiujia/GoMybatis/tree/master/lib/github.com/nytlabs/gojee
 https://github.com/zhuxiujia/GoMybatis/tree/master/lib/github.com/Knetic/govaluate
