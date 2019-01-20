@@ -163,9 +163,7 @@ func (n binaryNode) Eval(env interface{}) (interface{}, error) {
 		return !ok, nil
 
 	case "~":
-		if reflectLeft.Kind() == reflect.String && reflectRight.Kind() == reflect.String {
-			return left.(string) + right.(string), nil
-		}
+		fallthrough
 	case "+":
 		if reflectLeft.Kind() == reflect.String && reflectRight.Kind() == reflect.String {
 			return left.(string) + right.(string), nil
@@ -173,7 +171,7 @@ func (n binaryNode) Eval(env interface{}) (interface{}, error) {
 	}
 
 	// Next goes operators on numbers
-	l, r := toNumber(n.left, left), toNumber(n.right, right)
+	l, r := toNumberType(n.left, left,reflectLeft.Type()), toNumberType(n.right, right,reflectRight.Type())
 
 	switch n.operator {
 	case "|":

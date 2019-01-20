@@ -376,7 +376,7 @@ var evalErrorTests = []evalErrorTest{
 	{
 		`"foo" ~ foo`,
 		map[string]*int{"foo": nil},
-		`interface conversion: interface {} is *int, not string`,
+		`cannot convert "foo" (type string) to type float64`,
 	},
 	{
 		"1 or 0",

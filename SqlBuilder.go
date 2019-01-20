@@ -4,22 +4,24 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/zhuxiujia/GoMybatis/utils"
-	"log"
 	"reflect"
 	"strings"
 )
 
 type SqlBuilder interface {
-	BuildSql(paramMap map[string]SqlArg, mapperXml *MapperXml, enableLog bool) (string, error)
+	BuildSql(paramMap map[string]SqlArg, mapperXml *MapperXml) (string, error)
 	ExpressionEngineProxy() ExpressionEngineProxy
 	SqlArgTypeConvert() SqlArgTypeConvert
 	ExpressionTypeConvert() ExpressionTypeConvert
+	LogSystem() *LogSystem
 }
 
 type GoMybatisSqlBuilder struct {
 	expressionTypeConvert ExpressionTypeConvert
 	sqlArgTypeConvert     SqlArgTypeConvert
-	expressionEngineProxy      ExpressionEngineProxy
+	expressionEngineProxy ExpressionEngineProxy
+	logSystem             *LogSystem
+	enableLog             bool
 }
 
 func (this GoMybatisSqlBuilder) ExpressionEngineProxy() ExpressionEngineProxy {
@@ -32,14 +34,22 @@ func (this GoMybatisSqlBuilder) ExpressionTypeConvert() ExpressionTypeConvert {
 	return this.expressionTypeConvert
 }
 
-func (this GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert, SqlArgTypeConvert SqlArgTypeConvert, expressionEngine ExpressionEngineProxy) GoMybatisSqlBuilder {
+func (this GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert, SqlArgTypeConvert SqlArgTypeConvert, expressionEngine ExpressionEngineProxy, log Log, enableLog bool) GoMybatisSqlBuilder {
 	this.expressionTypeConvert = ExpressionTypeConvert
 	this.sqlArgTypeConvert = SqlArgTypeConvert
 	this.expressionEngineProxy = expressionEngine
+	this.enableLog = enableLog
+	if enableLog {
+		var logSystem, err = LogSystem{}.New(log)
+		if err != nil {
+			panic(err)
+		}
+		this.logSystem = &logSystem
+	}
 	return this
 }
 
-func (this GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml *MapperXml, enableLog bool) (string, error) {
+func (this GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml *MapperXml) (string, error) {
 	var sql bytes.Buffer
 	err := this.createFromElement(mapperXml.ElementItems, &sql, paramMap)
 	if err != nil {
@@ -47,8 +57,8 @@ func (this GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml *
 	}
 	var sqlStr = sql.String()
 	sql.Reset()
-	if enableLog {
-		log.Println("[GoMybatis] Preparing sql ==> ", sqlStr)
+	if this.enableLog {
+		this.logSystem.SendLog("[GoMybatis] Preparing sql ==> ", sqlStr)
 	}
 	return sqlStr, nil
 }
@@ -364,8 +374,6 @@ func (this *GoMybatisSqlBuilder) sqlParamterMap(parameters map[string]SqlArg, ty
 	return newMap
 }
 
-
-
 //trim处理element
 func (this *GoMybatisSqlBuilder) elementTrim(loopChildItem *bool, items []ElementItem, param map[string]SqlArg, prefix string, suffix string, prefixOverrides string, suffixOverrides string, sql *bytes.Buffer) error {
 	if *loopChildItem && items != nil && len(items) > 0 {
@@ -412,4 +420,8 @@ func (this *GoMybatisSqlBuilder) makeArgInterfaceMap(args map[string]SqlArg) map
 		}
 	}
 	return m
+}
+
+func (this GoMybatisSqlBuilder) LogSystem() *LogSystem{
+	return this.logSystem
 }

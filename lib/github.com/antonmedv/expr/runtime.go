@@ -6,24 +6,56 @@ import (
 )
 
 func toNumber(n Node, val interface{}) float64 {
-	v, ok := cast(val)
-	if ok {
-		return v
+	return toNumberType(n, val, nil)
+}
+
+func toNumberType(n Node, val interface{}, t reflect.Type) float64 {
+	if t != nil {
+		v, ok := castType(val, t)
+		if ok {
+			return v
+		}
+		panic(fmt.Sprintf("cannot convert %v (type %T) to type float64", n, val))
+	} else {
+		v, ok := cast(val)
+		if ok {
+			return v
+		}
+		panic(fmt.Sprintf("cannot convert %v (type %T) to type float64", n, val))
 	}
-	panic(fmt.Sprintf("cannot convert %v (type %T) to type float64", n, val))
 }
 
 func cast(val interface{}) (float64, bool) {
-	v := reflect.ValueOf(val)
-	switch v.Kind() {
-	case reflect.Float32, reflect.Float64:
-		return v.Float(), true
+	return castType(val, nil)
+}
 
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return float64(v.Int()), true
+func castType(val interface{}, t reflect.Type) (float64, bool) {
+	if t != nil {
+		v := reflect.ValueOf(val)
+		v=GetDeepPtr(v)
+		switch t.Kind() {
+		case reflect.Float32, reflect.Float64:
+			return v.Float(), true
 
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return float64(v.Uint()), true // TODO: Check if uint64 fits into float64.
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			return float64(v.Int()), true
+
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			return float64(v.Uint()), true // TODO: Check if uint64 fits into float64.
+		}
+	} else {
+		v := reflect.ValueOf(val)
+		v=GetDeepPtr(v)
+		switch v.Kind() {
+		case reflect.Float32, reflect.Float64:
+			return v.Float(), true
+
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			return float64(v.Int()), true
+
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			return float64(v.Uint()), true // TODO: Check if uint64 fits into float64.
+		}
 	}
 	return 0, false
 }
@@ -41,9 +73,9 @@ func canBeNumber(val interface{}) bool {
 
 func equal(left interface{}, right interface{}) bool {
 	lv := reflect.ValueOf(left)
-	lv=GetDeepPtr(lv)
+	lv = GetDeepPtr(lv)
 	rv := reflect.ValueOf(right)
-	rv=GetDeepPtr(rv)
+	rv = GetDeepPtr(rv)
 	if lv.IsValid() == false && rv.IsValid() == false {
 		return true
 	} else if isNumber(left) && canBeNumber(right) {
@@ -60,13 +92,12 @@ func equal(left interface{}, right interface{}) bool {
 func GetDeepPtr(v reflect.Value) reflect.Value {
 	if v.IsValid() && v.Kind() == reflect.Ptr {
 		v = v.Elem()
-		if v.IsValid() && v.Kind() == reflect.Ptr{
+		if v.IsValid() && v.Kind() == reflect.Ptr {
 			GetDeepPtr(v)
 		}
 	}
 	return v
 }
-
 
 func extract(val interface{}, i interface{}) (interface{}, bool) {
 	v := reflect.ValueOf(val)

@@ -1,6 +1,7 @@
 package GoMybatis
 
 import (
+	"fmt"
 	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
@@ -30,11 +31,11 @@ func (this *LogSystem) Close() ( error) {
 	return nil
 }
 
-func (this *LogSystem) SendLog(logs string) error {
+func (this *LogSystem) SendLog(logs ...interface{}) error {
 	if this.started == false {
 		return utils.NewError("LogSystem", "no log Receiver! you must call go GoMybatis.LogSystem{}.New()")
 	}
-	this.logChan <- logs
+	this.logChan <- fmt.Sprint(logs)
 	return nil
 }
 

@@ -35,7 +35,7 @@ func Benchmark_SqlBuilder(b *testing.B) {
 </mapper>`
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
-	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{},ExpressionEngineProxy{}.New(&ExpressionEngineExpr{},true))
+	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{},ExpressionEngineProxy{}.New(&ExpressionEngineExpr{},true),&LogStandard{},false)
 	var paramMap = make(map[string]SqlArg)
 	paramMap["name"] = SqlArg{
 		Value: "",
@@ -59,7 +59,7 @@ func Benchmark_SqlBuilder(b *testing.B) {
 	}
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		builder.BuildSql(paramMap, mapperTree["selectByCondition"], false)
+		builder.BuildSql(paramMap, mapperTree["selectByCondition"])
 	}
 }
 
@@ -106,7 +106,7 @@ func Test_SqlBuilder_Tps(t *testing.T) {
 </mapper>`
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
-	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{},ExpressionEngineProxy{}.New(&ExpressionEngineExpr{},true))
+	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{},ExpressionEngineProxy{}.New(&ExpressionEngineExpr{},true),&LogStandard{},false)
 	var paramMap = make(map[string]SqlArg)
 	paramMap["name"] = SqlArg{
 		Value: "",
@@ -131,7 +131,7 @@ func Test_SqlBuilder_Tps(t *testing.T) {
 	defer utils.CountMethodTps(10000, time.Now(), "Test_SqlBuilder_Tps")
 	for i := 0; i < 10000; i++ {
 		//var sql, e =
-		builder.BuildSql(paramMap, mapperTree["selectByCondition"], false)
+		builder.BuildSql(paramMap, mapperTree["selectByCondition"])
 		//fmt.Println(sql, e)
 	}
 }
@@ -212,7 +212,7 @@ func TestGoMybatisSqlBuilder_BuildSql(t *testing.T) {
 </mapper>`
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
-	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{},ExpressionEngineProxy{}.New(&ExpressionEngineExpr{},true))
+	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{},ExpressionEngineProxy{}.New(&ExpressionEngineExpr{},true),&LogStandard{},true)
 	var paramMap = make(map[string]SqlArg)
 	paramMap["name"] = SqlArg{
 		Value: "name",
@@ -234,7 +234,7 @@ func TestGoMybatisSqlBuilder_BuildSql(t *testing.T) {
 		Value: 0,
 		Type:  reflect.TypeOf(0),
 	}
-	var sql, err = builder.BuildSql(paramMap, mapperTree["selectByCondition"], false)
+	var sql, err = builder.BuildSql(paramMap, mapperTree["selectByCondition"])
 	if err != nil {
 		t.Fatal(err)
 	}

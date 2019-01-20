@@ -19,7 +19,12 @@ func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine *Session
 	if DefaultSessionFactory == nil {
 		DefaultSessionFactory = &factory
 	}
-	WriteMapper(value, xml, DefaultSessionFactory, GoMybatisSqlResultDecoder{}, GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineExpr{},true)), enableLog)
+	var expressConvert=GoMybatisExpressionTypeConvert{}
+	var sqlConvert=GoMybatisSqlArgTypeConvert{}
+	var expressionEngine = ExpressionEngineProxy{}.New(&ExpressionEngineExpr{},true)
+	var sqlBuilder=GoMybatisSqlBuilder{}.New(expressConvert,sqlConvert, expressionEngine,&LogStandard{},enableLog)
+	var decoder = GoMybatisSqlResultDecoder{}
+	WriteMapper(value, xml, DefaultSessionFactory, decoder,sqlBuilder,enableLog)
 }
 
 //根据sessionEngine写入到mapperPtr
@@ -358,7 +363,7 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlB
 		paramMap = scanStructArgFields(args[customIndex], nil)
 	}
 
-	result, err := sqlBuilder.BuildSql(paramMap, mapperXml, enableLog)
+	result, err := sqlBuilder.BuildSql(paramMap, mapperXml)
 	return session, result, err
 }
 
