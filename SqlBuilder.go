@@ -11,7 +11,7 @@ import (
 
 type SqlBuilder interface {
 	BuildSql(paramMap map[string]SqlArg, mapperXml *MapperXml, enableLog bool) (string, error)
-	ExpressionEngine() ExpressionEngine
+	ExpressionEngineProxy() ExpressionEngineProxy
 	SqlArgTypeConvert() SqlArgTypeConvert
 	ExpressionTypeConvert() ExpressionTypeConvert
 }
@@ -19,11 +19,11 @@ type SqlBuilder interface {
 type GoMybatisSqlBuilder struct {
 	expressionTypeConvert ExpressionTypeConvert
 	sqlArgTypeConvert     SqlArgTypeConvert
-	expressionEngine      ExpressionEngine
+	expressionEngineProxy      ExpressionEngineProxy
 }
 
-func (this GoMybatisSqlBuilder) ExpressionEngine() ExpressionEngine {
-	return this.expressionEngine
+func (this GoMybatisSqlBuilder) ExpressionEngineProxy() ExpressionEngineProxy {
+	return this.expressionEngineProxy
 }
 func (this GoMybatisSqlBuilder) SqlArgTypeConvert() SqlArgTypeConvert {
 	return this.sqlArgTypeConvert
@@ -32,10 +32,10 @@ func (this GoMybatisSqlBuilder) ExpressionTypeConvert() ExpressionTypeConvert {
 	return this.expressionTypeConvert
 }
 
-func (this GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert, SqlArgTypeConvert SqlArgTypeConvert, expressionEngine ExpressionEngine) GoMybatisSqlBuilder {
+func (this GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert, SqlArgTypeConvert SqlArgTypeConvert, expressionEngine ExpressionEngineProxy) GoMybatisSqlBuilder {
 	this.expressionTypeConvert = ExpressionTypeConvert
 	this.sqlArgTypeConvert = SqlArgTypeConvert
-	this.expressionEngine = expressionEngine
+	this.expressionEngineProxy = expressionEngine
 	return this
 }
 
@@ -75,7 +75,7 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 			break
 		case Element_String:
 			//string element
-			var replaceSql, err = replaceArg(v.DataString, defaultArgMap, this.sqlArgTypeConvert, this.expressionEngine)
+			var replaceSql, err = replaceArg(v.DataString, defaultArgMap, this.sqlArgTypeConvert, &this.expressionEngineProxy)
 			if err != nil {
 				return err
 			}
@@ -90,7 +90,7 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 			}
 			if result {
 				//test > true,write sql string
-				var replaceSql, err = replaceArg(v.DataString, defaultArgMap, this.sqlArgTypeConvert, this.expressionEngine)
+				var replaceSql, err = replaceArg(v.DataString, defaultArgMap, this.sqlArgTypeConvert, &this.expressionEngineProxy)
 				if err != nil {
 					return err
 				}
@@ -239,7 +239,7 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 			}
 			if result {
 				//test > true,write sql string
-				var replaceSql, err = replaceArg(v.DataString, defaultArgMap, this.sqlArgTypeConvert, this.expressionEngine)
+				var replaceSql, err = replaceArg(v.DataString, defaultArgMap, this.sqlArgTypeConvert, &this.expressionEngineProxy)
 				if err != nil {
 					return err
 				}
@@ -293,14 +293,14 @@ func (this *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *
 
 func (this *GoMybatisSqlBuilder) doIfElement(expression string, param map[string]SqlArg, evaluateParameters map[string]interface{}) (bool, error) {
 	//this.repleaceExpression(expression, param)
-	ifElementevalExpression, err := this.expressionEngine.Lexer(expression)
+	ifElementevalExpression, err := this.expressionEngineProxy.Lexer(expression)
 	if err != nil {
 		return false, err
 	}
 	if evaluateParameters == nil {
 		evaluateParameters = this.expressParamterMap(param, this.expressionTypeConvert)
 	}
-	result, err := this.expressionEngine.Eval(ifElementevalExpression, evaluateParameters, 0)
+	result, err := this.expressionEngineProxy.Eval(ifElementevalExpression, evaluateParameters, 0)
 	if err != nil {
 		err = utils.NewError("SqlBuilder", "[GoMybatis] <test `", expression, `> fail,`, err.Error())
 		return false, err
@@ -321,12 +321,12 @@ func (this *GoMybatisSqlBuilder) bindBindElementArg(args map[string]SqlArg, item
 		}
 		return args
 	}
-	bindEvalExpression, err := this.expressionEngine.Lexer(value)
+	bindEvalExpression, err := this.expressionEngineProxy.Lexer(value)
 	if err != nil {
 		return args
 	}
 	var evaluateParameters = this.expressParamterMap(args, this.expressionTypeConvert)
-	result, err := this.expressionEngine.Eval(bindEvalExpression, evaluateParameters, 0)
+	result, err := this.expressionEngineProxy.Eval(bindEvalExpression, evaluateParameters, 0)
 	if err != nil {
 		return args
 	}

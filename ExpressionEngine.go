@@ -8,10 +8,13 @@ type ExpressionEngine interface {
 	//编译一个表达式
 	//参数：lexerArg 表达式内容
 	//返回：interface{} 编译结果,error 错误
-	Lexer(expression string) (interface{}, error)
+	Lexer(lexerArg string) (interface{}, error)
 
 	//执行一个表达式
 	//参数：lexerResult=编译结果，arg=参数
 	//返回：执行结果，错误
 	Eval(lexerResult interface{}, arg interface{}, operation int) (interface{}, error)
+
+	//取Lexer缓存,可不提供。需要提供单例
+	LexerCache() ExpressionEngineLexerCache
 }

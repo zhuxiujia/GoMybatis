@@ -116,3 +116,8 @@ func (this *ExpressionEngineJee) LexerAndOrSupport(lexerArg string) string {
 	}
 	return lexerArg
 }
+
+//Lexer缓存,可不提供。
+func (this *ExpressionEngineJee) LexerCache() ExpressionEngineLexerCache{
+	return nil
+}
