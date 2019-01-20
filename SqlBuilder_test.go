@@ -35,7 +35,7 @@ func Benchmark_SqlBuilder(b *testing.B) {
 </mapper>`
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
-	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{},ExpressionEngineProxy{}.New(&ExpressionEngineExpr{},true),&LogStandard{},true)
+	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{},ExpressionEngineProxy{}.New(&ExpressionEngineExpr{},true),&LogStandard{},false)
 	var paramMap = make(map[string]SqlArg)
 	paramMap["name"] = SqlArg{
 		Value: "",
