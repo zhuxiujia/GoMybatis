@@ -90,7 +90,10 @@ func main() {
 	fmt.Println(result)
 }
 ```
-## v2019.1.19 新增了 github.com/nylabs/gojee 引擎（改进了原作者源码取消了开头的"."符号,例如.a.b变成 a.b）和 github.com/antonmedv/expr 表达式引擎（改进了原作者源码指针的bug,加入字符串相加操作例如'a'+'b'）
+#### v2019.1.19 新增了gojee引擎（改进了原作者源码取消了开头的"."符号,例如.a.b变成 a.b）和expr表达式引擎（改进了原作者源码指针的bug,加入字符串相加操作例如'a'+'b'）
+https://github.com/zhuxiujia/GoMybatis/tree/master/lib/github.com/antonmedv/expr
+https://github.com/zhuxiujia/GoMybatis/tree/master/lib/github.com/nytlabs/gojee
+https://github.com/zhuxiujia/GoMybatis/tree/master/lib/github.com/Knetic/govaluate
 <table border="1">
      <tr>
         <td>表达式引擎</td>
@@ -100,23 +103,23 @@ func main() {
         <td>表达式功能</td>
     </tr>
     <tr>
-         <td>https://github.com/antonmedv/expr</td>
+         <td>expr</td>
          <td>支持null和nil和指针</td>
-         <td>实测比govaluate快一半以上</td>
+         <td>快-实测比govaluate快</td>
 	 <td>还行</td>
          <td>一般</td>
     </tr>
     <tr>
-          <td>https://github.com/nylabs/gojee</td>
+          <td>gojee</td>
           <td>支持null和指针</td>
-          <td>实测缓慢-因为每次都有json序列化和反序列化操作</td>
+          <td>慢-每次检查表达式都有json序列化和反序列化操作</td>
 	  <td>大</td>
           <td>多</td>
     </tr>
     <tr>
-           <td>https://github.com/Knetic/govaluate</td>
+           <td>govaluate</td>
            <td>不支持null和nil和指针</td>
-           <td>中等速度</td>
+           <td>中等</td>
 	   <td>一般</td>
            <td>一般</td>
     </tr>
