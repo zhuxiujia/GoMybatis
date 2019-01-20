@@ -1,8 +1,8 @@
 
 ## 此次列出改进项
 
-## 1 表达式取指针属性值会直接取到实际值值
- 假设foo.Bar = *int = 1</br>
+## 1 改进支持表达式取指针属性值会直接取到实际值
+ 设foo.Bar = *int = 1</br>
  原版 表达式 ' foo.Bar ' 执行eval后 结果为  0x123ffcc</br>
  改进 表达式 ' foo.Bar ' 执行eval后 结果为  1</br>
 eval.go 中 加入取实际值代码</br>
@@ -27,4 +27,12 @@ var resultV = reflect.ValueOf(result)
 		}
 	}
 ```
-### 2 同时支持 表达式  ' foo.Bar == nil '  ' foo.Bar == null '
+### 2 改进同时支持 表达式  ' foo.Bar == nil '  ' foo.Bar == null '
+```
+//在 parser.go 中
+case "null":
+			return nilNode{}, nil
+```
+### 3 改进支持字符串相加操作符为+ 号
+ 原版表达式 "'foo.Bar'~ 'foo.Bar'"" 执行eval后 结果为  'foo.Barfoo.Bar'</br>
+ 改进表达式 "'foo.Bar'+ 'foo.Bar'"" 执行eval后 结果为  'foo.Barfoo.Bar'</br>
