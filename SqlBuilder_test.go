@@ -35,7 +35,7 @@ func Benchmark_SqlBuilder(b *testing.B) {
 </mapper>`
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
-	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{},ExpressionEngineProxy{}.New(&ExpressionEngineExpr{},true),&LogStandard{},false)
+	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{},ExpressionEngineProxy{}.New(&ExpressionEngineExpr{},true),&LogStandard{},true)
 	var paramMap = make(map[string]SqlArg)
 	paramMap["name"] = SqlArg{
 		Value: "",
@@ -61,6 +61,7 @@ func Benchmark_SqlBuilder(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		builder.BuildSql(paramMap, mapperTree["selectByCondition"])
 	}
+	fmt.Println("d")
 }
 
 //压力测试 表达式执行情况

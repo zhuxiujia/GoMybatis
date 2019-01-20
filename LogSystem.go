@@ -1,7 +1,7 @@
 package GoMybatis
 
 import (
-	"fmt"
+	"bytes"
 	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
@@ -10,16 +10,16 @@ type LogSystem struct {
 	logChan chan string
 	started bool
 }
-
-func (this LogSystem) New(l Log) (LogSystem, error) {
+//logImpl:日志实现类,queueLen:消息队列缓冲长度
+func (this LogSystem) New(logImpl Log,queueLen int) (LogSystem, error) {
 	if this.started == true {
 		return this, utils.NewError("LogSystem", "log system is started!")
 	}
-	if l == nil {
-		l = &LogStandard{}
+	if logImpl == nil {
+		logImpl = &LogStandard{}
 	}
-	this.logChan = make(chan string)
-	this.log = l
+	this.logChan = make(chan string,queueLen)
+	this.log = logImpl
 	go this.receiver()
 	this.started = true
 	return this, nil
@@ -31,11 +31,15 @@ func (this *LogSystem) Close() ( error) {
 	return nil
 }
 
-func (this *LogSystem) SendLog(logs ...interface{}) error {
+func (this *LogSystem) SendLog(logs ...string) error {
 	if this.started == false {
 		return utils.NewError("LogSystem", "no log Receiver! you must call go GoMybatis.LogSystem{}.New()")
 	}
-	this.logChan <- fmt.Sprint(logs)
+	var buf bytes.Buffer
+	for _,v:=range logs  {
+		buf.WriteString(v)
+	}
+	this.logChan <- buf.String()
 	return nil
 }
 
