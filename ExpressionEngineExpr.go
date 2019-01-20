@@ -2,7 +2,6 @@ package GoMybatis
 
 import (
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/antonmedv/expr"
-	"reflect"
 	"strings"
 )
 
@@ -26,19 +25,7 @@ func (this *ExpressionEngineExpr)Lexer(expression string) (interface{}, error){
 //参数：lexerResult=编译结果，arg=参数
 //返回：执行结果，错误
 func (this *ExpressionEngineExpr)Eval(lexerResult interface{}, arg interface{}, operation int) (interface{}, error){
-	var m=arg.(map[string]interface{})
-	for k,v:=range m  {
-		var rv=reflect.ValueOf(v)
-		if rv.Kind()==reflect.Ptr{
-			rv=rv.Elem()
-		}
-		if rv.IsValid()==false{
-			continue
-		}
-		v=expr.GetDeepPtr(rv).Interface()
-		m[k]=v
-	}
-	output, err := expr.Run(lexerResult.(expr.Node), m)
+	output, err := expr.Run(lexerResult.(expr.Node), arg)
 	return output,err
 }
 

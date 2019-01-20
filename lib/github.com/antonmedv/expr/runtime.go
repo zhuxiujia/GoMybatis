@@ -161,6 +161,11 @@ func contains(needle interface{}, array interface{}) (bool, error) {
 			}
 			return false, nil
 		case reflect.Struct:
+			//fi obj{aa:"aa"}==obj{aa:"aa"},is a in b
+			if equal(array, needle) {
+				return true, nil
+			}
+			//if not equal ,find field
 			n := reflect.ValueOf(needle)
 			if !n.IsValid() || n.Kind() != reflect.String {
 				return false, fmt.Errorf("cannot use %T as field name of %T", needle, array)

@@ -24,7 +24,19 @@ func Run(node Node, env interface{}) (out interface{}, err error) {
 		}
 	}()
 
-	return node.Eval(env)
+	result, err := node.Eval(env)
+	if err != nil {
+		return nil, err
+	}
+	var resultV = reflect.ValueOf(result)
+	if resultV.IsValid() && (resultV.Type().Kind() == reflect.Interface || resultV.Type().Kind() == reflect.Ptr) {
+		resultV = GetDeepPtr(resultV)
+		if resultV.IsValid() && resultV.CanInterface(){
+			result = resultV.Interface()
+			return result, nil
+		}
+	}
+	return result, err
 }
 
 // eval functions
@@ -85,6 +97,15 @@ func (n binaryNode) Eval(env interface{}) (interface{}, error) {
 		return nil, err
 	}
 
+	//指针转换真实值
+	var reflectLeft = reflect.ValueOf(left)
+	if reflectLeft.IsValid() && (reflectLeft.Type().Kind() == reflect.Interface || reflectLeft.Type().Kind() == reflect.Ptr) {
+		reflectLeft = GetDeepPtr(reflectLeft)
+		if reflectLeft.IsValid() && reflectLeft.CanInterface(){
+			left = reflectLeft.Interface()
+		}
+	}
+
 	switch n.operator {
 	case "or", "||":
 		if left.(bool) {
@@ -110,6 +131,14 @@ func (n binaryNode) Eval(env interface{}) (interface{}, error) {
 	right, err := n.right.Eval(env)
 	if err != nil {
 		return nil, err
+	}
+	//指针转换真实值
+	var reflectRight = reflect.ValueOf(right)
+	if reflectRight.IsValid() && (reflectRight.Type().Kind() == reflect.Interface || reflectRight.Type().Kind() == reflect.Ptr) {
+		reflectRight = GetDeepPtr(reflectRight)
+		if reflectRight.IsValid() && reflectRight.CanInterface(){
+			left = reflectRight.Interface()
+		}
 	}
 
 	switch n.operator {
@@ -137,12 +166,11 @@ func (n binaryNode) Eval(env interface{}) (interface{}, error) {
 		return left.(string) + right.(string), nil
 
 	case "+":
-		var tl = reflect.TypeOf(left)
-		var tr = reflect.TypeOf(right)
-		if tl.Kind() == reflect.String && tr.Kind() == reflect.String {
+		if reflectLeft.Kind() == reflect.String && reflectRight.Kind() == reflect.String {
 			return left.(string) + right.(string), nil
 		}
 	}
+
 	// Next goes operators on numbers
 	l, r := toNumber(n.left, left), toNumber(n.right, right)
 

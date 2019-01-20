@@ -30,6 +30,30 @@ func TestExpressionEngineExpr_Eval(t *testing.T) {
 	fmt.Println(result)
 }
 
+type TestNil struct {
+	Age *int
+}
+
+func TestExpressionEngineExpr_Struct(t *testing.T) {
+	var engine = ExpressionEngineExpr{}
+	var evaluateParameters = make(map[string]interface{})
+	//var p=1
+	var age = 1
+	evaluateParameters["obj"]=&TestNil{
+		Age:&age,
+	}
+	var expression = "obj.Age"
+	evalExpression, err := engine.Lexer(expression)
+	if err != nil {
+		t.Fatal(err)
+	}
+	result, err := engine.Eval(evalExpression, evaluateParameters, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(result)
+}
+
 func TestExpressionEngineExpr_Nil_Null(t *testing.T) {
 	var engine = ExpressionEngineExpr{}
 	var evaluateParameters = make(map[string]SqlArg)

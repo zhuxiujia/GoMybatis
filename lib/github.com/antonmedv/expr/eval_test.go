@@ -527,6 +527,11 @@ var evalErrorTests = []evalErrorTest{
 
 func TestEval(t *testing.T) {
 	for _, test := range evalTests {
+		test = evalTest{
+			`"Bar" in Ptr`,
+			struct{ Ptr *struct{ Bar bool } }{&struct{ Bar bool }{true}},
+			true,
+		}
 		actual, err := expr.Eval(test.input, test.env)
 		if err != nil {
 			t.Errorf("%s:\n%v", test.input, err)
