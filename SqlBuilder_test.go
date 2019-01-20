@@ -128,8 +128,8 @@ func Test_SqlBuilder_Tps(t *testing.T) {
 		Value: 0,
 		Type:  reflect.TypeOf(0),
 	}
-	defer utils.CountMethodTps(100000, time.Now(), "Test_SqlBuilder_Tps")
-	for i := 0; i < 100000; i++ {
+	defer utils.CountMethodTps(10000, time.Now(), "Test_SqlBuilder_Tps")
+	for i := 0; i < 10000; i++ {
 		//var sql, e =
 		builder.BuildSql(paramMap, mapperTree["selectByCondition"], false)
 		//fmt.Println(sql, e)
@@ -142,9 +142,9 @@ func Test_reflect_tps(t *testing.T) {
 	n["a"] = "b"
 	fmt.Println(p)
 
-	defer utils.CountMethodTps(100000, time.Now(), "Test_reflect_tps")
+	defer utils.CountMethodTps(10000, time.Now(), "Test_reflect_tps")
 
-	for k := 0; k < 100000; k++ {
+	for k := 0; k < 10000; k++ {
 		evalExpression, _ := govaluate.NewEvaluableExpression("name != ''")
 		//fmt.Println(err)
 		var p = make(map[string]interface{})

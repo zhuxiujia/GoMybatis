@@ -67,7 +67,7 @@ func Test_One_Transcation_TPS(t *testing.T) {
 	//使用mapper
 
 	//开始TPS测试
-	var total = 100000
+	var total = 10000
 	defer utils.CountMethodTps(float64(total), time.Now(), "Test_One_Transcation_TPS")
 	for i := 0; i < total; i++ {
 		var _, err = exampleActivityMapperImpl.SelectByCondition(&session, "", time.Time{}, time.Time{}, 0, 2000)

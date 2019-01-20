@@ -147,8 +147,8 @@ func TestTpsExpressionEngineExpr_Eval(t *testing.T) {
 
 	evaluateParameters["activity"] = &activity
 
-	defer utils.CountMethodTps(100000, time.Now(), "ExpressionEngineGovaluate")
-	for i := 0; i < 100000; i++ {
+	defer utils.CountMethodTps(10000, time.Now(), "ExpressionEngineGovaluate")
+	for i := 0; i < 10000; i++ {
 		var expression = "activity.DeleteFlag == 1 || activity.DeleteFlag > 0 "
 		evalExpression, err := engine.Lexer(expression)
 		if err != nil {

@@ -174,8 +174,8 @@ func Test_Ignore_Case_Underscores_Tps(t *testing.T) {
 
 	var result TestResult
 
-	defer utils.CountMethodTps(100000, time.Now(), "Test_Ignore_Case_Underscores_Tps")
-	for i := 0; i < 100000; i++ {
+	defer utils.CountMethodTps(10000, time.Now(), "Test_Ignore_Case_Underscores_Tps")
+	for i := 0; i < 10000; i++ {
 		GoMybatisSqlResultDecoder.Decode(nil, res, &result)
 	}
 

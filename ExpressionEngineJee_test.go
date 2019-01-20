@@ -109,8 +109,8 @@ func TestTpsExpressionEngineJee(t *testing.T) {
 	var engine = ExpressionEngineJee{}
 
 	//start
-	defer utils.CountMethodTps(100000, time.Now(), "ExpressionEngineGovaluate")
-	for i := 0; i < 100000; i++ {
+	defer utils.CountMethodTps(10000, time.Now(), "ExpressionEngineGovaluate")
+	for i := 0; i < 10000; i++ {
 		var lexer, error = engine.Lexer(".a == null")
 		if error != nil {
 			t.Fatal(error)
