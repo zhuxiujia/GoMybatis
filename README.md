@@ -100,21 +100,21 @@ func main() {
         <td>表达式功能</td>
     </tr>
     <tr>
-         <td>https://github.com/antonmedv/expr</td>
+         <td>https://github.com/zhuxiujia/GoMybatis/tree/master/lib/github.com/antonmedv/expr</td>
          <td>支持null和nil和指针</td>
          <td>快-实测比govaluate快</td>
 	 <td>还行</td>
          <td>一般</td>
     </tr>
     <tr>
-          <td>https://github.com/nylabs/gojee</td>
+          <td>https://github.com/zhuxiujia/GoMybatis/tree/master/lib/github.com/nytlabs/gojee</td>
           <td>支持null和指针</td>
           <td>慢-每次检查表达式都有json序列化和反序列化操作</td>
 	  <td>大</td>
           <td>多</td>
     </tr>
     <tr>
-           <td>https://github.com/Knetic/govaluate</td>
+           <td>https://github.com/zhuxiujia/GoMybatis/tree/master/lib/github.com/Knetic/govaluate</td>
            <td>不支持null和nil和指针</td>
            <td>中等</td>
 	   <td>一般</td>
