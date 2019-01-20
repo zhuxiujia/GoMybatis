@@ -137,7 +137,7 @@ func (n binaryNode) Eval(env interface{}) (interface{}, error) {
 	if reflectRight.IsValid() && (reflectRight.Type().Kind() == reflect.Interface || reflectRight.Type().Kind() == reflect.Ptr) {
 		reflectRight = GetDeepPtr(reflectRight)
 		if reflectRight.IsValid() && reflectRight.CanInterface(){
-			left = reflectRight.Interface()
+			right = reflectRight.Interface()
 		}
 	}
 
@@ -164,11 +164,11 @@ func (n binaryNode) Eval(env interface{}) (interface{}, error) {
 
 	case "~":
 		if reflectLeft.Kind() == reflect.String && reflectRight.Kind() == reflect.String {
-			return reflectLeft.Interface().(string) + reflectRight.Interface().(string), nil
+			return left.(string) + right.(string), nil
 		}
 	case "+":
 		if reflectLeft.Kind() == reflect.String && reflectRight.Kind() == reflect.String {
-			return reflectLeft.Interface().(string) + reflectRight.Interface().(string), nil
+			return left.(string) + right.(string), nil
 		}
 	}
 
