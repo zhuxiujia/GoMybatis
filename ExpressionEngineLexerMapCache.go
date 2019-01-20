@@ -2,10 +2,12 @@ package GoMybatis
 
 import (
 	"github.com/zhuxiujia/GoMybatis/utils"
+	"sync"
 )
 
 type ExpressionEngineLexerMapCache struct {
 	mapCache map[string]interface{}
+	lock     sync.RWMutex
 }
 
 func (this ExpressionEngineLexerMapCache) New() ExpressionEngineLexerMapCache {
@@ -19,9 +21,15 @@ func (this *ExpressionEngineLexerMapCache) Set(expression string, lexer interfac
 	if expression == "" {
 		return utils.NewError("ExpressionEngineLexerMapCache", "set lexerMap chache key can not be ''!")
 	}
+	this.lock.Lock()
 	this.mapCache[expression] = lexer
+	this.lock.Unlock()
 	return nil
 }
 func (this *ExpressionEngineLexerMapCache) Get(expression string) (interface{}, error) {
-	return this.mapCache[expression], nil
+	var result interface{}
+	this.lock.RLock()
+	result = this.mapCache[expression]
+	this.lock.RUnlock()
+	return result, nil
 }
