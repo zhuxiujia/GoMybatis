@@ -66,7 +66,7 @@ func BenchmarkExpress(b *testing.B) {
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		var expression = "activity.DeleteFlag == 1 || activity.DeleteFlag > 0 "
+		var expression = "activity.DeleteFlag == 1 and activity.DeleteFlag != 0 "
 		evalExpression, err := engine.Lexer(expression)
 		if err != nil {
 			b.Fatal(err)

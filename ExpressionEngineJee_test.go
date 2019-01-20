@@ -2,6 +2,7 @@ package GoMybatis
 
 import (
 	"fmt"
+	"github.com/zhuxiujia/GoMybatis/example"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"testing"
 	"time"
@@ -78,18 +79,21 @@ func TestExpressionEngineJeeTakeValue(t *testing.T) {
 
 func BenchmarkExpressionEngineJee_Eval(b *testing.B) {
 	b.StopTimer()
-	var m = make(map[string]interface{})
-	m["a"] = nil
+	var activity = example.Activity{
+		Id:         "1",
+		DeleteFlag: 1,
+	}
 	var engine = ExpressionEngineJee{}
-
+	var evaluateParameters = make(map[string]interface{})
+	evaluateParameters["activity"] = &activity
 	//start
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		var lexer, error = engine.Lexer(".a == null")
+		var lexer, error = engine.Lexer("activity.DeleteFlag == 1 and activity.DeleteFlag != 0 ")
 		if error != nil {
 			b.Fatal(error)
 		}
-		result, error := engine.Eval(lexer, m, JeeOperation_Marshal_Map)
+		result, error := engine.Eval(lexer, evaluateParameters, JeeOperation_Marshal_Map)
 		if error != nil {
 			b.Fatal(error)
 		}
