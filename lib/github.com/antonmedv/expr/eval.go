@@ -167,7 +167,7 @@ func (n binaryNode) Eval(env interface{}) (interface{}, error) {
 
 	case "+":
 		if reflectLeft.Kind() == reflect.String && reflectRight.Kind() == reflect.String {
-			return left.(string) + right.(string), nil
+			return reflectLeft.Interface().(string) + reflectRight.Interface().(string), nil
 		}
 	}
 
