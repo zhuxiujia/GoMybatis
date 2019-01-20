@@ -30,7 +30,7 @@ func TestExpressionEngineExpr_Eval(t *testing.T) {
 	fmt.Println(result)
 }
 
-type TestNil struct {
+type TestPtr struct {
 	Age *int
 }
 
@@ -39,7 +39,7 @@ func TestExpressionEngineExpr_Struct(t *testing.T) {
 	var evaluateParameters = make(map[string]interface{})
 	//var p=1
 	var age = 1
-	evaluateParameters["obj"]=&TestNil{
+	evaluateParameters["obj"]=&TestPtr{
 		Age:&age,
 	}
 	var expression = "obj.Age"
