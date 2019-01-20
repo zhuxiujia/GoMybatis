@@ -328,6 +328,7 @@ func (this *GoMybatisSqlBuilder) bindBindElementArg(args map[string]SqlArg, item
 	var evaluateParameters = this.expressParamterMap(args, this.expressionTypeConvert)
 	result, err := this.expressionEngineProxy.Eval(bindEvalExpression, evaluateParameters, 0)
 	if err != nil {
+		//TODO send log bind fail
 		return args
 	}
 	args[name] = SqlArg{
