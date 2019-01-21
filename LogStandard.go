@@ -6,10 +6,11 @@ type LogStandard struct {
 	PrintlnFunc func(v ...interface{})
 }
 
-func (this *LogStandard)Println(v ...interface{})  {
-	if this.PrintlnFunc!=nil{
+func (this *LogStandard) Println(v ...interface{}) {
+	if this.PrintlnFunc != nil {
 		this.PrintlnFunc(v)
-	}else{
-		log.Println(v)
+	} else {
+		var infos = v
+		log.Println(infos)
 	}
 }
