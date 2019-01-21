@@ -95,7 +95,7 @@ func (e env) Title() string {
 	return strings.Title(e.Name)
 }
 
-
+//p, err := expr.Parse("'Hello ' + Title()", expr.Env(env{}))
 p, err := expr.Parse("'Hello ' ~ Title()", expr.Env(env{}))
 
 out, err := expr.Run(p, env{"world"})
@@ -115,7 +115,7 @@ func (h helpers) Title(s string) string {
 	return strings.Title(s)
 }
 
-
+//p, err := expr.Parse("'Hello ' + Title(Name)", expr.Env(env{}))
 p, err := expr.Parse("'Hello ' ~ Title(Name)", expr.Env(env{}))
 
 out, err := expr.Run(p, env{"world"})
