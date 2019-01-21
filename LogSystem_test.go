@@ -9,12 +9,12 @@ import (
 func TestLogSystem_SendLog(t *testing.T) {
 	var endChan = make(chan int)
 	var stdLog = LogStandard{
-		PrintlnFunc: func(v ...interface{}) {
-			log.Println(v)
+		PrintlnFunc: func(v []byte) {
+			log.Println(string(v))
 			endChan <- 1
 		},
 	}
-	var system, err = LogSystem{}.New(&stdLog,1000000)
+	var system, err = LogSystem{}.New(&stdLog, 1000000, Log_Mode_async)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -30,12 +30,12 @@ func TestLogSystem_Close(t *testing.T) {
 
 	var endChan = make(chan int)
 	var stdLog = LogStandard{
-		PrintlnFunc: func(v ...interface{}) {
-			log.Println(v)
+		PrintlnFunc: func(v []byte) {
+			log.Println(string(v))
 			endChan <- 1
 		},
 	}
-	var system, err = LogSystem{}.New(&stdLog,1000000)
+	var system, err = LogSystem{}.New(&stdLog, 1000000, Log_Mode_async)
 	if err != nil {
 		t.Fatal(err)
 	}

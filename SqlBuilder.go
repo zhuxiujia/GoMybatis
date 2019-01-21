@@ -6,6 +6,7 @@ import (
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
 	"strings"
+	"time"
 )
 
 type SqlBuilder interface {
@@ -40,7 +41,7 @@ func (this GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert,
 	this.expressionEngineProxy = expressionEngine
 	this.enableLog = enableLog
 	if enableLog {
-		var logSystem, err = LogSystem{}.New(log,1000000)
+		var logSystem, err = LogSystem{}.New(log, 1000, Log_Mode_async)
 		if err != nil {
 			panic(err)
 		}
@@ -58,7 +59,8 @@ func (this GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml *
 	var sqlStr = sql.String()
 	sql.Reset()
 	if this.enableLog {
-		this.logSystem.SendLog("[GoMybatis] Preparing sql ==> ", sqlStr)
+		var now, _ = time.Now().MarshalText()
+		this.logSystem.SendLog("[GoMybatis] [", string(now), "] Preparing sql ==> ", sqlStr)
 	}
 	return sqlStr, nil
 }
@@ -422,6 +424,6 @@ func (this *GoMybatisSqlBuilder) makeArgInterfaceMap(args map[string]SqlArg) map
 	return m
 }
 
-func (this GoMybatisSqlBuilder) LogSystem() *LogSystem{
+func (this GoMybatisSqlBuilder) LogSystem() *LogSystem {
 	return this.logSystem
 }

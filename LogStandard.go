@@ -3,14 +3,13 @@ package GoMybatis
 import "log"
 
 type LogStandard struct {
-	PrintlnFunc func(v ...interface{})
+	PrintlnFunc func(v []byte)
 }
 
-func (this *LogStandard) Println(v ...interface{}) {
+func (this *LogStandard) Println(v []byte) {
 	if this.PrintlnFunc != nil {
 		this.PrintlnFunc(v)
 	} else {
-		var infos = v
-		log.Println(infos)
+		log.Println(string(v))
 	}
 }
