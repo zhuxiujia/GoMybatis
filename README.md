@@ -17,10 +17,10 @@ https://zhuxiujia.github.io/gomybatis.io/info.html
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-多数据库支持Mysql,Postgres,Tidb,SQLite,Oracle....等等更多</a><br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-快速上手</a>基于反射动态代理,无需go generate生成*.go等中间代码，xml读取后可直接调用函数<br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-表达式和xml面向对象设计</a>假如foo.Bar 这个属性是指针,那么在xml中调用 foo.Bar 则会取实际值,完全避免使用&和*符号指针操作<br>
-### 通过远程代理处理事务支持  处于 单数据库(Mysql,postgresql)-分布式数据库（TiDB,cockroachdb...）过渡期间的微服务
-![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/tx.png)
-### 异步消息队列日志
+#### 异步消息队列日志系统
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/log_system.png)
+#### 通过远程代替微服务成员 处理事务支持  处于 单数据库(Mysql,postgresql)-分布式数据库（TiDB,cockroachdb...）过渡期间的微服务
+![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/tx.png)
 
 数据库驱动列表
 ```
