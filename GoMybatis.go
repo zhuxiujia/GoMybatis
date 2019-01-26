@@ -10,30 +10,60 @@ import (
 //如果使用WriteMapperByEngine()，则内建默认的SessionFactory
 var DefaultSessionFactory *SessionFactory
 
-//根据sessionEngine写入到mapperPtr
-func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine *SessionEngine, enableLog bool) {
+var DefaultExpressionTypeConvert ExpressionTypeConvert
+
+var DefaultSqlArgTypeConvert SqlArgTypeConvert
+
+var DefaultExpressionEngine ExpressionEngine
+
+var DefaultSqlBuilder SqlBuilder
+
+var DefaultSqlResultDecoder SqlResultDecoder
+
+var DefaultLog Log
+
+//推荐默认使用单例传入
+//根据sessionEngine写入到mapperPtr，value:指向mapper指针反射对象，xml：xml数据，sessionEngine：session引擎，enableLog:是否允许日志输出，log：日志实现
+func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine *SessionEngine, enableLog bool, log Log) {
 	if value.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
-	var factory = SessionFactory{}.New(sessionEngine)
 	if DefaultSessionFactory == nil {
+		var factory = SessionFactory{}.New(sessionEngine)
 		DefaultSessionFactory = &factory
 	}
-	var expressConvert=GoMybatisExpressionTypeConvert{}
-	var sqlConvert=GoMybatisSqlArgTypeConvert{}
-	var expressionEngine = ExpressionEngineProxy{}.New(&ExpressionEngineExpr{},true)
-	var sqlBuilder=GoMybatisSqlBuilder{}.New(expressConvert,sqlConvert, expressionEngine,&LogStandard{},enableLog)
-	var decoder = GoMybatisSqlResultDecoder{}
-	WriteMapper(value, xml, DefaultSessionFactory, decoder,sqlBuilder,enableLog)
+	if DefaultExpressionTypeConvert == nil {
+		DefaultExpressionTypeConvert = GoMybatisExpressionTypeConvert{}
+	}
+	if DefaultSqlArgTypeConvert == nil {
+		DefaultSqlArgTypeConvert = GoMybatisSqlArgTypeConvert{}
+	}
+	if DefaultExpressionEngine == nil {
+		DefaultExpressionEngine = &ExpressionEngineExpr{}
+	}
+	var expressionEngineProxy = ExpressionEngineProxy{}.New(DefaultExpressionEngine, true)
+	if log == nil {
+		DefaultLog = &LogStandard{}
+	} else {
+		DefaultLog = log
+	}
+	if DefaultSqlBuilder == nil {
+		DefaultSqlBuilder = GoMybatisSqlBuilder{}.New(DefaultExpressionTypeConvert, DefaultSqlArgTypeConvert, expressionEngineProxy, DefaultLog, enableLog)
+	}
+	if DefaultSqlResultDecoder == nil {
+		DefaultSqlResultDecoder = GoMybatisSqlResultDecoder{}
+	}
+	WriteMapper(value, xml, DefaultSessionFactory, DefaultSqlResultDecoder, DefaultSqlBuilder, enableLog)
 }
 
-//根据sessionEngine写入到mapperPtr
-func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine *SessionEngine, enableLog bool) {
+//推荐默认使用单例传入
+//根据sessionEngine写入到mapperPtr，ptr:指向mapper指针，xml：xml数据，sessionEngine：session引擎，enableLog:是否允许日志输出，log：日志实现
+func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine *SessionEngine, enableLog bool, log Log) {
 	v := reflect.ValueOf(ptr)
 	if v.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
-	WriteMapperByEngine(v, xml, sessionEngine, enableLog)
+	WriteMapperByEngine(v, xml, sessionEngine, enableLog, log)
 }
 
 //写入方法内容，例如
@@ -48,7 +78,7 @@ func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine *SessionE
 //func的结构体参数无需指定mapperParams的tag，框架会自动扫描它的属性，封装为map处理掉
 //使用WriteMapper函数设置代理后即可正常使用。
 func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) {
-	beanCheck(bean,sqlBuilder)
+	beanCheck(bean, sqlBuilder)
 	var mapperTree = LoadMapperXml(xml)
 	//make a map[method]xml
 	var methodXmlMap = makeMethodXmlMap(bean, mapperTree)
@@ -91,7 +121,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 }
 
 //check beans
-func beanCheck(value reflect.Value,builder SqlBuilder) {
+func beanCheck(value reflect.Value, builder SqlBuilder) {
 	var t = value.Type()
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
@@ -105,7 +135,7 @@ func beanCheck(value reflect.Value,builder SqlBuilder) {
 		var customLen = 0
 		for argIndex := 0; argIndex < fieldItem.Type.NumIn(); argIndex++ {
 			var inType = fieldItem.Type.In(argIndex)
-			if builder.ExpressionEngineProxy().Name()=="ExpressionEngineGovaluate" && inType.Kind() == reflect.Ptr && inType.String() != GoMybatis_Session_Ptr {
+			if builder.ExpressionEngineProxy().Name() == "ExpressionEngineGovaluate" && inType.Kind() == reflect.Ptr && inType.String() != GoMybatis_Session_Ptr {
 				panic(`[GoMybats] ` + fieldItem.Name + `() arg = ` + inType.String() + ` can not be a ptr ! must delete '*'!`)
 			}
 			if isCustomStruct(inType) {

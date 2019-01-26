@@ -48,7 +48,7 @@ func init() {
 
 	bytes, _ := ioutil.ReadAll(file)
 	//设置对应的mapper xml文件
-	GoMybatis.WriteMapperPtrByEngine(&exampleActivityMapper, bytes, engine, true)
+	GoMybatis.WriteMapperPtrByEngine(&exampleActivityMapper, bytes, engine, true,nil)
 }
 
 //插入

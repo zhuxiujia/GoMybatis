@@ -41,7 +41,7 @@ func (this GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert,
 	this.expressionEngineProxy = expressionEngine
 	this.enableLog = enableLog
 	if enableLog {
-		var logSystem, err = LogSystem{}.New(log, 1000, Log_Mode_async)
+		var logSystem, err = LogSystem{}.New(log, log.QueueLen())
 		if err != nil {
 			panic(err)
 		}

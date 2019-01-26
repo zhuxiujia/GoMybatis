@@ -14,7 +14,7 @@ func TestLogSystem_SendLog(t *testing.T) {
 			endChan <- 1
 		},
 	}
-	var system, err = LogSystem{}.New(&stdLog, 1000000, Log_Mode_async)
+	var system, err = LogSystem{}.New(&stdLog, 1000000)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,7 +35,7 @@ func TestLogSystem_Close(t *testing.T) {
 			endChan <- 1
 		},
 	}
-	var system, err = LogSystem{}.New(&stdLog, 1000000, Log_Mode_async)
+	var system, err = LogSystem{}.New(&stdLog, 1000000)
 	if err != nil {
 		t.Fatal(err)
 	}
