@@ -38,7 +38,7 @@ func Test_Access_Arg(t *testing.T) {
 		t.Fatal(err)
 	}
 	if arg != "-----'father'------11---" {
-		t.Fatal("replaceArgFail","arg=",arg)
+		t.Fatal("replaceArgFail", "arg=", arg)
 	}
 	fmt.Println(arg)
 }

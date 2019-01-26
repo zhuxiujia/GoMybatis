@@ -62,7 +62,7 @@ func (this *TransationRMClient) Call(arg TransactionReqDTO, result *TransactionR
 		if this.Addr != "" {
 			this.Link(this.Addr)
 		} else {
-			error = utils.NewError("TransationRMClient"," link have no addr!")
+			error = utils.NewError("TransationRMClient", " link have no addr!")
 			return error
 		}
 	}

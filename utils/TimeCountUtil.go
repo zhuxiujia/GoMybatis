@@ -9,6 +9,7 @@ import (
 
 var c_FLOAT64_DEFAULT float64
 var Float64Type = reflect.TypeOf(c_FLOAT64_DEFAULT)
+
 //调用次方法 必须加上 defer 关键字！
 func CountMethodUseTime(now time.Time, info string, duration time.Duration) {
 	var end = time.Now()

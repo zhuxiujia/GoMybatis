@@ -8,30 +8,7 @@ import (
 	"time"
 )
 
-const Adapter_DateType = `time.Time`
 const Adapter_FormateDate = `2006-01-02 15:04:05`
-
-//表达式类型(基本类型)转换函数
-type ExpressionTypeConvert interface {
-	Convert(arg SqlArg) interface{}
-}
-
-//表达式类型(基本类型)转换函数
-type SqlArgTypeConvert interface {
-	Convert(arg SqlArg) string
-}
-
-//表达式类型转换器
-type GoMybatisExpressionTypeConvert struct {
-}
-
-//表达式类型转换器
-func (this GoMybatisExpressionTypeConvert) Convert(arg SqlArg) interface{} {
-	if arg.Type.Kind() == reflect.Struct && arg.Type.String() == Adapter_DateType {
-		return arg.Value.(time.Time).Nanosecond()
-	}
-	return arg.Value
-}
 
 //Sql内容类型转换器
 type GoMybatisSqlArgTypeConvert struct {
@@ -76,5 +53,5 @@ func (this GoMybatisSqlArgTypeConvert) toString(value *SqlArg) string {
 		return ""
 	}
 	//return fmt.Sprint(value.Value)
-	return utils.GetValue(value.Value,value.Type)
+	return utils.GetValue(value.Value, value.Type)
 }

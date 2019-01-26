@@ -293,7 +293,7 @@ func TestGoMybatisSqlResultDecoder_Decode(t *testing.T) {
 		result.Age7 == 0 ||
 		result.Age8 == 0 ||
 		result.Bool == false {
-      t.Fatal("TestGoMybatisSqlResultDecoder_Decode fail,result not decoded!")
+		t.Fatal("TestGoMybatisSqlResultDecoder_Decode fail,result not decoded!")
 	}
 	fmt.Println(result)
 }

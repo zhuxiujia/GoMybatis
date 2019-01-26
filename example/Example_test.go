@@ -48,7 +48,7 @@ func init() {
 
 	bytes, _ := ioutil.ReadAll(file)
 	//设置对应的mapper xml文件
-	GoMybatis.WriteMapperPtrByEngine(&exampleActivityMapper, bytes, engine, true,nil)
+	GoMybatis.WriteMapperPtrByEngine(&exampleActivityMapper, bytes, engine, true, nil)
 }
 
 //插入
@@ -106,7 +106,7 @@ func Test_select(t *testing.T) {
 	//使用mapper
 	name := "注册"
 
-	var result, err = exampleActivityMapper.SelectByCondition(&name, nil,nil,nil,nil)
+	var result, err = exampleActivityMapper.SelectByCondition(&name, nil, nil, nil, nil)
 	if err != nil {
 		panic(err)
 	}

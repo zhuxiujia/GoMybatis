@@ -38,9 +38,9 @@ func (this GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultPropert
 	if this.isGoBasicType(resultV.Type()) {
 		//single basic type
 		if sqlResultLen > 1 {
-			return utils.NewError("SqlResultDecoder"," Decode one result,but find database result size find > 1 !")
+			return utils.NewError("SqlResultDecoder", " Decode one result,but find database result size find > 1 !")
 		} else if sqlResultLen == 1 && len(sqlResult[0]) > 1 {
-			return utils.NewError("SqlResultDecoder"," Decode one result,but find database result size find > 1 !")
+			return utils.NewError("SqlResultDecoder", " Decode one result,but find database result size find > 1 !")
 		}
 		this.convertToBasicTypeCollection(sqlResult, &resultV, resultV.Type(), resultMap)
 	} else {
@@ -48,7 +48,7 @@ func (this GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultPropert
 		case reflect.Struct:
 			//single struct
 			if sqlResultLen > 1 {
-				return utils.NewError("SqlResultDecoder"," Decode one result,but find database result size find > 1 !")
+				return utils.NewError("SqlResultDecoder", " Decode one result,but find database result size find > 1 !")
 			}
 			for index, sItemMap := range sqlResult {
 				var value = this.sqlStructConvert(resultMap, resultT.Elem(), sItemMap, renameMapArray[index])
@@ -92,7 +92,7 @@ func (this GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultPropert
 			var isInterface = resultTItemType.String() == "interface {}"
 			if isBasicTypeSlice && isInterface == false {
 				if sqlResultLen > 1 {
-					return utils.NewError("SqlResultDecoder"," Decode one result,but find database result size find > 1!")
+					return utils.NewError("SqlResultDecoder", " Decode one result,but find database result size find > 1!")
 				}
 				this.convertToBasicTypeCollection(sqlResult, &resultV, resultTItemType, resultMap)
 			} else {

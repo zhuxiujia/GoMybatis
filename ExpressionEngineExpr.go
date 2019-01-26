@@ -70,9 +70,9 @@ func (this *ExpressionEngineExpr) split(str string) (stringItems []string) {
 
 //Lexer缓存,可不提供。
 func (this *ExpressionEngineExpr) LexerCache() ExpressionEngineLexerCache {
-	if this.mapCache==nil{
-		var cache= ExpressionEngineLexerMapCache{}.New()
-		this.mapCache=&cache
+	if this.mapCache == nil {
+		var cache = ExpressionEngineLexerMapCache{}.New()
+		this.mapCache = &cache
 	}
 	return this.mapCache
 }

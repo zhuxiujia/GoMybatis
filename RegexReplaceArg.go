@@ -20,8 +20,8 @@ func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlA
 	//replace default value
 	if defaultValue != nil {
 		var str = typeConvert.Convert(SqlArg{
-			Value:defaultValue,
-			Type:reflect.TypeOf(defaultValue),
+			Value: defaultValue,
+			Type:  reflect.TypeOf(defaultValue),
 		})
 		data = sqlArgRegex.ReplaceAllString(data, str)
 	}
@@ -67,4 +67,3 @@ func replace(startChar string, regex *regexp.Regexp, data string, typeConvert Sq
 	typeConvert = nil
 	return data, nil
 }
-

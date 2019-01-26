@@ -21,7 +21,7 @@ func (this *LocalSession) Id() string {
 
 func (this *LocalSession) Rollback() error {
 	if this.isClosed == true {
-		return utils.NewError("LocalSession"," can not Rollback() a Closed Session!")
+		return utils.NewError("LocalSession", " can not Rollback() a Closed Session!")
 	}
 	if this.tx != nil {
 		var err = this.tx.Rollback()
@@ -36,7 +36,7 @@ func (this *LocalSession) Rollback() error {
 
 func (this *LocalSession) Commit() error {
 	if this.isClosed == true {
-		return utils.NewError("LocalSession"," can not Commit() a Closed Session!")
+		return utils.NewError("LocalSession", " can not Commit() a Closed Session!")
 	}
 	if this.tx != nil {
 		var err = this.tx.Commit()
@@ -49,7 +49,7 @@ func (this *LocalSession) Commit() error {
 
 func (this *LocalSession) Begin() error {
 	if this.isClosed == true {
-		return utils.NewError("LocalSession"," can not Begin() a Closed Session!")
+		return utils.NewError("LocalSession", " can not Begin() a Closed Session!")
 	}
 	if this.tx == nil {
 		var tx, err = this.db.Begin()
@@ -81,7 +81,7 @@ func (this *LocalSession) Close() {
 
 func (this *LocalSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	if this.isClosed == true {
-		return nil, utils.NewError("LocalSession"," can not Query() a Closed Session!")
+		return nil, utils.NewError("LocalSession", " can not Query() a Closed Session!")
 	}
 	var rows *sql.Rows
 	var err error
@@ -101,13 +101,13 @@ func (this *LocalSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 
 func (this *LocalSession) Exec(sqlorArgs string) (*Result, error) {
 	if this.isClosed == true {
-		return nil, utils.NewError("LocalSession"," can not Exec() a Closed Session!")
+		return nil, utils.NewError("LocalSession", " can not Exec() a Closed Session!")
 	}
 	var result sql.Result
 	var err error
 	if this.tx != nil {
 		if this.isCommitedOrRollbacked {
-			return nil, utils.NewError("LocalSession"," Exec() sql fail!, session isCommitedOrRollbacked!")
+			return nil, utils.NewError("LocalSession", " Exec() sql fail!, session isCommitedOrRollbacked!")
 		}
 		result, err = this.tx.Exec(sqlorArgs)
 	} else {

@@ -65,6 +65,6 @@ func (this *ExpressionEngineGovaluate) split(str string) (stringItems []string) 
 }
 
 //Lexer缓存,可不提供。
-func (this *ExpressionEngineGovaluate) LexerCache() ExpressionEngineLexerCache{
+func (this *ExpressionEngineGovaluate) LexerCache() ExpressionEngineLexerCache {
 	return nil
 }

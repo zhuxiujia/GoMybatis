@@ -39,8 +39,8 @@ func TestExpressionEngineExpr_Struct(t *testing.T) {
 	var evaluateParameters = make(map[string]interface{})
 	//var p=1
 	var age = 1
-	evaluateParameters["obj"]=&TestPtr{
-		Age:&age,
+	evaluateParameters["obj"] = &TestPtr{
+		Age: &age,
 	}
 	var expression = "obj.Age"
 	evalExpression, err := engine.Lexer(expression)
@@ -58,10 +58,10 @@ func TestExpressionEngineExpr_Nil_Null(t *testing.T) {
 	var engine = ExpressionEngineExpr{}
 	var evaluateParameters = make(map[string]SqlArg)
 	//var p=1
-	evaluateParameters["startTime"]=SqlArg{
-		Value:nil,
+	evaluateParameters["startTime"] = SqlArg{
+		Value: nil,
 	}
-	var nmap=makeArgInterfaceMap(evaluateParameters)
+	var nmap = makeArgInterfaceMap(evaluateParameters)
 	var expression = "startTime == nil"
 	evalExpression, err := engine.Lexer(expression)
 	if err != nil {
