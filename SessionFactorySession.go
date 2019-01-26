@@ -9,49 +9,49 @@ type SessionFactorySession struct {
 	Factory *SessionFactory
 }
 
-func (this *SessionFactorySession) Id() string {
-	if this.Session == nil {
+func (it *SessionFactorySession) Id() string {
+	if it.Session == nil {
 		return ""
 	}
-	return this.Session.Id()
+	return it.Session.Id()
 }
-func (this *SessionFactorySession) Query(sqlorArgs string) ([]map[string][]byte, error) {
-	if this.Session == nil {
-		return nil, utils.NewError("SessionFactorySession", " can not run Id(),this.Session == nil")
+func (it *SessionFactorySession) Query(sqlorArgs string) ([]map[string][]byte, error) {
+	if it.Session == nil {
+		return nil, utils.NewError("SessionFactorySession", " can not run Id(),it.Session == nil")
 	}
-	return this.Session.Query(sqlorArgs)
+	return it.Session.Query(sqlorArgs)
 }
-func (this *SessionFactorySession) Exec(sqlorArgs string) (*Result, error) {
-	if this.Session == nil {
-		return nil, utils.NewError("SessionFactorySession", " can not run Exec(),this.Session == nil")
+func (it *SessionFactorySession) Exec(sqlorArgs string) (*Result, error) {
+	if it.Session == nil {
+		return nil, utils.NewError("SessionFactorySession", " can not run Exec(),it.Session == nil")
 	}
-	return this.Session.Exec(sqlorArgs)
+	return it.Session.Exec(sqlorArgs)
 }
-func (this *SessionFactorySession) Rollback() error {
-	if this.Session == nil {
-		return utils.NewError("SessionFactorySession", " can not run Rollback(),this.Session == nil")
+func (it *SessionFactorySession) Rollback() error {
+	if it.Session == nil {
+		return utils.NewError("SessionFactorySession", " can not run Rollback(),it.Session == nil")
 	}
-	return this.Session.Rollback()
+	return it.Session.Rollback()
 }
-func (this *SessionFactorySession) Commit() error {
-	if this.Session == nil {
-		return utils.NewError("SessionFactorySession", " can not run Commit(),this.Session == nil")
+func (it *SessionFactorySession) Commit() error {
+	if it.Session == nil {
+		return utils.NewError("SessionFactorySession", " can not run Commit(),it.Session == nil")
 	}
-	return this.Session.Commit()
+	return it.Session.Commit()
 }
-func (this *SessionFactorySession) Begin() error {
-	if this.Session == nil {
-		return utils.NewError("SessionFactorySession", " can not run Begin(),this.Session == nil")
+func (it *SessionFactorySession) Begin() error {
+	if it.Session == nil {
+		return utils.NewError("SessionFactorySession", " can not run Begin(),it.Session == nil")
 	}
-	return this.Session.Begin()
+	return it.Session.Begin()
 }
-func (this *SessionFactorySession) Close() {
-	var id = this.Id()
-	var s = this.Factory.SessionMap[id]
+func (it *SessionFactorySession) Close() {
+	var id = it.Id()
+	var s = it.Factory.SessionMap[id]
 	if s != nil {
-		if this.Session != nil {
-			this.Session.Close()
+		if it.Session != nil {
+			it.Session.Close()
 		}
-		this.Factory.SessionMap[id] = nil
+		it.Factory.SessionMap[id] = nil
 	}
 }

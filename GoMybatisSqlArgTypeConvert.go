@@ -15,7 +15,7 @@ type GoMybatisSqlArgTypeConvert struct {
 }
 
 //Sql内容类型转换器
-func (this GoMybatisSqlArgTypeConvert) Convert(arg SqlArg) string {
+func (it GoMybatisSqlArgTypeConvert) Convert(arg SqlArg) string {
 	var argValue = arg.Value
 	var argType = arg.Type
 	if argValue == nil {
@@ -32,7 +32,7 @@ func (this GoMybatisSqlArgTypeConvert) Convert(arg SqlArg) string {
 	case reflect.String:
 		var argStr bytes.Buffer
 		argStr.WriteString(`'`)
-		argStr.WriteString(this.toString(&arg))
+		argStr.WriteString(it.toString(&arg))
 		argStr.WriteString(`'`)
 		return argStr.String()
 	case reflect.Struct:
@@ -45,10 +45,10 @@ func (this GoMybatisSqlArgTypeConvert) Convert(arg SqlArg) string {
 		}
 		break
 	}
-	return this.toString(&arg)
+	return it.toString(&arg)
 }
 
-func (this GoMybatisSqlArgTypeConvert) toString(value *SqlArg) string {
+func (it GoMybatisSqlArgTypeConvert) toString(value *SqlArg) string {
 	if value.Value == nil {
 		return ""
 	}

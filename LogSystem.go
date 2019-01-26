@@ -12,46 +12,46 @@ type LogSystem struct {
 }
 
 //logImpl:日志实现类,queueLen:消息队列缓冲长度
-func (this LogSystem) New(logImpl Log, queueLen int) (LogSystem, error) {
-	if this.started == true {
-		return this, utils.NewError("LogSystem", "log system is started!")
+func (it LogSystem) New(logImpl Log, queueLen int) (LogSystem, error) {
+	if it.started == true {
+		return it, utils.NewError("LogSystem", "log system is started!")
 	}
 	if logImpl == nil {
 		logImpl = &LogStandard{}
 	}
-	this.logChan = make(chan []byte, queueLen)
-	this.log = logImpl
+	it.logChan = make(chan []byte, queueLen)
+	it.log = logImpl
 	//启动接受者
-	go this.receiver()
-	this.started = true
-	return this, nil
+	go it.receiver()
+	it.started = true
+	return it, nil
 }
 
 //关闭日志系统和队列
-func (this *LogSystem) Close() error {
-	close(this.logChan)
-	this.started = false
+func (it *LogSystem) Close() error {
+	close(it.logChan)
+	it.started = false
 	return nil
 }
 
 //日志发送者
-func (this *LogSystem) SendLog(logs ...string) error {
-	if this.started == false {
+func (it *LogSystem) SendLog(logs ...string) error {
+	if it.started == false {
 		return utils.NewError("LogSystem", "no log Receiver! you must call go GoMybatis.LogSystem{}.New()")
 	}
 	var buf bytes.Buffer
 	for _, v := range logs {
 		buf.WriteString(v)
 	}
-	this.logChan <- buf.Bytes()
+	it.logChan <- buf.Bytes()
 	return nil
 }
 
 //日志接受者
-func (this *LogSystem) receiver() error {
+func (it *LogSystem) receiver() error {
 	for {
-		logs := <-this.logChan
-		this.log.Println(logs)
+		logs := <-it.logChan
+		it.log.Println(logs)
 	}
 	return nil
 }

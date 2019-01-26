@@ -10,26 +10,26 @@ type ExpressionEngineLexerMapCache struct {
 	lock     sync.RWMutex
 }
 
-func (this ExpressionEngineLexerMapCache) New() ExpressionEngineLexerMapCache {
-	if this.mapCache == nil {
-		this.mapCache = make(map[string]interface{})
+func (it ExpressionEngineLexerMapCache) New() ExpressionEngineLexerMapCache {
+	if it.mapCache == nil {
+		it.mapCache = make(map[string]interface{})
 	}
-	return this
+	return it
 }
 
-func (this *ExpressionEngineLexerMapCache) Set(expression string, lexer interface{}) error {
+func (it *ExpressionEngineLexerMapCache) Set(expression string, lexer interface{}) error {
 	if expression == "" {
 		return utils.NewError("ExpressionEngineLexerMapCache", "set lexerMap chache key can not be ''!")
 	}
-	this.lock.Lock()
-	defer this.lock.Unlock()
-	this.mapCache[expression] = lexer
+	it.lock.Lock()
+	defer it.lock.Unlock()
+	it.mapCache[expression] = lexer
 	return nil
 }
-func (this *ExpressionEngineLexerMapCache) Get(expression string) (interface{}, error) {
+func (it *ExpressionEngineLexerMapCache) Get(expression string) (interface{}, error) {
 	var result interface{}
-	this.lock.RLock()
-	defer this.lock.RUnlock()
-	result = this.mapCache[expression]
+	it.lock.RLock()
+	defer it.lock.RUnlock()
+	result = it.mapCache[expression]
 	return result, nil
 }

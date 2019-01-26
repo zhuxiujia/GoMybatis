@@ -32,7 +32,7 @@ type TransactionDefinition struct {
 	IsReadOnly          bool
 }
 
-func (this TransactionDefinition) Default() TransactionDefinition {
+func (it TransactionDefinition) Default() TransactionDefinition {
 	return TransactionDefinition{
 		PropagationBehavior: PROPAGATION_REQUIRED,
 		IsolationLevel:      ISOLATION_DEFAULT,

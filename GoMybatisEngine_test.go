@@ -125,10 +125,10 @@ type TestSession struct {
 	Session
 }
 
-func (this *TestSession) Id() string {
+func (it *TestSession) Id() string {
 	return "sadf"
 }
-func (this *TestSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
+func (it *TestSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	resultsSlice := make([]map[string][]byte, 0)
 
 	result := make(map[string][]byte)
@@ -140,19 +140,19 @@ func (this *TestSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	resultsSlice = append(resultsSlice, result)
 	return resultsSlice, nil
 }
-func (this *TestSession) Exec(sqlorArgs string) (*Result, error) {
+func (it *TestSession) Exec(sqlorArgs string) (*Result, error) {
 	return nil, nil
 }
-func (this *TestSession) Rollback() error {
+func (it *TestSession) Rollback() error {
 	return nil
 }
-func (this *TestSession) Commit() error {
+func (it *TestSession) Commit() error {
 	return nil
 }
-func (this *TestSession) Begin() error {
+func (it *TestSession) Begin() error {
 	return nil
 }
-func (this *TestSession) Close() {
+func (it *TestSession) Close() {
 
 }
 

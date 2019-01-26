@@ -20,49 +20,49 @@ type Transaction struct {
 	Session Session
 }
 
-func (this *TransactionStatus) Rollback() error {
-	if this.IsCompleted == true {
+func (it *TransactionStatus) Rollback() error {
+	if it.IsCompleted == true {
 		return errors.New("[TransactionManager] can not Rollback() a completed Transaction!")
 	}
-	this.IsCompleted = true
-	defer this.Flush() //close session
-	return this.Transaction.Session.Rollback()
+	it.IsCompleted = true
+	defer it.Flush() //close session
+	return it.Transaction.Session.Rollback()
 }
 
-func (this *TransactionStatus) Commit() error {
-	if this.IsCompleted == true {
+func (it *TransactionStatus) Commit() error {
+	if it.IsCompleted == true {
 		return errors.New("[TransactionManager] can not Commit() a completed Transaction!")
 	}
-	this.IsCompleted = true
-	defer this.Flush() //close session
-	return this.Transaction.Session.Commit()
+	it.IsCompleted = true
+	defer it.Flush() //close session
+	return it.Transaction.Session.Commit()
 }
 
-func (this *TransactionStatus) Begin() error {
-	if this.IsNewTransaction == false {
+func (it *TransactionStatus) Begin() error {
+	if it.IsNewTransaction == false {
 		return errors.New("[TransactionManager] can not Begin() a old Transaction!")
 	}
-	this.IsNewTransaction = false
-	return this.Transaction.Session.Begin()
+	it.IsNewTransaction = false
+	return it.Transaction.Session.Begin()
 }
 
-func (this *TransactionStatus) Flush() {
-	if this.Transaction != nil && this.Transaction.Session != nil {
-		this.Transaction.Session.Close()
-		this.Transaction.Session = nil
-		this.Transaction = nil
+func (it *TransactionStatus) Flush() {
+	if it.Transaction != nil && it.Transaction.Session != nil {
+		it.Transaction.Session.Close()
+		it.Transaction.Session = nil
+		it.Transaction = nil
 	}
 }
 
 //延迟关闭
-func (this *TransactionStatus) DelayFlush(t time.Duration) {
-	if this.HasSetDelayClose == false {
+func (it *TransactionStatus) DelayFlush(t time.Duration) {
+	if it.HasSetDelayClose == false {
 		go func() {
 			time.Sleep(t)
-			if this.IsCompleted == false {
-				this.Rollback()
+			if it.IsCompleted == false {
+				it.Rollback()
 			}
 		}()
-		this.HasSetDelayClose = true
+		it.HasSetDelayClose = true
 	}
 }

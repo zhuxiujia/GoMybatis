@@ -5,28 +5,28 @@ type SessionFactory struct {
 	SessionMap map[string]*Session
 }
 
-func (this SessionFactory) New(Engine *SessionEngine) SessionFactory {
-	this.Engine = Engine
-	this.SessionMap = make(map[string]*Session)
-	return this
+func (it SessionFactory) New(Engine *SessionEngine) SessionFactory {
+	it.Engine = Engine
+	it.SessionMap = make(map[string]*Session)
+	return it
 }
 
-func (this *SessionFactory) NewSession(sessionType SessionType, config *TransationRMClientConfig) Session {
-	if this.SessionMap == nil || this.Engine == nil {
+func (it *SessionFactory) NewSession(sessionType SessionType, config *TransationRMClientConfig) Session {
+	if it.SessionMap == nil || it.Engine == nil {
 		panic("[GoMybatis] SessionFactory not init! you must call method SessionFactory.New(*)")
 	}
 	var newSession Session
 	switch sessionType {
 	case SessionType_Default:
-		var session = (*this.Engine).NewSession()
+		var session = (*it.Engine).NewSession()
 		var factorySession = SessionFactorySession{
 			Session: session,
-			Factory: this,
+			Factory: it,
 		}
 		newSession = Session(&factorySession)
 		break
 	case SessionType_Local:
-		newSession = (*this.Engine).NewSession()
+		newSession = (*it.Engine).NewSession()
 		break
 	case SessionType_TransationRM:
 		if config == nil {
@@ -41,37 +41,37 @@ func (this *SessionFactory) NewSession(sessionType SessionType, config *Transati
 	default:
 		panic("[GoMybatis] newSession() must have a SessionType!")
 	}
-	this.SessionMap[newSession.Id()] = &newSession
+	it.SessionMap[newSession.Id()] = &newSession
 	return newSession
 }
 
-func (this *SessionFactory) GetSession(id string) *Session {
-	return this.SessionMap[id]
+func (it *SessionFactory) GetSession(id string) *Session {
+	return it.SessionMap[id]
 }
 
-func (this *SessionFactory) SetSession(id string, session *Session) {
-	this.SessionMap[id] = session
+func (it *SessionFactory) SetSession(id string, session *Session) {
+	it.SessionMap[id] = session
 }
 
-func (this *SessionFactory) Close(id string) {
-	if this.SessionMap == nil {
+func (it *SessionFactory) Close(id string) {
+	if it.SessionMap == nil {
 		return
 	}
-	var s = this.SessionMap[id]
+	var s = it.SessionMap[id]
 	if s != nil {
 		(*s).Close()
-		this.SessionMap[id] = nil
+		it.SessionMap[id] = nil
 	}
 }
 
-func (this *SessionFactory) CloseAll(id string) {
-	if this.SessionMap == nil {
+func (it *SessionFactory) CloseAll(id string) {
+	if it.SessionMap == nil {
 		return
 	}
-	for _, v := range this.SessionMap {
+	for _, v := range it.SessionMap {
 		if v != nil {
 			(*v).Close()
-			this.SessionMap[id] = nil
+			it.SessionMap[id] = nil
 		}
 	}
 }

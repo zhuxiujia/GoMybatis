@@ -16,23 +16,23 @@ func (ExpressionEngineProxy) New(engine ExpressionEngine, useLexerCache bool) Ex
 }
 
 //引擎名称
-func (this ExpressionEngineProxy) Name() string {
-	if this.expressionEngine == nil {
+func (it ExpressionEngineProxy) Name() string {
+	if it.expressionEngine == nil {
 		return ""
 	}
-	return this.expressionEngine.Name()
+	return it.expressionEngine.Name()
 }
 
 //编译一个表达式
 //参数：lexerArg 表达式内容
 //返回：interface{} 编译结果,error 错误
-func (this *ExpressionEngineProxy) Lexer(expression string) (interface{}, error) {
-	if this.expressionEngine == nil {
+func (it *ExpressionEngineProxy) Lexer(expression string) (interface{}, error) {
+	if it.expressionEngine == nil {
 		return nil, utils.NewError("ExpressionEngineProxy", "ExpressionEngineProxy not init for ExpressionEngineProxy{}.New(...)")
 	}
-	if this.expressionEngine.LexerCache() != nil && this.lexerCacheable {
+	if it.expressionEngine.LexerCache() != nil && it.lexerCacheable {
 		//如果 提供缓存，则使用缓存
-		cacheResult, cacheErr := this.expressionEngine.LexerCache().Get(expression)
+		cacheResult, cacheErr := it.expressionEngine.LexerCache().Get(expression)
 		if cacheErr != nil {
 			return nil, cacheErr
 		}
@@ -40,10 +40,10 @@ func (this *ExpressionEngineProxy) Lexer(expression string) (interface{}, error)
 			return cacheResult, nil
 		}
 	}
-	var result, err = this.expressionEngine.Lexer(expression)
-	if this.expressionEngine.LexerCache() != nil && this.lexerCacheable {
+	var result, err = it.expressionEngine.Lexer(expression)
+	if it.expressionEngine.LexerCache() != nil && it.lexerCacheable {
 		//如果 提供缓存，则使用缓存
-		this.expressionEngine.LexerCache().Set(expression, result)
+		it.expressionEngine.LexerCache().Set(expression, result)
 	}
 	return result, err
 }
@@ -51,24 +51,24 @@ func (this *ExpressionEngineProxy) Lexer(expression string) (interface{}, error)
 //执行一个表达式
 //参数：lexerResult=编译结果，arg=参数
 //返回：执行结果，错误
-func (this *ExpressionEngineProxy) Eval(lexerResult interface{}, arg interface{}, operation int) (interface{}, error) {
-	if this.expressionEngine == nil {
+func (it *ExpressionEngineProxy) Eval(lexerResult interface{}, arg interface{}, operation int) (interface{}, error) {
+	if it.expressionEngine == nil {
 		return nil, utils.NewError("ExpressionEngineProxy", "ExpressionEngineProxy not init for ExpressionEngineProxy{}.New(...)")
 	}
-	return this.expressionEngine.Eval(lexerResult, arg, operation)
+	return it.expressionEngine.Eval(lexerResult, arg, operation)
 }
 
-func (this *ExpressionEngineProxy) LexerCache() ExpressionEngineLexerCache {
-	if this.expressionEngine == nil {
+func (it *ExpressionEngineProxy) LexerCache() ExpressionEngineLexerCache {
+	if it.expressionEngine == nil {
 		return nil
 	}
-	return this.expressionEngine.LexerCache()
+	return it.expressionEngine.LexerCache()
 }
 
-func (this *ExpressionEngineProxy) SetUseLexerCache(isUseCache bool) error {
-	this.lexerCacheable = isUseCache
+func (it *ExpressionEngineProxy) SetUseLexerCache(isUseCache bool) error {
+	it.lexerCacheable = isUseCache
 	return nil
 }
-func (this *ExpressionEngineProxy) LexerCacheable() bool {
-	return this.lexerCacheable
+func (it *ExpressionEngineProxy) LexerCacheable() bool {
+	return it.lexerCacheable
 }

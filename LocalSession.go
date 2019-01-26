@@ -15,18 +15,18 @@ type LocalSession struct {
 	isClosed               bool
 }
 
-func (this *LocalSession) Id() string {
-	return this.SessionId
+func (it *LocalSession) Id() string {
+	return it.SessionId
 }
 
-func (this *LocalSession) Rollback() error {
-	if this.isClosed == true {
+func (it *LocalSession) Rollback() error {
+	if it.isClosed == true {
 		return utils.NewError("LocalSession", " can not Rollback() a Closed Session!")
 	}
-	if this.tx != nil {
-		var err = this.tx.Rollback()
+	if it.tx != nil {
+		var err = it.tx.Rollback()
 		if err == nil {
-			this.isCommitedOrRollbacked = true
+			it.isCommitedOrRollbacked = true
 		} else {
 			return err
 		}
@@ -34,27 +34,27 @@ func (this *LocalSession) Rollback() error {
 	return nil
 }
 
-func (this *LocalSession) Commit() error {
-	if this.isClosed == true {
+func (it *LocalSession) Commit() error {
+	if it.isClosed == true {
 		return utils.NewError("LocalSession", " can not Commit() a Closed Session!")
 	}
-	if this.tx != nil {
-		var err = this.tx.Commit()
+	if it.tx != nil {
+		var err = it.tx.Commit()
 		if err == nil {
-			this.isCommitedOrRollbacked = true
+			it.isCommitedOrRollbacked = true
 		}
 	}
 	return nil
 }
 
-func (this *LocalSession) Begin() error {
-	if this.isClosed == true {
+func (it *LocalSession) Begin() error {
+	if it.isClosed == true {
 		return utils.NewError("LocalSession", " can not Begin() a Closed Session!")
 	}
-	if this.tx == nil {
-		var tx, err = this.db.Begin()
+	if it.tx == nil {
+		var tx, err = it.db.Begin()
 		if err == nil {
-			this.tx = tx
+			it.tx = tx
 		} else {
 			return err
 		}
@@ -62,33 +62,33 @@ func (this *LocalSession) Begin() error {
 	return nil
 }
 
-func (this *LocalSession) Close() {
-	if this.db != nil {
-		if this.stmt != nil {
-			this.stmt.Close()
+func (it *LocalSession) Close() {
+	if it.db != nil {
+		if it.stmt != nil {
+			it.stmt.Close()
 		}
 		// When Close be called, if session is a transaction and do not call
 		// Commit or Rollback, then call Rollback.
-		if this.tx != nil && !this.isCommitedOrRollbacked {
-			this.tx.Rollback()
+		if it.tx != nil && !it.isCommitedOrRollbacked {
+			it.tx.Rollback()
 		}
-		this.tx = nil
-		this.db = nil
-		this.stmt = nil
-		this.isClosed = true
+		it.tx = nil
+		it.db = nil
+		it.stmt = nil
+		it.isClosed = true
 	}
 }
 
-func (this *LocalSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
-	if this.isClosed == true {
+func (it *LocalSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
+	if it.isClosed == true {
 		return nil, utils.NewError("LocalSession", " can not Query() a Closed Session!")
 	}
 	var rows *sql.Rows
 	var err error
-	if this.tx != nil {
-		rows, err = this.tx.Query(sqlorArgs)
+	if it.tx != nil {
+		rows, err = it.tx.Query(sqlorArgs)
 	} else {
-		rows, err = this.db.Query(sqlorArgs)
+		rows, err = it.db.Query(sqlorArgs)
 	}
 	if err != nil {
 		return nil, err
@@ -99,19 +99,19 @@ func (this *LocalSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	return nil, nil
 }
 
-func (this *LocalSession) Exec(sqlorArgs string) (*Result, error) {
-	if this.isClosed == true {
+func (it *LocalSession) Exec(sqlorArgs string) (*Result, error) {
+	if it.isClosed == true {
 		return nil, utils.NewError("LocalSession", " can not Exec() a Closed Session!")
 	}
 	var result sql.Result
 	var err error
-	if this.tx != nil {
-		if this.isCommitedOrRollbacked {
+	if it.tx != nil {
+		if it.isCommitedOrRollbacked {
 			return nil, utils.NewError("LocalSession", " Exec() sql fail!, session isCommitedOrRollbacked!")
 		}
-		result, err = this.tx.Exec(sqlorArgs)
+		result, err = it.tx.Exec(sqlorArgs)
 	} else {
-		result, err = this.db.Exec(sqlorArgs)
+		result, err = it.db.Exec(sqlorArgs)
 	}
 	if err != nil {
 		return nil, err

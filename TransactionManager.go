@@ -64,13 +64,13 @@ type DefaultTransationManager struct {
 	TransactionFactory *TransactionFactory
 }
 
-func (this DefaultTransationManager) New(SessionFactory *SessionFactory, TransactionFactory *TransactionFactory) DefaultTransationManager {
-	this.SessionFactory = SessionFactory
-	this.TransactionFactory = TransactionFactory
-	return this
+func (it DefaultTransationManager) New(SessionFactory *SessionFactory, TransactionFactory *TransactionFactory) DefaultTransationManager {
+	it.SessionFactory = SessionFactory
+	it.TransactionFactory = TransactionFactory
+	return it
 }
 
-func (this DefaultTransationManager) GetTransaction(def *TransactionDefinition, transactionId string, OwnerId string) (*TransactionStatus, error) {
+func (it DefaultTransationManager) GetTransaction(def *TransactionDefinition, transactionId string, OwnerId string) (*TransactionStatus, error) {
 	if transactionId == "" {
 		return nil, utils.NewError("TransactionManager", " transactionId ="+transactionId+" transations is nil!")
 	}
@@ -78,7 +78,7 @@ func (this DefaultTransationManager) GetTransaction(def *TransactionDefinition, 
 		var d = TransactionDefinition{}.Default()
 		def = &d
 	}
-	var transationStatus, err = this.TransactionFactory.GetTransactionStatus(transactionId)
+	var transationStatus, err = it.TransactionFactory.GetTransactionStatus(transactionId)
 	if err != nil {
 		return nil, err
 	}
@@ -101,8 +101,8 @@ func (this DefaultTransationManager) GetTransaction(def *TransactionDefinition, 
 	return transationStatus, nil
 }
 
-func (this DefaultTransationManager) Commit(transactionId string) error {
-	var transactions, err = this.TransactionFactory.GetTransactionStatus(transactionId)
+func (it DefaultTransationManager) Commit(transactionId string) error {
+	var transactions, err = it.TransactionFactory.GetTransactionStatus(transactionId)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -110,8 +110,8 @@ func (this DefaultTransationManager) Commit(transactionId string) error {
 	return transactions.Commit()
 }
 
-func (this DefaultTransationManager) Rollback(transactionId string) error {
-	var transactions, err = this.TransactionFactory.GetTransactionStatus(transactionId)
+func (it DefaultTransationManager) Rollback(transactionId string) error {
+	var transactions, err = it.TransactionFactory.GetTransactionStatus(transactionId)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -120,11 +120,11 @@ func (this DefaultTransationManager) Rollback(transactionId string) error {
 }
 
 //执行事务
-func (this DefaultTransationManager) DoTransaction(dto TransactionReqDTO) TransactionRspDTO {
+func (it DefaultTransationManager) DoTransaction(dto TransactionReqDTO) TransactionRspDTO {
 	var transcationStatus *TransactionStatus
 	var err error
 
-	transcationStatus, err = this.GetTransaction(nil, dto.TransactionId, dto.OwnerId)
+	transcationStatus, err = it.GetTransaction(nil, dto.TransactionId, dto.OwnerId)
 	if transcationStatus == nil || transcationStatus.Transaction == nil || transcationStatus.Transaction.Session == nil {
 		return TransactionRspDTO{
 			TransactionId: dto.TransactionId,
@@ -147,9 +147,9 @@ func (this DefaultTransationManager) DoTransaction(dto TransactionReqDTO) Transa
 
 	if dto.Status == Transaction_Status_NO {
 		defer transcationStatus.Flush() //关闭
-		return this.DoAction(dto, transcationStatus)
+		return it.DoAction(dto, transcationStatus)
 	} else if dto.Status == Transaction_Status_Prepare {
-		return this.DoAction(dto, transcationStatus)
+		return it.DoAction(dto, transcationStatus)
 	} else if dto.Status == Transaction_Status_Commit {
 		if transcationStatus.OwnerId == dto.OwnerId { //PROPAGATION_REQUIRED 情况下 子事务 不可提交
 			defer transcationStatus.Flush() //关闭
@@ -160,7 +160,7 @@ func (this DefaultTransationManager) DoTransaction(dto TransactionReqDTO) Transa
 					Error:         err.Error(),
 				}
 			}
-			var transaction, err = this.TransactionFactory.GetTransactionStatus(dto.TransactionId)
+			var transaction, err = it.TransactionFactory.GetTransactionStatus(dto.TransactionId)
 			if err != nil {
 				log.Println(err)
 			} else {
@@ -190,7 +190,7 @@ func (this DefaultTransationManager) DoTransaction(dto TransactionReqDTO) Transa
 }
 
 //执行数据库操作
-func (this DefaultTransationManager) DoAction(dto TransactionReqDTO, transcationStatus *TransactionStatus) TransactionRspDTO {
+func (it DefaultTransationManager) DoAction(dto TransactionReqDTO, transcationStatus *TransactionStatus) TransactionRspDTO {
 	if transcationStatus.IsCompleted {
 		var TransactionRspDTO = TransactionRspDTO{
 			TransactionId: dto.TransactionId,

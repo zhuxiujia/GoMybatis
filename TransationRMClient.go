@@ -21,13 +21,13 @@ type RemoteSessionEngine struct {
 	Client *TransationRMClient
 }
 
-func (this RemoteSessionEngine) New(Client *TransationRMClient) RemoteSessionEngine {
-	this.Client = Client
-	return this
+func (it RemoteSessionEngine) New(Client *TransationRMClient) RemoteSessionEngine {
+	it.Client = Client
+	return it
 }
 
-func (this *RemoteSessionEngine) NewSession() Session {
-	var TransationSession = TransationRMSession{Client: this.Client}
+func (it *RemoteSessionEngine) NewSession() Session {
+	var TransationSession = TransationRMSession{Client: it.Client}
 	var session = Session(&TransationSession)
 	return session
 }
@@ -38,39 +38,39 @@ type TransationRMClient struct {
 	RetryTime int
 }
 
-func (this *TransationRMClient) Link(addr string) (*rpc.Client, error) {
-	this.Addr = addr
-	var client, error = this.autoLink()
+func (it *TransationRMClient) Link(addr string) (*rpc.Client, error) {
+	it.Addr = addr
+	var client, error = it.autoLink()
 	if error != nil {
 		return client, error
 	} else {
-		this.Client = client
+		it.Client = client
 		return client, nil
 	}
 }
-func (this *TransationRMClient) autoLink() (*rpc.Client, error) {
-	if this.Client != nil {
-		this.Client.Close()
-		this.Client = nil
+func (it *TransationRMClient) autoLink() (*rpc.Client, error) {
+	if it.Client != nil {
+		it.Client.Close()
+		it.Client = nil
 	}
-	return jsonrpc.Dial("tcp", this.Addr)
+	return jsonrpc.Dial("tcp", it.Addr)
 }
 
-func (this *TransationRMClient) Call(arg TransactionReqDTO, result *TransactionRspDTO) error {
+func (it *TransationRMClient) Call(arg TransactionReqDTO, result *TransactionRspDTO) error {
 	var error error
-	if this.Client == nil {
-		if this.Addr != "" {
-			this.Link(this.Addr)
+	if it.Client == nil {
+		if it.Addr != "" {
+			it.Link(it.Addr)
 		} else {
 			error = utils.NewError("TransationRMClient", " link have no addr!")
 			return error
 		}
 	}
-	error = this.Client.Call(CallMethod, arg, result)
+	error = it.Client.Call(CallMethod, arg, result)
 	if error != nil && error.Error() == ConnectError {
-		for i := 0; i < this.RetryTime; i++ {
-			this.autoLink()
-			error = this.Client.Call(CallMethod, arg, result)
+		for i := 0; i < it.RetryTime; i++ {
+			it.autoLink()
+			error = it.Client.Call(CallMethod, arg, result)
 			if error == nil {
 				break
 			}
@@ -79,9 +79,9 @@ func (this *TransationRMClient) Call(arg TransactionReqDTO, result *TransactionR
 	return error
 }
 
-func (this *TransationRMClient) Close() error {
-	if this.Client != nil {
-		return this.Client.Close()
+func (it *TransationRMClient) Close() error {
+	if it.Client != nil {
+		return it.Client.Close()
 	}
 	return nil
 }

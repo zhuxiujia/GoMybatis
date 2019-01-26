@@ -89,7 +89,7 @@ type TestOrderService struct {
 }
 
 //嵌套事务
-func (this TestOrderService) Transform(transactionId string, outid string, inId string, amount int) error {
+func (it TestOrderService) Transform(transactionId string, outid string, inId string, amount int) error {
 	var OwnerId = utils.CreateUUID()
 	var dto = TransactionReqDTO{
 		TransactionId: transactionId,
@@ -103,7 +103,7 @@ func (this TestOrderService) Transform(transactionId string, outid string, inId 
 		return errors.New(rspDTO.Error)
 	}
 	//事务id=2018092d6172014a2a4c8a949f1004623,已存在的事务不可提交commit，只能提交状态rollback和Pause
-	var e1 = this.TestPropertyServiceB.Reduce(transactionId, outid, amount)
+	var e1 = it.TestPropertyServiceB.Reduce(transactionId, outid, amount)
 	if e1 != nil {
 		return e1
 	}
@@ -114,7 +114,7 @@ func (this TestOrderService) Transform(transactionId string, outid string, inId 
 		return errors.New(rspDTO.Error)
 	}
 	//事务id=2018092d6172014a2a4c8a949f1004623,已存在的事务不可提交commit，只能提交状态rollback和Pause
-	var e = this.TestPropertyServiceA.Add(transactionId, inId, amount)
+	var e = it.TestPropertyServiceA.Add(transactionId, inId, amount)
 	if e != nil {
 		return e
 	}

@@ -19,15 +19,15 @@ const (
 type ExpressionEngineJee struct {
 }
 
-func (this *ExpressionEngineJee) Name() string {
+func (it *ExpressionEngineJee) Name() string {
 	return "ExpressionEngineJee"
 }
 
 //编译一个表达式
 //参数：lexerArg 表达式内容
 //返回：interface{} 编译结果,error 错误
-func (this *ExpressionEngineJee) Lexer(lexerArg string) (interface{}, error) {
-	tokenized, err := jee.Lexer(this.LexerAndOrSupport(lexerArg))
+func (it *ExpressionEngineJee) Lexer(lexerArg string) (interface{}, error) {
+	tokenized, err := jee.Lexer(it.LexerAndOrSupport(lexerArg))
 	if err != nil {
 		return nil, utils.NewError("ExpressionEngineJee", err)
 	}
@@ -41,7 +41,7 @@ func (this *ExpressionEngineJee) Lexer(lexerArg string) (interface{}, error) {
 //执行一个表达式
 //参数：lexerResult=编译结果，arg=参数
 //返回：执行结果，错误
-func (this *ExpressionEngineJee) Eval(compileResult interface{}, arg interface{}, operation int) (interface{}, error) {
+func (it *ExpressionEngineJee) Eval(compileResult interface{}, arg interface{}, operation int) (interface{}, error) {
 	var jeeMsg jee.BMsg
 	switch operation {
 	case JeeOperation_Marshal_Map:
@@ -73,16 +73,16 @@ func (this *ExpressionEngineJee) Eval(compileResult interface{}, arg interface{}
 }
 
 //编译后立即执行
-func (this *ExpressionEngineJee) LexerEval(lexerArg string, arg interface{}, operation int) (interface{}, error) {
-	var lexer, error = this.Lexer(lexerArg)
+func (it *ExpressionEngineJee) LexerEval(lexerArg string, arg interface{}, operation int) (interface{}, error) {
+	var lexer, error = it.Lexer(lexerArg)
 	if error != nil {
 		return nil, error
 	}
-	return this.Eval(lexer, arg, operation)
+	return it.Eval(lexer, arg, operation)
 }
 
 //添加and 和 or 语法支持
-func (this *ExpressionEngineJee) LexerAndOrSupport(lexerArg string) string {
+func (it *ExpressionEngineJee) LexerAndOrSupport(lexerArg string) string {
 	var buf bytes.Buffer
 	strs := strings.Split(lexerArg, " or ")
 	if len(strs) > 1 {
@@ -118,6 +118,6 @@ func (this *ExpressionEngineJee) LexerAndOrSupport(lexerArg string) string {
 }
 
 //Lexer缓存,可不提供。
-func (this *ExpressionEngineJee) LexerCache() ExpressionEngineLexerCache {
+func (it *ExpressionEngineJee) LexerCache() ExpressionEngineLexerCache {
 	return nil
 }
