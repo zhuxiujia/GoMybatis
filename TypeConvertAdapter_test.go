@@ -78,3 +78,33 @@ func Test_SqlArgTypeConvert(t *testing.T) {
 	}
 	fmt.Println(convertResult)
 }
+
+func BenchmarkGoMybatisExpressionTypeConvert_Convert(b *testing.B) {
+	b.StopTimer()
+	var convertType = reflect.TypeOf(1)
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		var convertResult = GoMybatisExpressionTypeConvert{}.Convert(SqlArg{
+			Value: 1,
+			Type:  convertType,
+		})
+		if convertResult == nil {
+			b.Fatal("convert fail!")
+		}
+	}
+}
+
+func BenchmarkGoMybatisSqlArgTypeConvert_Convert(b *testing.B) {
+	b.StopTimer()
+	var convertType = reflect.TypeOf(1)
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		var convertResult = GoMybatisSqlArgTypeConvert{}.Convert(SqlArg{
+			Value: 1,
+			Type:  convertType,
+		})
+		if convertResult == "" {
+			b.Fatal("convert fail!")
+		}
+	}
+}

@@ -3,9 +3,12 @@ package utils
 import (
 	"bytes"
 	"fmt"
+	"reflect"
 	"time"
 )
 
+var c_FLOAT64_DEFAULT float64
+var Float64Type = reflect.TypeOf(c_FLOAT64_DEFAULT)
 //调用次方法 必须加上 defer 关键字！
 func CountMethodUseTime(now time.Time, info string, duration time.Duration) {
 	var end = time.Now()
@@ -41,7 +44,7 @@ func PrintTimeString(info string, start time.Time, end time.Time, duration time.
 	var durationName = DurationToString(duration)
 	var str bytes.Buffer
 	str.WriteString(info)
-	str.WriteString(fmt.Sprint(end.Sub(start).Nanoseconds() / int64(duration)))
+	str.WriteString(GetValue(end.Sub(start).Nanoseconds()/int64(duration), Float64Type))
 	str.WriteString(durationName)
 	return str.String()
 }

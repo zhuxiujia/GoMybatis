@@ -2,7 +2,7 @@ package GoMybatis
 
 import (
 	"bytes"
-	"fmt"
+	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
 	"strconv"
 	"time"
@@ -75,5 +75,6 @@ func (this GoMybatisSqlArgTypeConvert) toString(value *SqlArg) string {
 	if value.Value == nil {
 		return ""
 	}
-	return fmt.Sprint(value.Value)
+	//return fmt.Sprint(value.Value)
+	return utils.GetValue(value.Value,value.Type)
 }
