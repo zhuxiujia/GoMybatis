@@ -19,7 +19,8 @@ https://zhuxiujia.github.io/gomybatis.io/info.html
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-表达式和xml面向对象设计</a>假如foo.Bar 这个属性是指针,那么在xml中调用 foo.Bar 则会取实际值,完全避免使用&和*符号指针操作<br>
 ### 通过远程代理处理事务支持  处于 单数据库(Mysql,postgresql)-分布式数据库（TiDB,cockroachdb...）过渡期间的微服务
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/tx.png)
-
+### 异步消息队列日志
+![Image text](https://github.com/zhuxiujia/gomybatis.io/assets/log_system.png)
 
 数据库驱动列表
 ```
