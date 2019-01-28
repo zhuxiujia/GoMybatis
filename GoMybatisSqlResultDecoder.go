@@ -8,14 +8,6 @@ import (
 	"time"
 )
 
-//
-type SqlResultDecoder interface {
-	//resultMap = in xml resultMap element
-	//dbData = select the SqlResult
-	//decodeResultPtr = need decode result type
-	Decode(resultMap map[string]*ResultProperty, SqlResult []map[string][]byte, decodeResultPtr interface{}) error
-}
-
 type GoMybatisSqlResultDecoder struct {
 	SqlResultDecoder
 }
