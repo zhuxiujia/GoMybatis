@@ -160,6 +160,12 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 			if collectionValueLen == 0 {
 				continue
 			}
+			if index == "" {
+				index = "index"
+			}
+			if item == "" {
+				item = "item"
+			}
 			switch collectionValue.Kind() {
 			case reflect.Map:
 				var mapKeys = collectionValue.MapKeys()
