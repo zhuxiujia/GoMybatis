@@ -273,15 +273,15 @@ func (it GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceArray []m
 	}
 }
 
-func (decoder GoMybatisSqlResultDecoder) getRenameMapArray(sourceArray []map[string][]byte) []map[string][]byte {
-	var renameMapArray = make([]map[string][]byte, 0)
-	for _, v := range sourceArray {
+func (it GoMybatisSqlResultDecoder) getRenameMapArray(sourceArray []map[string][]byte) []map[string][]byte {
+	var renameMapArray = make([]map[string][]byte, len(sourceArray))
+	for index, v := range sourceArray {
 		var m = make(map[string][]byte)
-		for ik, iv := range v {
-			var repleaceName = strings.ToLower(strings.Replace(ik, "_", "", -1))
-			m[repleaceName] = iv
+		for indexKey, indexValue := range v {
+			var repleaceName = strings.ToLower(strings.Replace(indexKey, "_", "", -1))
+			m[repleaceName] = indexValue
 		}
-		renameMapArray = append(renameMapArray, m)
+		renameMapArray[index] = m
 	}
 	return renameMapArray
 }
