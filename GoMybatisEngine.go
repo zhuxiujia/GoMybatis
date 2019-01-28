@@ -12,11 +12,11 @@ type GoMybatisEngine struct {
 
 func (it GoMybatisEngine) NewSession() Session {
 	uuid := utils.CreateUUID()
-	var mysqlLocalSession = LocalSession{
+	var localSession = LocalSession{
 		SessionId: uuid,
 		db:        it.DB,
 	}
-	var session = Session(&mysqlLocalSession)
+	var session = Session(&localSession)
 	return session
 }
 
