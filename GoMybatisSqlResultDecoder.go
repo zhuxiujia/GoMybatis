@@ -17,7 +17,7 @@ func (it GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultProperty,
 		return nil
 	}
 	var resultV = reflect.ValueOf(result)
-	var resultT = reflect.TypeOf(result)
+	var resultT = resultV.Type()
 	if resultV.Kind() == reflect.Ptr {
 		resultV = resultV.Elem()
 	} else {
