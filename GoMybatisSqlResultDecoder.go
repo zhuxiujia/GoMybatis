@@ -17,6 +17,7 @@ func (it GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultProperty,
 		return nil
 	}
 	var resultV = reflect.ValueOf(result)
+	var resultValue = resultV
 	var resultT = resultV.Type()
 	if resultV.Kind() == reflect.Ptr {
 		resultV = resultV.Elem()
@@ -95,7 +96,7 @@ func (it GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultProperty,
 			panic("[GoMybatis] Decode result type not support " + resultT.String() + "!")
 		}
 	}
-	resultV.Set(resultV)
+	resultValue.Elem().Set(resultV)
 	return nil
 }
 
