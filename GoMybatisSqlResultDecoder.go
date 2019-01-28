@@ -95,7 +95,7 @@ func (it GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultProperty,
 			panic("[GoMybatis] Decode result type not support " + resultT.String() + "!")
 		}
 	}
-	reflect.ValueOf(result).Elem().Set(resultV)
+	resultV.Set(resultV)
 	return nil
 }
 
