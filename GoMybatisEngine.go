@@ -26,9 +26,9 @@ func Open(driverName, dataSourceName string) (*SessionEngine, error) {
 	if err != nil {
 		return nil, err
 	}
-	var mysqlEngine = GoMybatisEngine{
+	var goMybatisEngine = GoMybatisEngine{
 		DB: db,
 	}
-	var engine = SessionEngine(mysqlEngine)
+	var engine = SessionEngine(goMybatisEngine)
 	return &engine, nil
 }
