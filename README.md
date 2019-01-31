@@ -131,5 +131,4 @@ https://github.com/zhuxiujia/GoMybatis/tree/master/lib/github.com/Knetic/govalua
 -专属简化模板标签,媲美语言层orm框架的开发效率，和java端的mybatis啰嗦的语法告别（进行中）
 -逻辑删除
 -乐观锁
--针对GoLand和IDEA的xml生成插件，右键一键生成CRUD代码</br>
 ## 喜欢的老铁欢迎在右上角点下 star 关注和支持我们哈
