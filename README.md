@@ -128,6 +128,6 @@ https://github.com/zhuxiujia/GoMybatis/tree/master/lib/github.com/Knetic/govalua
 
 ## 请及时关注版本，及时升级版本(新的功能，bug修复)
 ## TODO 期待功能路线（预览特性,有可能会更改）
--专属简化标签语言（进行中）
+-专属简化模板标签,媲美语言层orm框架的开发效率，和java端的mybatis啰嗦的语法告别（进行中）
 -针对GoLand和IDEA的xml生成插件，右键一键生成CRUD代码</br>
 ## 喜欢的老铁欢迎在右上角点下 star 关注和支持我们哈
