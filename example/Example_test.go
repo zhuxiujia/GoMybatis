@@ -38,12 +38,12 @@ func init() {
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
 
 	var router = GoMybatis.GoMybatisDataSourceRouter{}.New(func(mapperName string) *string {
-		//根据包名路由指向数据源
+		//根据包名或者struct名称路由指向数据源
 		if strings.Contains(mapperName,"example."){
 			var url=MysqlUri
 			return &url
 		}
-		//根据包名路由指向数据源
+		//根据包名或者struct名称路由指向数据源
 		if strings.Contains(mapperName,"example."){
 			var url=MysqlUri
 			return &url
