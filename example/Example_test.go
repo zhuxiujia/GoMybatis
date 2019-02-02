@@ -6,6 +6,7 @@ import (
 	"github.com/zhuxiujia/GoMybatis"
 	"io/ioutil"
 	"os"
+	"strings"
 	"testing"
 	"time"
 )
@@ -35,7 +36,22 @@ var exampleActivityMapper = ExampleActivityMapper{}
 func init() {
 	var err error
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
-	engine, err := GoMybatis.Open("mysql", MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
+
+	var router = GoMybatis.GoMybatisDataSourceRouter{}.New(func(mapperName string) *string {
+		//根据包名路由指向数据源
+		if strings.Contains(mapperName,"example."){
+			var url=MysqlUri
+			return &url
+		}
+		//根据包名路由指向数据源
+		if strings.Contains(mapperName,"example."){
+			var url=MysqlUri
+			return &url
+		}
+		return nil
+	})
+
+	engine, err := GoMybatis.Open("mysql", MysqlUri, &router) //此处请按格式填写你的mysql链接，这里用*号代替
 	if err != nil {
 		panic(err.Error())
 	}
@@ -178,7 +194,7 @@ func Test_local_Transation(t *testing.T) {
 		return
 	}
 	//使用事务
-	var session = GoMybatis.DefaultSessionFactory.NewSession(GoMybatis.SessionType_Default, nil)
+	var session = GoMybatis.DefaultSessionFactory.NewSession("exampleActivityMapper", GoMybatis.SessionType_Default, nil)
 	session.Begin() //开启事务
 	var activityBean = Activity{
 		Id:   "170",
@@ -205,7 +221,7 @@ func Test_Remote_Transation(t *testing.T) {
 
 	//开始使用
 	//关键，使用远程Session替换本地Session调用
-	var transationRMSession = GoMybatis.DefaultSessionFactory.NewSession(GoMybatis.SessionType_TransationRM, &GoMybatis.TransationRMClientConfig{
+	var transationRMSession = GoMybatis.DefaultSessionFactory.NewSession("", GoMybatis.SessionType_TransationRM, &GoMybatis.TransationRMClientConfig{
 		Addr:          remoteAddr,
 		RetryTime:     3,
 		TransactionId: "12345678",

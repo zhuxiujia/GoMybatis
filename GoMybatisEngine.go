@@ -32,8 +32,6 @@ func (it *GoMybatisEngine) NewSession(mapperName string) (Session, error) {
 	return session, err
 }
 
-var DefaultGoMybatisEngine SessionEngine
-
 //打开一个本地引擎,driverName 驱动名称例如"mysql", dataSourceName string 数据库url, router DataSourceRouter 路由规则
 func Open(driverName, dataSourceName string, router DataSourceRouter) (SessionEngine, error) {
 	if DefaultGoMybatisEngine == nil {
@@ -45,9 +43,13 @@ func Open(driverName, dataSourceName string, router DataSourceRouter) (SessionEn
 		return nil, err
 	}
 	DefaultGoMybatisEngine.DBMap()[dataSourceName] = db
-	if router == nil {
-		router = GoMybatisDataSourceRouter{}.New(db)
+	if router == nil && DefaultGoMybatisEngine.DataSourceRouter() == nil {
+		var newRouter = GoMybatisDataSourceRouter{}.New(nil)
+		router=&newRouter
+		DefaultGoMybatisEngine.SetDataSourceRouter(router)
+	} else if router != nil && DefaultGoMybatisEngine.DataSourceRouter() == nil {
 		DefaultGoMybatisEngine.SetDataSourceRouter(router)
 	}
+	router.SetDB(dataSourceName,db)
 	return DefaultGoMybatisEngine, nil
 }

@@ -22,9 +22,11 @@ var DefaultSqlResultDecoder SqlResultDecoder
 
 var DefaultLog Log
 
+var DefaultGoMybatisEngine SessionEngine
+
 //推荐默认使用单例传入
 //根据sessionEngine写入到mapperPtr，value:指向mapper指针反射对象，xml：xml数据，sessionEngine：session引擎，enableLog:是否允许日志输出，log：日志实现
-func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine *SessionEngine, enableLog bool, log Log) {
+func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine SessionEngine, enableLog bool, log Log) {
 	if value.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
@@ -58,7 +60,7 @@ func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine *Session
 
 //推荐默认使用单例传入
 //根据sessionEngine写入到mapperPtr，ptr:指向mapper指针，xml：xml数据，sessionEngine：session引擎，enableLog:是否允许日志输出，log：日志实现
-func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine *SessionEngine, enableLog bool, log Log) {
+func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine SessionEngine, enableLog bool, log Log) {
 	v := reflect.ValueOf(ptr)
 	if v.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")

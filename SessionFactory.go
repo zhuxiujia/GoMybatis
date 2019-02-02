@@ -1,13 +1,13 @@
 package GoMybatis
 
 type SessionFactory struct {
-	Engine     *SessionEngine
-	SessionMap map[string]*Session
+	Engine     SessionEngine
+	SessionMap map[string]Session
 }
 
-func (it SessionFactory) New(Engine *SessionEngine) SessionFactory {
+func (it SessionFactory) New(Engine SessionEngine) SessionFactory {
 	it.Engine = Engine
-	it.SessionMap = make(map[string]*Session)
+	it.SessionMap = make(map[string]Session)
 	return it
 }
 
@@ -16,9 +16,13 @@ func (it *SessionFactory) NewSession(mapperName string, sessionType SessionType,
 		panic("[GoMybatis] SessionFactory not init! you must call method SessionFactory.New(*)")
 	}
 	var newSession Session
+	var err error
 	switch sessionType {
 	case SessionType_Default:
-		var session = (*it.Engine).NewSession(mapperName)
+		var session, err = it.Engine.NewSession(mapperName)
+		if err != nil {
+			panic(err)
+		}
 		var factorySession = SessionFactorySession{
 			Session: session,
 			Factory: it,
@@ -26,7 +30,10 @@ func (it *SessionFactory) NewSession(mapperName string, sessionType SessionType,
 		newSession = Session(&factorySession)
 		break
 	case SessionType_Local:
-		newSession = (*it.Engine).NewSession(mapperName)
+		newSession, err = it.Engine.NewSession(mapperName)
+		if err != nil {
+			panic(err)
+		}
 		break
 	case SessionType_TransationRM:
 		if config == nil {
@@ -41,15 +48,15 @@ func (it *SessionFactory) NewSession(mapperName string, sessionType SessionType,
 	default:
 		panic("[GoMybatis] newSession() must have a SessionType!")
 	}
-	it.SessionMap[newSession.Id()] = &newSession
+	it.SessionMap[newSession.Id()] = newSession
 	return newSession
 }
 
-func (it *SessionFactory) GetSession(id string) *Session {
+func (it *SessionFactory) GetSession(id string) Session {
 	return it.SessionMap[id]
 }
 
-func (it *SessionFactory) SetSession(id string, session *Session) {
+func (it *SessionFactory) SetSession(id string, session Session) {
 	it.SessionMap[id] = session
 }
 
@@ -59,7 +66,7 @@ func (it *SessionFactory) Close(id string) {
 	}
 	var s = it.SessionMap[id]
 	if s != nil {
-		(*s).Close()
+		s.Close()
 		it.SessionMap[id] = nil
 	}
 }
@@ -70,7 +77,7 @@ func (it *SessionFactory) CloseAll(id string) {
 	}
 	for _, v := range it.SessionMap {
 		if v != nil {
-			(*v).Close()
+			v.Close()
 			it.SessionMap[id] = nil
 		}
 	}

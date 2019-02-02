@@ -26,7 +26,7 @@ func (it TransationRMServer) Msg(arg TransactionReqDTO, result *TransactionRspDT
 func ServerTransationTcp(addr string, driverName, dataSourceName string) {
 	transationRMServer := new(TransationRMServer)
 
-	engine, err := Open(driverName, dataSourceName)
+	engine, err := Open(driverName, dataSourceName,nil)
 	if err != nil {
 		panic(err.Error())
 	}

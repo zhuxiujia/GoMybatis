@@ -78,7 +78,8 @@ func (it DefaultTransationManager) GetTransaction(def *TransactionDefinition, tr
 		var d = TransactionDefinition{}.Default()
 		def = &d
 	}
-	var transationStatus, err = it.TransactionFactory.GetTransactionStatus(transactionId)
+	//TODO equal mapperName
+	var transationStatus, err = it.TransactionFactory.GetTransactionStatus("",transactionId)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +103,8 @@ func (it DefaultTransationManager) GetTransaction(def *TransactionDefinition, tr
 }
 
 func (it DefaultTransationManager) Commit(transactionId string) error {
-	var transactions, err = it.TransactionFactory.GetTransactionStatus(transactionId)
+	//TODO equal mapperName
+	var transactions, err = it.TransactionFactory.GetTransactionStatus("",transactionId)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -111,7 +113,8 @@ func (it DefaultTransationManager) Commit(transactionId string) error {
 }
 
 func (it DefaultTransationManager) Rollback(transactionId string) error {
-	var transactions, err = it.TransactionFactory.GetTransactionStatus(transactionId)
+	//TODO equal mapperName
+	var transactions, err = it.TransactionFactory.GetTransactionStatus("",transactionId)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -160,7 +163,8 @@ func (it DefaultTransationManager) DoTransaction(dto TransactionReqDTO) Transact
 					Error:         err.Error(),
 				}
 			}
-			var transaction, err = it.TransactionFactory.GetTransactionStatus(dto.TransactionId)
+			//TODO equal mapperName
+			var transaction, err = it.TransactionFactory.GetTransactionStatus("",dto.TransactionId)
 			if err != nil {
 				log.Println(err)
 			} else {
