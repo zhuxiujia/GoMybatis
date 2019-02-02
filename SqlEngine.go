@@ -1,5 +1,7 @@
 package GoMybatis
 
+import "database/sql"
+
 type Result struct {
 	LastInsertId int64
 	RowsAffected int64
@@ -17,5 +19,8 @@ type Session interface {
 
 //产生session的引擎
 type SessionEngine interface {
-	NewSession() Session
+	NewSession(mapperName string) (Session, error)
+	DBMap() map[string]*sql.DB
+	DataSourceRouter() DataSourceRouter
+	SetDataSourceRouter(router DataSourceRouter)
 }

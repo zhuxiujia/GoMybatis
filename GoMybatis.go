@@ -84,6 +84,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 	var methodXmlMap = makeMethodXmlMap(bean, mapperTree)
 	var resultMaps = makeResultMaps(mapperTree)
 	var returnTypeMap = makeReturnTypeMap(bean)
+	var beanName = bean.Type().PkgPath() + bean.Type().String()
 	var proxyFunc = func(method string, args []reflect.Value, tagArgs []TagArg) []reflect.Value {
 		var returnValue *reflect.Value = nil
 		var returnType = returnTypeMap[method]
@@ -113,7 +114,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 		}
 
 		//exe sql
-		var e = exeMethodByXml(sessionFactory, tagArgs, args, mapperXml, resultMap, returnValue, decoder, sqlBuilder, enableLog)
+		var e = exeMethodByXml(beanName, sessionFactory, tagArgs, args, mapperXml, resultMap, returnValue, decoder, sqlBuilder, enableLog)
 
 		return buildReturnValues(returnType, returnValue, e)
 	}
@@ -293,7 +294,7 @@ func findMapperXml(mapperTree map[string]*MapperXml, methodName string) *MapperX
 	return nil
 }
 
-func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, mapperXml *MapperXml, resultMap map[string]*ResultProperty, returnValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) error {
+func exeMethodByXml(beanName string, sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, mapperXml *MapperXml, resultMap map[string]*ResultProperty, returnValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) error {
 	//build sql string
 	var session Session
 	var sql string
@@ -307,7 +308,7 @@ func exeMethodByXml(sessionFactory *SessionFactory, tagParamMap []TagArg, args [
 	}
 	//session
 	if session == nil {
-		session = sessionFactory.NewSession(SessionType_Default, nil)
+		session = sessionFactory.NewSession(beanName, SessionType_Default, nil)
 		//not arg session,just close!
 		defer closeSession(sessionFactory, session)
 	}

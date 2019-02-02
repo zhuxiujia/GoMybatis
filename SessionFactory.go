@@ -11,14 +11,14 @@ func (it SessionFactory) New(Engine *SessionEngine) SessionFactory {
 	return it
 }
 
-func (it *SessionFactory) NewSession(sessionType SessionType, config *TransationRMClientConfig) Session {
+func (it *SessionFactory) NewSession(mapperName string, sessionType SessionType, config *TransationRMClientConfig) Session {
 	if it.SessionMap == nil || it.Engine == nil {
 		panic("[GoMybatis] SessionFactory not init! you must call method SessionFactory.New(*)")
 	}
 	var newSession Session
 	switch sessionType {
 	case SessionType_Default:
-		var session = (*it.Engine).NewSession()
+		var session = (*it.Engine).NewSession(mapperName)
 		var factorySession = SessionFactorySession{
 			Session: session,
 			Factory: it,
@@ -26,7 +26,7 @@ func (it *SessionFactory) NewSession(sessionType SessionType, config *Transation
 		newSession = Session(&factorySession)
 		break
 	case SessionType_Local:
-		newSession = (*it.Engine).NewSession()
+		newSession = (*it.Engine).NewSession(mapperName)
 		break
 	case SessionType_TransationRM:
 		if config == nil {
