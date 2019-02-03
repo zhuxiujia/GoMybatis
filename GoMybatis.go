@@ -45,10 +45,10 @@ func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine SessionE
 	}
 	var expressionEngineProxy = ExpressionEngineProxy{}.New(DefaultExpressionEngine, true)
 
-	var log,enableLog=sessionEngine.LogEnable()
-	if log == nil {
+	var log, enableLog = sessionEngine.LogEnable()
+	if enableLog == true && log == nil {
 		log = &LogStandard{}
-		sessionEngine.SetLogEnable(enableLog,log)
+		sessionEngine.SetLogEnable(enableLog, log)
 	}
 	if DefaultSqlBuilder == nil {
 		DefaultSqlBuilder = GoMybatisSqlBuilder{}.New(DefaultExpressionTypeConvert, DefaultSqlArgTypeConvert, expressionEngineProxy, log, enableLog)
