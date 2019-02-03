@@ -6,6 +6,7 @@ import (
 )
 
 type TransactionStatus struct {
+	MapperName       string
 	OwnerId          string       //所有者id
 	IsNewTransaction bool         //是否新启动的事务
 	HasSavepoint     bool         //是否保存点

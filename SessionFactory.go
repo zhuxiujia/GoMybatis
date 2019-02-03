@@ -39,7 +39,7 @@ func (it *SessionFactory) NewSession(mapperName string, sessionType SessionType,
 		if config == nil {
 			panic("[GoMybatis] SessionFactory can not create TransationRMSession,config *TransationRMClientConfig is nil!")
 		}
-		var transationRMSession = TransationRMSession{}.New(config.TransactionId, &TransationRMClient{
+		var transationRMSession = TransationRMSession{}.New(mapperName, config.TransactionId, &TransationRMClient{
 			RetryTime: config.RetryTime,
 			Addr:      config.Addr,
 		}, config.Status)

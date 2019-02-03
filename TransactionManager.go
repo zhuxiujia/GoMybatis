@@ -42,6 +42,7 @@ type TransactionReqDTO struct {
 	OwnerId       string //所有者
 	Sql           string //sql内容(可空)
 	ActionType    ActionType
+	MapperName    string //mapper名称
 }
 
 type TransactionRspDTO struct {
@@ -53,9 +54,9 @@ type TransactionRspDTO struct {
 }
 
 type TransactionManager interface {
-	GetTransaction(def *TransactionDefinition, transactionId string, OwnerId string) (*TransactionStatus, error)
-	Commit(transactionId string) error
-	Rollback(transactionId string) error
+	GetTransaction(mapperName string, def *TransactionDefinition, transactionId string, OwnerId string) (*TransactionStatus, error)
+	Commit(mapperName string, transactionId string) error
+	Rollback(mapperName string, transactionId string) error
 }
 
 type DefaultTransationManager struct {
@@ -70,7 +71,7 @@ func (it DefaultTransationManager) New(SessionFactory *SessionFactory, Transacti
 	return it
 }
 
-func (it DefaultTransationManager) GetTransaction(def *TransactionDefinition, transactionId string, OwnerId string) (*TransactionStatus, error) {
+func (it DefaultTransationManager) GetTransaction(mapperName string, def *TransactionDefinition, transactionId string, OwnerId string) (*TransactionStatus, error) {
 	if transactionId == "" {
 		return nil, utils.NewError("TransactionManager", " transactionId ="+transactionId+" transations is nil!")
 	}
@@ -79,7 +80,7 @@ func (it DefaultTransationManager) GetTransaction(def *TransactionDefinition, tr
 		def = &d
 	}
 	//TODO equal mapperName
-	var transationStatus, err = it.TransactionFactory.GetTransactionStatus("",transactionId)
+	var transationStatus, err = it.TransactionFactory.GetTransactionStatus(mapperName, transactionId)
 	if err != nil {
 		return nil, err
 	}
@@ -102,9 +103,9 @@ func (it DefaultTransationManager) GetTransaction(def *TransactionDefinition, tr
 	return transationStatus, nil
 }
 
-func (it DefaultTransationManager) Commit(transactionId string) error {
+func (it DefaultTransationManager) Commit(mapperName string, transactionId string) error {
 	//TODO equal mapperName
-	var transactions, err = it.TransactionFactory.GetTransactionStatus("",transactionId)
+	var transactions, err = it.TransactionFactory.GetTransactionStatus(mapperName, transactionId)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -112,9 +113,9 @@ func (it DefaultTransationManager) Commit(transactionId string) error {
 	return transactions.Commit()
 }
 
-func (it DefaultTransationManager) Rollback(transactionId string) error {
+func (it DefaultTransationManager) Rollback(mapperName string, transactionId string) error {
 	//TODO equal mapperName
-	var transactions, err = it.TransactionFactory.GetTransactionStatus("",transactionId)
+	var transactions, err = it.TransactionFactory.GetTransactionStatus(mapperName, transactionId)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -127,7 +128,7 @@ func (it DefaultTransationManager) DoTransaction(dto TransactionReqDTO) Transact
 	var transcationStatus *TransactionStatus
 	var err error
 
-	transcationStatus, err = it.GetTransaction(nil, dto.TransactionId, dto.OwnerId)
+	transcationStatus, err = it.GetTransaction(dto.MapperName, nil, dto.TransactionId, dto.OwnerId)
 	if transcationStatus == nil || transcationStatus.Transaction == nil || transcationStatus.Transaction.Session == nil {
 		return TransactionRspDTO{
 			TransactionId: dto.TransactionId,
@@ -164,7 +165,7 @@ func (it DefaultTransationManager) DoTransaction(dto TransactionReqDTO) Transact
 				}
 			}
 			//TODO equal mapperName
-			var transaction, err = it.TransactionFactory.GetTransactionStatus("",dto.TransactionId)
+			var transaction, err = it.TransactionFactory.GetTransactionStatus(dto.MapperName, dto.TransactionId)
 			if err != nil {
 				log.Println(err)
 			} else {

@@ -11,11 +11,11 @@ func (it TransactionFactory) New(SessionFactory *SessionFactory) TransactionFact
 	return it
 }
 
-func (it *TransactionFactory) GetTransactionStatus(mapperName string,transactionId string) (*TransactionStatus, error) {
+func (it *TransactionFactory) GetTransactionStatus(mapperName string, transactionId string) (*TransactionStatus, error) {
 	var Session Session
 	var result = it.TransactionStatuss[transactionId]
 	if result == nil {
-		Session = it.SessionFactory.NewSession(mapperName,SessionType_Default, nil)
+		Session = it.SessionFactory.NewSession(mapperName, SessionType_Default, nil)
 		var transaction = Transaction{
 			Id:      transactionId,
 			Session: Session,
@@ -27,6 +27,7 @@ func (it *TransactionFactory) GetTransactionStatus(mapperName string,transaction
 		result = &transactionStatus
 		it.TransactionStatuss[transactionId] = result
 	}
+	result.MapperName = mapperName
 	return result, nil
 }
 
@@ -37,11 +38,11 @@ func (it *TransactionFactory) SetTransactionStatus(transactionId string, transac
 	it.TransactionStatuss[transactionId] = transaction
 }
 
-func (it *TransactionFactory) Append(mapperName string,transactionId string, transaction TransactionStatus) {
+func (it *TransactionFactory) Append(mapperName string, transactionId string, transaction TransactionStatus) {
 	if transactionId == "" {
 		return
 	}
-	var old, _ = it.GetTransactionStatus(mapperName,transactionId)
+	var old, _ = it.GetTransactionStatus(mapperName, transactionId)
 	if old != nil {
 		it.SetTransactionStatus(transactionId, old)
 	}
