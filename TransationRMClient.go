@@ -60,7 +60,11 @@ func (it *TransationRMClient) Call(arg TransactionReqDTO, result *TransactionRsp
 	var error error
 	if it.Client == nil {
 		if it.Addr != "" {
-			it.Link(it.Addr)
+			var c, err = it.Link(it.Addr)
+			if err != nil {
+				return err
+			}
+			it.Client = c
 		} else {
 			error = utils.NewError("TransationRMClient", " link have no addr!")
 			return error

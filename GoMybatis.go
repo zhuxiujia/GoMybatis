@@ -24,7 +24,7 @@ var DefaultLog Log
 
 var DefaultGoMybatisEngine SessionEngine
 
-const NewSessionFunc = "NewSession"
+const NewSessionFunc = "NewSession" //NewSession method,auto write implement body code
 
 //推荐默认使用单例传入
 //根据sessionEngine写入到mapperPtr，value:指向mapper指针反射对象，xml：xml数据，sessionEngine：session引擎，enableLog:是否允许日志输出，log：日志实现
@@ -282,6 +282,7 @@ func makeMethodXmlMap(bean reflect.Value, mapperTree map[string]*MapperXml) map[
 	return methodXmlMap
 }
 
+//方法基本规则检查
 func methodFieldCheck(beanType *reflect.Type, methodType *reflect.StructField) {
 	if methodType.Type.NumOut() < 1 {
 		var buffer bytes.Buffer
