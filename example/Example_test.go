@@ -6,7 +6,6 @@ import (
 	"github.com/zhuxiujia/GoMybatis"
 	"io/ioutil"
 	"os"
-	"strings"
 	"testing"
 	"time"
 )
@@ -41,17 +40,18 @@ func init() {
 		panic(err.Error())
 	}
 
-	//自定义路由规则
-	var router = GoMybatis.GoMybatisDataSourceRouter{}.New(func(mapperName string) *string {
-		//根据包名或者struct名称路由指向数据源
-		if strings.Contains(mapperName, "example.") {
-			var url = MysqlUri
-			fmt.Println(url)
-			return &url
-		}
-		return nil
-	})
-	engine.SetDataSourceRouter(&router)
+	//动态数据源路由
+	//GoMybatis.Open("mysql", MysqlUri)//添加第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
+	//var router = GoMybatis.GoMybatisDataSourceRouter{}.New(func(mapperName string) *string {
+	//	//根据包名路由指向数据源
+	//	if strings.Contains(mapperName, "example.") {
+	//		var url = MysqlUri//第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
+	//		fmt.Println(url)
+	//		return &url
+	//	}
+	//	return nil
+	//})
+	//engine.SetDataSourceRouter(&router)
 
 	//读取mapper xml文件
 	file, err := os.Open("Example_ActivityMapper.xml")
