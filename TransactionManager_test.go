@@ -17,7 +17,7 @@ func TestManager(t *testing.T) {
 		fmt.Println("no mysql config in project, you must set the mysql link!")
 		return
 	}
-	engine, err := Open("mysql", example.MysqlUri,nil) //此处请按格式填写你的mysql链接，这里用*号代替
+	engine, err := Open("mysql", example.MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
 	if err != nil {
 		t.Fatal(err)
 	}
