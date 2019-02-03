@@ -36,25 +36,23 @@ var exampleActivityMapper = ExampleActivityMapper{}
 func init() {
 	var err error
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
+	engine, err := GoMybatis.Open("mysql", MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
+	if err != nil {
+		panic(err.Error())
+	}
 
+	//自定义路由规则
 	var router = GoMybatis.GoMybatisDataSourceRouter{}.New(func(mapperName string) *string {
 		//根据包名或者struct名称路由指向数据源
-		if strings.Contains(mapperName,"example."){
-			var url=MysqlUri
-			return &url
-		}
-		//根据包名或者struct名称路由指向数据源
-		if strings.Contains(mapperName,"example."){
-			var url=MysqlUri
+		if strings.Contains(mapperName, "example.") {
+			var url = MysqlUri
+			fmt.Println(url)
 			return &url
 		}
 		return nil
 	})
+	engine.SetDataSourceRouter(&router)
 
-	engine, err := GoMybatis.Open("mysql", MysqlUri, &router) //此处请按格式填写你的mysql链接，这里用*号代替
-	if err != nil {
-		panic(err.Error())
-	}
 	//读取mapper xml文件
 	file, err := os.Open("Example_ActivityMapper.xml")
 	if err != nil {

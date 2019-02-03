@@ -5,7 +5,6 @@ import (
 )
 
 type GoMybatisEngine struct {
-	SessionEngine
 	dbMap            map[string]*sql.DB
 	dbMapLen         int
 	dataSourceRouter DataSourceRouter
@@ -16,10 +15,21 @@ func (it GoMybatisEngine) New() GoMybatisEngine {
 	return it
 }
 
+func (it *GoMybatisEngine) Name() string {
+	return "GoMybatisEngine"
+}
+
 func (it *GoMybatisEngine) DataSourceRouter() DataSourceRouter {
+	if it.dataSourceRouter == nil {
+		var newRouter = GoMybatisDataSourceRouter{}.New(nil)
+		DefaultGoMybatisEngine.SetDataSourceRouter(&newRouter)
+	}
 	return it.dataSourceRouter
 }
 func (it *GoMybatisEngine) SetDataSourceRouter(router DataSourceRouter) {
+	for k, v := range it.dbMap {
+		router.SetDB(k, v)
+	}
 	it.dataSourceRouter = router
 }
 
@@ -28,12 +38,13 @@ func (it *GoMybatisEngine) DBMap() map[string]*sql.DB {
 }
 
 func (it *GoMybatisEngine) NewSession(mapperName string) (Session, error) {
-	var session, err = it.dataSourceRouter.Router(mapperName)
+	var session, err = it.DataSourceRouter().Router(mapperName)
 	return session, err
 }
 
-//打开一个本地引擎,driverName 驱动名称例如"mysql", dataSourceName string 数据库url, router DataSourceRouter 路由规则
-func Open(driverName, dataSourceName string, router DataSourceRouter) (SessionEngine, error) {
+//打开一个本地引擎
+//driverName: 驱动名称例如"mysql", dataSourceName: string 数据库url
+func Open(driverName, dataSourceName string) (SessionEngine, error) {
 	if DefaultGoMybatisEngine == nil {
 		var goMybatisEngine = GoMybatisEngine{}.New()
 		DefaultGoMybatisEngine = SessionEngine(&goMybatisEngine)
@@ -43,13 +54,5 @@ func Open(driverName, dataSourceName string, router DataSourceRouter) (SessionEn
 		return nil, err
 	}
 	DefaultGoMybatisEngine.DBMap()[dataSourceName] = db
-	if router == nil && DefaultGoMybatisEngine.DataSourceRouter() == nil {
-		var newRouter = GoMybatisDataSourceRouter{}.New(nil)
-		router=&newRouter
-		DefaultGoMybatisEngine.SetDataSourceRouter(router)
-	} else if router != nil && DefaultGoMybatisEngine.DataSourceRouter() == nil {
-		DefaultGoMybatisEngine.SetDataSourceRouter(router)
-	}
-	router.SetDB(dataSourceName,db)
 	return DefaultGoMybatisEngine, nil
 }

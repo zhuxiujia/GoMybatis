@@ -10,6 +10,7 @@ type GoMybatisDataSourceRouter struct {
 	routerFunc func(mapperName string) *string
 }
 
+//初始化路由，routerFunc为nil或者routerFunc返回nil，则框架自行选择第一个数据库作为数据源
 func (it GoMybatisDataSourceRouter) New(routerFunc func(mapperName string) *string) GoMybatisDataSourceRouter {
 	if routerFunc == nil {
 		routerFunc = func(mapperName string) *string {
@@ -26,8 +27,13 @@ func (it *GoMybatisDataSourceRouter) SetDB(url string, db *sql.DB) {
 }
 
 func (it *GoMybatisDataSourceRouter) Router(mapperName string) (Session, error) {
-	var key = it.routerFunc(mapperName)
+	var key *string
 	var db *sql.DB
+
+	if it.routerFunc != nil {
+		key = it.routerFunc(mapperName)
+	}
+
 	if key != nil && *key != "" {
 		db = it.dbMap[*key]
 	} else {
@@ -41,10 +47,9 @@ func (it *GoMybatisDataSourceRouter) Router(mapperName string) (Session, error) 
 			return nil, utils.NewError("GoMybatisDataSourceRouter", "router not find datasource!")
 		}
 	}
-	var localSession = LocalSession{
+	var session = Session(&LocalSession{
 		SessionId: utils.CreateUUID(),
 		db:        db,
-	}
-	var session = Session(&localSession)
+	})
 	return session, nil
 }

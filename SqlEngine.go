@@ -19,8 +19,14 @@ type Session interface {
 
 //产生session的引擎
 type SessionEngine interface {
+	//引擎名称
+	Name() string
+	//创建session
 	NewSession(mapperName string) (Session, error)
+	//获取数据库map
 	DBMap() map[string]*sql.DB
+	//获取数据源路由
 	DataSourceRouter() DataSourceRouter
+	//设置数据源路由
 	SetDataSourceRouter(router DataSourceRouter)
 }
