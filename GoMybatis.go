@@ -24,6 +24,8 @@ var DefaultLog Log
 
 var DefaultGoMybatisEngine SessionEngine
 
+const NewSessionFunc = "NewSession"
+
 //推荐默认使用单例传入
 //根据sessionEngine写入到mapperPtr，value:指向mapper指针反射对象，xml：xml数据，sessionEngine：session引擎，enableLog:是否允许日志输出，log：日志实现
 func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine SessionEngine, enableLog bool, log Log) {
@@ -94,7 +96,6 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 		if returnType == nil {
 			panic("[GoMybatis] struct have no return values!")
 		}
-
 		//build return Type
 		if returnType.ReturnOutType != nil {
 			var returnV = reflect.New(*returnType.ReturnOutType)
@@ -105,6 +106,22 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 				returnV.Elem().Set(reflect.MakeSlice(*returnType.ReturnOutType, 0, 0))
 			}
 			returnValue = &returnV
+		}
+
+		if method == NewSessionFunc {
+			var session Session
+			var err error
+			if len(args) == 1 && args[0].IsValid() == true && !args[0].IsNil() {
+				session = DefaultSessionFactory.NewSession(beanName, SessionType_TransationRM, args[0].Interface().(*TransationRMClientConfig))
+			} else {
+				session = DefaultSessionFactory.NewSession(beanName, SessionType_Default, nil)
+			}
+			if session != nil {
+				returnValue.Elem().Set(reflect.ValueOf(session).Elem().Addr().Convert(*returnType.ReturnOutType))
+			} else {
+				err = utils.NewError("GoMybatis", "Create Session fail.")
+			}
+			return buildReturnValues(returnType, returnValue, err)
 		}
 
 		//resultMaps
@@ -188,8 +205,11 @@ func makeReturnTypeMap(value reflect.Value) (returnMap map[string]*ReturnType) {
 		}
 		for f := 0; f < numOut; f++ {
 			var outType = funcType.Out(f)
-			if outType.Kind() == reflect.Ptr || (outType.Kind() == reflect.Interface && outType.String() != "error") {
-				panic("[GoMybatis] func '" + funcName + "()' return '" + outType.String() + "' can not be a 'ptr' or 'interface'!")
+			if funcName != NewSessionFunc {
+				//过滤NewSession方法
+				if outType.Kind() == reflect.Ptr || (outType.Kind() == reflect.Interface && outType.String() != "error") {
+					panic("[GoMybatis] func '" + funcName + "()' return '" + outType.String() + "' can not be a 'ptr' or 'interface'!")
+				}
 			}
 			var returnType = returnMap[funcName]
 			if returnType == nil {
@@ -251,6 +271,10 @@ func makeMethodXmlMap(bean reflect.Value, mapperTree map[string]*MapperXml) map[
 			if mapperXml != nil {
 				methodXmlMap[fieldItem.Name] = mapperXml
 			} else {
+				if fieldItem.Name == NewSessionFunc {
+					//过滤NewSession方法
+					continue
+				}
 				panic("[GoMybatis] can not find method " + beanType.String() + "." + fieldItem.Name + "() in xml !")
 			}
 		}
