@@ -47,7 +47,7 @@ go get github.com/go-sql-driver/mysql
 Actual use of mapper
 ```
 import (
-	_ "github.com/go-sql-driver/mysql" //导入mysql驱动
+	_ "github.com/go-sql-driver/mysql" //Import MySQL driver
 	"github.com/zhuxiujia/GoMybatis"
 	"fmt"
 	"time"
