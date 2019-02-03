@@ -29,4 +29,8 @@ type SessionEngine interface {
 	DataSourceRouter() DataSourceRouter
 	//设置数据源路由
 	SetDataSourceRouter(router DataSourceRouter)
+	//获取日志实现类，是否启用日志
+	LogEnable()(Log,bool)
+	//设置日志实现类，是否启用日志
+	SetLogEnable(enable bool,log Log)
 }

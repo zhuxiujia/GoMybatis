@@ -20,15 +20,13 @@ var DefaultSqlBuilder SqlBuilder
 
 var DefaultSqlResultDecoder SqlResultDecoder
 
-var DefaultLog Log
-
 var DefaultGoMybatisEngine SessionEngine
 
 const NewSessionFunc = "NewSession" //NewSession method,auto write implement body code
 
 //推荐默认使用单例传入
 //根据sessionEngine写入到mapperPtr，value:指向mapper指针反射对象，xml：xml数据，sessionEngine：session引擎，enableLog:是否允许日志输出，log：日志实现
-func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine SessionEngine, enableLog bool, log Log) {
+func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine SessionEngine) {
 	if value.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
@@ -46,13 +44,14 @@ func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine SessionE
 		DefaultExpressionEngine = &ExpressionEngineExpr{}
 	}
 	var expressionEngineProxy = ExpressionEngineProxy{}.New(DefaultExpressionEngine, true)
+
+	var log,enableLog=sessionEngine.LogEnable()
 	if log == nil {
-		DefaultLog = &LogStandard{}
-	} else {
-		DefaultLog = log
+		log = &LogStandard{}
+		sessionEngine.SetLogEnable(enableLog,log)
 	}
 	if DefaultSqlBuilder == nil {
-		DefaultSqlBuilder = GoMybatisSqlBuilder{}.New(DefaultExpressionTypeConvert, DefaultSqlArgTypeConvert, expressionEngineProxy, DefaultLog, enableLog)
+		DefaultSqlBuilder = GoMybatisSqlBuilder{}.New(DefaultExpressionTypeConvert, DefaultSqlArgTypeConvert, expressionEngineProxy, log, enableLog)
 	}
 	if DefaultSqlResultDecoder == nil {
 		DefaultSqlResultDecoder = GoMybatisSqlResultDecoder{}
@@ -62,12 +61,12 @@ func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine SessionE
 
 //推荐默认使用单例传入
 //根据sessionEngine写入到mapperPtr，ptr:指向mapper指针，xml：xml数据，sessionEngine：session引擎，enableLog:是否允许日志输出，log：日志实现
-func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine SessionEngine, enableLog bool, log Log) {
+func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine SessionEngine) {
 	v := reflect.ValueOf(ptr)
 	if v.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
-	WriteMapperByEngine(v, xml, sessionEngine, enableLog, log)
+	WriteMapperByEngine(v, xml, sessionEngine)
 }
 
 //写入方法内容，例如

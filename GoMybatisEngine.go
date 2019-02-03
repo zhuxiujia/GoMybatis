@@ -8,10 +8,13 @@ type GoMybatisEngine struct {
 	dbMap            map[string]*sql.DB
 	dbMapLen         int
 	dataSourceRouter DataSourceRouter
+	log              Log
+	logEnable        bool
 }
 
 func (it GoMybatisEngine) New() GoMybatisEngine {
 	it.dbMap = make(map[string]*sql.DB)
+	it.logEnable = true
 	return it
 }
 
@@ -40,6 +43,17 @@ func (it *GoMybatisEngine) DBMap() map[string]*sql.DB {
 func (it *GoMybatisEngine) NewSession(mapperName string) (Session, error) {
 	var session, err = it.DataSourceRouter().Router(mapperName)
 	return session, err
+}
+
+//获取日志实现类，是否启用日志
+func (it *GoMybatisEngine) LogEnable() (Log, bool) {
+	return it.log, it.logEnable
+}
+
+//设置日志实现类，是否启用日志
+func (it *GoMybatisEngine) SetLogEnable(enable bool, log Log) {
+	it.logEnable = enable
+	it.log = log
 }
 
 //打开一个本地引擎

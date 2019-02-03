@@ -57,6 +57,12 @@ func init() {
 	//})
 	//engine.SetDataSourceRouter(&router)
 
+	//自定义日志实现
+	//engine.SetLogEnable(true, &GoMybatis.LogStandard{
+	//	PrintlnFunc: func(messages []byte) {
+	//	},
+	//})
+
 	//读取mapper xml文件
 	file, err := os.Open("Example_ActivityMapper.xml")
 	if err != nil {
@@ -66,7 +72,7 @@ func init() {
 
 	bytes, _ := ioutil.ReadAll(file)
 	//设置对应的mapper xml文件
-	GoMybatis.WriteMapperPtrByEngine(&exampleActivityMapper, bytes, engine, true, nil)
+	GoMybatis.WriteMapperPtrByEngine(&exampleActivityMapper, bytes, engine)
 }
 
 //插入
