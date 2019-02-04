@@ -29,8 +29,46 @@ type SessionEngine interface {
 	DataSourceRouter() DataSourceRouter
 	//设置数据源路由
 	SetDataSourceRouter(router DataSourceRouter)
+
 	//获取日志实现类，是否启用日志
-	LogEnable()(Log,bool)
+	LogEnable() (Log, bool)
+
 	//设置日志实现类，是否启用日志
-	SetLogEnable(enable bool,log Log)
+	SetLogEnable(enable bool, log Log)
+
+	//session工厂
+	SessionFactory() *SessionFactory
+
+	//设置session工厂
+	SetSessionFactory(factory *SessionFactory)
+
+	//表达式数据类型转换器
+	ExpressionTypeConvert() ExpressionTypeConvert
+
+	//设置表达式数据类型转换器
+	SetExpressionTypeConvert(convert ExpressionTypeConvert)
+
+	//sql类型转换器
+	SqlArgTypeConvert() SqlArgTypeConvert
+
+	//设置sql类型转换器
+	SetSqlArgTypeConvert(convert SqlArgTypeConvert)
+
+	//表达式执行引擎
+	ExpressionEngine() ExpressionEngine
+
+	//设置表达式执行引擎
+	SetExpressionEngine(engine ExpressionEngine)
+
+	//sql构建器
+	SqlBuilder() SqlBuilder
+
+	//设置sql构建器
+	SetSqlBuilder(builder SqlBuilder)
+
+	//sql查询结果解析器
+	SqlResultDecoder() SqlResultDecoder
+
+	//设置sql查询结果解析器
+	SetSqlResultDecoder(decoder SqlResultDecoder)
 }

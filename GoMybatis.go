@@ -7,19 +7,6 @@ import (
 	"strings"
 )
 
-//如果使用WriteMapperByEngine()，则内建默认的SessionFactory
-var DefaultSessionFactory *SessionFactory
-
-var DefaultExpressionTypeConvert ExpressionTypeConvert
-
-var DefaultSqlArgTypeConvert SqlArgTypeConvert
-
-var DefaultExpressionEngine ExpressionEngine
-
-var DefaultSqlBuilder SqlBuilder
-
-var DefaultSqlResultDecoder SqlResultDecoder
-
 var DefaultGoMybatisEngine SessionEngine
 
 const NewSessionFunc = "NewSession" //NewSession method,auto write implement body code
@@ -30,33 +17,13 @@ func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine SessionE
 	if value.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
-	if DefaultSessionFactory == nil {
-		var factory = SessionFactory{}.New(sessionEngine)
-		DefaultSessionFactory = &factory
-	}
-	if DefaultExpressionTypeConvert == nil {
-		DefaultExpressionTypeConvert = GoMybatisExpressionTypeConvert{}
-	}
-	if DefaultSqlArgTypeConvert == nil {
-		DefaultSqlArgTypeConvert = GoMybatisSqlArgTypeConvert{}
-	}
-	if DefaultExpressionEngine == nil {
-		DefaultExpressionEngine = &ExpressionEngineExpr{}
-	}
-	var expressionEngineProxy = ExpressionEngineProxy{}.New(DefaultExpressionEngine, true)
-
 	var log, enableLog = sessionEngine.LogEnable()
 	if enableLog == true && log == nil {
 		log = &LogStandard{}
 		sessionEngine.SetLogEnable(enableLog, log)
 	}
-	if DefaultSqlBuilder == nil {
-		DefaultSqlBuilder = GoMybatisSqlBuilder{}.New(DefaultExpressionTypeConvert, DefaultSqlArgTypeConvert, expressionEngineProxy, log, enableLog)
-	}
-	if DefaultSqlResultDecoder == nil {
-		DefaultSqlResultDecoder = GoMybatisSqlResultDecoder{}
-	}
-	WriteMapper(value, xml, DefaultSessionFactory, DefaultSqlResultDecoder, DefaultSqlBuilder, enableLog)
+
+	WriteMapper(value, xml, sessionEngine.SessionFactory(), sessionEngine.SqlResultDecoder(), sessionEngine.SqlBuilder(), enableLog)
 }
 
 //推荐默认使用单例传入
@@ -111,9 +78,9 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 			var session Session
 			var err error
 			if len(args) == 1 && args[0].IsValid() == true && !args[0].IsNil() {
-				session = DefaultSessionFactory.NewSession(beanName, SessionType_TransationRM, args[0].Interface().(*TransationRMClientConfig))
+				session = sessionFactory.NewSession(beanName, SessionType_TransationRM, args[0].Interface().(*TransationRMClientConfig))
 			} else {
-				session = DefaultSessionFactory.NewSession(beanName, SessionType_Default, nil)
+				session = sessionFactory.NewSession(beanName, SessionType_Default, nil)
 			}
 			if session != nil {
 				returnValue.Elem().Set(reflect.ValueOf(session).Elem().Addr().Convert(*returnType.ReturnOutType))
