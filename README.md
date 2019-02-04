@@ -82,7 +82,7 @@ func main() {
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	
 	//Loading XML implementation logic to ExampleActivity Mapper Impl
-	GoMybatis.WriteMapperPtrByEngine(&exampleActivityMapperImpl, xmlBytes, engine,true)
+	GoMybatis.WriteMapperPtrByEngine(&exampleActivityMapperImpl, xmlBytes, engine)
 
 	//Using mapper
 	result, err := exampleActivityMapperImpl.SelectAll(&result)
