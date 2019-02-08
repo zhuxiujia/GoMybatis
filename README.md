@@ -73,9 +73,9 @@ type ExampleActivityMapperImpl struct {
 }
 
 func main() {
-	var err error
+	var engine = GoMybatis.GoMybatisEngine{}.New()
 	//Mysql link format user name: password @ (database link address: port)/database name, such as root: 123456 @(***.com: 3306)/test
-	engine, err := GoMybatis.Open("mysql", "*?charset=utf8&parseTime=True&loc=Local")
+	err := engine.Open("mysql", "*?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 	   panic(err)
 	}

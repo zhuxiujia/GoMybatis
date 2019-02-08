@@ -19,6 +19,8 @@ type Session interface {
 
 //产生session的引擎
 type SessionEngine interface {
+	//打开数据库
+	Open(driverName, dataSourceName string) error
 	//写方法到mapper
 	WriteMapperPtr(ptr interface{}, xml []byte)
 	//引擎名称

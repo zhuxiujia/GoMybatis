@@ -7,8 +7,6 @@ import (
 	"strings"
 )
 
-var DefaultGoMybatisEngine SessionEngine
-
 const NewSessionFunc = "NewSession" //NewSession method,auto write implement body code
 
 //推荐默认使用单例传入

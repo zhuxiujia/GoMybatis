@@ -25,12 +25,12 @@ func (it TransationRMServer) Msg(arg TransactionReqDTO, result *TransactionRspDT
 //开启一个事务节点
 func ServerTransationTcp(addr string, driverName, dataSourceName string) {
 	transationRMServer := new(TransationRMServer)
-
-	engine, err := Open(driverName, dataSourceName)
+	var engine = GoMybatisEngine{}.New()
+	err := engine.Open(driverName, dataSourceName)
 	if err != nil {
 		panic(err.Error())
 	}
-	var SessionFactory = SessionFactory{}.New(engine)
+	var SessionFactory = SessionFactory{}.New(&engine)
 	var TransactionFactory = TransactionFactory{}.New(&SessionFactory)
 	var manager = DefaultTransationManager{}.New(&SessionFactory, &TransactionFactory)
 	transationRMServer.DefaultTransationManager = &manager

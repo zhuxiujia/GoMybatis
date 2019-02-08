@@ -72,9 +72,9 @@ type ExampleActivityMapperImpl struct {
 }
 
 func main() {
-	var err error
+    var engine = GoMybatis.GoMybatisEngine{}.New()
 	//Mysql链接格式 用户名:密码@(数据库链接地址:端口)/数据库名称,如root:123456@(***.com:3306)/test
-	engine, err := GoMybatis.Open("mysql", "*?charset=utf8&parseTime=True&loc=Local")
+	err := engine.Open("mysql", "*?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 	   panic(err)
 	}

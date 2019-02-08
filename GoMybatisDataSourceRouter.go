@@ -45,7 +45,7 @@ func (it *GoMybatisDataSourceRouter) Router(mapperName string) (Session, error) 
 		}
 	}
 	if db == nil {
-		return nil, utils.NewError("GoMybatisDataSourceRouter", "router not find datasource! do you forget invoke GoMybatis.Open(\"driverName\", MysqlUri)?")
+		return nil, utils.NewError("GoMybatisDataSourceRouter", "router not find datasource opened ! do you forget invoke GoMybatis.GoMybatisEngine{}.New().Open(\"driverName\", Uri)?")
 	}
 	var session = Session(&LocalSession{
 		SessionId: utils.CreateUUID(),

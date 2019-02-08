@@ -23,10 +23,10 @@ type ExampleActivityMapper struct {
 	SelectByCondition func(name *string, startTime *time.Time, endTime *time.Time, page *int, size *int) ([]Activity, error) `mapperParams:"name,startTime,endTime,page,size"`
 	UpdateById        func(session *GoMybatis.Session, arg Activity) (int64, error)
 	Insert            func(arg Activity) (int64, error)
-	CountByCondition  func(name string, startTime time.Time, endTime time.Time) (int, error)      `mapperParams:"name,startTime,endTime"`
-	DeleteById        func(id string) (int64, error)                                              `mapperParams:"id"`
-	Choose            func(deleteFlag int) ([]Activity, error)                                    `mapperParams:"deleteFlag"`
-	SelectLinks       func(column string) ([]Activity, error)                                     `mapperParams:"column"`
+	CountByCondition  func(name string, startTime time.Time, endTime time.Time) (int, error) `mapperParams:"name,startTime,endTime"`
+	DeleteById        func(id string) (int64, error)                                         `mapperParams:"id"`
+	Choose            func(deleteFlag int) ([]Activity, error)                               `mapperParams:"deleteFlag"`
+	SelectLinks       func(column string) ([]Activity, error)                                `mapperParams:"column"`
 	NewSession        func(config *GoMybatis.TransationRMClientConfig) (GoMybatis.Session, error) //参数：config，传nil为本地session,传值则为远程 remote session
 	//NewSession      func() (GoMybatis.Session, error)    //NewSession也可以无参数写法
 }
@@ -35,9 +35,9 @@ type ExampleActivityMapper struct {
 var exampleActivityMapper = ExampleActivityMapper{}
 
 func init() {
-	var err error
+	var engine = GoMybatis.GoMybatisEngine{}.New()
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
-	engine, err := GoMybatis.Open("mysql", MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
+	err := engine.Open("mysql", MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
 	if err != nil {
 		panic(err.Error())
 	}
