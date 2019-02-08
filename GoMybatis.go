@@ -17,13 +17,7 @@ func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine SessionE
 	if value.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
-	var log, enableLog = sessionEngine.LogEnable()
-	if enableLog == true && log == nil {
-		log = &LogStandard{}
-		sessionEngine.SetLogEnable(enableLog, log)
-	}
-
-	WriteMapper(value, xml, sessionEngine.SessionFactory(), sessionEngine.SqlResultDecoder(), sessionEngine.SqlBuilder(), enableLog)
+	WriteMapper(value, xml, sessionEngine.SessionFactory(), sessionEngine.SqlResultDecoder(), sessionEngine.SqlBuilder(), sessionEngine.LogEnable())
 }
 
 //推荐默认使用单例传入
