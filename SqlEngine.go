@@ -19,6 +19,9 @@ type Session interface {
 
 //产生session的引擎
 type SessionEngine interface {
+
+	//写方法到mapper
+	WriteMapperPtr(ptr interface{}, xml []byte)
 	//引擎名称
 	Name() string
 	//创建session

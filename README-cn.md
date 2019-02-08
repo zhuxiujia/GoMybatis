@@ -81,7 +81,7 @@ func main() {
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	
 	//加载xml实现逻辑到ExampleActivityMapperImpl
-	GoMybatis.WriteMapperPtrByEngine(&exampleActivityMapperImpl, xmlBytes, engine)
+	engine.WriteMapperPtr(&exampleActivityMapperImpl, xmlBytes)
 
 	//使用mapper
 	result, err := exampleActivityMapperImpl.SelectAll(&result)
