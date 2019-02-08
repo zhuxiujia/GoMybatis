@@ -29,6 +29,10 @@ func (it GoMybatisEngine) New() GoMybatisEngine {
 	return it
 }
 
+func (it *GoMybatisEngine) WriteMapperPtr(ptr interface{}, xml []byte) {
+	WriteMapperPtrByEngine(ptr, xml, it)
+}
+
 func (it *GoMybatisEngine) Name() string {
 	return "GoMybatisEngine"
 }
