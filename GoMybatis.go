@@ -7,13 +7,11 @@ import (
 	"strings"
 )
 
-var DefaultGoMybatisEngine SessionEngine
-
 const NewSessionFunc = "NewSession" //NewSession method,auto write implement body code
 
 //推荐默认使用单例传入
 //根据sessionEngine写入到mapperPtr，value:指向mapper指针反射对象，xml：xml数据，sessionEngine：session引擎，enableLog:是否允许日志输出，log：日志实现
-func WriteMapperByEngine(value reflect.Value, xml []byte, sessionEngine SessionEngine) {
+func WriteMapperByValue(value reflect.Value, xml []byte, sessionEngine SessionEngine) {
 	if value.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
@@ -27,7 +25,7 @@ func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine SessionEn
 	if v.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
-	WriteMapperByEngine(v, xml, sessionEngine)
+	WriteMapperByValue(v, xml, sessionEngine)
 }
 
 //写入方法内容，例如

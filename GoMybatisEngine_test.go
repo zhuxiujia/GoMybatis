@@ -167,9 +167,9 @@ type ExampleActivityMapperImpl struct {
 
 //初始化mapper文件和结构体
 func InitMapperByLocalSession() ExampleActivityMapperImpl {
-	var err error
+	var engine = GoMybatisEngine{}.New()
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
-	engine, err := Open("mysql", "") //此处请按格式填写你的mysql链接，这里用*号代替
+	err := engine.Open("mysql", "") //此处请按格式填写你的mysql链接，这里用*号代替
 	if err != nil {
 		panic(err.Error())
 	}
@@ -207,6 +207,6 @@ func InitMapperByLocalSession() ExampleActivityMapperImpl {
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	//设置对应的mapper xml文件,禁止输出日志
 	engine.SetLogEnable(false)
-	WriteMapperPtrByEngine(&exampleActivityMapperImpl, bytes, engine)
+	engine.WriteMapperPtr(&exampleActivityMapperImpl, bytes)
 	return exampleActivityMapperImpl
 }
