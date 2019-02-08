@@ -5,10 +5,10 @@ import (
 )
 
 type GoMybatisEngine struct {
-	dbMap            map[string]*sql.DB //数据库map
+	dbMap            map[string]*sql.DB //数据库map（默认不为nil）
 	dataSourceRouter DataSourceRouter   //动态数据源路由器
 	log              Log                //日志实现
-	logEnable        bool               //是否允许日志输出
+	logEnable        bool               //是否允许日志输出（默认开启）
 
 	sessionFactory *SessionFactory
 
@@ -61,13 +61,25 @@ func (it *GoMybatisEngine) NewSession(mapperName string) (Session, error) {
 }
 
 //获取日志实现类，是否启用日志
-func (it *GoMybatisEngine) LogEnable() (Log, bool) {
-	return it.log, it.logEnable
+func (it *GoMybatisEngine) LogEnable() bool {
+	return it.logEnable
 }
 
 //设置日志实现类，是否启用日志
-func (it *GoMybatisEngine) SetLogEnable(enable bool, log Log) {
+func (it *GoMybatisEngine) SetLogEnable(enable bool) {
 	it.logEnable = enable
+}
+
+//获取日志实现类
+func (it *GoMybatisEngine) Log() Log {
+	if it.logEnable == true && it.log == nil {
+		it.log = &LogStandard{}
+	}
+	return it.log
+}
+
+//设置日志实现类
+func (it *GoMybatisEngine) SetLog(log Log) {
 	it.log = log
 }
 
@@ -128,8 +140,7 @@ func (it *GoMybatisEngine) SetExpressionEngine(engine ExpressionEngine) {
 func (it *GoMybatisEngine) SqlBuilder() SqlBuilder {
 	if it.sqlBuilder == nil {
 		var expressionEngineProxy = ExpressionEngineProxy{}.New(it.ExpressionEngine(), true)
-		var log, enable = it.LogEnable()
-		it.sqlBuilder = GoMybatisSqlBuilder{}.New(it.ExpressionTypeConvert(), it.SqlArgTypeConvert(), expressionEngineProxy, log, enable)
+		it.sqlBuilder = GoMybatisSqlBuilder{}.New(it.ExpressionTypeConvert(), it.SqlArgTypeConvert(), expressionEngineProxy, it.Log(), it.LogEnable())
 	}
 	return it.sqlBuilder
 }

@@ -56,7 +56,8 @@ func init() {
 	//engine.SetDataSourceRouter(&router)
 
 	//自定义日志实现
-	//engine.SetLogEnable(true, &GoMybatis.LogStandard{
+	//engine.SetLogEnable(true)
+	//engine.SetLog(&GoMybatis.LogStandard{
 	//	PrintlnFunc: func(messages []byte) {
 	//	},
 	//})

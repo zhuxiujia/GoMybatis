@@ -19,7 +19,6 @@ type Session interface {
 
 //产生session的引擎
 type SessionEngine interface {
-
 	//写方法到mapper
 	WriteMapperPtr(ptr interface{}, xml []byte)
 	//引擎名称
@@ -33,11 +32,17 @@ type SessionEngine interface {
 	//设置数据源路由
 	SetDataSourceRouter(router DataSourceRouter)
 
-	//获取日志实现类，是否启用日志
-	LogEnable() (Log, bool)
+	//是否启用日志
+	LogEnable() bool
 
-	//设置日志实现类，是否启用日志
-	SetLogEnable(enable bool, log Log)
+	//是否启用日志
+	SetLogEnable(enable bool)
+
+	//获取日志实现类
+	Log() Log
+
+	//设置日志实现类
+	SetLog(log Log)
 
 	//session工厂
 	SessionFactory() *SessionFactory

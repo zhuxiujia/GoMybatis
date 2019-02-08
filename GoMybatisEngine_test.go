@@ -206,7 +206,7 @@ func InitMapperByLocalSession() ExampleActivityMapperImpl {
     </select>`)
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	//设置对应的mapper xml文件,禁止输出日志
-	engine.SetLogEnable(false,nil)
+	engine.SetLogEnable(false)
 	WriteMapperPtrByEngine(&exampleActivityMapperImpl, bytes, engine)
 	return exampleActivityMapperImpl
 }
