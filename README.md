@@ -1,5 +1,6 @@
 # SQL mapper ORM framework for Golang
-# [切换中文](https://github.com/zhuxiujia/GoMybatis/blob/master/README-cn.md)
+* English
+* [中文](README-cn.md)   
 [![Go Report Card](https://goreportcard.com/badge/github.com/zhuxiujia/GoMybatis)](https://goreportcard.com/report/github.com/zhuxiujia/GoMybatis)
 [![Build Status](https://travis-ci.com/zhuxiujia/GoMybatis.svg?branch=master)](https://travis-ci.com/zhuxiujia/GoMybatis)
 [![GoDoc](https://godoc.org/github.com/zhuxiujia/GoMybatis?status.svg)](https://godoc.org/github.com/zhuxiujia/GoMybatis)
