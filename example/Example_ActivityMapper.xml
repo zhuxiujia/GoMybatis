@@ -2,7 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://raw.githubusercontent.com/zhuxiujia/GoMybatis/master/mybatis-3-mapper.dtd">
 <mapper>
-    <resultMap id="BaseResultMap">
+    <!--key_logic_delete 逻辑删除字段-->
+    <!--value_logic_deleted 逻辑删除已删除字段-->
+    <!--value_logic_undelete 逻辑删除 未删除字段-->
+    <!--key_version 乐观锁版本字段-->
+    <resultMap id="BaseResultMap" key_logic_delete="delete_flag" value_logic_deleted="1"  value_logic_undelete="" key_version="create_time" >
         <id column="id" property="id"/>
         <result column="name" property="name" langType="string"/>
         <result column="pc_link" property="pcLink" langType="string"/>
@@ -11,11 +15,16 @@
         <result column="create_time" property="createTime" langType="time.Time"/>
         <result column="delete_flag" property="deleteFlag" langType="int"/>
     </resultMap>
-    <insert id="" t_table="" t_for_insert="id,name,pc_link,h5_link,remark,create_time,delete_flag"></insert>
-    <select id="" t_table="" t_select="*" t_for_where="id = #{id}" ></select>
-    <update id="" t_table="" t_for_set="name,pc_link,h5_link,remark" t_for_where="id = #{id}" ></update>
-    <delete id="" t_table="" t_for_where="id = #{id}"></delete>
 
+    <!--id=""值默认标签名-->
+    <!--arg_id默认值id-->
+    <insertOne id="" t_table=""></insertOne>
+    <selectById id="" t_table="" arg_id="id"></selectById>
+    <updateById id="" t_table="" arg_id="id"></updateById>
+    <deleteById id="" t_table="" arg_id="id"></deleteById>
+
+    <selectPage id="" t_table="" wheres="name==null?=name,=pc_link,=h5_link,=remark"></selectPage>
+    <selectCount id="" t_table="" count_column="*" wheres="=name,=pc_link,=h5_link,=remark"></selectCount>
 
     <!--List<Activity> selectByCondition(@Param("name") String name,@Param("startTime") Date startTime,@Param("endTime") Date endTime,@Param("index") Integer index,@Param("size") Integer size);-->
     <!-- 后台查询产品 -->
