@@ -20,6 +20,7 @@ func (it *GoMybatisTempleteDecoder) Decode(mapper *MapperXml) error {
 	//TODO decode table
 	//TODO decode columns
 	//TODO decode wheres
+	it.DecodeWheres(&wheres)
 
 	var sql bytes.Buffer
 	if mapper.Tag == "selectTemplete" {
@@ -30,10 +31,28 @@ func (it *GoMybatisTempleteDecoder) Decode(mapper *MapperXml) error {
 		sql.WriteString(" where ")
 		sql.WriteString(wheres)
 		sql.WriteString(" ")
-		mapper.ElementItems= append(mapper.ElementItems, ElementItem{
-			DataString:sql.String(),
+		mapper.ElementItems = append(mapper.ElementItems, ElementItem{
+			DataString: sql.String(),
 		})
 	}
 
 	return nil
+}
+
+func (it *GoMybatisTempleteDecoder) DecodeWheres(arg *string) {
+
+	//var wheres = strings.Split(*arg, "?")
+	//if len(wheres) > 1 {
+	//	//have ?
+	//	var newWheres = ""
+	//	newWheres = "#{ " + wheres[0] + ` != null ? "`
+	//	for k, v := range wheres {
+	//		if k > 0 {
+	//			newWheres += v
+	//		}
+	//	}
+	//
+	//	newWheres=newWheres+ `" : "" }`
+	//	*arg = newWheres
+	//}
 }

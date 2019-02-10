@@ -100,4 +100,5 @@ func TestGoMybatisTempleteDecoder_Decode(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
+	fmt.Println(xml.ElementItems)
 }
