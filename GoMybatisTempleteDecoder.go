@@ -3,6 +3,7 @@ package GoMybatis
 import (
 	"bytes"
 	"fmt"
+	"strings"
 )
 
 type GoMybatisTempleteDecoder struct {
@@ -41,18 +42,18 @@ func (it *GoMybatisTempleteDecoder) Decode(mapper *MapperXml) error {
 
 func (it *GoMybatisTempleteDecoder) DecodeWheres(arg *string) {
 
-	//var wheres = strings.Split(*arg, "?")
-	//if len(wheres) > 1 {
-	//	//have ?
-	//	var newWheres = ""
-	//	newWheres = "#{ " + wheres[0] + ` != null ? "`
-	//	for k, v := range wheres {
-	//		if k > 0 {
-	//			newWheres += v
-	//		}
-	//	}
-	//
-	//	newWheres=newWheres+ `" : "" }`
-	//	*arg = newWheres
-	//}
+	var wheres = strings.Split(*arg, "?")
+	if len(wheres) > 1 {
+		//TODO have ?
+		var newWheres = ""
+		newWheres = `<if test="` + wheres[0] + ` != null " >`
+		for k, v := range wheres {
+			if k > 0 {
+				newWheres += v
+			}
+		}
+
+		newWheres=newWheres+ `</if>`
+		*arg = newWheres
+	}
 }
