@@ -45,13 +45,16 @@ func (it *GoMybatisTempleteDecoder) Decode(mapper *MapperXml) error {
 //解码逗号分隔的where
 func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *MapperXml) {
 	var wheres = strings.Split(arg, ",")
-	for _, v := range wheres {
+	for index, v := range wheres {
 		var expressions = strings.Split(v, "?")
 		if len(expressions) > 1 {
 			//TODO have ?
 			var newWheres bytes.Buffer
 			for k, v := range expressions {
 				if k > 0 {
+					if index > 0 {
+						newWheres.WriteString(" and ")
+					}
 					newWheres.WriteString(v)
 				}
 			}
