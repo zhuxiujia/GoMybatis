@@ -17,9 +17,11 @@ import (
 //返回中必须有error
 // 函数return必须为error 为返回错误信息
 type ExampleActivityMapper struct {
+	SelectTemplete func(name string) ([]Activity, error) `mapperParams:"name"`
+	InsertTemplete func(arg Activity) (int64, error)
+
 	SelectByIds       func(ids []string) ([]Activity, error)       `mapperParams:"ids"`
 	SelectByIdMaps    func(ids map[int]string) ([]Activity, error) `mapperParams:"ids"`
-	SelectTemplete    func(name string) ([]Activity, error)        `mapperParams:"name"`
 	SelectAll         func() ([]map[string]string, error)
 	SelectByCondition func(name *string, startTime *time.Time, endTime *time.Time, page *int, size *int) ([]Activity, error) `mapperParams:"name,startTime,endTime,page,size"`
 	UpdateById        func(session *GoMybatis.Session, arg Activity) (int64, error)
@@ -291,13 +293,26 @@ func Test_include_sql(t *testing.T) {
 	fmt.Println("result=", result)
 }
 
-func Test_select_name(t *testing.T) {
+func TestSelectTemplete(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
 		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
 	//使用mapper
 	var result, err = exampleActivityMapper.SelectTemplete("hello")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("result=", result)
+}
+
+func TestInsertTemplete(t *testing.T) {
+	if MysqlUri == "" || MysqlUri == "*" {
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		return
+	}
+	//使用mapper
+	var result, err = exampleActivityMapper.InsertTemplete(Activity{Id: "171", Name: "test_insret", CreateTime: time.Now(), DeleteFlag: 1})
 	if err != nil {
 		panic(err)
 	}

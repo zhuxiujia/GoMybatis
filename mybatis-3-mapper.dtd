@@ -16,7 +16,7 @@
                limitations under the License.
 
         -->
-        <!ELEMENT mapper (cache-ref | cache | resultMap* | parameterMap* | sql* | insert* | update* | delete* | select* | selectTemplete* )+>
+        <!ELEMENT mapper (cache-ref | cache | resultMap* | parameterMap* | sql* | insert* | update* | delete* | select* | selectTemplete* | insertTemplete* )+>
         <!ATTLIST mapper
                 >
 
@@ -218,6 +218,14 @@
                 
                 
                 lang CDATA #IMPLIED
+                >
+
+        <!ELEMENT insertTemplete (#PCDATA | selectKey | include | trim | where | set | foreach | choose | if | bind)*>
+        <!ATTLIST insertTemplete
+                id CDATA #REQUIRED
+                resultMap CDATA #IMPLIED
+                tables CDATA #REQUIRED
+                inserts CDATA #IMPLIED
                 >
 
         <!ELEMENT selectKey (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>

@@ -2,15 +2,18 @@ package GoMybatis
 
 import (
 	"bytes"
+	"github.com/zhuxiujia/GoMybatis/utils"
 	"strings"
 )
 
 var equalOperator = []string{"/", "+", "-", "*", "**", "|", "^", "&", "%", "<", ">", ">=", "<=", " in ", " not in ", " or ", "||", " and ", "&&", "==", "!="}
 
 type GoMybatisTempleteDecoder struct {
+	tree map[string]*MapperXml
 }
 
 func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]*MapperXml) error {
+	it.tree = tree
 	for _, v := range tree {
 		it.Decode(v)
 	}
@@ -19,11 +22,11 @@ func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]*MapperXml) error
 
 func (it *GoMybatisTempleteDecoder) Decode(mapper *MapperXml) error {
 
-	var tables = mapper.Propertys["tables"]
-	var columns = mapper.Propertys["columns"]
-	var wheres = mapper.Propertys["wheres"]
-	var sql bytes.Buffer
 	if mapper.Tag == "selectTemplete" {
+		var tables = mapper.Propertys["tables"]
+		var columns = mapper.Propertys["columns"]
+		var wheres = mapper.Propertys["wheres"]
+		var sql bytes.Buffer
 		sql.WriteString("select ")
 		if columns == "" {
 			columns = "*"
@@ -46,6 +49,86 @@ func (it *GoMybatisTempleteDecoder) Decode(mapper *MapperXml) error {
 			mapper.Id = mapper.Tag
 		}
 		mapper.Tag = Element_Select
+	} else if mapper.Tag == "insertTemplete" {
+		var tables = mapper.Propertys["tables"]
+		var resultMap = mapper.Propertys["resultMap"]
+		var inserts = mapper.Propertys["inserts"]
+
+		if resultMap == "" {
+			resultMap = "BaseResultMap"
+		}
+		if inserts == "" {
+			inserts = "*?*"
+		}
+
+		var resultMapData = it.tree[resultMap]
+		if resultMapData == nil {
+			panic(utils.NewError("GoMybatisTempleteDecoder", "resultMap not define! id = ", resultMap))
+		}
+		var sql bytes.Buffer
+		sql.WriteString("insert into ")
+		sql.WriteString(tables)
+
+		mapper.ElementItems = append(mapper.ElementItems, ElementItem{
+			ElementType: Element_String,
+			DataString:  sql.String(),
+		})
+
+		//add insert column
+		var trimColumn = ElementItem{
+			ElementType:  Element_Trim,
+			Propertys:    map[string]string{"prefix": "(", "suffix": ")", "suffixOverrides": ","},
+			ElementItems: []ElementItem{},
+		}
+		if inserts == "*?*" {
+			for _, v := range resultMapData.ElementItems {
+				trimColumn.ElementItems = append(trimColumn.ElementItems, ElementItem{
+					ElementType: Element_If,
+					Propertys:   map[string]string{"test": it.convertEqualAction(v.Propertys["property"])},
+					ElementItems: []ElementItem{
+						{
+							ElementType: Element_String,
+							DataString:  v.Propertys["column"] + ",",
+						},
+					},
+				})
+			}
+		} else if inserts == "*" {
+			for _, v := range resultMapData.ElementItems {
+				trimColumn.ElementItems = append(trimColumn.ElementItems, ElementItem{
+					ElementType: Element_String,
+					DataString:  v.Propertys["column"] + ",",
+				})
+			}
+		} else {
+			panic(utils.NewError("GoMybatisTempleteDecoder", `inserts only support "*" or "*?*"`))
+		}
+
+		mapper.ElementItems = append(mapper.ElementItems, trimColumn)
+
+		//add insert arg
+		var trimArg = ElementItem{
+			ElementType:  Element_Trim,
+			Propertys:    map[string]string{"prefix": "values (", "suffix": ")", "suffixOverrides": ","},
+			ElementItems: []ElementItem{},
+		}
+		if inserts == "*?*" {
+			for _, v := range resultMapData.ElementItems {
+				trimArg.ElementItems = append(trimArg.ElementItems, ElementItem{
+					ElementType: Element_If,
+					Propertys:   map[string]string{"test": it.convertEqualAction(v.Propertys["property"])},
+					DataString:  "#{" + v.Propertys["property"] + "},",
+				})
+			}
+		} else if inserts == "*" {
+			for _, v := range resultMapData.ElementItems {
+				trimArg.ElementItems = append(trimArg.ElementItems, ElementItem{
+					ElementType: Element_String,
+					DataString:  "#{" + v.Propertys["property"] + "},",
+				})
+			}
+		}
+		mapper.ElementItems = append(mapper.ElementItems, trimArg)
 	}
 
 	return nil

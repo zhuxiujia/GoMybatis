@@ -6,6 +6,7 @@ CREATE TABLE `biz_activity` (
   `pc_link` varchar(255) DEFAULT NULL,
   `h5_link` varchar(255) DEFAULT NULL,
   `remark` varchar(255) DEFAULT NULL,
+  `version` int(11) DEFAULT 0,
   `create_time` datetime NULL,
   `delete_flag` int(1) NOT NULL,
   PRIMARY KEY (`id`)
