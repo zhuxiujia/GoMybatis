@@ -18,11 +18,11 @@
     </resultMap>
 
 
-    <insertTemplete id="" table=""></insertTemplete>
-    <selectTemplete id="" table="" columns="*" wheres="name?name = #{name}"></selectTemplete>
+    <!--<insertTemplete id="" tables=""></insertTemplete>-->
+    <selectTemplete id="SelectByName" tables="biz_activity" columns="*" wheres="name?name = #{name}"></selectTemplete>
     <!--updateTemplete,sets="*"更新全部内容,sets="*?*"判空参数，然后设置对应参数.-->
-    <updateTemplete id="" table="" sets="name?name = #{name}" wheres="name?name = #{name}"></updateTemplete>
-    <deleteTemplete id="" table="" wheres="name?name = #{name}"></deleteTemplete>
+    <!--<updateTemplete id="" tables="" sets="name?name = #{name}" wheres="name?name = #{name}"></updateTemplete>-->
+    <!--<deleteTemplete id="" tables="" wheres="name?name = #{name}"></deleteTemplete>-->
 
 
     <!--List<Activity> selectByCondition(@Param("name") String name,@Param("startTime") Date startTime,@Param("endTime") Date endTime,@Param("index") Integer index,@Param("size") Integer size);-->

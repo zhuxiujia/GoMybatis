@@ -11,6 +11,12 @@ const (
 	Element_Select    ElementType = "select"
 	Element_Sql       ElementType = "sql"
 
+	//root templete elements
+	Element_Insert_Templete ElementType = "insertTemplete"
+	Element_Delete_Templete ElementType = "deleteTemplete"
+	Element_Update_Templete ElementType = `updateTemplete`
+	Element_Select_Templete ElementType = "selectTemplete"
+
 	//child elements
 	Element_bind      ElementType = "bind"
 	Element_String    ElementType = "string"

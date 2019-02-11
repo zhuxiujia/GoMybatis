@@ -15,7 +15,7 @@ func WriteMapperByValue(value reflect.Value, xml []byte, sessionEngine SessionEn
 	if value.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
-	WriteMapper(value, xml, sessionEngine.SessionFactory(), sessionEngine.SqlResultDecoder(), sessionEngine.SqlBuilder(), sessionEngine.LogEnable())
+	WriteMapper(value, xml, sessionEngine.SessionFactory(), sessionEngine.TempleteDecoder(), sessionEngine.SqlResultDecoder(), sessionEngine.SqlBuilder(), sessionEngine.LogEnable())
 }
 
 //推荐默认使用单例传入
@@ -39,9 +39,10 @@ func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine SessionEn
 //func的基本类型的参数（例如string,int,time.Time,int64,float....）个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，返回值必须有error
 //func的结构体参数无需指定mapperParams的tag，框架会自动扫描它的属性，封装为map处理掉
 //使用WriteMapper函数设置代理后即可正常使用。
-func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) {
+func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, templeteDecoder TempleteDecoder, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) {
 	beanCheck(bean, sqlBuilder)
 	var mapperTree = LoadMapperXml(xml)
+	templeteDecoder.DecodeTree(mapperTree)
 	//make a map[method]xml
 	var methodXmlMap = makeMethodXmlMap(bean, mapperTree)
 	var resultMaps = makeResultMaps(mapperTree)

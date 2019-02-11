@@ -81,4 +81,10 @@ type SessionEngine interface {
 
 	//设置sql查询结果解析器
 	SetSqlResultDecoder(decoder SqlResultDecoder)
+
+	//模板解析器
+	TempleteDecoder() TempleteDecoder
+
+	//设置模板解析器
+	SetTempleteDecoder(decoder TempleteDecoder)
 }

@@ -23,6 +23,8 @@ type GoMybatisEngine struct {
 	sqlBuilder SqlBuilder
 
 	sqlResultDecoder SqlResultDecoder
+
+	templeteDecoder TempleteDecoder
 }
 
 func (it GoMybatisEngine) New() GoMybatisEngine {
@@ -203,4 +205,17 @@ func (it *GoMybatisEngine) Open(driverName, dataSourceName string) error {
 	}
 	it.DBMap()[dataSourceName] = db
 	return nil
+}
+
+//模板解析器
+func (it *GoMybatisEngine) TempleteDecoder() TempleteDecoder {
+	if it.templeteDecoder == nil {
+		it.SetTempleteDecoder(&GoMybatisTempleteDecoder{})
+	}
+	return it.templeteDecoder
+}
+
+//设置模板解析器
+func (it *GoMybatisEngine) SetTempleteDecoder(decoder TempleteDecoder) {
+	it.templeteDecoder = decoder
 }
