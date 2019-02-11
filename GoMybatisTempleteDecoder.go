@@ -2,6 +2,7 @@ package GoMybatis
 
 import (
 	"bytes"
+	"errors"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"strings"
 )
@@ -13,8 +14,11 @@ type GoMybatisTempleteDecoder struct {
 }
 
 func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]*MapperXml) error {
+	if tree == nil {
+		return errors.New("data cant be nil!")
+	}
 	it.tree = tree
-	for _, v := range tree {
+	for _, v := range it.tree {
 		it.Decode(v)
 	}
 	return nil
@@ -23,6 +27,8 @@ func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]*MapperXml) error
 func (it *GoMybatisTempleteDecoder) Decode(mapper *MapperXml) error {
 
 	if mapper.Tag == "selectTemplete" {
+		mapper.Tag = Element_Select
+
 		var tables = mapper.Propertys["tables"]
 		var columns = mapper.Propertys["columns"]
 		var wheres = mapper.Propertys["wheres"]
@@ -44,12 +50,9 @@ func (it *GoMybatisTempleteDecoder) Decode(mapper *MapperXml) error {
 			sql.Reset()
 			it.DecodeWheres(wheres, mapper)
 		}
-
-		if mapper.Id == "" {
-			mapper.Id = mapper.Tag
-		}
-		mapper.Tag = Element_Select
 	} else if mapper.Tag == "insertTemplete" {
+		mapper.Tag = Element_Insert
+
 		var tables = mapper.Propertys["tables"]
 		var resultMap = mapper.Propertys["resultMap"]
 		var inserts = mapper.Propertys["inserts"]

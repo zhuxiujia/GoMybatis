@@ -222,7 +222,7 @@
 
         <!ELEMENT insertTemplete (#PCDATA | selectKey | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST insertTemplete
-                id CDATA #REQUIRED
+                id CDATA #IMPLIED
                 resultMap CDATA #IMPLIED
                 tables CDATA #REQUIRED
                 inserts CDATA #IMPLIED
