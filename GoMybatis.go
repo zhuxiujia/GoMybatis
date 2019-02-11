@@ -42,7 +42,7 @@ func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine SessionEn
 func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, templeteDecoder TempleteDecoder, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) {
 	beanCheck(bean, sqlBuilder)
 	var mapperTree = LoadMapperXml(xml)
-	templeteDecoder.DecodeTree(mapperTree)
+	templeteDecoder.DecodeTree(mapperTree, bean.Type())
 	//make a map[method]xml
 	var methodXmlMap = makeMethodXmlMap(bean, mapperTree)
 	var resultMaps = makeResultMaps(mapperTree)

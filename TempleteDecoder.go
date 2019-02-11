@@ -1,6 +1,7 @@
 package GoMybatis
 
+import "reflect"
+
 type TempleteDecoder interface {
-	Decode(mapper *MapperXml) error
-	DecodeTree(tree map[string]*MapperXml) error
+	DecodeTree(tree map[string]*MapperXml, beanType reflect.Type) error
 }

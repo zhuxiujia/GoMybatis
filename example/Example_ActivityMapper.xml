@@ -17,6 +17,7 @@
         <result column="delete_flag" property="deleteFlag" langType="int"  enable_logic_delete="true"  logic_deleted_value="1" logic_undelete_value="0" />
     </resultMap>
 
+    <!--Templete模板标签可以省略id="",框架默认设置<insertTemplete id="insertTemplete"/>-->
     <insertTemplete tables="biz_activity"></insertTemplete>
     <selectTemplete tables="biz_activity" wheres="name?name = #{name},name?name = #{name},name?name = #{name}"></selectTemplete>
     <!--updateTemplete,sets="*"更新全部内容,sets="*?*"判空参数，然后设置对应参数.-->

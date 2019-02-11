@@ -2,31 +2,43 @@ package GoMybatis
 
 import (
 	"bytes"
-	"errors"
 	"github.com/zhuxiujia/GoMybatis/utils"
+	"reflect"
 	"strings"
 )
 
 var equalOperator = []string{"/", "+", "-", "*", "**", "|", "^", "&", "%", "<", ">", ">=", "<=", " in ", " not in ", " or ", "||", " and ", "&&", "==", "!="}
 
 type GoMybatisTempleteDecoder struct {
-	tree map[string]*MapperXml
 }
 
-func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]*MapperXml) error {
+func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]*MapperXml, beanType reflect.Type) error {
 	if tree == nil {
-		return errors.New("data cant be nil!")
+		return utils.NewError("GoMybatisTempleteDecoder", "decode data map[string]*MapperXml cant be nil!")
 	}
-	it.tree = tree
-	for _, v := range it.tree {
-		it.Decode(v)
+	if beanType.Kind() == reflect.Ptr {
+		beanType = beanType.Elem()
+	}
+
+	for _, v := range tree {
+		var method *reflect.StructField
+		if isMethodElement(v.Tag) {
+			var upperId = utils.UpperFieldFirstName(v.Id)
+			m, haveMethod := beanType.FieldByName(upperId)
+			if haveMethod {
+				method = &m
+			}
+		}
+		it.Decode(method, v, tree)
 	}
 	return nil
 }
 
-func (it *GoMybatisTempleteDecoder) Decode(mapper *MapperXml) error {
+func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *MapperXml, tree map[string]*MapperXml) error {
 
-	if mapper.Tag == "selectTemplete" {
+	switch mapper.Tag {
+
+	case "selectTemplete":
 		mapper.Tag = Element_Select
 
 		var tables = mapper.Propertys["tables"]
@@ -50,7 +62,9 @@ func (it *GoMybatisTempleteDecoder) Decode(mapper *MapperXml) error {
 			sql.Reset()
 			it.DecodeWheres(wheres, mapper)
 		}
-	} else if mapper.Tag == "insertTemplete" {
+		break
+
+	case "insertTemplete":
 		mapper.Tag = Element_Insert
 
 		var tables = mapper.Propertys["tables"]
@@ -64,7 +78,7 @@ func (it *GoMybatisTempleteDecoder) Decode(mapper *MapperXml) error {
 			inserts = "*?*"
 		}
 
-		var resultMapData = it.tree[resultMap]
+		var resultMapData = tree[resultMap]
 		if resultMapData == nil {
 			panic(utils.NewError("GoMybatisTempleteDecoder", "resultMap not define! id = ", resultMap))
 		}
@@ -132,6 +146,7 @@ func (it *GoMybatisTempleteDecoder) Decode(mapper *MapperXml) error {
 			}
 		}
 		mapper.ElementItems = append(mapper.ElementItems, trimArg)
+		break
 	}
 
 	return nil

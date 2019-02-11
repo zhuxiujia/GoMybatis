@@ -30,3 +30,12 @@ const (
 	Element_where     ElementType = "where"
 	Element_Include   ElementType = "include"
 )
+
+func isMethodElement(tag ElementType) bool {
+	switch tag {
+	case Element_Insert, Element_Delete, Element_Update, Element_Select,
+		Element_Insert_Templete, Element_Delete_Templete, Element_Update_Templete, Element_Select_Templete:
+		return true
+	}
+	return false
+}
