@@ -19,7 +19,7 @@
 
 
     <!--<insertTemplete id="" tables=""></insertTemplete>-->
-    <selectTemplete id="SelectByName" tables="biz_activity" columns="*" wheres="name?name = #{name}"></selectTemplete>
+    <selectTemplete id="SelectByName" tables="biz_activity" columns="*" wheres="name?name = #{name},name?name = #{name},name?name = #{name}"></selectTemplete>
     <!--updateTemplete,sets="*"更新全部内容,sets="*?*"判空参数，然后设置对应参数.-->
     <!--<updateTemplete id="" tables="" sets="name?name = #{name}" wheres="name?name = #{name}"></updateTemplete>-->
     <!--<deleteTemplete id="" tables="" wheres="name?name = #{name}"></deleteTemplete>-->

@@ -23,6 +23,9 @@ func (it *GoMybatisTempleteDecoder) Decode(mapper *MapperXml) error {
 	var sql bytes.Buffer
 	if mapper.Tag == "selectTemplete" {
 		sql.WriteString("select ")
+		if columns == "" {
+			columns = "*"
+		}
 		sql.WriteString(columns)
 		sql.WriteString(" from ")
 		sql.WriteString(tables)
