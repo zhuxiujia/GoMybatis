@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+var equalOperator = []string{"/", "+", "-", "*", "**", "|", "^", "&", "%", "<", ">", ">=", "<=", " in ", " not in ", " or ", "||", " and ", "&&", "==", "!="}
+
 type GoMybatisTempleteDecoder struct {
 }
 
@@ -39,6 +41,10 @@ func (it *GoMybatisTempleteDecoder) Decode(mapper *MapperXml) error {
 			sql.Reset()
 			it.DecodeWheres(wheres, mapper)
 		}
+
+		if mapper.Id == "" {
+			mapper.Id = mapper.Tag
+		}
 		mapper.Tag = Element_Select
 	}
 
@@ -63,10 +69,19 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *MapperXml) 
 			}
 			var item = ElementItem{
 				ElementType: Element_If,
-				Propertys:   map[string]string{"test": expressions[0] + ` != null`},
+				Propertys:   map[string]string{"test": it.convertEqualAction(expressions[0])},
 				DataString:  newWheres.String(),
 			}
 			mapper.ElementItems = append(mapper.ElementItems, item)
 		}
 	}
+}
+
+func (it *GoMybatisTempleteDecoder) convertEqualAction(arg string) string {
+	for _, v := range equalOperator {
+		if strings.Contains(arg, v) {
+			return arg
+		}
+	}
+	return arg + ` != null`
 }

@@ -19,7 +19,7 @@ import (
 type ExampleActivityMapper struct {
 	SelectByIds       func(ids []string) ([]Activity, error)       `mapperParams:"ids"`
 	SelectByIdMaps    func(ids map[int]string) ([]Activity, error) `mapperParams:"ids"`
-	SelectByName      func(name string) ([]Activity, error)        `mapperParams:"name"`
+	SelectTemplete    func(name string) ([]Activity, error)        `mapperParams:"name"`
 	SelectAll         func() ([]map[string]string, error)
 	SelectByCondition func(name *string, startTime *time.Time, endTime *time.Time, page *int, size *int) ([]Activity, error) `mapperParams:"name,startTime,endTime,page,size"`
 	UpdateById        func(session *GoMybatis.Session, arg Activity) (int64, error)
@@ -297,7 +297,7 @@ func Test_select_name(t *testing.T) {
 		return
 	}
 	//使用mapper
-	var result, err = exampleActivityMapper.SelectByName("hello")
+	var result, err = exampleActivityMapper.SelectTemplete("hello")
 	if err != nil {
 		panic(err)
 	}

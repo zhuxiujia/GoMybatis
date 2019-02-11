@@ -51,9 +51,9 @@ func LoadMapperXml(bytes []byte) (items map[string]*MapperXml) {
 			s.Tag == Element_Update_Templete ||
 			s.Tag == Element_Select_Templete {
 			var elementID = attrMap[ID]
-			if elementID == "" {
-				panic("[GoMybatis] element Id can not be nil in xml! please check your xml!")
-			}
+			//if elementID == "" {
+			//	panic("[GoMybatis] element Id can not be nil in xml! please check your xml!")
+			//}
 			var oldItem = items[elementID]
 			if oldItem != nil {
 				panic("[GoMybatis] element Id can not repeat in xml! elementId=" + elementID)

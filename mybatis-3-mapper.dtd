@@ -16,7 +16,7 @@
                limitations under the License.
 
         -->
-        <!ELEMENT mapper (cache-ref | cache | resultMap* | parameterMap* | sql* | insert* | update* | delete* | select* )+>
+        <!ELEMENT mapper (cache-ref | cache | resultMap* | parameterMap* | sql* | insert* | update* | delete* | select* | selectTemplete* )+>
         <!ATTLIST mapper
                 >
 
@@ -181,6 +181,29 @@
                 
                 
                 >
+
+        <!ELEMENT selectTemplete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+        <!ATTLIST selectTemplete
+                id CDATA #IMPLIED
+                parameterMap CDATA #IMPLIED
+                parameterType CDATA #IMPLIED
+                resultMap CDATA #IMPLIED
+                resultType CDATA #IMPLIED
+
+
+                fetchSize CDATA #IMPLIED
+                timeout CDATA #IMPLIED
+                flushCache (true|false) #IMPLIED
+                useCache (true|false) #IMPLIED
+
+                lang CDATA #IMPLIED
+
+
+                tables CDATA #REQUIRED
+                columns CDATA #IMPLIED
+                wheres CDATA #IMPLIED
+                >
+
 
         <!ELEMENT insert (#PCDATA | selectKey | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST insert
