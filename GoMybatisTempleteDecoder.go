@@ -59,7 +59,6 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 				DataString:  sql.String(),
 			})
 			//TODO decode wheres
-			sql.Reset()
 			it.DecodeWheres(wheres, mapper)
 		}
 		break
@@ -171,6 +170,17 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *MapperXml) 
 			var item = ElementItem{
 				ElementType: Element_If,
 				Propertys:   map[string]string{"test": it.convertEqualAction(expressions[0])},
+				DataString:  newWheres.String(),
+			}
+			mapper.ElementItems = append(mapper.ElementItems, item)
+		} else {
+			var newWheres bytes.Buffer
+			if index > 0 {
+				newWheres.WriteString(" and ")
+			}
+			newWheres.WriteString(v)
+			var item = ElementItem{
+				ElementType: Element_String,
 				DataString:  newWheres.String(),
 			}
 			mapper.ElementItems = append(mapper.ElementItems, item)
