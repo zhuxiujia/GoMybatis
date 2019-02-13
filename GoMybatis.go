@@ -331,7 +331,7 @@ func closeSession(factory *SessionFactory, session Session) {
 
 func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlBuilder SqlBuilder, enableLog bool) (Session, string, error) {
 	var session Session
-	var paramMap = make(map[string]SqlArg)
+	var paramMap = make(map[string]interface{})
 	var tagArgsLen = len(tagArgs)
 	var argsLen = len(args) //参数长度，除session参数外。
 	var customLen = 0
@@ -358,20 +358,17 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlB
 			}
 		}
 		if tagArgsLen > 0 && argIndex < tagArgsLen && tagArgs[argIndex].Name != "" {
-			var sqlArg = SqlArg{
-				Value: argInterface,
-				Type:  arg.Type(),
-			}
 			//插入2份参数，兼容大小写不敏感的参数
 			var lowerKey = utils.LowerFieldFirstName(tagArgs[argIndex].Name)
 			var upperKey = utils.UpperFieldFirstName(tagArgs[argIndex].Name)
-			paramMap[lowerKey] = sqlArg
-			paramMap[upperKey] = sqlArg
+			paramMap[lowerKey] = argInterface
+			paramMap[upperKey] = argInterface
+			paramMap["type_"+lowerKey] = arg.Type()
+			paramMap["type_"+upperKey] = arg.Type()
 		} else {
-			paramMap[DefaultOneArg] = SqlArg{
-				Value: argInterface,
-				Type:  arg.Type(),
-			}
+			paramMap[DefaultOneArg] = argInterface
+			paramMap["type_"+DefaultOneArg] = arg.Type()
+
 		}
 	}
 	if customLen == 1 && customIndex != -1 {
@@ -384,9 +381,9 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlB
 }
 
 //scan params
-func scanStructArgFields(v reflect.Value, typeConvert func(arg interface{}) interface{}) map[string]SqlArg {
+func scanStructArgFields(v reflect.Value, typeConvert func(arg interface{}) interface{}) map[string]interface{} {
 	var t = v.Type()
-	parameters := make(map[string]SqlArg)
+	parameters := make(map[string]interface{})
 	if v.Kind() == reflect.Ptr {
 		if v.IsNil() == true {
 			return parameters
@@ -406,15 +403,11 @@ func scanStructArgFields(v reflect.Value, typeConvert func(arg interface{}) inte
 		}
 		var jsonKey = typeValue.Tag.Get(`json`)
 		if jsonKey != "" {
-			parameters[jsonKey] = SqlArg{
-				Type:  v.Field(i).Type(),
-				Value: obj,
-			}
+			parameters[jsonKey] = obj
+			parameters["type_"+jsonKey] = v.Field(i).Type()
 		} else {
-			parameters[typeValue.Name] = SqlArg{
-				Type:  v.Field(i).Type(),
-				Value: obj,
-			}
+			parameters[typeValue.Name] = obj
+			parameters["type_"+typeValue.Name] = v.Field(i).Type()
 		}
 	}
 	return parameters
