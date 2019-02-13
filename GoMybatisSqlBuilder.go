@@ -64,17 +64,17 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 	//默认的map[string]interface{}
 	var defaultArgMap = it.makeArgInterfaceMap(sqlArgMap)
 	//test表达式参数map
-	var evaluateParameters map[string]interface{}
+	var evaluateParameters = it.makeExpressParamterMap(sqlArgMap, it.expressionTypeConvert)
 	for _, v := range itemTree {
 		var loopChildItem = true
 		var breakChildItem = false
 		switch v.ElementType {
 		case Element_bind:
 			//bind,param args change!need update
-			sqlArgMap = it.bindBindElementArg(sqlArgMap, v, it.sqlArgTypeConvert)
+			sqlArgMap = it.bindBindElementArg(sqlArgMap, v, it.sqlArgTypeConvert, evaluateParameters)
 			defaultArgMap = it.makeArgInterfaceMap(sqlArgMap)
 			if evaluateParameters != nil {
-				evaluateParameters = it.expressParamterMap(sqlArgMap, it.expressionTypeConvert)
+				evaluateParameters = it.makeExpressParamterMap(sqlArgMap, it.expressionTypeConvert)
 			}
 			break
 		case Element_String:
@@ -307,9 +307,6 @@ func (it *GoMybatisSqlBuilder) doIfElement(expression string, param map[string]S
 	if err != nil {
 		return false, err
 	}
-	if evaluateParameters == nil {
-		evaluateParameters = it.expressParamterMap(param, it.expressionTypeConvert)
-	}
 	result, err := it.expressionEngineProxy.Eval(ifElementevalExpression, evaluateParameters, 0)
 	if err != nil {
 		err = utils.NewError("GoMybatisSqlBuilder", "[GoMybatis] <test `", expression, `> fail,`, err.Error())
@@ -318,7 +315,7 @@ func (it *GoMybatisSqlBuilder) doIfElement(expression string, param map[string]S
 	return result.(bool), nil
 }
 
-func (it *GoMybatisSqlBuilder) bindBindElementArg(args map[string]SqlArg, item ElementItem, typeConvert SqlArgTypeConvert) map[string]SqlArg {
+func (it *GoMybatisSqlBuilder) bindBindElementArg(args map[string]SqlArg, item ElementItem, typeConvert SqlArgTypeConvert, evaluateParameters map[string]interface{}) map[string]SqlArg {
 	var name = item.Propertys["name"]
 	var value = item.Propertys["value"]
 	if name == "" {
@@ -335,7 +332,6 @@ func (it *GoMybatisSqlBuilder) bindBindElementArg(args map[string]SqlArg, item E
 	if err != nil {
 		return args
 	}
-	var evaluateParameters = it.expressParamterMap(args, it.expressionTypeConvert)
 	result, err := it.expressionEngineProxy.Eval(bindEvalExpression, evaluateParameters, 0)
 	if err != nil {
 		//TODO send log bind fail
@@ -349,7 +345,7 @@ func (it *GoMybatisSqlBuilder) bindBindElementArg(args map[string]SqlArg, item E
 }
 
 //scan params
-func (it *GoMybatisSqlBuilder) expressParamterMap(parameters map[string]SqlArg, typeConvert ExpressionTypeConvert) map[string]interface{} {
+func (it *GoMybatisSqlBuilder) makeExpressParamterMap(parameters map[string]SqlArg, typeConvert ExpressionTypeConvert) map[string]interface{} {
 	var newMap = make(map[string]interface{})
 	for k, obj := range parameters {
 		var value = obj.Value
@@ -357,19 +353,6 @@ func (it *GoMybatisSqlBuilder) expressParamterMap(parameters map[string]SqlArg, 
 			value = typeConvert.Convert(obj)
 		}
 		newMap[k] = value
-	}
-	return newMap
-}
-
-//scan params
-func (it *GoMybatisSqlBuilder) sqlParamterMap(parameters map[string]SqlArg, typeConvert SqlArgTypeConvert) map[string]string {
-	var newMap = make(map[string]string)
-	for k, obj := range parameters {
-		var value = obj.Value
-		if typeConvert != nil {
-			value = typeConvert.Convert(obj)
-		}
-		newMap[k] = fmt.Sprint(value)
 	}
 	return newMap
 }
