@@ -2,7 +2,6 @@ package GoMybatis
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
 	"strings"
@@ -65,6 +64,9 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 	var defaultArgMap = it.makeArgInterfaceMap(sqlArgMap)
 	//test表达式参数map
 	var evaluateParameters map[string]interface{}
+	if evaluateParameters == nil {
+		evaluateParameters = it.makeExpressParamterMap(sqlArgMap, it.expressionTypeConvert)
+	}
 	for _, v := range itemTree {
 		var loopChildItem = true
 		var breakChildItem = false
@@ -74,7 +76,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 			sqlArgMap = it.bindBindElementArg(sqlArgMap, v, it.sqlArgTypeConvert)
 			defaultArgMap = it.makeArgInterfaceMap(sqlArgMap)
 			if evaluateParameters != nil {
-				evaluateParameters = it.expressParamterMap(sqlArgMap, it.expressionTypeConvert)
+				evaluateParameters = it.makeExpressParamterMap(sqlArgMap, it.expressionTypeConvert)
 			}
 			break
 		case Element_String:
@@ -172,6 +174,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 					for k, v := range sqlArgMap {
 						tempArgMap[k] = v
 					}
+
 					if item != "" {
 						tempArgMap[item] = SqlArg{
 							Value: collectionItem.Interface(),
@@ -307,9 +310,6 @@ func (it *GoMybatisSqlBuilder) doIfElement(expression string, param map[string]S
 	if err != nil {
 		return false, err
 	}
-	if evaluateParameters == nil {
-		evaluateParameters = it.expressParamterMap(param, it.expressionTypeConvert)
-	}
 	result, err := it.expressionEngineProxy.Eval(ifElementevalExpression, evaluateParameters, 0)
 	if err != nil {
 		err = utils.NewError("GoMybatisSqlBuilder", "[GoMybatis] <test `", expression, `> fail,`, err.Error())
@@ -335,7 +335,6 @@ func (it *GoMybatisSqlBuilder) bindBindElementArg(args map[string]SqlArg, item E
 	if err != nil {
 		return args
 	}
-	var evaluateParameters = it.expressParamterMap(args, it.expressionTypeConvert)
 	result, err := it.expressionEngineProxy.Eval(bindEvalExpression, evaluateParameters, 0)
 	if err != nil {
 		//TODO send log bind fail

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
-	"strconv"
 	"time"
 )
 
@@ -24,9 +23,9 @@ func (it GoMybatisSqlArgTypeConvert) Convert(arg SqlArg) string {
 	switch argType.Kind() {
 	case reflect.Bool:
 		if argValue.(bool) {
-			argValue = strconv.FormatBool(true)
+			return "true"
 		} else {
-			argValue = strconv.FormatBool(false)
+			return "false"
 		}
 		break
 	case reflect.String:
