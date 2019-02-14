@@ -8,9 +8,7 @@ import (
 func TestGoMybatisTempleteDecoder_Decode(t *testing.T) {
 	var decoder = GoMybatisTempleteDecoder{}
 	var mapElements = make([]ElementItem, 0)
-	mapElements = append(mapElements, ElementItem{
-
-	})
+	mapElements = append(mapElements, ElementItem{})
 	var BaseResultMap = MapperXml{
 		Tag: "resultMap",
 		Id:  "BaseResultMap",
@@ -96,7 +94,8 @@ func TestGoMybatisTempleteDecoder_Decode(t *testing.T) {
 		},
 		ElementItems: []ElementItem{},
 	}
-	var e = decoder.Decode(&xml)
+
+	var e = decoder.DecodeTree(map[string]*MapperXml{"m": &xml}, nil)
 	if e != nil {
 		t.Fatal(e)
 	}

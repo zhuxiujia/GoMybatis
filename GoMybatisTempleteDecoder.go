@@ -16,17 +16,20 @@ func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]*MapperXml, beanT
 	if tree == nil {
 		return utils.NewError("GoMybatisTempleteDecoder", "decode data map[string]*MapperXml cant be nil!")
 	}
-	if beanType.Kind() == reflect.Ptr {
-		beanType = beanType.Elem()
+	if beanType != nil {
+		if beanType.Kind() == reflect.Ptr {
+			beanType = beanType.Elem()
+		}
 	}
-
 	for _, v := range tree {
 		var method *reflect.StructField
-		if isMethodElement(v.Tag) {
-			var upperId = utils.UpperFieldFirstName(v.Id)
-			m, haveMethod := beanType.FieldByName(upperId)
-			if haveMethod {
-				method = &m
+		if beanType != nil {
+			if isMethodElement(v.Tag) {
+				var upperId = utils.UpperFieldFirstName(v.Id)
+				m, haveMethod := beanType.FieldByName(upperId)
+				if haveMethod {
+					method = &m
+				}
 			}
 		}
 		it.Decode(method, v, tree)
