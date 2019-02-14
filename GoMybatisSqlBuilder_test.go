@@ -29,24 +29,24 @@ func Benchmark_SqlBuilder(b *testing.B) {
             and create_time &lt;= #{endTime}
         </if>
         order by create_time desc
-        <if test="page != '' and size != ''">limit #{page}, #{size}</if>
+        <if test="page >= 0 and size != 0">limit #{page}, #{size}</if>
     </select>
 </mapper>`
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
 	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineExpr{}, true), &LogStandard{}, false)
 	var paramMap = make(map[string]interface{})
-	paramMap["name"] = "sda"
+	paramMap["name"] = ""
 	paramMap["startTime"] = ""
 	paramMap["endTime"] = ""
-	paramMap["page"] = "1"
-	paramMap["size"] = "20"
+	paramMap["page"] = 0
+	paramMap["size"] = 0
 
-	//paramMap["type_name"] =  StringType
-	//paramMap["type_startTime"] = StringType
-	//paramMap["type_endTime"] = StringType
-	//paramMap["type_page"] = IntType
-	//paramMap["type_size"] = IntType
+	paramMap["type_name"] = StringType
+	paramMap["type_startTime"] = StringType
+	paramMap["type_endTime"] = StringType
+	paramMap["type_page"] = IntType
+	paramMap["type_size"] = IntType
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
@@ -85,6 +85,12 @@ func Test_SqlBuilder_Tps(t *testing.T) {
 	paramMap["endTime"] = ""
 	paramMap["page"] = 0
 	paramMap["size"] = 0
+
+	paramMap["type_name"] = StringType
+	paramMap["type_startTime"] = StringType
+	paramMap["type_endTime"] = StringType
+	paramMap["type_page"] = IntType
+	paramMap["type_size"] = IntType
 
 	var startTime = time.Now()
 	for i := 0; i < 100000; i++ {
