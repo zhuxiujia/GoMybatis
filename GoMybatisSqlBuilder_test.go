@@ -29,24 +29,24 @@ func Benchmark_SqlBuilder(b *testing.B) {
             and create_time &lt;= #{endTime}
         </if>
         order by create_time desc
-        <if test="page >= 0 and size != 0">limit #{page}, #{size}</if>
+        <if test="page != '' and size != ''">limit #{page}, #{size}</if>
     </select>
 </mapper>`
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
 	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineExpr{}, true), &LogStandard{}, false)
 	var paramMap = make(map[string]interface{})
-	paramMap["name"] =  ""
+	paramMap["name"] = "sda"
 	paramMap["startTime"] = ""
 	paramMap["endTime"] = ""
-	paramMap["page"] = 0
-	paramMap["size"] = 0
+	paramMap["page"] = "1"
+	paramMap["size"] = "20"
 
-	paramMap["type_name"] =  StringType
-	paramMap["type_startTime"] = StringType
-	paramMap["type_endTime"] = StringType
-	paramMap["type_page"] = IntType
-	paramMap["type_size"] = IntType
+	//paramMap["type_name"] =  StringType
+	//paramMap["type_startTime"] = StringType
+	//paramMap["type_endTime"] = StringType
+	//paramMap["type_page"] = IntType
+	//paramMap["type_size"] = IntType
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
@@ -63,13 +63,13 @@ func Test_SqlBuilder_Tps(t *testing.T) {
     <!-- 后台查询产品 -->
     <select id="selectByCondition">
         select * from biz_activity where delete_flag=1
-        <if test="name != ''">
+        <if test="name != nil">
             and name like concat('%',#{name},'%')
         </if>
-        <if test="startTime != ''">
+        <if test="startTime != nil">
             and create_time >= #{startTime}
         </if>
-        <if test="endTime != ''">
+        <if test="endTime != nil">
             and create_time &lt;= #{endTime}
         </if>
         order by create_time desc
@@ -104,7 +104,7 @@ func Test_reflect_tps(t *testing.T) {
 	defer utils.CountMethodTps(10000, time.Now(), "Test_reflect_tps")
 
 	for k := 0; k < 10000; k++ {
-		evalExpression, _ := govaluate.NewEvaluableExpression("name != ''")
+		evalExpression, _ := govaluate.NewEvaluableExpression("name != nil")
 		//fmt.Println(err)
 		var p = make(map[string]interface{})
 		p["name"] = "sdaf"
@@ -151,15 +151,15 @@ func TestGoMybatisSqlBuilder_BuildSql(t *testing.T) {
         <bind name="pattern" value="'%' + name + '%'"/>
         select * from biz_activity
         <where>
-            <if test="name != ''">
+            <if test="name != nil">
                 and name like #{pattern}
             </if>
-            <if test="startTime != ''">and create_time >= #{startTime}</if>
-            <if test="endTime != ''">and create_time &lt;= #{endTime}</if>
+            <if test="startTime != nil">and create_time >= #{startTime}</if>
+            <if test="endTime != nil">and create_time &lt;= #{endTime}</if>
         </where>
         order by 
         <trim prefix="" suffix="" suffixOverrides=",">
-            <if test="name != ''">name,</if>
+            <if test="name != nil">name,</if>
         </trim>
         desc
         <choose>
@@ -173,10 +173,10 @@ func TestGoMybatisSqlBuilder_BuildSql(t *testing.T) {
 
 	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineExpr{}, true), &LogStandard{}, true)
 	var paramMap = make(map[string]interface{})
-	paramMap["name"] =  "name"
-	paramMap["type_name"] =  StringType
-	paramMap["startTime"] = ""
-	paramMap["endTime"] = ""
+	paramMap["name"] = "name"
+	paramMap["type_name"] = StringType
+	paramMap["startTime"] = nil
+	paramMap["endTime"] = nil
 	paramMap["page"] = 0
 	paramMap["size"] = 0
 	var sql, err = builder.BuildSql(paramMap, mapperTree["selectByCondition"])
