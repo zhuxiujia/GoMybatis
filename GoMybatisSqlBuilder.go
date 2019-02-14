@@ -165,14 +165,10 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 				if collectionKeyLen == 0 {
 					continue
 				}
+				var tempArgMap = sqlArgMap
 				for _, keyValue := range mapKeys {
 					var key = keyValue.Interface()
 					var collectionItem = collectionValue.MapIndex(keyValue)
-					var tempArgMap = make(map[string]interface{}) //temp parameter Map
-					for k, v := range sqlArgMap {
-						tempArgMap[k] = v
-					}
-
 					if item != "" {
 						tempArgMap[item] = collectionItem.Interface()
 						tempArgMap["type_"+item] = collectionItem.Type()
@@ -186,21 +182,20 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 						}
 						tempSql.WriteString(separator)
 					}
+					delete(tempArgMap, item)
+					delete(tempArgMap, "type_"+item)
 				}
 				break
 			case reflect.Slice:
+				var tempArgMap = sqlArgMap
 				for i := 0; i < collectionValueLen; i++ {
 					var collectionItem = collectionValue.Index(i)
-					var tempArgMap = make(map[string]interface{}) //temp parameter Map
-					for k, v := range sqlArgMap {
-						tempArgMap[k] = v
-					}
 					if item != "" {
 						tempArgMap[item] = collectionItem.Interface()
 						tempArgMap["type_"+item] = collectionItem.Type()
 					}
 					if index != "" {
-						tempArgMap[index] = index
+						tempArgMap[index] = i
 						tempArgMap["type_"+index] = IntType
 					}
 					if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
@@ -210,6 +205,8 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 						}
 						tempSql.WriteString(separator)
 					}
+					delete(tempArgMap, item)
+					delete(tempArgMap, "type_"+item)
 				}
 				break
 			}
