@@ -9,7 +9,6 @@ import (
 )
 
 type GoMybatisSqlBuilder struct {
-	expressionTypeConvert ExpressionTypeConvert
 	sqlArgTypeConvert     SqlArgTypeConvert
 	expressionEngineProxy ExpressionEngineProxy
 	logSystem             *LogSystem
@@ -22,12 +21,8 @@ func (it GoMybatisSqlBuilder) ExpressionEngineProxy() ExpressionEngineProxy {
 func (it GoMybatisSqlBuilder) SqlArgTypeConvert() SqlArgTypeConvert {
 	return it.sqlArgTypeConvert
 }
-func (it GoMybatisSqlBuilder) ExpressionTypeConvert() ExpressionTypeConvert {
-	return it.expressionTypeConvert
-}
 
-func (it GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert, SqlArgTypeConvert SqlArgTypeConvert, expressionEngine ExpressionEngineProxy, log Log, enableLog bool) GoMybatisSqlBuilder {
-	it.expressionTypeConvert = ExpressionTypeConvert
+func (it GoMybatisSqlBuilder) New(SqlArgTypeConvert SqlArgTypeConvert, expressionEngine ExpressionEngineProxy, log Log, enableLog bool) GoMybatisSqlBuilder {
 	it.sqlArgTypeConvert = SqlArgTypeConvert
 	it.expressionEngineProxy = expressionEngine
 	it.enableLog = enableLog
@@ -43,8 +38,7 @@ func (it GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert, S
 
 func (it GoMybatisSqlBuilder) BuildSql(paramMap map[string]interface{}, mapperXml *MapperXml) (string, error) {
 	var sql bytes.Buffer
-	var evaluateParameters = it.makeExpressParamterMap(paramMap, it.expressionTypeConvert)
-	err := it.createFromElement(mapperXml.ElementItems, &sql, paramMap, evaluateParameters)
+	err := it.createFromElement(mapperXml.ElementItems, &sql, paramMap)
 	if err != nil {
 		return "", err
 	}
@@ -57,12 +51,9 @@ func (it GoMybatisSqlBuilder) BuildSql(paramMap map[string]interface{}, mapperXm
 	return sqlStr, nil
 }
 
-func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *bytes.Buffer, sqlArgMap map[string]interface{}, evaluateParameters map[string]interface{}) error {
-	if it.sqlArgTypeConvert == nil || it.expressionTypeConvert == nil {
-		panic("[GoMybatis] GoMybatisSqlBuilder.sqlArgTypeConvert and GoMybatisSqlBuilder.expressionTypeConvert can not be nil!")
-	}
-	if evaluateParameters == nil {
-		evaluateParameters = it.makeExpressParamterMap(sqlArgMap, it.expressionTypeConvert)
+func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *bytes.Buffer, sqlArgMap map[string]interface{}) error {
+	if it.sqlArgTypeConvert == nil {
+		panic("[GoMybatis] GoMybatisSqlBuilder.sqlArgTypeConvert can not be nil!")
 	}
 	//默认的map[string]interface{}
 	//test表达式参数map
@@ -72,10 +63,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 		switch v.ElementType {
 		case Element_bind:
 			//bind,param args change!need update
-			sqlArgMap = it.bindBindElementArg(sqlArgMap, v, it.sqlArgTypeConvert, evaluateParameters)
-			if evaluateParameters != nil {
-				evaluateParameters = it.makeExpressParamterMap(sqlArgMap, it.expressionTypeConvert)
-			}
+			sqlArgMap = it.bindBindElementArg(sqlArgMap, v, it.sqlArgTypeConvert)
 			break
 		case Element_String:
 			//string element
@@ -88,7 +76,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 		case Element_If:
 			//if element
 			var expression = v.Propertys[`test`]
-			var result, err = it.doIfElement(expression, sqlArgMap, evaluateParameters)
+			var result, err = it.doIfElement(expression, sqlArgMap)
 			if err != nil {
 				return err
 			}
@@ -118,7 +106,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 		case Element_Set:
 			if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
 				var trim bytes.Buffer
-				var err = it.createFromElement(v.ElementItems, &trim, sqlArgMap, evaluateParameters)
+				var err = it.createFromElement(v.ElementItems, &trim, sqlArgMap)
 				if err != nil {
 					return err
 				}
@@ -165,14 +153,10 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 				if collectionKeyLen == 0 {
 					continue
 				}
+				var tempArgMap = sqlArgMap
 				for _, keyValue := range mapKeys {
 					var key = keyValue.Interface()
 					var collectionItem = collectionValue.MapIndex(keyValue)
-					var tempArgMap = make(map[string]interface{}) //temp parameter Map
-					for k, v := range sqlArgMap {
-						tempArgMap[k] = v
-					}
-
 					if item != "" {
 						tempArgMap[item] = collectionItem.Interface()
 						tempArgMap["type_"+item] = collectionItem.Type()
@@ -180,36 +164,37 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 					tempArgMap[index] = key
 					tempArgMap["type_"+index] = keyValue.Type()
 					if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
-						var err = it.createFromElement(v.ElementItems, &tempSql, tempArgMap, evaluateParameters)
+						var err = it.createFromElement(v.ElementItems, &tempSql, tempArgMap)
 						if err != nil {
 							return err
 						}
 						tempSql.WriteString(separator)
 					}
+					delete(tempArgMap, item)
+					delete(tempArgMap, "type_"+item)
 				}
 				break
 			case reflect.Slice:
+				var tempArgMap = sqlArgMap
 				for i := 0; i < collectionValueLen; i++ {
 					var collectionItem = collectionValue.Index(i)
-					var tempArgMap = make(map[string]interface{}) //temp parameter Map
-					for k, v := range sqlArgMap {
-						tempArgMap[k] = v
-					}
 					if item != "" {
 						tempArgMap[item] = collectionItem.Interface()
 						tempArgMap["type_"+item] = collectionItem.Type()
 					}
 					if index != "" {
-						tempArgMap[index] = index
+						tempArgMap[index] = i
 						tempArgMap["type_"+index] = IntType
 					}
 					if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
-						var err = it.createFromElement(v.ElementItems, &tempSql, tempArgMap, evaluateParameters)
+						var err = it.createFromElement(v.ElementItems, &tempSql, tempArgMap)
 						if err != nil {
 							return err
 						}
 						tempSql.WriteString(separator)
 					}
+					delete(tempArgMap, item)
+					delete(tempArgMap, "type_"+item)
 				}
 				break
 			}
@@ -226,7 +211,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 		case Element_choose:
 			//read when and otherwise
 			var temp bytes.Buffer
-			var err = it.createFromElement(v.ElementItems, &temp, sqlArgMap, evaluateParameters)
+			var err = it.createFromElement(v.ElementItems, &temp, sqlArgMap)
 			if err != nil {
 				return err
 			}
@@ -236,7 +221,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 		case Element_when:
 			//if element
 			var expression = v.Propertys[`test`]
-			var result, err = it.doIfElement(expression, sqlArgMap, evaluateParameters)
+			var result, err = it.doIfElement(expression, sqlArgMap)
 			if err != nil {
 				return err
 			}
@@ -248,7 +233,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 				}
 				sql.WriteString(replaceSql)
 				if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
-					var err = it.createFromElement(v.ElementItems, sql, sqlArgMap, evaluateParameters)
+					var err = it.createFromElement(v.ElementItems, sql, sqlArgMap)
 					if err != nil {
 						return err
 					}
@@ -262,7 +247,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 			break
 		case Element_otherwise:
 			if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
-				var err = it.createFromElement(v.ElementItems, sql, sqlArgMap, evaluateParameters)
+				var err = it.createFromElement(v.ElementItems, sql, sqlArgMap)
 				if err != nil {
 					return err
 				}
@@ -285,7 +270,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 			break
 		}
 		if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
-			var err = it.createFromElement(v.ElementItems, sql, sqlArgMap, evaluateParameters)
+			var err = it.createFromElement(v.ElementItems, sql, sqlArgMap)
 			if err != nil {
 				return err
 			}
@@ -294,13 +279,13 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 	return nil
 }
 
-func (it *GoMybatisSqlBuilder) doIfElement(expression string, param map[string]interface{}, evaluateParameters map[string]interface{}) (bool, error) {
+func (it *GoMybatisSqlBuilder) doIfElement(expression string, param map[string]interface{}) (bool, error) {
 	//it.repleaceExpression(expression, param)
 	ifElementevalExpression, err := it.expressionEngineProxy.Lexer(expression)
 	if err != nil {
 		return false, err
 	}
-	result, err := it.expressionEngineProxy.Eval(ifElementevalExpression, evaluateParameters, 0)
+	result, err := it.expressionEngineProxy.Eval(ifElementevalExpression, param, 0)
 	if err != nil {
 		err = utils.NewError("GoMybatisSqlBuilder", "[GoMybatis] <test `", expression, `> fail,`, err.Error())
 		return false, err
@@ -308,7 +293,7 @@ func (it *GoMybatisSqlBuilder) doIfElement(expression string, param map[string]i
 	return result.(bool), nil
 }
 
-func (it *GoMybatisSqlBuilder) bindBindElementArg(args map[string]interface{}, item ElementItem, typeConvert SqlArgTypeConvert, evaluateParameters map[string]interface{}) map[string]interface{} {
+func (it *GoMybatisSqlBuilder) bindBindElementArg(args map[string]interface{}, item ElementItem, typeConvert SqlArgTypeConvert) map[string]interface{} {
 	var name = item.Propertys["name"]
 	var value = item.Propertys["value"]
 	if name == "" {
@@ -323,7 +308,7 @@ func (it *GoMybatisSqlBuilder) bindBindElementArg(args map[string]interface{}, i
 	if err != nil {
 		return args
 	}
-	result, err := it.expressionEngineProxy.Eval(bindEvalExpression, evaluateParameters, 0)
+	result, err := it.expressionEngineProxy.Eval(bindEvalExpression, args, 0)
 	if err != nil {
 		//TODO send log bind fail
 		return args
@@ -333,32 +318,11 @@ func (it *GoMybatisSqlBuilder) bindBindElementArg(args map[string]interface{}, i
 	return args
 }
 
-//scan params
-func (it *GoMybatisSqlBuilder) makeExpressParamterMap(parameters map[string]interface{}, typeConvert ExpressionTypeConvert) map[string]interface{} {
-	var newMap = make(map[string]interface{})
-	for k, obj := range parameters {
-		if strings.Contains(k, "type_") {
-			continue
-		}
-		var value = obj
-		if typeConvert != nil {
-			var t reflect.Type
-			var typeValue = parameters["type_"+k]
-			if typeValue != nil {
-				t = typeValue.(reflect.Type)
-			}
-			value = typeConvert.Convert(obj, t)
-		}
-		newMap[k] = value
-	}
-	return newMap
-}
-
 //trim处理element
 func (it *GoMybatisSqlBuilder) elementTrim(loopChildItem *bool, items []ElementItem, param map[string]interface{}, prefix string, suffix string, prefixOverrides string, suffixOverrides string, sql *bytes.Buffer) error {
 	if *loopChildItem && items != nil && len(items) > 0 {
 		var tempTrimSql bytes.Buffer
-		var err = it.createFromElement(items, &tempTrimSql, param, nil)
+		var err = it.createFromElement(items, &tempTrimSql, param)
 		if err != nil {
 			return err
 		}
