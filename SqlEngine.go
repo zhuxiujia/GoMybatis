@@ -52,12 +52,6 @@ type SessionEngine interface {
 	//设置session工厂
 	SetSessionFactory(factory *SessionFactory)
 
-	//表达式数据类型转换器
-	ExpressionTypeConvert() ExpressionTypeConvert
-
-	//设置表达式数据类型转换器
-	SetExpressionTypeConvert(convert ExpressionTypeConvert)
-
 	//sql类型转换器
 	SqlArgTypeConvert() SqlArgTypeConvert
 

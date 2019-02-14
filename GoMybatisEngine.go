@@ -14,8 +14,6 @@ type GoMybatisEngine struct {
 
 	sessionFactory *SessionFactory
 
-	expressionTypeConvert ExpressionTypeConvert
-
 	sqlArgTypeConvert SqlArgTypeConvert
 
 	expressionEngine ExpressionEngine
@@ -117,21 +115,6 @@ func (it *GoMybatisEngine) SetSessionFactory(factory *SessionFactory) {
 	it.sessionFactory = factory
 }
 
-//表达式数据类型转换器
-func (it *GoMybatisEngine) ExpressionTypeConvert() ExpressionTypeConvert {
-	it.initCheck()
-	if it.expressionTypeConvert == nil {
-		it.expressionTypeConvert = GoMybatisExpressionTypeConvert{}
-	}
-	return it.expressionTypeConvert
-}
-
-//设置表达式数据类型转换器
-func (it *GoMybatisEngine) SetExpressionTypeConvert(convert ExpressionTypeConvert) {
-	it.initCheck()
-	it.expressionTypeConvert = convert
-}
-
 //sql类型转换器
 func (it *GoMybatisEngine) SqlArgTypeConvert() SqlArgTypeConvert {
 	it.initCheck()
@@ -167,7 +150,7 @@ func (it *GoMybatisEngine) SqlBuilder() SqlBuilder {
 	it.initCheck()
 	if it.sqlBuilder == nil {
 		var expressionEngineProxy = ExpressionEngineProxy{}.New(it.ExpressionEngine(), true)
-		it.sqlBuilder = GoMybatisSqlBuilder{}.New(it.ExpressionTypeConvert(), it.SqlArgTypeConvert(), expressionEngineProxy, it.Log(), it.LogEnable())
+		it.sqlBuilder = GoMybatisSqlBuilder{}.New(it.SqlArgTypeConvert(), expressionEngineProxy, it.Log(), it.LogEnable())
 	}
 	return it.sqlBuilder
 }

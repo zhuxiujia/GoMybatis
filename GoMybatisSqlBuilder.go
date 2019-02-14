@@ -9,7 +9,6 @@ import (
 )
 
 type GoMybatisSqlBuilder struct {
-	expressionTypeConvert ExpressionTypeConvert
 	sqlArgTypeConvert     SqlArgTypeConvert
 	expressionEngineProxy ExpressionEngineProxy
 	logSystem             *LogSystem
@@ -22,12 +21,8 @@ func (it GoMybatisSqlBuilder) ExpressionEngineProxy() ExpressionEngineProxy {
 func (it GoMybatisSqlBuilder) SqlArgTypeConvert() SqlArgTypeConvert {
 	return it.sqlArgTypeConvert
 }
-func (it GoMybatisSqlBuilder) ExpressionTypeConvert() ExpressionTypeConvert {
-	return it.expressionTypeConvert
-}
 
-func (it GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert, SqlArgTypeConvert SqlArgTypeConvert, expressionEngine ExpressionEngineProxy, log Log, enableLog bool) GoMybatisSqlBuilder {
-	it.expressionTypeConvert = ExpressionTypeConvert
+func (it GoMybatisSqlBuilder) New(SqlArgTypeConvert SqlArgTypeConvert, expressionEngine ExpressionEngineProxy, log Log, enableLog bool) GoMybatisSqlBuilder {
 	it.sqlArgTypeConvert = SqlArgTypeConvert
 	it.expressionEngineProxy = expressionEngine
 	it.enableLog = enableLog

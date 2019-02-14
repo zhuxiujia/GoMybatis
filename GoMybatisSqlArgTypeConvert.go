@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -35,7 +36,7 @@ func (it GoMybatisSqlArgTypeConvert) Convert(argValue interface{}, argType refle
 		argStr.WriteString(`'`)
 		return argStr.String()
 	case reflect.Struct:
-		if argType.String() == Adapter_DateType {
+		if strings.Contains(argType.String(), "time.Time") {
 			var argStr bytes.Buffer
 			argStr.WriteString(`'`)
 			argStr.WriteString(argValue.(time.Time).Format(Adapter_FormateDate))
