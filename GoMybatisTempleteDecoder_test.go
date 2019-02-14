@@ -101,3 +101,57 @@ func TestGoMybatisTempleteDecoder_Decode(t *testing.T) {
 	}
 	fmt.Println(xml.ElementItems)
 }
+
+type El struct {
+	Els []El
+
+	String string
+
+	test string
+
+	prefix          string
+	suffix          string
+	suffixOverrides string
+
+	separator  string
+	collection string
+	item       string
+	index      string
+	open       string
+}
+
+func Test_create_conf(t *testing.T) {
+	var els = []El{
+		{
+			test:   "name != null",
+			String: "and name like #{pattern}",
+		},
+		{
+			test:   "startTime != null",
+			String: "and startTime = #{startTime}",
+		},
+		{
+			String: "order by desc",
+		},
+		{
+			test:   "page != null and size != null",
+			String: "limit #{page}, #{size}",
+		},
+		{
+			prefix:          "(",
+			suffix:          ")",
+			suffixOverrides: ",",
+			Els: []El{
+				{
+					test:   "page != null and size != null",
+					String: "limit #{page}, #{size}",
+				},
+			},
+		},
+		{
+			open:       "(",
+			collection: "ids",
+		},
+	}
+	fmt.Println(els[0].test)
+}
