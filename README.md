@@ -93,4 +93,25 @@ func main() {
 	fmt.Println(result)
 }
 ```
+## Dynamic Data Source
+```
+GoMybatis.Open("mysql", MysqlUri)//Second database
+	var router = GoMybatis.GoMybatisDataSourceRouter{}.New(func(mapperName string) *string {
+		//Point to the data source according to the packet name routing
+		if strings.Contains(mapperName, "example.") {
+			var url = MysqlUri
+			fmt.Println(url)
+			return &url
+		}
+		return nil
+	})
+ engine.SetDataSourceRouter(&router)
+```
+## Custom log output
+```
+	engine.SetLog(&GoMybatis.LogStandard{
+		PrintlnFunc: func(messages []byte) {
+		},
+	})
+```
 ## Welcome to the top right-hand corner of star.
