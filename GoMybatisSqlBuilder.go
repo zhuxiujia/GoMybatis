@@ -2,7 +2,6 @@ package GoMybatis
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
 	"strings"
@@ -42,7 +41,7 @@ func (it GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert, S
 	return it
 }
 
-func (it GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml *MapperXml) (string, error) {
+func (it GoMybatisSqlBuilder) BuildSql(paramMap map[string]interface{}, mapperXml *MapperXml) (string, error) {
 	var sql bytes.Buffer
 	err := it.createFromElement(mapperXml.ElementItems, &sql, paramMap)
 	if err != nil {
@@ -57,14 +56,16 @@ func (it GoMybatisSqlBuilder) BuildSql(paramMap map[string]SqlArg, mapperXml *Ma
 	return sqlStr, nil
 }
 
-func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *bytes.Buffer, sqlArgMap map[string]SqlArg) error {
+func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *bytes.Buffer, sqlArgMap map[string]interface{}) error {
 	if it.sqlArgTypeConvert == nil || it.expressionTypeConvert == nil {
 		panic("[GoMybatis] GoMybatisSqlBuilder.sqlArgTypeConvert and GoMybatisSqlBuilder.expressionTypeConvert can not be nil!")
 	}
 	//默认的map[string]interface{}
-	var defaultArgMap = it.makeArgInterfaceMap(sqlArgMap)
 	//test表达式参数map
-	var evaluateParameters = it.makeExpressParamterMap(sqlArgMap, it.expressionTypeConvert)
+	var evaluateParameters map[string]interface{}
+	if evaluateParameters == nil {
+		evaluateParameters = it.makeExpressParamterMap(sqlArgMap, it.expressionTypeConvert)
+	}
 	for _, v := range itemTree {
 		var loopChildItem = true
 		var breakChildItem = false
@@ -72,14 +73,13 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 		case Element_bind:
 			//bind,param args change!need update
 			sqlArgMap = it.bindBindElementArg(sqlArgMap, v, it.sqlArgTypeConvert, evaluateParameters)
-			defaultArgMap = it.makeArgInterfaceMap(sqlArgMap)
 			if evaluateParameters != nil {
 				evaluateParameters = it.makeExpressParamterMap(sqlArgMap, it.expressionTypeConvert)
 			}
 			break
 		case Element_String:
 			//string element
-			var replaceSql, err = replaceArg(v.DataString, defaultArgMap, it.sqlArgTypeConvert, &it.expressionEngineProxy)
+			var replaceSql, err = replaceArg(v.DataString, sqlArgMap, it.sqlArgTypeConvert, &it.expressionEngineProxy)
 			if err != nil {
 				return err
 			}
@@ -94,7 +94,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 			}
 			if result {
 				//test > true,write sql string
-				var replaceSql, err = replaceArg(v.DataString, defaultArgMap, it.sqlArgTypeConvert, &it.expressionEngineProxy)
+				var replaceSql, err = replaceArg(v.DataString, sqlArgMap, it.sqlArgTypeConvert, &it.expressionEngineProxy)
 				if err != nil {
 					return err
 				}
@@ -143,7 +143,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 				panic(`[GoMybatis] collection value can not be "" in <foreach collection=""> !`)
 			}
 			var tempSql bytes.Buffer
-			var datas = sqlArgMap[collection].Value
+			var datas = sqlArgMap[collection]
 			var collectionValue = reflect.ValueOf(datas)
 			if collectionValue.Kind() != reflect.Slice && collectionValue.Kind() != reflect.Map {
 				panic(`[GoMybatis] collection value must be a slice or map !`)
@@ -168,20 +168,17 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 				for _, keyValue := range mapKeys {
 					var key = keyValue.Interface()
 					var collectionItem = collectionValue.MapIndex(keyValue)
-					var tempArgMap = make(map[string]SqlArg) //temp parameter Map
+					var tempArgMap = make(map[string]interface{}) //temp parameter Map
 					for k, v := range sqlArgMap {
 						tempArgMap[k] = v
 					}
+
 					if item != "" {
-						tempArgMap[item] = SqlArg{
-							Value: collectionItem.Interface(),
-							Type:  collectionItem.Type(),
-						}
+						tempArgMap[item] = collectionItem.Interface()
+						tempArgMap["type_"+item] = collectionItem.Type()
 					}
-					tempArgMap[index] = SqlArg{
-						Value: key,
-						Type:  keyValue.Type(),
-					}
+					tempArgMap[index] = key
+					tempArgMap["type_"+index] = keyValue.Type()
 					if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
 						var err = it.createFromElement(v.ElementItems, &tempSql, tempArgMap)
 						if err != nil {
@@ -194,21 +191,17 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 			case reflect.Slice:
 				for i := 0; i < collectionValueLen; i++ {
 					var collectionItem = collectionValue.Index(i)
-					var tempArgMap = make(map[string]SqlArg) //temp parameter Map
+					var tempArgMap = make(map[string]interface{}) //temp parameter Map
 					for k, v := range sqlArgMap {
 						tempArgMap[k] = v
 					}
 					if item != "" {
-						tempArgMap[item] = SqlArg{
-							Value: collectionItem.Interface(),
-							Type:  collectionItem.Type(),
-						}
+						tempArgMap[item] = collectionItem.Interface()
+						tempArgMap["type_"+item] = collectionItem.Type()
 					}
 					if index != "" {
-						tempArgMap[index] = SqlArg{
-							Value: index,
-							Type:  IntType,
-						}
+						tempArgMap[index] = index
+						tempArgMap["type_"+index] = IntType
 					}
 					if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
 						var err = it.createFromElement(v.ElementItems, &tempSql, tempArgMap)
@@ -249,7 +242,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 			}
 			if result {
 				//test > true,write sql string
-				var replaceSql, err = replaceArg(v.DataString, defaultArgMap, it.sqlArgTypeConvert, &it.expressionEngineProxy)
+				var replaceSql, err = replaceArg(v.DataString, sqlArgMap, it.sqlArgTypeConvert, &it.expressionEngineProxy)
 				if err != nil {
 					return err
 				}
@@ -301,7 +294,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 	return nil
 }
 
-func (it *GoMybatisSqlBuilder) doIfElement(expression string, param map[string]SqlArg, evaluateParameters map[string]interface{}) (bool, error) {
+func (it *GoMybatisSqlBuilder) doIfElement(expression string, param map[string]interface{}, evaluateParameters map[string]interface{}) (bool, error) {
 	//it.repleaceExpression(expression, param)
 	ifElementevalExpression, err := it.expressionEngineProxy.Lexer(expression)
 	if err != nil {
@@ -315,17 +308,15 @@ func (it *GoMybatisSqlBuilder) doIfElement(expression string, param map[string]S
 	return result.(bool), nil
 }
 
-func (it *GoMybatisSqlBuilder) bindBindElementArg(args map[string]SqlArg, item ElementItem, typeConvert SqlArgTypeConvert, evaluateParameters map[string]interface{}) map[string]SqlArg {
+func (it *GoMybatisSqlBuilder) bindBindElementArg(args map[string]interface{}, item ElementItem, typeConvert SqlArgTypeConvert, evaluateParameters map[string]interface{}) map[string]interface{} {
 	var name = item.Propertys["name"]
 	var value = item.Propertys["value"]
 	if name == "" {
 		panic(`[GoMybatis] element <bind name = ""> name can not be nil!`)
 	}
 	if value == "" {
-		args[name] = SqlArg{
-			Value: fmt.Sprint(value),
-			Type:  StringType,
-		}
+		args[name] = value
+		args["type_"+name] = StringType
 		return args
 	}
 	bindEvalExpression, err := it.expressionEngineProxy.Lexer(value)
@@ -337,20 +328,26 @@ func (it *GoMybatisSqlBuilder) bindBindElementArg(args map[string]SqlArg, item E
 		//TODO send log bind fail
 		return args
 	}
-	args[name] = SqlArg{
-		Value: fmt.Sprint(result),
-		Type:  StringType,
-	}
+	args[name] = result
+	args["type_"+name] = StringType
 	return args
 }
 
 //scan params
-func (it *GoMybatisSqlBuilder) makeExpressParamterMap(parameters map[string]SqlArg, typeConvert ExpressionTypeConvert) map[string]interface{} {
+func (it *GoMybatisSqlBuilder) makeExpressParamterMap(parameters map[string]interface{}, typeConvert ExpressionTypeConvert) map[string]interface{} {
 	var newMap = make(map[string]interface{})
 	for k, obj := range parameters {
-		var value = obj.Value
+		if strings.Contains(k,"type_"){
+			continue
+		}
+		var value = obj
 		if typeConvert != nil {
-			value = typeConvert.Convert(obj)
+			var t reflect.Type
+			var typeValue = parameters["type_"+k]
+			if typeValue != nil {
+				t = typeValue.(reflect.Type)
+			}
+			value = typeConvert.Convert(obj, t)
 		}
 		newMap[k] = value
 	}
@@ -358,7 +355,7 @@ func (it *GoMybatisSqlBuilder) makeExpressParamterMap(parameters map[string]SqlA
 }
 
 //trim处理element
-func (it *GoMybatisSqlBuilder) elementTrim(loopChildItem *bool, items []ElementItem, param map[string]SqlArg, prefix string, suffix string, prefixOverrides string, suffixOverrides string, sql *bytes.Buffer) error {
+func (it *GoMybatisSqlBuilder) elementTrim(loopChildItem *bool, items []ElementItem, param map[string]interface{}, prefix string, suffix string, prefixOverrides string, suffixOverrides string, sql *bytes.Buffer) error {
 	if *loopChildItem && items != nil && len(items) > 0 {
 		var tempTrimSql bytes.Buffer
 		var err = it.createFromElement(items, &tempTrimSql, param)
@@ -393,16 +390,6 @@ func (it *GoMybatisSqlBuilder) elementTrim(loopChildItem *bool, items []ElementI
 		*loopChildItem = false
 	}
 	return nil
-}
-
-func (it *GoMybatisSqlBuilder) makeArgInterfaceMap(args map[string]SqlArg) map[string]interface{} {
-	var m = make(map[string]interface{})
-	if args != nil {
-		for k, v := range args {
-			m[k] = v.Value
-		}
-	}
-	return m
 }
 
 func (it GoMybatisSqlBuilder) LogSystem() *LogSystem {

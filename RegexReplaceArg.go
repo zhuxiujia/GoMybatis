@@ -19,10 +19,7 @@ func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlA
 	var defaultValue = parameters[DefaultOneArg]
 	//replace default value
 	if defaultValue != nil {
-		var str = typeConvert.Convert(SqlArg{
-			Value: defaultValue,
-			Type:  reflect.TypeOf(defaultValue),
-		})
+		var str = typeConvert.Convert( defaultValue, reflect.TypeOf(defaultValue))
 		data = sqlArgRegex.ReplaceAllString(data, str)
 	}
 	//replace arg data
@@ -54,10 +51,7 @@ func replace(startChar string, regex *regexp.Regexp, data string, typeConvert Sq
 			return "", err
 		}
 		if typeConvert != nil {
-			repleaceStr = typeConvert.Convert(SqlArg{
-				Value: evalData,
-				Type:  reflect.TypeOf(evalData),
-			})
+			repleaceStr = typeConvert.Convert( evalData, reflect.TypeOf(evalData))
 		} else {
 			repleaceStr = fmt.Sprint(evalData)
 		}

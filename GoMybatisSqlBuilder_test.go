@@ -5,7 +5,6 @@ import (
 	"github.com/zhuxiujia/GoMybatis/example"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
 	"github.com/zhuxiujia/GoMybatis/utils"
-	"reflect"
 	"testing"
 	"time"
 )
@@ -36,27 +35,19 @@ func Benchmark_SqlBuilder(b *testing.B) {
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
 	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineExpr{}, true), &LogStandard{}, false)
-	var paramMap = make(map[string]SqlArg)
-	paramMap["name"] = SqlArg{
-		Value: "",
-		Type:  reflect.TypeOf(""),
-	}
-	paramMap["startTime"] = SqlArg{
-		Value: "",
-		Type:  reflect.TypeOf(""),
-	}
-	paramMap["endTime"] = SqlArg{
-		Value: "",
-		Type:  reflect.TypeOf(""),
-	}
-	paramMap["page"] = SqlArg{
-		Value: 0,
-		Type:  reflect.TypeOf(0),
-	}
-	paramMap["size"] = SqlArg{
-		Value: 0,
-		Type:  reflect.TypeOf(0),
-	}
+	var paramMap = make(map[string]interface{})
+	paramMap["name"] =  ""
+	paramMap["startTime"] = ""
+	paramMap["endTime"] = ""
+	paramMap["page"] = 0
+	paramMap["size"] = 0
+
+	paramMap["type_name"] =  StringType
+	paramMap["type_startTime"] = StringType
+	paramMap["type_endTime"] = StringType
+	paramMap["type_page"] = IntType
+	paramMap["type_size"] = IntType
+
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		builder.BuildSql(paramMap, mapperTree["selectByCondition"])
@@ -88,27 +79,12 @@ func Test_SqlBuilder_Tps(t *testing.T) {
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
 	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineExpr{}, true), &LogStandard{}, false)
-	var paramMap = make(map[string]SqlArg)
-	paramMap["name"] = SqlArg{
-		Value: "",
-		Type:  reflect.TypeOf(""),
-	}
-	paramMap["startTime"] = SqlArg{
-		Value: "",
-		Type:  reflect.TypeOf(""),
-	}
-	paramMap["endTime"] = SqlArg{
-		Value: "",
-		Type:  reflect.TypeOf(""),
-	}
-	paramMap["page"] = SqlArg{
-		Value: 0,
-		Type:  reflect.TypeOf(0),
-	}
-	paramMap["size"] = SqlArg{
-		Value: 0,
-		Type:  reflect.TypeOf(0),
-	}
+	var paramMap = make(map[string]interface{})
+	paramMap["name"] = ""
+	paramMap["startTime"] = ""
+	paramMap["endTime"] = ""
+	paramMap["page"] = 0
+	paramMap["size"] = 0
 
 	var startTime = time.Now()
 	for i := 0; i < 100000; i++ {
@@ -196,27 +172,13 @@ func TestGoMybatisSqlBuilder_BuildSql(t *testing.T) {
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
 	var builder = GoMybatisSqlBuilder{}.New(GoMybatisExpressionTypeConvert{}, GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineExpr{}, true), &LogStandard{}, true)
-	var paramMap = make(map[string]SqlArg)
-	paramMap["name"] = SqlArg{
-		Value: "name",
-		Type:  reflect.TypeOf(""),
-	}
-	paramMap["startTime"] = SqlArg{
-		Value: "",
-		Type:  reflect.TypeOf(""),
-	}
-	paramMap["endTime"] = SqlArg{
-		Value: "",
-		Type:  reflect.TypeOf(""),
-	}
-	paramMap["page"] = SqlArg{
-		Value: 0,
-		Type:  reflect.TypeOf(0),
-	}
-	paramMap["size"] = SqlArg{
-		Value: 0,
-		Type:  reflect.TypeOf(0),
-	}
+	var paramMap = make(map[string]interface{})
+	paramMap["name"] =  "name"
+	paramMap["type_name"] =  StringType
+	paramMap["startTime"] = ""
+	paramMap["endTime"] = ""
+	paramMap["page"] = 0
+	paramMap["size"] = 0
 	var sql, err = builder.BuildSql(paramMap, mapperTree["selectByCondition"])
 	if err != nil {
 		t.Fatal(err)
