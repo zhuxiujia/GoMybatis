@@ -56,11 +56,9 @@ func TestExpressionEngineExpr_Struct(t *testing.T) {
 
 func TestExpressionEngineExpr_Nil_Null(t *testing.T) {
 	var engine = ExpressionEngineExpr{}
-	var evaluateParameters = make(map[string]SqlArg)
+	var evaluateParameters = make(map[string]interface{})
 	//var p=1
-	evaluateParameters["startTime"] = SqlArg{
-		Value: nil,
-	}
+	evaluateParameters["startTime"] = nil
 	var nmap = makeArgInterfaceMap(evaluateParameters)
 	var expression = "startTime == nil"
 	evalExpression, err := engine.Lexer(expression)
@@ -74,11 +72,11 @@ func TestExpressionEngineExpr_Nil_Null(t *testing.T) {
 	fmt.Println(result)
 }
 
-func makeArgInterfaceMap(args map[string]SqlArg) map[string]interface{} {
+func makeArgInterfaceMap(args map[string]interface{}) map[string]interface{} {
 	var m = make(map[string]interface{})
 	if args != nil {
 		for k, v := range args {
-			m[k] = v.Value
+			m[k] = v
 		}
 	}
 	return m

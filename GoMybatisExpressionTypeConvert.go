@@ -12,9 +12,12 @@ type GoMybatisExpressionTypeConvert struct {
 }
 
 //表达式类型转换器
-func (it GoMybatisExpressionTypeConvert) Convert(arg SqlArg) interface{} {
-	if arg.Type.Kind() == reflect.Struct && arg.Type.String() == Adapter_DateType {
-		return arg.Value.(time.Time).Nanosecond()
+func (it GoMybatisExpressionTypeConvert) Convert(arg interface{},argType reflect.Type) interface{} {
+	if argType==nil{
+		argType=reflect.TypeOf(arg)
 	}
-	return arg.Value
+	if argType.Kind() == reflect.Struct && argType.String() == Adapter_DateType {
+		return arg.(time.Time).Nanosecond()
+	}
+	return arg
 }

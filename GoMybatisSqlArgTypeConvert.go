@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
-	"strconv"
 	"time"
 )
 
@@ -15,24 +14,24 @@ type GoMybatisSqlArgTypeConvert struct {
 }
 
 //Sql内容类型转换器
-func (it GoMybatisSqlArgTypeConvert) Convert(arg SqlArg) string {
-	var argValue = arg.Value
-	var argType = arg.Type
+func (it GoMybatisSqlArgTypeConvert) Convert(argValue interface{}, argType reflect.Type) string {
+	if argType == nil {
+		argType = reflect.TypeOf(argValue)
+	}
 	if argValue == nil {
 		return "''"
 	}
 	switch argType.Kind() {
 	case reflect.Bool:
 		if argValue.(bool) {
-			argValue = strconv.FormatBool(true)
+			return "true"
 		} else {
-			argValue = strconv.FormatBool(false)
+			return "false"
 		}
-		break
 	case reflect.String:
 		var argStr bytes.Buffer
 		argStr.WriteString(`'`)
-		argStr.WriteString(it.toString(&arg))
+		argStr.WriteString(argValue.(string))
 		argStr.WriteString(`'`)
 		return argStr.String()
 	case reflect.Struct:
@@ -45,13 +44,12 @@ func (it GoMybatisSqlArgTypeConvert) Convert(arg SqlArg) string {
 		}
 		break
 	}
-	return it.toString(&arg)
+	return it.toString(argValue, argType)
 }
 
-func (it GoMybatisSqlArgTypeConvert) toString(value *SqlArg) string {
-	if value.Value == nil {
+func (it GoMybatisSqlArgTypeConvert) toString(value interface{}, argType reflect.Type) string {
+	if value == nil {
 		return ""
 	}
-	//return fmt.Sprint(value.Value)
-	return utils.GetValue(value.Value, value.Type)
+	return utils.GetValue(value, argType)
 }
