@@ -43,7 +43,8 @@ func (it GoMybatisSqlBuilder) New(ExpressionTypeConvert ExpressionTypeConvert, S
 
 func (it GoMybatisSqlBuilder) BuildSql(paramMap map[string]interface{}, mapperXml *MapperXml) (string, error) {
 	var sql bytes.Buffer
-	err := it.createFromElement(mapperXml.ElementItems, &sql, paramMap)
+	var evaluateParameters = it.makeExpressParamterMap(paramMap, it.expressionTypeConvert)
+	err := it.createFromElement(mapperXml.ElementItems, &sql, paramMap, evaluateParameters)
 	if err != nil {
 		return "", err
 	}
@@ -56,16 +57,15 @@ func (it GoMybatisSqlBuilder) BuildSql(paramMap map[string]interface{}, mapperXm
 	return sqlStr, nil
 }
 
-func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *bytes.Buffer, sqlArgMap map[string]interface{}) error {
+func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *bytes.Buffer, sqlArgMap map[string]interface{}, evaluateParameters map[string]interface{}) error {
 	if it.sqlArgTypeConvert == nil || it.expressionTypeConvert == nil {
 		panic("[GoMybatis] GoMybatisSqlBuilder.sqlArgTypeConvert and GoMybatisSqlBuilder.expressionTypeConvert can not be nil!")
 	}
-	//默认的map[string]interface{}
-	//test表达式参数map
-	var evaluateParameters map[string]interface{}
 	if evaluateParameters == nil {
 		evaluateParameters = it.makeExpressParamterMap(sqlArgMap, it.expressionTypeConvert)
 	}
+	//默认的map[string]interface{}
+	//test表达式参数map
 	for _, v := range itemTree {
 		var loopChildItem = true
 		var breakChildItem = false
@@ -118,7 +118,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 		case Element_Set:
 			if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
 				var trim bytes.Buffer
-				var err = it.createFromElement(v.ElementItems, &trim, sqlArgMap)
+				var err = it.createFromElement(v.ElementItems, &trim, sqlArgMap, evaluateParameters)
 				if err != nil {
 					return err
 				}
@@ -180,7 +180,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 					tempArgMap[index] = key
 					tempArgMap["type_"+index] = keyValue.Type()
 					if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
-						var err = it.createFromElement(v.ElementItems, &tempSql, tempArgMap)
+						var err = it.createFromElement(v.ElementItems, &tempSql, tempArgMap, evaluateParameters)
 						if err != nil {
 							return err
 						}
@@ -204,7 +204,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 						tempArgMap["type_"+index] = IntType
 					}
 					if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
-						var err = it.createFromElement(v.ElementItems, &tempSql, tempArgMap)
+						var err = it.createFromElement(v.ElementItems, &tempSql, tempArgMap, evaluateParameters)
 						if err != nil {
 							return err
 						}
@@ -226,7 +226,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 		case Element_choose:
 			//read when and otherwise
 			var temp bytes.Buffer
-			var err = it.createFromElement(v.ElementItems, &temp, sqlArgMap)
+			var err = it.createFromElement(v.ElementItems, &temp, sqlArgMap, evaluateParameters)
 			if err != nil {
 				return err
 			}
@@ -248,7 +248,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 				}
 				sql.WriteString(replaceSql)
 				if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
-					var err = it.createFromElement(v.ElementItems, sql, sqlArgMap)
+					var err = it.createFromElement(v.ElementItems, sql, sqlArgMap, evaluateParameters)
 					if err != nil {
 						return err
 					}
@@ -262,7 +262,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 			break
 		case Element_otherwise:
 			if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
-				var err = it.createFromElement(v.ElementItems, sql, sqlArgMap)
+				var err = it.createFromElement(v.ElementItems, sql, sqlArgMap, evaluateParameters)
 				if err != nil {
 					return err
 				}
@@ -285,7 +285,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 			break
 		}
 		if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
-			var err = it.createFromElement(v.ElementItems, sql, sqlArgMap)
+			var err = it.createFromElement(v.ElementItems, sql, sqlArgMap, evaluateParameters)
 			if err != nil {
 				return err
 			}
@@ -337,7 +337,7 @@ func (it *GoMybatisSqlBuilder) bindBindElementArg(args map[string]interface{}, i
 func (it *GoMybatisSqlBuilder) makeExpressParamterMap(parameters map[string]interface{}, typeConvert ExpressionTypeConvert) map[string]interface{} {
 	var newMap = make(map[string]interface{})
 	for k, obj := range parameters {
-		if strings.Contains(k,"type_"){
+		if strings.Contains(k, "type_") {
 			continue
 		}
 		var value = obj
@@ -358,7 +358,7 @@ func (it *GoMybatisSqlBuilder) makeExpressParamterMap(parameters map[string]inte
 func (it *GoMybatisSqlBuilder) elementTrim(loopChildItem *bool, items []ElementItem, param map[string]interface{}, prefix string, suffix string, prefixOverrides string, suffixOverrides string, sql *bytes.Buffer) error {
 	if *loopChildItem && items != nil && len(items) > 0 {
 		var tempTrimSql bytes.Buffer
-		var err = it.createFromElement(items, &tempTrimSql, param)
+		var err = it.createFromElement(items, &tempTrimSql, param, nil)
 		if err != nil {
 			return err
 		}
