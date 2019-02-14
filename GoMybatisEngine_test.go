@@ -21,7 +21,7 @@ func Benchmark_One_Transcation(b *testing.B) {
 	//开始压力测试
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		var _, err = exampleActivityMapperImpl.SelectByCondition(&session, "", time.Time{}, time.Time{}, 0, 2000)
+		var _, err = exampleActivityMapperImpl.SelectByCondition(&session, nil, nil,nil,nil,nil)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -50,7 +50,7 @@ func Benchmark_One_Transcation_multiple_coroutine(b *testing.B) {
 		go func() {
 			var itemCount = total / goruntine
 			for f := 0; f < itemCount; f++ {
-				exampleActivityMapperImpl.SelectByCondition(&session, "", time.Time{}, time.Time{}, 0, 2000)
+				exampleActivityMapperImpl.SelectByCondition(&session, nil, nil,nil,nil,nil)
 			}
 			waitGroup.Done()
 		}()
@@ -70,7 +70,7 @@ func Test_One_Transcation_TPS(t *testing.T) {
 	var total = 10000
 	defer utils.CountMethodTps(float64(total), time.Now(), "Test_One_Transcation_TPS")
 	for i := 0; i < total; i++ {
-		var _, err = exampleActivityMapperImpl.SelectByCondition(&session, "", time.Time{}, time.Time{}, 0, 2000)
+		var _, err = exampleActivityMapperImpl.SelectByCondition(&session, nil, nil,nil,nil,nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -97,7 +97,7 @@ func Test_One_Transcation_multiple_coroutine_TPS(t *testing.T) {
 		go func() {
 			var itemCount = total / goruntine
 			for f := 0; f < itemCount; f++ {
-				exampleActivityMapperImpl.SelectByCondition(&session, "", time.Time{}, time.Time{}, 0, 2000)
+				exampleActivityMapperImpl.SelectByCondition(&session, nil, nil,nil,nil,nil)
 			}
 			waitGroup.Done()
 		}()
@@ -114,7 +114,7 @@ func Test_Transcation(t *testing.T) {
 	//使用mapper
 
 	//开始TPS测试
-	var results, err = exampleActivityMapperImpl.SelectByCondition(&session, "", time.Time{}, time.Time{}, 0, 2000)
+	var results, err = exampleActivityMapperImpl.SelectByCondition(&session, nil, nil,nil,nil,nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -162,7 +162,7 @@ func (it *TestSession) Close() {
 //参数中除了session指针外，为指针类型的皆为数据
 // 函数return必须为error 为返回错误信息
 type ExampleActivityMapperImpl struct {
-	SelectByCondition func(session *Session, name string, startTime time.Time, endTime time.Time, page int, size int) ([]example.Activity, error) `mapperParams:"session,name,startTime,endTime,page,size"`
+	SelectByCondition func(session *Session, name *string, startTime *time.Time, endTime *time.Time, page *int, size *int) ([]example.Activity, error) `mapperParams:"session,name,startTime,endTime,page,size"`
 }
 
 //初始化mapper文件和结构体
