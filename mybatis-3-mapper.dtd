@@ -260,7 +260,7 @@
                 >
         <!ELEMENT updateTemplete (#PCDATA | selectKey | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST updateTemplete
-                id CDATA #REQUIRED
+                id CDATA #IMPLIED
                 parameterMap CDATA #IMPLIED
                 parameterType CDATA #IMPLIED
                 timeout CDATA #IMPLIED
@@ -289,7 +289,7 @@
                 >
         <!ELEMENT deleteTemplete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST deleteTemplete
-                id CDATA #REQUIRED
+                id CDATA #IMPLIED
                 parameterMap CDATA #IMPLIED
                 parameterType CDATA #IMPLIED
                 timeout CDATA #IMPLIED

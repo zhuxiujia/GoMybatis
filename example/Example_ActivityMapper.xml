@@ -18,9 +18,9 @@
     </resultMap>
     <!--TODO #{_,v print ids}-->
     <insertTemplete tables="biz_activity" inserts="*"></insertTemplete>
-    <selectTemplete tables="biz_activity" wheres="name?name = #{name}" />
-    <updateTemplete id="" tables="biz_activity"  sets="name?name = #{name}" wheres="name?name = #{name}"></updateTemplete>
-    <deleteTemplete id="" tables="biz_activity"  wheres="name?name = #{name}"></deleteTemplete>
+    <selectTemplete tables="biz_activity" wheres="name?name = #{name}"/>
+    <updateTemplete tables="biz_activity"  sets="name?name = #{name}" wheres="name?name = #{name}"></updateTemplete>
+    <deleteTemplete tables="biz_activity"  wheres="name?name = #{name}"></deleteTemplete>
 
    <!-- 后台查询产品 -->
     <select id="selectByCondition" resultMap="BaseResultMap">
