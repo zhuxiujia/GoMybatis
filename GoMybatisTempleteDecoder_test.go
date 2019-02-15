@@ -2,8 +2,108 @@ package GoMybatis
 
 import (
 	"fmt"
+	"github.com/zhuxiujia/GoMybatis/example"
+	"io/ioutil"
 	"testing"
 )
+
+type ExampleActivityMapper struct {
+	SelectTemplete func(name string, session Session) ([]example.Activity, error) `mapperParams:"name,session"`
+	InsertTemplete func(arg example.Activity, session Session) (int64, error)     `mapperParams:"arg,session"`
+	UpdateTemplete func(arg example.Activity, session Session) (int64, error)     `mapperParams:"name,session"`
+	DeleteTemplete func(name string, session Session) (int64, error)              `mapperParams:"name,session"`
+}
+
+//初始化mapper文件和结构体
+var exampleActivityMapper = ExampleActivityMapper{}
+
+func init() {
+	bytes, err := ioutil.ReadFile("example/Example_ActivityMapper.xml")
+	if err != nil {
+		panic(err)
+	}
+	var xmlItems = LoadMapperXml(bytes)
+	if xmlItems == nil {
+		panic(`Test_Load_Xml fail,LoadMapperXml "example/Example_ActivityMapper.xml"`)
+	}
+
+	var decoder = GoMybatisTempleteDecoder{}
+	err = decoder.DecodeTree(xmlItems, nil)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(xmlItems)
+
+	var engine = GoMybatisEngine{}.New()
+	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
+	err = engine.Open("mysql", "") //此处请按格式填写你的mysql链接，这里用*号代替
+	if err != nil {
+		panic(err)
+	}
+	engine.SetLogEnable(true)
+	engine.WriteMapperPtr(&exampleActivityMapper, bytes)
+}
+
+type TempleteSession struct {
+	Session
+}
+
+func (it *TempleteSession) Id() string {
+	return "sadf"
+}
+func (it *TempleteSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
+	resultsSlice := make([]map[string][]byte, 0)
+
+	result := make(map[string][]byte)
+	result["name"] = []byte("活动1")
+	result["id"] = []byte("125")
+	result["pc_link"] = []byte("http://www.baidu.com")
+	result["h5_link"] = []byte("http://www.baidu.com")
+	result["remark"] = []byte("活动1")
+	resultsSlice = append(resultsSlice, result)
+	return resultsSlice, nil
+}
+func (it *TempleteSession) Exec(sqlorArgs string) (*Result, error) {
+	var result = Result{
+		LastInsertId: 1,
+		RowsAffected: 1,
+	}
+	return &result, nil
+}
+func (it *TempleteSession) Rollback() error {
+	return nil
+}
+func (it *TempleteSession) Commit() error {
+	return nil
+}
+func (it *TempleteSession) Begin() error {
+	return nil
+}
+func (it *TempleteSession) Close() {
+
+}
+
+func TestGoMybatisTempleteDecoder_Decode_Update(t *testing.T) {
+	var act = example.Activity{
+		Id:   "123",
+		Name: "test",
+	}
+	var session = TempleteSession{}
+	n, err := exampleActivityMapper.UpdateTemplete(act, &session)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println("updateNum", n)
+}
+
+func TestGoMybatisTempleteDecoder_Decode_Delete(t *testing.T) {
+	var session = TempleteSession{}
+	n, err := exampleActivityMapper.DeleteTemplete("test", &session)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println("updateNum", n)
+}
 
 func TestGoMybatisTempleteDecoder_Decode(t *testing.T) {
 	var decoder = GoMybatisTempleteDecoder{}

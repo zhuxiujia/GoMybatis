@@ -16,7 +16,7 @@
                limitations under the License.
 
         -->
-        <!ELEMENT mapper (cache-ref | cache | resultMap* | parameterMap* | sql* | insert* | update* | delete* | select* | selectTemplete* | insertTemplete* )+>
+        <!ELEMENT mapper (cache-ref | cache | resultMap* | parameterMap* | sql* | insert* | update* |updateTemplete* | delete* |deleteTemplete* | select* | selectTemplete* | insertTemplete* )+>
         <!ATTLIST mapper
                 >
 
@@ -75,6 +75,11 @@
                 property CDATA #IMPLIED
                 langType CDATA #IMPLIED
                 column CDATA #IMPLIED
+
+                version_enable CDATA #IMPLIED
+                logic_enable CDATA #IMPLIED
+                logic_deleted_value CDATA #IMPLIED
+                logic_undelete_value CDATA #IMPLIED
                 <!--jdbcType CDATA #IMPLIED-->
                 typeHandler CDATA #IMPLIED
                 >
@@ -252,6 +257,23 @@
                 
                 lang CDATA #IMPLIED
                 >
+        <!ELEMENT updateTemplete (#PCDATA | selectKey | include | trim | where | set | foreach | choose | if | bind)*>
+        <!ATTLIST updateTemplete
+                id CDATA #REQUIRED
+                parameterMap CDATA #IMPLIED
+                parameterType CDATA #IMPLIED
+                timeout CDATA #IMPLIED
+                flushCache (true|false) #IMPLIED
+
+
+                useGeneratedKeys (true|false) #IMPLIED
+
+
+                lang CDATA #IMPLIED
+                tables CDATA #REQUIRED
+                sets CDATA #IMPLIED
+                wheres CDATA #IMPLIED
+                >
 
         <!ELEMENT delete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST delete
@@ -264,7 +286,19 @@
                 
                 lang CDATA #IMPLIED
                 >
+        <!ELEMENT deleteTemplete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+        <!ATTLIST deleteTemplete
+                id CDATA #REQUIRED
+                parameterMap CDATA #IMPLIED
+                parameterType CDATA #IMPLIED
+                timeout CDATA #IMPLIED
+                flushCache (true|false) #IMPLIED
 
+
+                lang CDATA #IMPLIED
+                tables CDATA #REQUIRED
+                wheres CDATA #IMPLIED
+                >
         <!-- Dynamic -->
 
         <!ELEMENT include (property+)?>

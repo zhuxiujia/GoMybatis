@@ -12,15 +12,15 @@
         <result column="pc_link" property="pcLink" langType="string"/>
         <result column="h5_link" property="h5Link" langType="string"/>
         <result column="remark" property="remark" langType="string"/>
-        <result column="version" property="version" langType="int" enable_version="true"/>
+        <result column="version" property="version" langType="int" version_enable="true"/>
         <result column="create_time" property="createTime" langType="time.Time"/>
-        <result column="delete_flag" property="deleteFlag" langType="int"  enable_logic_delete="true"  logic_deleted_value="1" logic_undelete_value="0" />
+        <result column="delete_flag" property="deleteFlag" langType="int"  logic_enable="true"  logic_deleted_value="1" logic_undelete_value="0" />
     </resultMap>
     <!--TODO #{_,v print ids}-->
     <insertTemplete tables="biz_activity"></insertTemplete>
     <selectTemplete columns="*" tables="biz_activity" wheres="name?name = #{name}"   />
-    <!--<updateTemplete id="" tables="" sets="name?name = #{name}" wheres="name?name = #{name}"></updateTemplete>-->
-    <!--<deleteTemplete id="" tables="" wheres="name?name = #{name}"></deleteTemplete>-->
+    <updateTemplete id="" tables="biz_activity"  sets="name?name = #{name}" wheres="name?name = #{name}"></updateTemplete>
+    <deleteTemplete id="" tables="biz_activity" wheres="name?name = #{name}"></deleteTemplete>
 
    <!-- 后台查询产品 -->
     <select id="selectByCondition" resultMap="BaseResultMap">
