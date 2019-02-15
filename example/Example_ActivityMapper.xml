@@ -18,7 +18,7 @@
     </resultMap>
     <!--TODO #{_,v print ids}-->
     <insertTemplete tables="biz_activity" inserts="*"></insertTemplete>
-    <selectTemplete tables="biz_activity" wheres="name?name = #{name}"/>
+    <selectTemplete tables="biz_activity" wheres="name?name = #{name}"></selectTemplete>
     <updateTemplete tables="biz_activity"  sets="name?name = #{name}" wheres="name?name = #{name}"></updateTemplete>
     <deleteTemplete tables="biz_activity"  wheres="name?name = #{name}"></deleteTemplete>
 
