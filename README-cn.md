@@ -93,6 +93,31 @@ func main() {
 	fmt.Println(result)
 }
 ```
+## 动态数据源
+```
+        //添加第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
+	GoMybatis.Open("mysql", MysqlUri)
+	//动态数据源路由
+	var router = GoMybatis.GoMybatisDataSourceRouter{}.New(func(mapperName string) *string {
+		//根据包名路由指向数据源
+		if strings.Contains(mapperName, "example.") {
+			var url = MysqlUri//第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
+			fmt.Println(url)
+			return &url
+		}
+		return nil
+	})
+```
+## 自定义日志输出
+```
+	engine.SetLogEnable(true)
+	engine.SetLog(&GoMybatis.LogStandard{
+		PrintlnFunc: func(messages []byte) {
+		},
+	})
+```
+
+
 #### v2019.1.19 新增了gojee引擎（改进了原作者源码取消了开头的"."符号,例如.a.b变成 a.b）和expr表达式引擎（改进了原作者源码指针的bug,加入字符串相加操作例如'a'+'b'）
 https://github.com/zhuxiujia/GoMybatis/tree/master/lib/github.com/antonmedv/expr
 https://github.com/zhuxiujia/GoMybatis/tree/master/lib/github.com/nytlabs/gojee
