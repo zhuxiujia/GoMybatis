@@ -5,7 +5,7 @@
     <!--logic_delete_key 逻辑删除字段-->
     <!--logic_deleted_value 逻辑删除已删除字段-->
     <!--logic_undelete_value 逻辑删除 未删除字段-->
-    <!--version_key 乐观锁版本字段,支持int,int8,int16,int32,int64,time.Time-->
+    <!--version_key 乐观锁版本字段,支持int,int8,int16,int32,int64-->
     <resultMap id="BaseResultMap">
         <id column="id" property="id"/>
         <result column="name" property="name" langType="string"/>
