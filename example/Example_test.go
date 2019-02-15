@@ -16,9 +16,11 @@ import (
 //返回中必须有error
 // 函数return必须为error 为返回错误信息
 type ExampleActivityMapper struct {
-	SelectTemplete  func(name string) ([]Activity, error) `mapperParams:"name"`
-	InsertTemplete  func(arg Activity) (int64, error)
-	InsertTemplete2 func(args []Activity) (int64, error) `mapperParams:"args"`
+	SelectTemplete      func(name string) ([]Activity, error) `mapperParams:"name"`
+	InsertTemplete      func(arg Activity) (int64, error)
+	InsertTempleteBatch func(args []Activity) (int64, error) `mapperParams:"args"`
+	UpdateTemplete      func(arg Activity) (int64, error)    `mapperParams:"name"`
+	DeleteTemplete      func(name string) (int64, error)     `mapperParams:"name"`
 
 	SelectByIds       func(ids []string) ([]Activity, error)       `mapperParams:"ids"`
 	SelectByIdMaps    func(ids map[int]string) ([]Activity, error) `mapperParams:"ids"`
@@ -313,8 +315,12 @@ func TestInsertTemplete(t *testing.T) {
 	fmt.Println("result=", result)
 }
 
-func TestGoMybatisTempleteDecoder_Create(t *testing.T) {
-
+//批量插入模板
+func InsertTempleteBatch(t *testing.T) {
+	if MysqlUri == "" || MysqlUri == "*" {
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		return
+	}
 	var args = []Activity{
 		{
 			Id:   "221",
@@ -329,10 +335,41 @@ func TestGoMybatisTempleteDecoder_Create(t *testing.T) {
 			Name: "test",
 		},
 	}
-	n, err := exampleActivityMapper.InsertTemplete2(args)
+	n, err := exampleActivityMapper.InsertTempleteBatch(args)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println("updateNum", n)
 	time.Sleep(time.Second)
+}
+
+//修改模板默认支持逻辑删除和乐观锁
+func TestUpdateTemplete(t *testing.T) {
+	if MysqlUri == "" || MysqlUri == "*" {
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		return
+	}
+	var activityBean = Activity{
+		Id:   "171",
+		Name: "rs168",
+	}
+	var updateNum, e = exampleActivityMapper.UpdateTemplete(activityBean)
+	fmt.Println("updateNum=", updateNum)
+	if e != nil {
+		panic(e)
+	}
+}
+
+//删除
+func TestDeleteTemplete(t *testing.T) {
+	if MysqlUri == "" || MysqlUri == "*" {
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		return
+	}
+	//模板默认支持逻辑删除
+	var result, err = exampleActivityMapper.DeleteTemplete("rs168")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("result=", result)
 }
