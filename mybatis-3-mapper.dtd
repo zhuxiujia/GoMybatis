@@ -192,7 +192,7 @@
                 id CDATA #IMPLIED
                 parameterMap CDATA #IMPLIED
                 parameterType CDATA #IMPLIED
-                resultMap CDATA #IMPLIED
+                resultMap (BaseResultMap) #IMPLIED
                 resultType CDATA #IMPLIED
 
 
@@ -231,6 +231,7 @@
                 resultMap CDATA #IMPLIED
                 tables CDATA #REQUIRED
                 inserts CDATA #IMPLIED
+                resultMap (BaseResultMap) #IMPLIED
                 >
 
         <!ELEMENT selectKey (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
@@ -264,7 +265,7 @@
                 parameterType CDATA #IMPLIED
                 timeout CDATA #IMPLIED
                 flushCache (true|false) #IMPLIED
-
+                resultMap (BaseResultMap) #IMPLIED
 
                 useGeneratedKeys (true|false) #IMPLIED
 
@@ -298,6 +299,7 @@
                 lang CDATA #IMPLIED
                 tables CDATA #REQUIRED
                 wheres CDATA #IMPLIED
+                resultMap (BaseResultMap) #IMPLIED
                 >
         <!-- Dynamic -->
 

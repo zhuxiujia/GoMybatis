@@ -14,13 +14,13 @@
         <result column="remark" property="remark" langType="string"/>
         <result column="version" property="version" langType="int" version_enable="true"/>
         <result column="create_time" property="createTime" langType="time.Time"/>
-        <result column="delete_flag" property="deleteFlag" langType="int"  logic_enable="true"  logic_deleted_value="1" logic_undelete_value="0" />
+        <result column="delete_flag" property="deleteFlag" langType="int"  logic_enable="true"  logic_undelete_value="1" logic_deleted_value="0"  />
     </resultMap>
     <!--TODO #{_,v print ids}-->
-    <insertTemplete tables="biz_activity"></insertTemplete>
-    <selectTemplete columns="*" tables="biz_activity" wheres="name?name = #{name}"   />
+    <insertTemplete tables="biz_activity" inserts="*"></insertTemplete>
+    <selectTemplete tables="biz_activity" wheres="name?name = #{name}" />
     <updateTemplete id="" tables="biz_activity"  sets="name?name = #{name}" wheres="name?name = #{name}"></updateTemplete>
-    <deleteTemplete id="" tables="biz_activity" wheres="name?name = #{name}"></deleteTemplete>
+    <deleteTemplete id="" tables="biz_activity"  wheres="name?name = #{name}"></deleteTemplete>
 
    <!-- 后台查询产品 -->
     <select id="selectByCondition" resultMap="BaseResultMap">

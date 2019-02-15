@@ -97,13 +97,15 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			resultMap = "BaseResultMap"
 		}
 		if inserts == "" {
-			inserts = "*"
+			inserts = "*?*"
 		}
 
 		var resultMapData = tree[resultMap]
 		if resultMapData == nil {
 			panic(utils.NewError("GoMybatisTempleteDecoder", "resultMap not define! id = ", resultMap))
 		}
+		var logic = it.decodeLogicDelete(resultMapData)
+
 		var sql bytes.Buffer
 		sql.WriteString("insert into ")
 		sql.WriteString(tables)
@@ -119,11 +121,19 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			Propertys:    map[string]string{"prefix": "(", "suffix": ")", "suffixOverrides": ","},
 			ElementItems: []ElementItem{},
 		}
-		if inserts == "*" {
-			for _, v := range resultMapData.ElementItems {
+
+		for _, v := range resultMapData.ElementItems {
+			if logic.Enable && v.Propertys["property"] == logic.Property {
+				trimColumn.ElementItems = append(trimColumn.ElementItems, ElementItem{
+					ElementType: Element_String,
+					DataString:  logic.Undelete_value + ",",
+				})
+				continue
+			}
+			if inserts == "*?*" {
 				trimColumn.ElementItems = append(trimColumn.ElementItems, ElementItem{
 					ElementType: Element_If,
-					Propertys:   map[string]string{"test": it.makeEqualAction(v.Propertys["property"])},
+					Propertys:   map[string]string{"test": it.makeIfNotNull(v.Propertys["property"])},
 					ElementItems: []ElementItem{
 						{
 							ElementType: Element_String,
@@ -131,16 +141,12 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 						},
 					},
 				})
-			}
-		} else if inserts == "*" {
-			for _, v := range resultMapData.ElementItems {
+			} else if inserts == "*" {
 				trimColumn.ElementItems = append(trimColumn.ElementItems, ElementItem{
 					ElementType: Element_String,
 					DataString:  v.Propertys["column"] + ",",
 				})
 			}
-		} else {
-			panic(utils.NewError("GoMybatisTempleteDecoder", `inserts only support "*" or "*"`))
 		}
 
 		mapper.ElementItems = append(mapper.ElementItems, trimColumn)
@@ -151,16 +157,21 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			Propertys:    map[string]string{"prefix": "values (", "suffix": ")", "suffixOverrides": ","},
 			ElementItems: []ElementItem{},
 		}
-		if inserts == "*" {
-			for _, v := range resultMapData.ElementItems {
+		for _, v := range resultMapData.ElementItems {
+			if logic.Enable && v.Propertys["property"] == logic.Property {
+				trimArg.ElementItems = append(trimArg.ElementItems, ElementItem{
+					ElementType: Element_String,
+					DataString:  logic.Undelete_value + ",",
+				})
+				continue
+			}
+			if inserts == "*?*" {
 				trimArg.ElementItems = append(trimArg.ElementItems, ElementItem{
 					ElementType: Element_If,
-					Propertys:   map[string]string{"test": it.makeEqualAction(v.Propertys["property"])},
+					Propertys:   map[string]string{"test": it.makeIfNotNull(v.Propertys["property"])},
 					DataString:  "#{" + v.Propertys["property"] + "},",
 				})
-			}
-		} else if inserts == "*" {
-			for _, v := range resultMapData.ElementItems {
+			} else if inserts == "*" {
 				trimArg.ElementItems = append(trimArg.ElementItems, ElementItem{
 					ElementType: Element_String,
 					DataString:  "#{" + v.Propertys["property"] + "},",
@@ -201,7 +212,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 				var property = v.Propertys["property"]
 				mapper.ElementItems = append(mapper.ElementItems, ElementItem{
 					ElementType: Element_If,
-					Propertys:   map[string]string{"test": it.makeEqualAction(property)},
+					Propertys:   map[string]string{"test": it.makeIfNotNull(property)},
 					DataString:  column + " = #{" + v.Propertys["property"] + "},",
 				})
 			}
@@ -211,7 +222,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 				DataString:  sql.String(),
 			})
 			sql.Reset()
-			it.DecodeSets(columns, mapper, logic)
+			it.DecodeSets(columns, mapper, LogicDeleteData{})
 		}
 		sql.WriteString(" from ")
 		sql.WriteString(tables)
@@ -230,7 +241,6 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 		mapper.Tag = Element_Delete
 
 		var tables = mapper.Propertys["tables"]
-		var columns = mapper.Propertys["sets"]
 		var wheres = mapper.Propertys["wheres"]
 
 		var resultMap = mapper.Propertys["resultMap"]
@@ -248,29 +258,14 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			//enable logic delete
 			var sql bytes.Buffer
 			sql.WriteString("update set ")
-			if columns == "" {
-				mapper.ElementItems = append(mapper.ElementItems, ElementItem{
-					ElementType: Element_String,
-					DataString:  sql.String(),
-				})
-				sql.Reset()
-				for _, v := range resultMapData.ElementItems {
-					var column = v.Propertys["column"]
-					var property = v.Propertys["property"]
-					mapper.ElementItems = append(mapper.ElementItems, ElementItem{
-						ElementType: Element_If,
-						Propertys:   map[string]string{"test": it.makeEqualAction(property)},
-						DataString:  column + " = #{" + v.Propertys["property"] + "},",
-					})
-				}
-			} else {
-				mapper.ElementItems = append(mapper.ElementItems, ElementItem{
-					ElementType: Element_String,
-					DataString:  sql.String(),
-				})
-				sql.Reset()
-				it.DecodeSets(columns, mapper, logic)
-			}
+
+			mapper.ElementItems = append(mapper.ElementItems, ElementItem{
+				ElementType: Element_String,
+				DataString:  sql.String(),
+			})
+			sql.Reset()
+			it.DecodeSets("", mapper, logic)
+
 			sql.WriteString(" from ")
 			sql.WriteString(tables)
 			if len(wheres) > 0 {
@@ -311,17 +306,13 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *MapperXml, 
 		if len(expressions) > 1 {
 			//TODO have ?
 			var newWheres bytes.Buffer
-			for k, v := range expressions {
-				if k > 0 {
-					if index > 0 {
-						newWheres.WriteString(" and ")
-					}
-					newWheres.WriteString(v)
-				}
+			if index > 0 {
+				newWheres.WriteString(" and ")
 			}
+			newWheres.WriteString(expressions[1])
 			var item = ElementItem{
 				ElementType: Element_If,
-				Propertys:   map[string]string{"test": it.makeEqualAction(expressions[0])},
+				Propertys:   map[string]string{"test": it.makeIfNotNull(expressions[0])},
 				DataString:  newWheres.String(),
 			}
 			mapper.ElementItems = append(mapper.ElementItems, item)
@@ -340,7 +331,7 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *MapperXml, 
 	}
 	if logic.Enable == true {
 		var appendAdd = ""
-		if len(wheres) > 0 {
+		if len(wheres) >= 1 {
 			appendAdd = " and "
 		}
 		var item = ElementItem{
@@ -358,17 +349,13 @@ func (it *GoMybatisTempleteDecoder) DecodeSets(arg string, mapper *MapperXml, lo
 		if len(expressions) > 1 {
 			//TODO have ?
 			var newWheres bytes.Buffer
-			for k, v := range expressions {
-				if k > 0 {
-					if index > 0 {
-						newWheres.WriteString(",")
-					}
-					newWheres.WriteString(v)
-				}
+			if index > 0 {
+				newWheres.WriteString(",")
 			}
+			newWheres.WriteString(expressions[1])
 			var item = ElementItem{
 				ElementType: Element_If,
-				Propertys:   map[string]string{"test": it.makeEqualAction(expressions[0])},
+				Propertys:   map[string]string{"test": it.makeIfNotNull(expressions[0])},
 				DataString:  newWheres.String(),
 			}
 			mapper.ElementItems = append(mapper.ElementItems, item)
@@ -387,7 +374,7 @@ func (it *GoMybatisTempleteDecoder) DecodeSets(arg string, mapper *MapperXml, lo
 	}
 	if logic.Enable == true {
 		var appendAdd = ""
-		if len(sets) > 0 {
+		if len(sets) >= 1 {
 			appendAdd = ","
 		}
 		var item = ElementItem{
@@ -398,7 +385,7 @@ func (it *GoMybatisTempleteDecoder) DecodeSets(arg string, mapper *MapperXml, lo
 	}
 }
 
-func (it *GoMybatisTempleteDecoder) makeEqualAction(arg string) string {
+func (it *GoMybatisTempleteDecoder) makeIfNotNull(arg string) string {
 	for _, v := range equalOperator {
 		if strings.Contains(arg, v) {
 			return arg

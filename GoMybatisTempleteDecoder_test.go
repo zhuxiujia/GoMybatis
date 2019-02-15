@@ -5,6 +5,7 @@ import (
 	"github.com/zhuxiujia/GoMybatis/example"
 	"io/ioutil"
 	"testing"
+	"time"
 )
 
 type ExampleActivityMapper struct {
@@ -81,28 +82,6 @@ func (it *TempleteSession) Begin() error {
 }
 func (it *TempleteSession) Close() {
 
-}
-
-func TestGoMybatisTempleteDecoder_Decode_Update(t *testing.T) {
-	var act = example.Activity{
-		Id:   "123",
-		Name: "test",
-	}
-	var session = TempleteSession{}
-	n, err := exampleActivityMapper.UpdateTemplete(act, &session)
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Println("updateNum", n)
-}
-
-func TestGoMybatisTempleteDecoder_Decode_Delete(t *testing.T) {
-	var session = TempleteSession{}
-	n, err := exampleActivityMapper.DeleteTemplete("test", &session)
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Println("updateNum", n)
 }
 
 func TestGoMybatisTempleteDecoder_Decode(t *testing.T) {
@@ -254,4 +233,52 @@ func Test_create_conf(t *testing.T) {
 		},
 	}
 	fmt.Println(els[0].test)
+}
+
+func TestGoMybatisTempleteDecoder_Create(t *testing.T) {
+	var act = example.Activity{
+		Id:   "123",
+		Name: "test",
+	}
+	var session = TempleteSession{}
+	n, err := exampleActivityMapper.InsertTemplete(act, &session)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println("updateNum", n)
+	time.Sleep(time.Second)
+}
+
+func TestGoMybatisTempleteDecoder_Select(t *testing.T) {
+	var session = TempleteSession{}
+	n, err := exampleActivityMapper.SelectTemplete("test", &session)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println("updateNum", n)
+	time.Sleep(time.Second)
+}
+
+func TestGoMybatisTempleteDecoder_Update(t *testing.T) {
+	var act = example.Activity{
+		Id:   "123",
+		Name: "test",
+	}
+	var session = TempleteSession{}
+	n, err := exampleActivityMapper.UpdateTemplete(act, &session)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println("updateNum", n)
+	time.Sleep(time.Second)
+}
+
+func TestGoMybatisTempleteDecoder_Delete(t *testing.T) {
+	var session = TempleteSession{}
+	n, err := exampleActivityMapper.DeleteTemplete("test", &session)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println("updateNum", n)
+	time.Sleep(time.Second)
 }
