@@ -32,7 +32,7 @@ func cast(val interface{}) (float64, bool) {
 func castType(val interface{}, t reflect.Type) (float64, bool) {
 	if t != nil {
 		v := reflect.ValueOf(val)
-		v=GetDeepPtr(v)
+		v = GetDeepPtr(v)
 		switch t.Kind() {
 		case reflect.Float32, reflect.Float64:
 			return v.Float(), true
@@ -45,7 +45,7 @@ func castType(val interface{}, t reflect.Type) (float64, bool) {
 		}
 	} else {
 		v := reflect.ValueOf(val)
-		v=GetDeepPtr(v)
+		v = GetDeepPtr(v)
 		switch v.Kind() {
 		case reflect.Float32, reflect.Float64:
 			return v.Float(), true
@@ -220,5 +220,8 @@ func contains(needle interface{}, array interface{}) (bool, error) {
 
 func isNil(val interface{}) bool {
 	v := reflect.ValueOf(val)
+	if v.Kind() == reflect.Struct {
+		return false
+	}
 	return !v.IsValid() || v.IsNil()
 }

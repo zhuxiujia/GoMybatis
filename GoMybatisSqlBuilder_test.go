@@ -19,13 +19,13 @@ func Benchmark_SqlBuilder(b *testing.B) {
     <!-- 后台查询产品 -->
     <select id="selectByCondition">
         select * from biz_activity where delete_flag=1
-        <if test="name != ''">
+        <if test="name != nil">
             and name like concat('%',#{name},'%')
         </if>
-        <if test="startTime != ''">
+        <if test="startTime != nil">
             and create_time >= #{startTime}
         </if>
-        <if test="endTime != ''">
+        <if test="endTime != nil">
             and create_time &lt;= #{endTime}
         </if>
         order by create_time desc

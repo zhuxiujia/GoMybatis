@@ -16,8 +16,9 @@ import (
 //返回中必须有error
 // 函数return必须为error 为返回错误信息
 type ExampleActivityMapper struct {
-	SelectTemplete func(name string) ([]Activity, error) `mapperParams:"name"`
-	InsertTemplete func(arg Activity) (int64, error)
+	SelectTemplete  func(name string) ([]Activity, error) `mapperParams:"name"`
+	InsertTemplete  func(arg Activity) (int64, error)
+	InsertTemplete2 func(args []Activity) (int64, error) `mapperParams:"args"`
 
 	SelectByIds       func(ids []string) ([]Activity, error)       `mapperParams:"ids"`
 	SelectByIdMaps    func(ids map[int]string) ([]Activity, error) `mapperParams:"ids"`
@@ -305,9 +306,33 @@ func TestInsertTemplete(t *testing.T) {
 		return
 	}
 	//使用mapper
-	var result, err = exampleActivityMapper.InsertTemplete(Activity{Id: "171", Name: "test_insret", CreateTime: time.Now(), DeleteFlag: 1})
+	var result, err = exampleActivityMapper.InsertTemplete(Activity{Id: "178", Name: "test_insret", CreateTime: time.Now(), DeleteFlag: 1})
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("result=", result)
+}
+
+func TestGoMybatisTempleteDecoder_Create(t *testing.T) {
+
+	var args = []Activity{
+		{
+			Id:   "221",
+			Name: "test",
+		},
+		{
+			Id:   "222",
+			Name: "test",
+		},
+		{
+			Id:   "223",
+			Name: "test",
+		},
+	}
+	n, err := exampleActivityMapper.InsertTemplete2(args)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println("updateNum", n)
+	time.Sleep(time.Second)
 }

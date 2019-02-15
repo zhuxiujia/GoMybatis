@@ -1,6 +1,7 @@
 package GoMybatis
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"regexp"
@@ -19,7 +20,7 @@ func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlA
 	var defaultValue = parameters[DefaultOneArg]
 	//replace default value
 	if defaultValue != nil {
-		var str = typeConvert.Convert( defaultValue, reflect.TypeOf(defaultValue))
+		var str = typeConvert.Convert(defaultValue, reflect.TypeOf(defaultValue))
 		data = sqlArgRegex.ReplaceAllString(data, str)
 	}
 	//replace arg data
@@ -44,14 +45,14 @@ func replace(startChar string, regex *regexp.Regexp, data string, typeConvert Sq
 		}
 		lexer, err := engine.Lexer(repleaceStr)
 		if err != nil {
-			return "", err
+			return "", errors.New(engine.Name() + ":" + err.Error())
 		}
 		evalData, err := engine.Eval(lexer, arg, 0)
 		if err != nil {
-			return "", err
+			return "", errors.New(engine.Name() + ":" + err.Error())
 		}
 		if typeConvert != nil {
-			repleaceStr = typeConvert.Convert( evalData, reflect.TypeOf(evalData))
+			repleaceStr = typeConvert.Convert(evalData, reflect.TypeOf(evalData))
 		} else {
 			repleaceStr = fmt.Sprint(evalData)
 		}

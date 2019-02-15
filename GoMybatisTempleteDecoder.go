@@ -92,7 +92,6 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			it.DecodeWheres(wheres, mapper, logic, nil)
 		}
 		break
-
 	case "insertTemplete":
 		mapper.Tag = Element_Insert
 
@@ -113,6 +112,21 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 		}
 		var logic = it.decodeLogicDelete(resultMapData)
 
+		var collection string
+		//check method arg type
+		if method != nil {
+			method.Type.NumIn()
+			for i := 0; i < method.Type.NumIn(); i++ {
+				var itemType = method.Type.In(i)
+				if itemType.Kind() == reflect.Slice {
+					var mapperParams = method.Tag.Get("mapperParams")
+					var args = strings.Split(mapperParams, ",")
+					collection = args[i]
+				}
+			}
+		}
+
+		//start builder
 		var sql bytes.Buffer
 		sql.WriteString("insert into ")
 		sql.WriteString(tables)
@@ -129,63 +143,103 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			ElementItems: []ElementItem{},
 		}
 
-		for _, v := range resultMapData.ElementItems {
-			if logic.Enable && v.Propertys["property"] == logic.Property {
-				trimColumn.ElementItems = append(trimColumn.ElementItems, ElementItem{
-					ElementType: Element_String,
-					DataString:  logic.Undelete_value + ",",
-				})
-				continue
+		//cloumns
+		if collection != "" {
+			for _, v := range resultMapData.ElementItems {
+				if inserts == "*" || inserts == "*?*" {
+					trimColumn.ElementItems = append(trimColumn.ElementItems, ElementItem{
+						ElementType: Element_String,
+						DataString:  v.Propertys["column"] + ",",
+					})
+				}
 			}
-			if inserts == "*?*" {
-				trimColumn.ElementItems = append(trimColumn.ElementItems, ElementItem{
-					ElementType: Element_If,
-					Propertys:   map[string]string{"test": it.makeIfNotNull(v.Propertys["property"])},
-					ElementItems: []ElementItem{
-						{
-							ElementType: Element_String,
-							DataString:  v.Propertys["column"] + ",",
+		} else {
+			for _, v := range resultMapData.ElementItems {
+				if collection == "" && inserts == "*?*" {
+					trimColumn.ElementItems = append(trimColumn.ElementItems, ElementItem{
+						ElementType: Element_If,
+						Propertys:   map[string]string{"test": it.makeIfNotNull(v.Propertys["property"])},
+						ElementItems: []ElementItem{
+							{
+								ElementType: Element_String,
+								DataString:  v.Propertys["column"] + ",",
+							},
 						},
-					},
-				})
-			} else if inserts == "*" {
-				trimColumn.ElementItems = append(trimColumn.ElementItems, ElementItem{
-					ElementType: Element_String,
-					DataString:  v.Propertys["column"] + ",",
-				})
+					})
+				} else if inserts == "*" {
+					trimColumn.ElementItems = append(trimColumn.ElementItems, ElementItem{
+						ElementType: Element_String,
+						DataString:  v.Propertys["column"] + ",",
+					})
+				}
 			}
 		}
 
 		mapper.ElementItems = append(mapper.ElementItems, trimColumn)
 
-		//add insert arg
+		//args
 		var trimArg = ElementItem{
 			ElementType:  Element_Trim,
 			Propertys:    map[string]string{"prefix": "values (", "suffix": ")", "suffixOverrides": ","},
 			ElementItems: []ElementItem{},
 		}
-		for _, v := range resultMapData.ElementItems {
-			if logic.Enable && v.Propertys["property"] == logic.Property {
-				trimArg.ElementItems = append(trimArg.ElementItems, ElementItem{
-					ElementType: Element_String,
-					DataString:  logic.Undelete_value + ",",
-				})
-				continue
+
+		if collection == "" {
+			for _, v := range resultMapData.ElementItems {
+				if logic.Enable && v.Propertys["property"] == logic.Property {
+					trimArg.ElementItems = append(trimArg.ElementItems, ElementItem{
+						ElementType: Element_String,
+						DataString:  logic.Undelete_value + ",",
+					})
+					continue
+				}
+				if inserts == "*?*" {
+					trimArg.ElementItems = append(trimArg.ElementItems, ElementItem{
+						ElementType: Element_If,
+						Propertys:   map[string]string{"test": it.makeIfNotNull(v.Propertys["property"])},
+						DataString:  "#{" + v.Propertys["property"] + "},",
+					})
+				} else if inserts == "*" {
+					trimArg.ElementItems = append(trimArg.ElementItems, ElementItem{
+						ElementType: Element_String,
+						DataString:  "#{" + v.Propertys["property"] + "},",
+					})
+				}
 			}
-			if inserts == "*?*" {
-				trimArg.ElementItems = append(trimArg.ElementItems, ElementItem{
-					ElementType: Element_If,
-					Propertys:   map[string]string{"test": it.makeIfNotNull(v.Propertys["property"])},
-					DataString:  "#{" + v.Propertys["property"] + "},",
-				})
-			} else if inserts == "*" {
-				trimArg.ElementItems = append(trimArg.ElementItems, ElementItem{
+		} else {
+			trimArg.Propertys["prefix"] = "values "
+			trimArg.Propertys["suffix"] = ""
+			trimArg.Propertys["suffixOverrides"] = ","
+
+			var forEach = ElementItem{
+				ElementType:  Element_Foreach,
+				Propertys:    map[string]string{"open": "", "close": "", "separator": ",", "collection": collection},
+				ElementItems: []ElementItem{},
+			}
+
+			for index, v := range resultMapData.ElementItems {
+				var prefix = ""
+				if index == 0 {
+					prefix = "("
+				}
+				var value = prefix + "#{" + "item." + utils.UpperFieldFirstName(v.Propertys["property"]) + "}"
+				if logic.Enable && v.Propertys["property"] == logic.Property {
+					value = `'` + logic.Undelete_value + "'"
+				}
+				if index+1 == len(resultMapData.ElementItems) {
+					value += ")"
+				} else {
+					value += ","
+				}
+				forEach.ElementItems = append(forEach.ElementItems, ElementItem{
 					ElementType: Element_String,
-					DataString:  "#{" + v.Propertys["property"] + "},",
+					DataString:  value,
 				})
 			}
+			trimArg.ElementItems = append(trimArg.ElementItems, forEach)
 		}
 		mapper.ElementItems = append(mapper.ElementItems, trimArg)
+
 		break
 	case "updateTemplete":
 		mapper.Tag = Element_Update
@@ -241,7 +295,6 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			it.DecodeWheres(wheres, mapper, logic, versionData)
 		}
 		break
-
 	case "deleteTemplete":
 		mapper.Tag = Element_Delete
 

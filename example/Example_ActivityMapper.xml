@@ -22,6 +22,7 @@
     <!--更新模板:默认id="updateTemplete,set自动设置乐观锁版本号-->
     <!--删除模板:默认id="deleteTemplete,where自动设置逻辑删除字段-->
     <insertTemplete tables="biz_activity" />
+    <insertTemplete id="insertTemplete2" tables="biz_activity" />
     <selectTemplete tables="biz_activity" wheres="name?name = #{name}" columns=""/>
     <updateTemplete tables="biz_activity" sets="name?name = #{name}" wheres="name?name = #{name}"/>
     <deleteTemplete tables="biz_activity" wheres="name?name = #{name}"/>
