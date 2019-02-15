@@ -13,12 +13,19 @@ type GoMybatisTempleteDecoder struct {
 }
 
 type LogicDeleteData struct {
+	Column   string
+	Property string
+	LangType string
+
 	Enable         bool
 	Deleted_value  string
 	Undelete_value string
-	Column         string
-	Property       string
-	LangType       string
+}
+
+type VersionData struct {
+	Column   string
+	Property string
+	LangType string
 }
 
 func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]*MapperXml, beanType reflect.Type) error {
@@ -82,7 +89,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 				DataString:  sql.String(),
 			})
 			//TODO decode wheres
-			it.DecodeWheres(wheres, mapper, logic)
+			it.DecodeWheres(wheres, mapper, logic, nil)
 		}
 		break
 
@@ -199,6 +206,8 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 
 		var logic = it.decodeLogicDelete(resultMapData)
 
+		var versionData = it.decodeVersionData(resultMapData)
+
 		var sql bytes.Buffer
 		sql.WriteString("update set ")
 		if columns == "" {
@@ -208,21 +217,17 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			})
 			sql.Reset()
 			for _, v := range resultMapData.ElementItems {
-				var column = v.Propertys["column"]
-				var property = v.Propertys["property"]
-				mapper.ElementItems = append(mapper.ElementItems, ElementItem{
-					ElementType: Element_If,
-					Propertys:   map[string]string{"test": it.makeIfNotNull(property)},
-					DataString:  column + " = #{" + v.Propertys["property"] + "},",
-				})
+				columns += v.Propertys["property"] + "?" + v.Propertys["column"] + ","
 			}
+			columns = strings.Trim(columns, ",")
+			it.DecodeSets(columns, mapper, LogicDeleteData{}, versionData)
 		} else {
 			mapper.ElementItems = append(mapper.ElementItems, ElementItem{
 				ElementType: Element_String,
 				DataString:  sql.String(),
 			})
 			sql.Reset()
-			it.DecodeSets(columns, mapper, LogicDeleteData{})
+			it.DecodeSets(columns, mapper, LogicDeleteData{}, versionData)
 		}
 		sql.WriteString(" from ")
 		sql.WriteString(tables)
@@ -233,7 +238,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 				ElementType: Element_String,
 				DataString:  sql.String(),
 			})
-			it.DecodeWheres(wheres, mapper, logic)
+			it.DecodeWheres(wheres, mapper, logic, versionData)
 		}
 		break
 
@@ -264,7 +269,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 				DataString:  sql.String(),
 			})
 			sql.Reset()
-			it.DecodeSets("", mapper, logic)
+			it.DecodeSets("", mapper, logic, nil)
 
 			sql.WriteString(" from ")
 			sql.WriteString(tables)
@@ -275,7 +280,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 					DataString:  sql.String(),
 				})
 				//TODO decode wheres
-				it.DecodeWheres(wheres, mapper, logic)
+				it.DecodeWheres(wheres, mapper, logic, nil)
 			}
 			break
 		} else {
@@ -290,7 +295,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 					DataString:  sql.String(),
 				})
 				//TODO decode wheres
-				it.DecodeWheres(wheres, mapper, LogicDeleteData{})
+				it.DecodeWheres(wheres, mapper, LogicDeleteData{}, nil)
 			}
 		}
 	}
@@ -299,7 +304,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 }
 
 //解码逗号分隔的where
-func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *MapperXml, logic LogicDeleteData) {
+func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *MapperXml, logic LogicDeleteData, versionData *VersionData) {
 	var wheres = strings.Split(arg, ",")
 	for index, v := range wheres {
 		var expressions = strings.Split(v, "?")
@@ -331,7 +336,7 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *MapperXml, 
 	}
 	if logic.Enable == true {
 		var appendAdd = ""
-		if len(wheres) >= 1 {
+		if len(wheres) >= 1 && arg != "" {
 			appendAdd = " and "
 		}
 		var item = ElementItem{
@@ -340,9 +345,20 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *MapperXml, 
 		}
 		mapper.ElementItems = append(mapper.ElementItems, item)
 	}
+	if versionData != nil {
+		var appendAdd = ""
+		if len(wheres) >= 1 && arg != "" {
+			appendAdd = " and "
+		}
+		var item = ElementItem{
+			ElementType: Element_String,
+			DataString:  appendAdd + versionData.Column + " = #{" + versionData.Property + "}",
+		}
+		mapper.ElementItems = append(mapper.ElementItems, item)
+	}
 }
 
-func (it *GoMybatisTempleteDecoder) DecodeSets(arg string, mapper *MapperXml, logic LogicDeleteData) {
+func (it *GoMybatisTempleteDecoder) DecodeSets(arg string, mapper *MapperXml, logic LogicDeleteData, versionData *VersionData) {
 	var sets = strings.Split(arg, ",")
 	for index, v := range sets {
 		var expressions = strings.Split(v, "?")
@@ -374,12 +390,23 @@ func (it *GoMybatisTempleteDecoder) DecodeSets(arg string, mapper *MapperXml, lo
 	}
 	if logic.Enable == true {
 		var appendAdd = ""
-		if len(sets) >= 1 {
+		if len(sets) >= 1 && arg != "" {
 			appendAdd = ","
 		}
 		var item = ElementItem{
 			ElementType: Element_String,
 			DataString:  appendAdd + logic.Column + " = " + logic.Deleted_value,
+		}
+		mapper.ElementItems = append(mapper.ElementItems, item)
+	}
+	if versionData != nil {
+		var appendAdd = ""
+		if len(sets) >= 1 && arg != "" {
+			appendAdd = ","
+		}
+		var item = ElementItem{
+			ElementType: Element_String,
+			DataString:  appendAdd + versionData.Column + " = #{" + versionData.Property + "+1}",
 		}
 		mapper.ElementItems = append(mapper.ElementItems, item)
 	}
@@ -421,4 +448,25 @@ func (it *GoMybatisTempleteDecoder) decodeLogicDelete(xml *MapperXml) LogicDelet
 		}
 	}
 	return logicData
+}
+
+func (it *GoMybatisTempleteDecoder) decodeVersionData(xml *MapperXml) *VersionData {
+	if xml == nil || len(xml.ElementItems) == 0 {
+		return nil
+	}
+	for _, v := range xml.ElementItems {
+		if v.Propertys["version_enable"] == "true" {
+
+			var versionData = VersionData{}
+			versionData.Column = v.Propertys["column"]
+			versionData.Property = v.Propertys["property"]
+			versionData.LangType = v.Propertys["langType"]
+			//check
+			if !(strings.Contains(versionData.LangType, "int") || strings.Contains(versionData.LangType, "time.Time")) {
+				panic(utils.NewError("GoMybatisTempleteDecoder", `version_enable only support int...,time.Time... number type!`))
+			}
+			return &versionData
+		}
+	}
+	return nil
 }

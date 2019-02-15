@@ -5,7 +5,7 @@
     <!--logic_delete_key 逻辑删除字段-->
     <!--logic_deleted_value 逻辑删除已删除字段-->
     <!--logic_undelete_value 逻辑删除 未删除字段-->
-    <!--version_key 乐观锁版本字段-->
+    <!--version_key 乐观锁版本字段,支持int,int8,int16,int32,int64,time.Time-->
     <resultMap id="BaseResultMap">
         <id column="id" property="id"/>
         <result column="name" property="name" langType="string"/>
@@ -14,15 +14,19 @@
         <result column="remark" property="remark" langType="string"/>
         <result column="version" property="version" langType="int" version_enable="true"/>
         <result column="create_time" property="createTime" langType="time.Time"/>
-        <result column="delete_flag" property="deleteFlag" langType="int" logic_enable="true" logic_undelete="1" logic_deleted="1"/>
+        <result column="delete_flag" property="deleteFlag" langType="int" logic_enable="true" logic_undelete="1" logic_deleted="0"/>
     </resultMap>
-    <!--插入模板:默认id="insertTemplete,test="field != null",自动设置逻辑删除字段" -->
-    <!--查询模板:默认id="selectTemplete-->
-    <!--更新模板:默认id="updateTemplete-->
-    <!--删除模板:默认id="deleteTemplete-->
+    <!--插入模板:默认id="insertTemplete,test="field != null",where自动设置逻辑删除字段" -->
+    <!--查询模板:默认id="selectTemplete,where自动设置逻辑删除字段-->
+    <!--更新模板:默认id="updateTemplete,set自动设置乐观锁版本号-->
+    <!--删除模板:默认id="deleteTemplete,where自动设置逻辑删除字段-->
     <insertTemplete tables="biz_activity" />
     <selectTemplete tables="biz_activity" wheres="name?name = #{name}"/>
-    <updateTemplete tables="biz_activity" sets="name?name = #{name}" wheres="name?name = #{name}"/>
+    <updateTemplete tables="biz_activity"
+                    sets="name?name = #{name}"
+                    wheres="name?name = #{name}"
+    />
+    <!--sets="name?name = #{name}"-->
     <deleteTemplete tables="biz_activity" wheres="name?name = #{name}"/>
 
     <!-- 后台查询产品 -->
