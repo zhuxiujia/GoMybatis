@@ -78,8 +78,8 @@
 
                 version_enable CDATA #IMPLIED
                 logic_enable CDATA #IMPLIED
-                logic_deleted_value CDATA #IMPLIED
-                logic_undelete_value CDATA #IMPLIED
+                logic_deleted CDATA #IMPLIED
+                logic_undelete CDATA #IMPLIED
                 <!--jdbcType CDATA #IMPLIED-->
                 typeHandler CDATA #IMPLIED
                 >

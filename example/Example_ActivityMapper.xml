@@ -14,8 +14,7 @@
         <result column="remark" property="remark" langType="string"/>
         <result column="version" property="version" langType="int" version_enable="true"/>
         <result column="create_time" property="createTime" langType="time.Time"/>
-        <result column="delete_flag" property="deleteFlag" langType="int" logic_enable="true" logic_undelete_value="1"
-                logic_deleted_value="0"/>
+        <result column="delete_flag" property="deleteFlag" langType="int" logic_enable="true" logic_undelete="1" logic_deleted="1"/>
     </resultMap>
     <!--插入模板:默认id="insertTemplete,test="field != null",自动设置逻辑删除字段" -->
     <!--查询模板:默认id="selectTemplete-->

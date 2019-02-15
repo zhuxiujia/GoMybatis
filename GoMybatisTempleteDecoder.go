@@ -402,11 +402,21 @@ func (it *GoMybatisTempleteDecoder) decodeLogicDelete(xml *MapperXml) LogicDelet
 	for _, v := range xml.ElementItems {
 		if v.Propertys["logic_enable"] == "true" {
 			logicData.Enable = true
-			logicData.Deleted_value = v.Propertys["logic_deleted_value"]
-			logicData.Undelete_value = v.Propertys["logic_undelete_value"]
+			logicData.Deleted_value = v.Propertys["logic_deleted"]
+			logicData.Undelete_value = v.Propertys["logic_undelete"]
 			logicData.Column = v.Propertys["column"]
 			logicData.Property = v.Propertys["property"]
 			logicData.LangType = v.Propertys["langType"]
+			//check
+			if logicData.Deleted_value == "" {
+				panic(utils.NewError("GoMybatisTempleteDecoder", `<resultMap> logic_deleted="" can't be empty !`))
+			}
+			if logicData.Undelete_value == "" {
+				panic(utils.NewError("GoMybatisTempleteDecoder", `<resultMap> logic_undelete="" can't be empty !`))
+			}
+			if logicData.Undelete_value == logicData.Deleted_value {
+				panic(utils.NewError("GoMybatisTempleteDecoder", `<resultMap> logic_deleted value can't be logic_undelete value!`))
+			}
 			break
 		}
 	}
