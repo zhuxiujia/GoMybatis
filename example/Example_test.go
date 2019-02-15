@@ -350,9 +350,14 @@ func TestUpdateTemplete(t *testing.T) {
 		return
 	}
 	var activityBean = Activity{
-		Id:   "171",
-		Name: "rs168",
+		Id:      "171",
+		Name:    "rs168",
+		Version: 2,
 	}
+	//自动乐观锁会生成 delete_flag = * 和 set version= * where version = *
+	// update set name = 'rs168',version = 1
+	// from biz_activity
+	// where name = 'rs168' and delete_flag = 1 and version = 0
 	var updateNum, e = exampleActivityMapper.UpdateTemplete(activityBean)
 	fmt.Println("updateNum=", updateNum)
 	if e != nil {
