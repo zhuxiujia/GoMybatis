@@ -25,21 +25,18 @@ func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlA
 	}
 	//replace arg data
 	if strings.Index(data, `#`) != -1 {
-		data, err = replace(`#{`, sqlArgRegex, data, typeConvert, parameters, engine)
+		data, err = replace(`#{`, FindAllExpressConvertString(data), data, typeConvert, parameters, engine)
 	}
 	if strings.Index(data, `$`) != -1 {
-		data, err = replace(`${`, defaultArgRegex, data, nil, parameters, engine)
+		data, err = replace(`${`, FindAllExpressString(data), data, nil, parameters, engine)
 	}
 	return data, err
 }
 
 //执行替换操作
-func replace(startChar string, regex *regexp.Regexp, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine ExpressionEngine) (string, error) {
-	var findStrs = regex.FindAllString(data, -1)
-	var repleaceStr = ""
+func replace(startChar string, findStrs []string, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine ExpressionEngine) (string, error) {
 	for _, findStr := range findStrs {
-		repleaceStr = strings.Replace(findStr, startChar, "", -1)
-		repleaceStr = strings.Replace(repleaceStr, "}", "", -1)
+		var repleaceStr = findStr
 		if strings.Contains(repleaceStr, ",") {
 			repleaceStr = strings.Split(repleaceStr, ",")[0]
 		}
@@ -52,13 +49,37 @@ func replace(startChar string, regex *regexp.Regexp, data string, typeConvert Sq
 			return "", errors.New(engine.Name() + ":" + err.Error())
 		}
 		if typeConvert != nil {
-			repleaceStr = typeConvert.Convert(evalData, reflect.TypeOf(evalData))
+			repleaceStr = typeConvert.Convert(evalData, nil)
 		} else {
 			repleaceStr = fmt.Sprint(evalData)
 		}
-		data = strings.Replace(data, findStr, repleaceStr, -1)
+		data = strings.Replace(data, startChar+findStr+"}", repleaceStr, -1)
 	}
 	arg = nil
 	typeConvert = nil
 	return data, nil
+}
+
+func FindAllExpressConvertString(s string) []string {
+	var finds = []string{}
+	var sps = strings.Split(s, "#{")
+	for _, v := range sps {
+		if strings.Contains(v, "}") {
+			var item = strings.Split(v, "}")[0]
+			finds = append(finds, item)
+		}
+	}
+	return finds
+}
+
+func FindAllExpressString(s string) []string {
+	var finds = []string{}
+	var sps = strings.Split(s, "${")
+	for _, v := range sps {
+		if strings.Contains(v, "}") {
+			var item = strings.Split(v, "}")[0]
+			finds = append(finds, item)
+		}
+	}
+	return finds
 }
