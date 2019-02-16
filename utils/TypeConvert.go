@@ -135,36 +135,96 @@ func caseTypePtr(arg interface{}, types reflect.Type) string {
 	var childType = types.Elem()
 	switch childType.Kind() {
 	case reflect.String:
-		return *arg.(*string)
+		arg := arg.(*string)
+		if arg == nil {
+			return ""
+		}
+		return *arg
 	case reflect.Int:
-		return strconv.FormatInt(int64(*arg.(*int)), 8)
+		arg := arg.(*int)
+		if arg == nil {
+			return ""
+		}
+		return strconv.FormatInt(int64(*arg), 8)
 	case reflect.Int8:
-		return strconv.FormatInt(int64(*arg.(*int8)), 8)
+		arg := arg.(*int8)
+		if arg == nil {
+			return ""
+		}
+		return strconv.FormatInt(int64(*arg), 8)
 	case reflect.Int16:
-		return strconv.FormatInt(int64(*arg.(*int16)), 16)
+		arg := arg.(*int16)
+		if arg == nil {
+			return ""
+		}
+		return strconv.FormatInt(int64(*arg), 16)
 	case reflect.Int32:
-		return strconv.FormatInt(int64(*arg.(*int32)), 32)
+		arg := arg.(*int32)
+		if arg == nil {
+			return ""
+		}
+		return strconv.FormatInt(int64(*arg), 32)
 	case reflect.Int64:
-		return strconv.FormatInt(int64(*arg.(*int64)), 64)
+		arg := arg.(*int64)
+		if arg == nil {
+			return ""
+		}
+		return strconv.FormatInt(int64(*arg), 64)
 	case reflect.Float32:
-		return strconv.FormatFloat(float64(*arg.(*float32)), 'f', -1, 32)
+		arg := arg.(*float32)
+		if arg == nil {
+			return ""
+		}
+		return strconv.FormatFloat(float64(*arg), 'f', -1, 32)
 	case reflect.Float64:
-		return strconv.FormatFloat(float64(*arg.(*float64)), 'f', -1, 64)
+		arg := arg.(*float64)
+		if arg == nil {
+			return ""
+		}
+		return strconv.FormatFloat(float64(*arg), 'f', -1, 64)
 	case reflect.Bool:
-		return strconv.FormatBool(*arg.(*bool))
+		arg := arg.(*bool)
+		if arg == nil {
+			return ""
+		}
+		return strconv.FormatBool(*arg)
 	case reflect.Uint:
-		return strconv.FormatUint(uint64(*arg.(*uint)), 2)
+		arg := arg.(*uint)
+		if arg == nil {
+			return ""
+		}
+		return strconv.FormatUint(uint64(*arg), 2)
 	case reflect.Uint8:
-		return strconv.FormatUint(uint64(*arg.(*uint8)), 8)
+		arg := arg.(*uint8)
+		if arg == nil {
+			return ""
+		}
+		return strconv.FormatUint(uint64(*arg), 8)
 	case reflect.Uint16:
-		return strconv.FormatUint(uint64(*arg.(*uint16)), 16)
+		arg := arg.(*uint16)
+		if arg == nil {
+			return ""
+		}
+		return strconv.FormatUint(uint64(*arg), 16)
 	case reflect.Uint32:
-		return strconv.FormatUint(uint64(*arg.(*uint32)), 32)
+		arg := arg.(*uint32)
+		if arg == nil {
+			return ""
+		}
+		return strconv.FormatUint(uint64(*arg), 32)
 	case reflect.Uint64:
-		return strconv.FormatUint(uint64(*arg.(*uint64)), 64)
+		arg := arg.(*uint64)
+		if arg == nil {
+			return ""
+		}
+		return strconv.FormatUint(uint64(*arg), 64)
 	case reflect.Struct:
 		if types.String() == "*time.Time" {
-			return (*arg.(*time.Time)).Format(`2006-01-02 15:04:05`)
+			arg := arg.(*time.Time)
+			if arg == nil {
+				return ""
+			}
+			return (*arg).Format(`2006-01-02 15:04:05`)
 		} else {
 			return fmt.Sprint(arg)
 		}
