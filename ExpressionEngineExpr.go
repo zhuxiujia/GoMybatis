@@ -6,7 +6,6 @@ import (
 )
 
 type ExpressionEngineExpr struct {
-	mapCache *ExpressionEngineLexerMapCache
 }
 
 //引擎名称
@@ -68,11 +67,3 @@ func (it *ExpressionEngineExpr) split(str string) (stringItems []string) {
 	return newStrings
 }
 
-//Lexer缓存,可不提供。
-func (it *ExpressionEngineExpr) LexerCache() ExpressionEngineLexerCache {
-	if it.mapCache == nil {
-		var cache = ExpressionEngineLexerMapCache{}.New()
-		it.mapCache = &cache
-	}
-	return it.mapCache
-}

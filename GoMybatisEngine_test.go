@@ -17,7 +17,6 @@ func Benchmark_One_Transcation(b *testing.B) {
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
-
 	//开始压力测试
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
@@ -25,6 +24,7 @@ func Benchmark_One_Transcation(b *testing.B) {
 		if err != nil {
 			b.Fatal(err)
 		}
+		//fmt.Println(data)
 	}
 }
 

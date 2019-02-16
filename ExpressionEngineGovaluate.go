@@ -2,6 +2,7 @@ package GoMybatis
 
 import (
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
+	"reflect"
 	"strings"
 )
 
@@ -24,7 +25,18 @@ func (it *ExpressionEngineGovaluate) Lexer(expression string) (interface{}, erro
 //参数：lexerResult=编译结果，arg=参数
 //返回：执行结果，错误
 func (it *ExpressionEngineGovaluate) Eval(compileResult interface{}, arg interface{}, operation int) (interface{}, error) {
-	return compileResult.(*govaluate.EvaluableExpression).Evaluate(arg.(map[string]interface{}))
+	var argMap=arg.(map[string]interface{})
+	for k,v:=range argMap{
+		if v!=nil{
+			var reflectV=reflect.ValueOf(v)
+			if reflectV.IsValid()==false || reflectV.IsNil(){
+				argMap[k]=nil
+			}
+		}
+	}
+	argMap["nil"]=nil
+	argMap["null"]=nil
+	return compileResult.(*govaluate.EvaluableExpression).Evaluate(argMap)
 }
 
 //替换表达式中的值 and,or,参数 替换为实际值

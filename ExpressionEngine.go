@@ -14,7 +14,4 @@ type ExpressionEngine interface {
 	//参数：lexerResult=编译结果，arg=参数
 	//返回：执行结果，错误
 	Eval(lexerResult interface{}, arg interface{}, operation int) (interface{}, error)
-
-	//取Lexer缓存,可不提供。需要提供单例
-	LexerCache() ExpressionEngineLexerCache
 }

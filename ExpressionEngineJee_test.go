@@ -86,19 +86,16 @@ func BenchmarkExpressionEngineJee_Eval(b *testing.B) {
 	var engine = ExpressionEngineJee{}
 	var evaluateParameters = make(map[string]interface{})
 	evaluateParameters["activity"] = &activity
+	var lexer, error = engine.Lexer("activity.DeleteFlag == 1 and activity.DeleteFlag != 0 ")
+	if error != nil {
+		b.Fatal(error)
+	}
 	//start
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		var lexer, error = engine.Lexer("activity.DeleteFlag == 1 and activity.DeleteFlag != 0 ")
+		_, error := engine.Eval(lexer, evaluateParameters, JeeOperation_Marshal_Map)
 		if error != nil {
 			b.Fatal(error)
-		}
-		result, error := engine.Eval(lexer, evaluateParameters, JeeOperation_Marshal_Map)
-		if error != nil {
-			b.Fatal(error)
-		}
-		if result == nil {
-			b.Fatal("eval fail")
 		}
 	}
 }

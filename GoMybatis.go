@@ -114,9 +114,9 @@ func beanCheck(value reflect.Value, builder SqlBuilder) {
 		var customLen = 0
 		for argIndex := 0; argIndex < fieldItem.Type.NumIn(); argIndex++ {
 			var inType = fieldItem.Type.In(argIndex)
-			if builder.ExpressionEngineProxy().Name() == "ExpressionEngineGovaluate" && inType.Kind() == reflect.Ptr && inType.String() != GoMybatis_Session_Ptr {
-				panic(`[GoMybats] ` + fieldItem.Name + `() arg = ` + inType.String() + ` can not be a ptr ! must delete '*'!`)
-			}
+			//if builder.ExpressionEngineProxy().Name() == "ExpressionEngineGovaluate" && inType.Kind() == reflect.Ptr && inType.String() != GoMybatis_Session_Ptr {
+			//	panic(`[GoMybats] ` + fieldItem.Name + `() arg = ` + inType.String() + ` can not be a ptr ! must delete '*'!`)
+			//}
 			if isCustomStruct(inType) {
 				customLen++
 			}

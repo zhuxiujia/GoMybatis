@@ -3,8 +3,9 @@ package GoMybatis
 import "github.com/zhuxiujia/GoMybatis/utils"
 
 type ExpressionEngineProxy struct {
-	expressionEngine ExpressionEngine
-	lexerCacheable   bool //是否使用lexer缓存,默认false
+	expressionEngineLexerCache ExpressionEngineLexerCache //lexer缓存接口，默认使用ExpressionEngineLexerMapCache
+	expressionEngine           ExpressionEngine
+	lexerCacheable             bool //是否使用lexer缓存,默认false
 }
 
 //engine ：表达式引擎,useLexerCache：是否缓存Lexer表达式编译结果
@@ -30,9 +31,9 @@ func (it *ExpressionEngineProxy) Lexer(expression string) (interface{}, error) {
 	if it.expressionEngine == nil {
 		return nil, utils.NewError("ExpressionEngineProxy", "ExpressionEngineProxy not init for ExpressionEngineProxy{}.New(...)")
 	}
-	if it.expressionEngine.LexerCache() != nil && it.lexerCacheable {
+	if it.LexerCache() != nil && it.lexerCacheable {
 		//如果 提供缓存，则使用缓存
-		cacheResult, cacheErr := it.expressionEngine.LexerCache().Get(expression)
+		cacheResult, cacheErr := it.LexerCache().Get(expression)
 		if cacheErr != nil {
 			return nil, cacheErr
 		}
@@ -41,9 +42,9 @@ func (it *ExpressionEngineProxy) Lexer(expression string) (interface{}, error) {
 		}
 	}
 	var result, err = it.expressionEngine.Lexer(expression)
-	if it.expressionEngine.LexerCache() != nil && it.lexerCacheable {
+	if it.LexerCache() != nil && it.lexerCacheable {
 		//如果 提供缓存，则使用缓存
-		it.expressionEngine.LexerCache().Set(expression, result)
+		it.LexerCache().Set(expression, result)
 	}
 	return result, err
 }
@@ -59,10 +60,15 @@ func (it *ExpressionEngineProxy) Eval(lexerResult interface{}, arg interface{}, 
 }
 
 func (it *ExpressionEngineProxy) LexerCache() ExpressionEngineLexerCache {
-	if it.expressionEngine == nil {
-		return nil
+	if it.expressionEngineLexerCache == nil {
+		var cache = ExpressionEngineLexerMapCache{}.New()
+		it.expressionEngineLexerCache = &cache
 	}
-	return it.expressionEngine.LexerCache()
+	return it.expressionEngineLexerCache
+}
+
+func (it *ExpressionEngineProxy) SetLexerCache(cache ExpressionEngineLexerCache) {
+	it.expressionEngineLexerCache = cache
 }
 
 func (it *ExpressionEngineProxy) SetUseLexerCache(isUseCache bool) error {

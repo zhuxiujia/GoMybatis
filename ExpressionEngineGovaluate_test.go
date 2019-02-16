@@ -63,20 +63,16 @@ func BenchmarkExpress(b *testing.B) {
 	var evaluateParameters = make(map[string]interface{})
 
 	evaluateParameters["activity"] = &activity
-
+	var expression = "activity.DeleteFlag == 1 and activity.DeleteFlag != 0 "
+	evalExpression, err := engine.Lexer(expression)
+	if err != nil {
+		b.Fatal(err)
+	}
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		var expression = "activity.DeleteFlag == 1 and activity.DeleteFlag != 0 "
-		evalExpression, err := engine.Lexer(expression)
+		_, err := engine.Eval(evalExpression, evaluateParameters, 0)
 		if err != nil {
 			b.Fatal(err)
-		}
-		result, err := engine.Eval(evalExpression, evaluateParameters, 0)
-		if err != nil {
-			b.Fatal(err)
-		}
-		if result.(bool) {
-
 		}
 	}
 }
@@ -108,4 +104,27 @@ func TestTpsExpressionEngineGovaluate(t *testing.T) {
 
 		}
 	}
+}
+
+
+func TestExpress_nil(t *testing.T) {
+	var engine = ExpressionEngineGovaluate{}
+	var evaluateParameters = make(map[string]interface{})
+
+	var namePtr *string
+
+	evaluateParameters["name"] = namePtr
+
+
+
+	var expression = "name != nil"
+	evalExpression, err := engine.Lexer(expression)
+	if err != nil {
+		t.Fatal(err)
+	}
+	result, err := engine.Eval(evalExpression, evaluateParameters, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(result)
 }
