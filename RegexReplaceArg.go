@@ -37,9 +37,6 @@ func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlA
 func replace(startChar string, findStrs []string, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine ExpressionEngine) (string, error) {
 	for _, findStr := range findStrs {
 		var repleaceStr = findStr
-		if strings.Contains(repleaceStr, ",") {
-			repleaceStr = strings.Split(repleaceStr, ",")[0]
-		}
 		lexer, err := engine.Lexer(repleaceStr)
 		if err != nil {
 			return "", errors.New(engine.Name() + ":" + err.Error())
@@ -66,6 +63,9 @@ func FindAllExpressConvertString(s string) []string {
 	for _, v := range sps {
 		if strings.Contains(v, "}") {
 			var item = strings.Split(v, "}")[0]
+			if strings.Contains(item, ",") {
+				item = strings.Split(item, ",")[0]
+			}
 			finds = append(finds, item)
 		}
 	}
@@ -78,6 +78,9 @@ func FindAllExpressString(s string) []string {
 	for _, v := range sps {
 		if strings.Contains(v, "}") {
 			var item = strings.Split(v, "}")[0]
+			if strings.Contains(item, ",") {
+				item = strings.Split(item, ",")[0]
+			}
 			finds = append(finds, item)
 		}
 	}
