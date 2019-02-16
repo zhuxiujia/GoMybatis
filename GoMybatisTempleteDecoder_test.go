@@ -67,7 +67,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	engine.SetLogEnable(true)
+	engine.SetLogEnable(false)
 	engine.WriteMapperPtr(&exampleActivityMapper, bytes)
 }
 

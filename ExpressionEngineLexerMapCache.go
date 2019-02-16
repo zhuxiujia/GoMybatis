@@ -33,3 +33,6 @@ func (it *ExpressionEngineLexerMapCache) Get(expression string) (interface{}, er
 	result = it.mapCache[expression]
 	return result, nil
 }
+func (it *ExpressionEngineLexerMapCache) Name() string  {
+	return "ExpressionEngineLexerMapCache"
+}

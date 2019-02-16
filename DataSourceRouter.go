@@ -10,4 +10,6 @@ type DataSourceRouter interface {
 	Router(mapperName string) (Session, error)
 	//设置sql.DB，该方法会被GoMybatis框架内调用
 	SetDB(url string, db *sql.DB)
+
+	Name() string
 }

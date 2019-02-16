@@ -112,8 +112,6 @@ func Test_Transcation(t *testing.T) {
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
-
-	//开始TPS测试
 	var results, err = exampleActivityMapperImpl.SelectByCondition(&session, nil, nil,nil,nil,nil)
 	if err != nil {
 		t.Fatal(err)

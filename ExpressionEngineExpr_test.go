@@ -72,6 +72,61 @@ func TestExpressionEngineExpr_Nil_Null(t *testing.T) {
 	fmt.Println(result)
 }
 
+func BenchmarkExpressionEngineExprNil_Null(b *testing.B) {
+	b.StopTimer()
+	var engine = ExpressionEngineExpr{}
+	var evaluateParameters = make(map[string]interface{})
+	//var p=1
+	evaluateParameters["startTime"] = nil
+	var nmap = makeArgInterfaceMap(evaluateParameters)
+	evalExpression, err := engine.Lexer("startTime == nil")
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.StartTimer()
+	for i:=0;i<b.N ;i++  {
+		_, err := engine.Eval(evalExpression, nmap, 0)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+func BenchmarkExpressionEngineExprNilTakeValue(b *testing.B) {
+	b.StopTimer()
+	var engine = ExpressionEngineExpr{}
+	var evaluateParameters = make(map[string]interface{})
+	var startTime * string
+	var startTimeV * string
+
+	var s="12345"
+	startTimeV=&s
+	evaluateParameters["startTime"] = startTime
+	evaluateParameters["startTimeValue"] = startTimeV
+	var nmap = makeArgInterfaceMap(evaluateParameters)
+	evalExpression, err := engine.Lexer("startTime == nil")
+	if err != nil {
+		b.Fatal(err)
+	}
+	takeValueExpression, err := engine.Lexer("startTimeValue")
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.StartTimer()
+	for i:=0;i<b.N ;i++  {
+		for k:=0;k<8;k++{
+			_, err := engine.Eval(evalExpression, nmap, 0)
+			if err != nil {
+				b.Fatal(err)
+			}
+			_, err=engine.Eval(takeValueExpression,nmap,0)
+			if err != nil {
+				b.Fatal(err)
+			}
+		}
+	}
+}
+
 func makeArgInterfaceMap(args map[string]interface{}) map[string]interface{} {
 	var m = make(map[string]interface{})
 	if args != nil {

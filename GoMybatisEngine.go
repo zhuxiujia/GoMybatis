@@ -29,6 +29,37 @@ func (it GoMybatisEngine) New() GoMybatisEngine {
 	it.dbMap = make(map[string]*sql.DB)
 	it.logEnable = true
 	it.isInit = true
+
+	if it.dataSourceRouter == nil {
+		var newRouter = GoMybatisDataSourceRouter{}.New(nil)
+		it.SetDataSourceRouter(&newRouter)
+	}
+
+	if it.logEnable == true && it.log == nil {
+		it.log = &LogStandard{}
+	}
+	if it.sqlArgTypeConvert == nil {
+		it.sqlArgTypeConvert = GoMybatisSqlArgTypeConvert{}
+	}
+	if it.expressionEngine == nil {
+		it.expressionEngine = &ExpressionEngineExpr{}
+	}
+	if it.sqlResultDecoder == nil {
+		it.sqlResultDecoder = GoMybatisSqlResultDecoder{}
+	}
+	if it.templeteDecoder == nil {
+		it.SetTempleteDecoder(&GoMybatisTempleteDecoder{})
+	}
+
+	if it.sqlBuilder == nil {
+		var expressionEngineProxy = ExpressionEngineProxy{}.New(it.ExpressionEngine(), true)
+		it.sqlBuilder = GoMybatisSqlBuilder{}.New(it.SqlArgTypeConvert(), expressionEngineProxy, it.Log(), it.LogEnable())
+	}
+
+	if it.sessionFactory == nil {
+		var factory = SessionFactory{}.New(&it)
+		it.sessionFactory = &factory
+	}
 	return it
 }
 
@@ -49,10 +80,6 @@ func (it *GoMybatisEngine) Name() string {
 
 func (it *GoMybatisEngine) DataSourceRouter() DataSourceRouter {
 	it.initCheck()
-	if it.dataSourceRouter == nil {
-		var newRouter = GoMybatisDataSourceRouter{}.New(nil)
-		it.SetDataSourceRouter(&newRouter)
-	}
 	return it.dataSourceRouter
 }
 func (it *GoMybatisEngine) SetDataSourceRouter(router DataSourceRouter) {
@@ -89,9 +116,6 @@ func (it *GoMybatisEngine) SetLogEnable(enable bool) {
 //获取日志实现类
 func (it *GoMybatisEngine) Log() Log {
 	it.initCheck()
-	if it.logEnable == true && it.log == nil {
-		it.log = &LogStandard{}
-	}
 	return it.log
 }
 
@@ -104,10 +128,6 @@ func (it *GoMybatisEngine) SetLog(log Log) {
 //session工厂
 func (it *GoMybatisEngine) SessionFactory() *SessionFactory {
 	it.initCheck()
-	if it.sessionFactory == nil {
-		var factory = SessionFactory{}.New(it)
-		it.sessionFactory = &factory
-	}
 	return it.sessionFactory
 }
 
@@ -120,9 +140,6 @@ func (it *GoMybatisEngine) SetSessionFactory(factory *SessionFactory) {
 //sql类型转换器
 func (it *GoMybatisEngine) SqlArgTypeConvert() SqlArgTypeConvert {
 	it.initCheck()
-	if it.sqlArgTypeConvert == nil {
-		it.sqlArgTypeConvert = GoMybatisSqlArgTypeConvert{}
-	}
 	return it.sqlArgTypeConvert
 }
 
@@ -135,9 +152,6 @@ func (it *GoMybatisEngine) SetSqlArgTypeConvert(convert SqlArgTypeConvert) {
 //表达式执行引擎
 func (it *GoMybatisEngine) ExpressionEngine() ExpressionEngine {
 	it.initCheck()
-	if it.expressionEngine == nil {
-		it.expressionEngine = &ExpressionEngineExpr{}
-	}
 	return it.expressionEngine
 }
 
@@ -150,10 +164,6 @@ func (it *GoMybatisEngine) SetExpressionEngine(engine ExpressionEngine) {
 //sql构建器
 func (it *GoMybatisEngine) SqlBuilder() SqlBuilder {
 	it.initCheck()
-	if it.sqlBuilder == nil {
-		var expressionEngineProxy = ExpressionEngineProxy{}.New(it.ExpressionEngine(), true)
-		it.sqlBuilder = GoMybatisSqlBuilder{}.New(it.SqlArgTypeConvert(), expressionEngineProxy, it.Log(), it.LogEnable())
-	}
 	return it.sqlBuilder
 }
 
@@ -166,9 +176,6 @@ func (it *GoMybatisEngine) SetSqlBuilder(builder SqlBuilder) {
 //sql查询结果解析器
 func (it *GoMybatisEngine) SqlResultDecoder() SqlResultDecoder {
 	it.initCheck()
-	if it.sqlResultDecoder == nil {
-		it.sqlResultDecoder = GoMybatisSqlResultDecoder{}
-	}
 	return it.sqlResultDecoder
 }
 
@@ -192,9 +199,6 @@ func (it *GoMybatisEngine) Open(driverName, dataSourceName string) error {
 
 //模板解析器
 func (it *GoMybatisEngine) TempleteDecoder() TempleteDecoder {
-	if it.templeteDecoder == nil {
-		it.SetTempleteDecoder(&GoMybatisTempleteDecoder{})
-	}
 	return it.templeteDecoder
 }
 

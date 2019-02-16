@@ -4,4 +4,5 @@ package GoMybatis
 type ExpressionEngineLexerCache interface {
 	Set(expression string, lexer interface{}) error
 	Get(expression string) (interface{}, error)
+	Name() string
 }

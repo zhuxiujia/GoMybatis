@@ -53,3 +53,7 @@ func (it *GoMybatisDataSourceRouter) Router(mapperName string) (Session, error) 
 	})
 	return session, nil
 }
+
+func (it *GoMybatisDataSourceRouter) Name() string  {
+	return "GoMybatisDataSourceRouter"
+}

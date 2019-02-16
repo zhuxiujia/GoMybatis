@@ -1,6 +1,8 @@
 package GoMybatis
 
-import "github.com/zhuxiujia/GoMybatis/utils"
+import (
+	"github.com/zhuxiujia/GoMybatis/utils"
+)
 
 type ExpressionEngineProxy struct {
 	expressionEngineLexerCache ExpressionEngineLexerCache //lexer缓存接口，默认使用ExpressionEngineLexerMapCache
@@ -10,10 +12,15 @@ type ExpressionEngineProxy struct {
 
 //engine ：表达式引擎,useLexerCache：是否缓存Lexer表达式编译结果
 func (ExpressionEngineProxy) New(engine ExpressionEngine, useLexerCache bool) ExpressionEngineProxy {
-	return ExpressionEngineProxy{
+	var it = ExpressionEngineProxy{
 		expressionEngine: engine,
 		lexerCacheable:   useLexerCache,
 	}
+	if it.expressionEngineLexerCache == nil {
+		var cache = ExpressionEngineLexerMapCache{}.New()
+		it.SetLexerCache(&cache)
+	}
+	return it
 }
 
 //引擎名称
@@ -31,7 +38,11 @@ func (it *ExpressionEngineProxy) Lexer(expression string) (interface{}, error) {
 	if it.expressionEngine == nil {
 		return nil, utils.NewError("ExpressionEngineProxy", "ExpressionEngineProxy not init for ExpressionEngineProxy{}.New(...)")
 	}
-	if it.LexerCache() != nil && it.lexerCacheable {
+
+	if it.lexerCacheable {
+		if it.LexerCache() == nil {
+			panic(utils.NewError("ExpressionEngineProxy", "lexerCacheable =true! lexerCache can not be nil! you must set the cache!"))
+		}
 		//如果 提供缓存，则使用缓存
 		cacheResult, cacheErr := it.LexerCache().Get(expression)
 		if cacheErr != nil {
@@ -42,7 +53,7 @@ func (it *ExpressionEngineProxy) Lexer(expression string) (interface{}, error) {
 		}
 	}
 	var result, err = it.expressionEngine.Lexer(expression)
-	if it.LexerCache() != nil && it.lexerCacheable {
+	if it.lexerCacheable && err == nil {
 		//如果 提供缓存，则使用缓存
 		it.LexerCache().Set(expression, result)
 	}
@@ -60,10 +71,6 @@ func (it *ExpressionEngineProxy) Eval(lexerResult interface{}, arg interface{}, 
 }
 
 func (it *ExpressionEngineProxy) LexerCache() ExpressionEngineLexerCache {
-	if it.expressionEngineLexerCache == nil {
-		var cache = ExpressionEngineLexerMapCache{}.New()
-		it.expressionEngineLexerCache = &cache
-	}
 	return it.expressionEngineLexerCache
 }
 
