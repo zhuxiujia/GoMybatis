@@ -37,13 +37,24 @@ func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlA
 func replace(startChar string, findStrs []string, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine ExpressionEngine) (string, error) {
 	for _, findStr := range findStrs {
 		var repleaceStr = findStr
-		lexer, err := engine.Lexer(repleaceStr)
-		if err != nil {
-			return "", errors.New(engine.Name() + ":" + err.Error())
+		if strings.Contains(repleaceStr, ",") {
+			repleaceStr = strings.Split(repleaceStr, ",")[0]
 		}
-		evalData, err := engine.Eval(lexer, arg, 0)
-		if err != nil {
-			return "", errors.New(engine.Name() + ":" + err.Error())
+		var evalData interface{}
+		//find param arg
+		var argValue = arg[findStr]
+		if argValue != nil {
+			evalData = argValue
+		} else {
+			//exec lexer
+			lexer, err := engine.Lexer(repleaceStr)
+			if err != nil {
+				return "", errors.New(engine.Name() + ":" + err.Error())
+			}
+			evalData, err = engine.Eval(lexer, arg, 0)
+			if err != nil {
+				return "", errors.New(engine.Name() + ":" + err.Error())
+			}
 		}
 		if typeConvert != nil {
 			repleaceStr = typeConvert.Convert(evalData, nil)
@@ -63,9 +74,6 @@ func FindAllExpressConvertString(s string) []string {
 	for _, v := range sps {
 		if strings.Contains(v, "}") {
 			var item = strings.Split(v, "}")[0]
-			if strings.Contains(item, ",") {
-				item = strings.Split(item, ",")[0]
-			}
 			finds = append(finds, item)
 		}
 	}
@@ -78,9 +86,6 @@ func FindAllExpressString(s string) []string {
 	for _, v := range sps {
 		if strings.Contains(v, "}") {
 			var item = strings.Split(v, "}")[0]
-			if strings.Contains(item, ",") {
-				item = strings.Split(item, ",")[0]
-			}
 			finds = append(finds, item)
 		}
 	}
