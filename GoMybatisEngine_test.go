@@ -17,11 +17,10 @@ func Benchmark_One_Transcation(b *testing.B) {
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
-	var name="ss"
 	//开始压力测试
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		var _, err = exampleActivityMapperImpl.SelectByCondition(&session, &name, nil,nil,nil,nil)
+		var _, err = exampleActivityMapperImpl.SelectByCondition(&session, nil, nil,nil,nil,nil)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -66,12 +65,14 @@ func Test_One_Transcation_TPS(t *testing.T) {
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
-
+	var name="dsa"
+	var times=time.Now()
+	var page=1
 	//开始TPS测试
 	var total = 10000
 	defer utils.CountMethodTps(float64(total), time.Now(), "Test_One_Transcation_TPS")
 	for i := 0; i < total; i++ {
-		var _, err = exampleActivityMapperImpl.SelectByCondition(&session, nil, nil,nil,nil,nil)
+		var _, err = exampleActivityMapperImpl.SelectByCondition(&session,  &name, &times, &times,&page,&page)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -86,6 +87,10 @@ func Test_One_Transcation_multiple_coroutine_TPS(t *testing.T) {
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
 
+	var name="dsa"
+	var times=time.Now()
+	var page=1
+
 	////开始TPS测试
 	var total = 100000   //总数
 	var goruntine = 1000 //并发数
@@ -98,7 +103,7 @@ func Test_One_Transcation_multiple_coroutine_TPS(t *testing.T) {
 		go func() {
 			var itemCount = total / goruntine
 			for f := 0; f < itemCount; f++ {
-				exampleActivityMapperImpl.SelectByCondition(&session, nil, nil,nil,nil,nil)
+				exampleActivityMapperImpl.SelectByCondition(&session, &name, &times, &times,&page,&page)
 			}
 			waitGroup.Done()
 		}()
@@ -192,7 +197,7 @@ func InitMapperByLocalSession() ExampleActivityMapperImpl {
     <select id="selectByCondition" resultMap="BaseResultMap">
         select * from biz_activity where delete_flag=1
         <if test="name != nil">
-            and name like #{'%' + name + '%'}
+            and name like #{name}
         </if>
         <if test="startTime != nil">
             and create_time >= #{startTime}
