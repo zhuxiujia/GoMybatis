@@ -69,7 +69,7 @@ func replace(startChar string, findStrs []string, data string, typeConvert SqlAr
 
 
 func FindAllExpressConvertString(s string) []string {
-	var finds = []string{}
+	var finds []string
 	var sps = strings.Split(s, "#{")
 	for _, v := range sps {
 		var lastIndex = strings.LastIndex(v, "}")
@@ -82,7 +82,7 @@ func FindAllExpressConvertString(s string) []string {
 }
 
 func FindAllExpressString(s string) []string {
-	var finds = []string{}
+	var finds []string
 	var sps = strings.Split(s, "${")
 	for _, v := range sps {
 		var lastIndex = strings.LastIndex(v, "}")
