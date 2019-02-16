@@ -15,10 +15,10 @@ type GoMybatisSqlBuilder struct {
 	enableLog             bool
 }
 
-func (it GoMybatisSqlBuilder) ExpressionEngineProxy() ExpressionEngineProxy {
+func (it *GoMybatisSqlBuilder) ExpressionEngineProxy() ExpressionEngineProxy {
 	return it.expressionEngineProxy
 }
-func (it GoMybatisSqlBuilder) SqlArgTypeConvert() SqlArgTypeConvert {
+func (it *GoMybatisSqlBuilder) SqlArgTypeConvert() SqlArgTypeConvert {
 	return it.sqlArgTypeConvert
 }
 
@@ -36,7 +36,7 @@ func (it GoMybatisSqlBuilder) New(SqlArgTypeConvert SqlArgTypeConvert, expressio
 	return it
 }
 
-func (it GoMybatisSqlBuilder) BuildSql(paramMap map[string]interface{}, mapperXml *MapperXml) (string, error) {
+func (it *GoMybatisSqlBuilder) BuildSql(paramMap map[string]interface{}, mapperXml *MapperXml) (string, error) {
 	var sql bytes.Buffer
 	err := it.createFromElement(mapperXml.ElementItems, &sql, paramMap)
 	if err != nil {
@@ -49,6 +49,13 @@ func (it GoMybatisSqlBuilder) BuildSql(paramMap map[string]interface{}, mapperXm
 		it.logSystem.SendLog("[GoMybatis] [", string(now), "] Preparing sql ==> ", sqlStr)
 	}
 	return sqlStr, nil
+}
+
+func (it *GoMybatisSqlBuilder) SetEnableLog(enable bool) {
+	it.enableLog = enable
+}
+func (it *GoMybatisSqlBuilder) EnableLog() bool {
+	return it.enableLog
 }
 
 func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *bytes.Buffer, sqlArgMap map[string]interface{}) error {
@@ -356,6 +363,6 @@ func (it *GoMybatisSqlBuilder) elementTrim(loopChildItem *bool, items []ElementI
 	return nil
 }
 
-func (it GoMybatisSqlBuilder) LogSystem() *LogSystem {
+func (it *GoMybatisSqlBuilder) LogSystem() *LogSystem {
 	return it.logSystem
 }

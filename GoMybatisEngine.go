@@ -53,7 +53,8 @@ func (it GoMybatisEngine) New() GoMybatisEngine {
 
 	if it.sqlBuilder == nil {
 		var expressionEngineProxy = ExpressionEngineProxy{}.New(it.ExpressionEngine(), true)
-		it.sqlBuilder = GoMybatisSqlBuilder{}.New(it.SqlArgTypeConvert(), expressionEngineProxy, it.Log(), it.LogEnable())
+		var builder = GoMybatisSqlBuilder{}.New(it.SqlArgTypeConvert(), expressionEngineProxy, it.Log(), it.LogEnable())
+		it.sqlBuilder = &builder
 	}
 
 	if it.sessionFactory == nil {
@@ -111,6 +112,7 @@ func (it *GoMybatisEngine) LogEnable() bool {
 func (it *GoMybatisEngine) SetLogEnable(enable bool) {
 	it.initCheck()
 	it.logEnable = enable
+	it.sqlBuilder.SetEnableLog(enable)
 }
 
 //获取日志实现类

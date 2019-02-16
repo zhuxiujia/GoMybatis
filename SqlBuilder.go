@@ -6,4 +6,6 @@ type SqlBuilder interface {
 	ExpressionEngineProxy() ExpressionEngineProxy
 	SqlArgTypeConvert() SqlArgTypeConvert
 	LogSystem() *LogSystem
+	SetEnableLog(enable bool)
+	EnableLog() bool
 }

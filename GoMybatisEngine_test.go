@@ -17,10 +17,11 @@ func Benchmark_One_Transcation(b *testing.B) {
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
+	var name="ss"
 	//开始压力测试
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		var _, err = exampleActivityMapperImpl.SelectByCondition(&session, nil, nil,nil,nil,nil)
+		var _, err = exampleActivityMapperImpl.SelectByCondition(&session, &name, nil,nil,nil,nil)
 		if err != nil {
 			b.Fatal(err)
 		}
