@@ -60,3 +60,27 @@ func BenchmarkExpressionEngineProxy_Eval(b *testing.B) {
 		}
 	}
 }
+
+
+func BenchmarkExpressionEngineProxy_Eval_each(b *testing.B) {
+	b.StopTimer()
+	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineGovaluate{}, true)
+	var evaluateParameters = make(map[string]interface{})
+	var name = "dsafas"
+	evaluateParameters["activity"] = &name
+
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		for run:=0;run<8;run++{
+			var expression = "activity"
+			evalExpression, err := engine.Lexer(expression)
+			if err != nil {
+				b.Fatal(err)
+			}
+			_, err = engine.Eval(evalExpression, evaluateParameters, 0)
+			if err != nil {
+				b.Fatal(err)
+			}
+		}
+	}
+}
