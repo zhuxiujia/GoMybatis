@@ -23,7 +23,6 @@ func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlA
 		var str = typeConvert.Convert(defaultValue, reflect.TypeOf(defaultValue))
 		data = sqlArgRegex.ReplaceAllString(data, str)
 	}
-	//replace arg data
 	if strings.Index(data, `#`) != -1 {
 		data, err = replace(`#{`, FindAllExpressConvertString(data), data, typeConvert, parameters, engine)
 	}
@@ -68,7 +67,7 @@ func replace(startChar string, findStrs []string, data string, typeConvert SqlAr
 	return data, nil
 }
 
-func FindAllExpressConvertString(s string) []string {
+func FindAllExpressConvertString2(s string) []string {
 	var finds = []string{}
 	var sps = strings.Split(s, "#{")
 	for _, v := range sps {
@@ -80,13 +79,30 @@ func FindAllExpressConvertString(s string) []string {
 	return finds
 }
 
+func FindAllExpressConvertString(s string) []string {
+	var finds = []string{}
+	var sps = strings.Split(s, "#{")
+	for _, v := range sps {
+		var lastIndex = strings.LastIndex(v, "}")
+		if lastIndex != -1 {
+			var bytes = []byte(v)
+			bytes = bytes[0:lastIndex]
+			v = string(bytes)
+			finds = append(finds, v)
+		}
+	}
+	return finds
+}
+
 func FindAllExpressString(s string) []string {
 	var finds = []string{}
 	var sps = strings.Split(s, "${")
 	for _, v := range sps {
-		if strings.Contains(v, "}") {
-			var item = strings.Split(v, "}")[0]
-			finds = append(finds, item)
+		if strings.LastIndex(v, "}") != -1 {
+			var bytes = []byte(v)
+			bytes = bytes[0 : len(v)-1]
+			v = string(bytes)
+			finds = append(finds, v)
 		}
 	}
 	return finds
