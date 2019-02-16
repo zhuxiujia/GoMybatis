@@ -29,7 +29,7 @@ func (it *ExpressionEngineGovaluate) Eval(compileResult interface{}, arg interfa
 	for k,v:=range argMap{
 		if v!=nil{
 			var reflectV=reflect.ValueOf(v)
-			if reflectV.IsValid()==false || reflectV.IsNil(){
+			if reflectV.IsValid()==false || (reflectV.Kind()==reflect.Ptr && reflectV.IsNil()){
 				argMap[k]=nil
 			}
 		}
