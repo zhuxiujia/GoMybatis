@@ -25,6 +25,11 @@ type IntNode struct {
 	value int
 }
 
+//值节点
+type BoolNode struct {
+	value bool
+}
+
 //空节点
 type NilNode struct {
 }
