@@ -21,6 +21,10 @@
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-表达式和xml面向对象设计</a>假如foo.Bar 这个属性是指针,那么在xml中调用 foo.Bar 则会取实际值,完全避免使用&和*符号指针操作<br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-支持动态多数据源</a>可以使用路由engine.SetDataSourceRouter自定义多数据源规则<br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-模板标签</a>高开发效率的模板，一行代码实现增删改查，逻辑删除，乐观锁版本号<br>
+<a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-乐观锁</a>`updateTemplete`支持通过修改版本号实现的乐观锁<br>
+<a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-逻辑删除</a>`insertTemplete``updateTemplete``deleteTemplete``selectTemplete`均支持逻辑删除<br>
+
+
 #### 异步消息队列日志系统
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/log_system.png)
 #### 通过远程代替微服务成员 处理事务支持  处于 单数据库(Mysql,postgresql)-分布式数据库（TiDB,cockroachdb...）过渡期间的微服务
