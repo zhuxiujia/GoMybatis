@@ -26,6 +26,18 @@ const (
 	MoreEqual Operator = ">="
 )
 
+//乘除优先于加减 计算优于比较,
+var priorityArray = []Operator{Ride, Divide, Add, Reduce, And, Or, Equal, UnEqual, Less, LessEqual, More, MoreEqual}
+
+//操作符优先级
+var priorityMap = map[Operator]int{}
+
+func init() {
+	for k, v := range priorityArray {
+		priorityMap[v] = k
+	}
+}
+
 //节点类型
 type NodeType = int
 
@@ -103,6 +115,7 @@ func Parser(express string) []Node {
 }
 
 func ParserOperators(express string) []Operator {
+	express = strings.Replace(express, "nil", " nil ", -1)
 	express = strings.Replace(express, Equal, " "+Equal+" ", -1)
 	express = strings.Replace(express, Reduce, " "+Reduce+" ", -1)
 	express = strings.Replace(express, Ride, " "+Ride+" ", -1)
@@ -115,6 +128,7 @@ func ParserOperators(express string) []Operator {
 	express = strings.Replace(express, LessEqual, " "+LessEqual+" ", -1)
 	express = strings.Replace(express, More, " "+More+" ", -1)
 	express = strings.Replace(express, MoreEqual, " "+MoreEqual+" ", -1)
+
 	var newResult []string
 	var results = strings.Split(express, " ")
 	for _, v := range results {
@@ -131,7 +145,7 @@ func isOperatorsAction(arg string) bool {
 		arg == Reduce ||
 		arg == Ride ||
 		arg == Divide ||
-	//比较操作符
+		//比较操作符
 		arg == And ||
 		arg == Or ||
 		arg == Equal ||
