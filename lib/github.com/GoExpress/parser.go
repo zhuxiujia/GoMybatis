@@ -41,10 +41,10 @@ func init() {
 	}
 }
 
-func Parser(express string) (node, error) {
+func Parser(express string) (Node, error) {
 	var opts = ParserOperators(express)
 
-	var nodes []node
+	var nodes []Node
 	for _, v := range opts {
 		var node = parserNode(v)
 		nodes = append(nodes, node)
@@ -62,8 +62,8 @@ func Parser(express string) (node, error) {
 	return nodes[0], nil
 }
 
-func parserNode(v Operator) node {
-	var node node
+func parserNode(v Operator) Node {
+	var node Node
 	if v == "nil" {
 		var inode = NilNode{}
 		node = inode
@@ -115,7 +115,7 @@ func parserNode(v Operator) node {
 	}
 	return node
 }
-func findReplaceOpt(operator Operator, nodearg *[]node) error {
+func findReplaceOpt(operator Operator, nodearg *[]Node) error {
 	var nodes = *nodearg
 	for nIndex, n := range nodes {
 		if n.Type() == NOpt {
@@ -138,7 +138,7 @@ func findReplaceOpt(operator Operator, nodearg *[]node) error {
 				right: nodes[nIndex+1],
 				opt:   opt.value,
 			}
-			var newNodes []node
+			var newNodes []Node
 			newNodes = append(nodes[:nIndex-1], newNode)
 			newNodes = append(newNodes, nodes[nIndex+2:]...)
 
@@ -153,7 +153,7 @@ func findReplaceOpt(operator Operator, nodearg *[]node) error {
 	return nil
 }
 
-func haveOpt(nodes []node) bool {
+func haveOpt(nodes []Node) bool {
 	for _, v := range nodes {
 		if v.Type() == NOpt {
 			return true

@@ -6,7 +6,7 @@ import (
 )
 
 func TestNode_Run(t *testing.T) {
-	var express = "1 + 2 + 3 + 2 + 3 + 2 + 3 + 2 + 3 + 2 + 3"
+	var express = "a == 1 && a != 0"
 
 	//express = "1 + 2 > 3 + 6"
 	//express = "1 + 2 != nil"
@@ -15,7 +15,7 @@ func TestNode_Run(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	v, e := node.Eval(nil)
+	v, e := node.Eval(map[string]interface{}{"a": 1})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -24,14 +24,15 @@ func TestNode_Run(t *testing.T) {
 
 func BenchmarkArgNode_Eval(b *testing.B) {
 	b.StopTimer()
-	var express = "1 == 1 && 1 == 1 && 1 == 1 && 1 == 1 && 1 == 1"
+	var express = "a != nil"
 	var node, e = Parser(express)
 	if e != nil {
 		b.Fatal(e)
 	}
+	var m = map[string]interface{}{"a": 2}
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		_, e := node.Eval(nil)
+		_, e := node.Eval(m)
 		if e != nil {
 			b.Fatal(e)
 		}

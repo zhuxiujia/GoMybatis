@@ -15,7 +15,7 @@ const (
 )
 
 //抽象语法树节点
-type node interface {
+type Node interface {
 	Type() nodeType
 	Eval(env interface{}) (interface{}, error)
 }
@@ -52,9 +52,9 @@ func (ArgNode) Type() nodeType {
 	return NArg
 }
 
-func (ArgNode) Eval(env interface{}) (interface{}, error) {
+func (it ArgNode) Eval(env interface{}) (interface{}, error) {
 	//TODO do arg
-	return nil, nil
+	return EvalTake(it.value, env)
 }
 
 //值节点
@@ -135,8 +135,8 @@ func (NilNode) Eval(env interface{}) (interface{}, error) {
 
 //计算节点
 type BinaryNode struct {
-	left  node
-	right node
+	left  Node
+	right Node
 	opt   Operator
 }
 

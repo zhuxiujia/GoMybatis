@@ -19,6 +19,25 @@ func EvalTake(operator Operator, arg interface{}) (interface{}, error) {
 		return arg, nil
 	}
 	var av = reflect.ValueOf(arg)
+	if av.Kind() == reflect.Map {
+		var m = arg.(map[string]interface{})
+		var result interface{}
+		if strings.Index(operator, ".") != -1 {
+			var sps = strings.Split(operator, ".")
+			result = m[sps[0]]
+			return getObj(operator, reflect.ValueOf(result), result)
+		} else {
+			result = m[operator]
+			return result, nil
+		}
+	} else {
+		return getObj(operator, av, arg)
+
+	}
+	return arg, nil
+}
+
+func getObj(operator Operator, av reflect.Value, arg interface{}) (interface{}, error) {
 	if strings.Index(operator, ".") != -1 {
 		if av.Kind() == reflect.Ptr {
 			arg, av = GetDeepValue(av, arg)
@@ -117,7 +136,7 @@ func DoEqual(operator Operator, a interface{}, b interface{}, av reflect.Value, 
 	a, av = GetDeepValue(av, a)
 	b, bv = GetDeepValue(bv, b)
 
-	if av.Kind() != bv.Kind() {
+	if strings.Contains(av.String(), bv.String()) || strings.Contains(bv.String(), av.String()) {
 		return false, nil
 	}
 	if av.Kind() == reflect.Bool {
@@ -133,7 +152,7 @@ func DoEqual(operator Operator, a interface{}, b interface{}, av reflect.Value, 
 		case Equal:
 			return a.(float64) == b.(float64), nil
 		case UnEqual:
-			return a.(float64) != b.(float64), nil
+			return !(a.(float64) != b.(float64)), nil
 		case Less:
 			return a.(float64) < b.(float64), nil
 		case More:
