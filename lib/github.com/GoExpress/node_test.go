@@ -38,3 +38,24 @@ func BenchmarkArgNode_Eval(b *testing.B) {
 		}
 	}
 }
+
+type As struct {
+	B string
+}
+
+func BenchmarkArgNode_Eval_Take(b *testing.B) {
+	b.StopTimer()
+	var express = "a.B"
+	var node, e = Parser(express)
+	if e != nil {
+		b.Fatal(e)
+	}
+	var m = map[string]interface{}{"a": As{B: "sdffdasf"}}
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		_, e := node.Eval(m)
+		if e != nil {
+			b.Fatal(e)
+		}
+	}
+}
