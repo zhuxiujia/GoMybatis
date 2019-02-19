@@ -25,7 +25,7 @@ func EvalTake(operator Operator, arg interface{}) (interface{}, error) {
 		if strings.Index(operator, ".") != -1 {
 			var sps = strings.Split(operator, ".")
 			result = m[sps[0]]
-			return getObj(operator, reflect.ValueOf(result), result)
+			return getObj(sps[len(sps)-1], reflect.ValueOf(result), result)
 		} else {
 			result = m[operator]
 			return result, nil
@@ -39,21 +39,7 @@ func EvalTake(operator Operator, arg interface{}) (interface{}, error) {
 
 func getObj(operator Operator, av reflect.Value, arg interface{}) (interface{}, error) {
 	if strings.Index(operator, ".") != -1 {
-		if av.Kind() == reflect.Ptr {
-			arg, av = GetDeepValue(av, arg)
-		}
-		var childs = strings.Split(operator, ".")
-		var v reflect.Value
-		for _, item := range childs {
-			if av.Kind() == reflect.Struct {
-				v = av.FieldByName(item)
-				if v.Kind() == reflect.Ptr {
-					v = v.Elem()
-				}
-			} else {
-				panic(errors.New("only struct support take value a.b!"))
-			}
-		}
+		var v = av.FieldByName(operator)
 		if v.IsValid() && v.CanInterface() {
 			return v.Interface(), nil
 		} else {

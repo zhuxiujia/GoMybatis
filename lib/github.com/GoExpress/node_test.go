@@ -57,5 +57,6 @@ func BenchmarkArgNode_Eval_Take(b *testing.B) {
 		if e != nil {
 			b.Fatal(e)
 		}
+		//fmt.Println(r)
 	}
 }
