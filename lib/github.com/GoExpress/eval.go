@@ -38,17 +38,14 @@ func EvalTake(operator Operator, arg interface{}) (interface{}, error) {
 }
 
 func getObj(operator Operator, av reflect.Value, arg interface{}) (interface{}, error) {
-	if strings.Index(operator, ".") != -1 {
-		var v = av.FieldByName(operator)
-		if v.IsValid() && v.CanInterface() {
-			return v.Interface(), nil
-		} else {
-			return nil, nil
-		}
+	if av.Kind() == reflect.Ptr {
+		av = GetDeepPtr(av)
+	}
+	var v = av.FieldByName(operator)
+	if v.IsValid() && v.CanInterface() {
+		return v.Interface(), nil
 	} else {
-		if av.Kind() == reflect.Ptr {
-			arg, av = GetDeepValue(av, arg)
-		}
+		return nil, nil
 	}
 	return arg, nil
 }

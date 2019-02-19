@@ -43,6 +43,20 @@ type As struct {
 	B string
 }
 
+func TestArgNode_Eval_Take(b *testing.T) {
+	var express = "a.B"
+	var node, e = Parser(express)
+	if e != nil {
+		b.Fatal(e)
+	}
+	var m = map[string]interface{}{"a": As{B: "sdffdasf"}}
+	r, e := node.Eval(m)
+	if e != nil {
+		b.Fatal(e)
+	}
+	fmt.Println(r)
+}
+
 func BenchmarkArgNode_Eval_Take(b *testing.B) {
 	b.StopTimer()
 	var express = "a.B"
