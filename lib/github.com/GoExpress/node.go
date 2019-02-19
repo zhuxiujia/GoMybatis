@@ -3,22 +3,21 @@ package GoExpress
 type nodeType int
 
 const (
-	NArg         nodeType = iota
-	NString               //string 节点
-	NFloat                //float节点
-	NInt                  //int 节点
-	NUInt                 //uint节点
-	NBool                 //bool节点
-	NNil                  //空节点
-	NEqual                //比较节点
-	NCalculation          //计算节点
-	NOpt                  //操作符节点
+	NArg    nodeType = iota
+	NString          //string 节点
+	NFloat           //float节点
+	NInt             //int 节点
+	NUInt            //uint节点
+	NBool            //bool节点
+	NNil             //空节点
+	NBinary          //二元计算节点
+	NOpt             //操作符节点
 )
 
 //抽象语法树节点
 type node interface {
 	Type() nodeType
-	Eval(operator Operator, nexNode Node) (interface{}, error)
+	Eval(env interface{}) (interface{}, error)
 }
 
 type OptNode struct {
@@ -40,8 +39,8 @@ func (it OptNode) IsCalculationOperator() bool {
 
 }
 
-func (OptNode) Eval(operator Operator, nexNode Node) (interface{}, error) {
-	return nil, nil
+func (it OptNode) Eval(env interface{}) (interface{}, error) {
+	return it.value, nil
 }
 
 //参数节点
@@ -53,7 +52,8 @@ func (ArgNode) Type() nodeType {
 	return NArg
 }
 
-func (ArgNode) Eval(operator Operator, nexNode Node) (interface{}, error) {
+func (ArgNode) Eval(env interface{}) (interface{}, error) {
+	//TODO do arg
 	return nil, nil
 }
 
@@ -66,8 +66,8 @@ func (StringNode) Type() nodeType {
 	return NString
 }
 
-func (StringNode) Eval(operator Operator, nexNode Node) (interface{}, error) {
-	return nil, nil
+func (it StringNode) Eval(env interface{}) (interface{}, error) {
+	return it.value, nil
 }
 
 //值节点
@@ -79,8 +79,8 @@ func (FloatNode) Type() nodeType {
 	return NFloat
 }
 
-func (FloatNode) Eval(operator Operator, nexNode Node) (interface{}, error) {
-	return nil, nil
+func (it FloatNode) Eval(env interface{}) (interface{}, error) {
+	return it.value, nil
 }
 
 //值节点
@@ -92,8 +92,8 @@ func (IntNode) Type() nodeType {
 	return NInt
 }
 
-func (IntNode) Eval(operator Operator, nexNode Node) (interface{}, error) {
-	return nil, nil
+func (it IntNode) Eval(env interface{}) (interface{}, error) {
+	return it.value, nil
 }
 
 type UIntNode struct {
@@ -104,8 +104,8 @@ func (UIntNode) Type() nodeType {
 	return NUInt
 }
 
-func (UIntNode) Eval(operator Operator, nexNode Node) (interface{}, error) {
-	return nil, nil
+func (it UIntNode) Eval(env interface{}) (interface{}, error) {
+	return it.value, nil
 }
 
 //值节点
@@ -117,8 +117,8 @@ func (BoolNode) Type() nodeType {
 	return NBool
 }
 
-func (BoolNode) Eval(operator Operator, nexNode Node) (interface{}, error) {
-	return nil, nil
+func (it BoolNode) Eval(env interface{}) (interface{}, error) {
+	return it.value, nil
 }
 
 //空节点
@@ -129,42 +129,36 @@ func (NilNode) Type() nodeType {
 	return NNil
 }
 
-func (NilNode) Eval(operator Operator, nexNode Node) (interface{}, error) {
-	return nil, nil
-}
-
-/**
-组合节点
-*/
-//比较节点
-type EqualNode struct {
-	left  node
-	right node
-	opt   Operator
-}
-
-func (EqualNode) Type() nodeType {
-	return NEqual
-}
-
-func (EqualNode) Eval(operator Operator, nexNode Node) (interface{}, error) {
+func (NilNode) Eval(env interface{}) (interface{}, error) {
 	return nil, nil
 }
 
 //计算节点
-type CalculationNode struct {
+type BinaryNode struct {
 	left  node
 	right node
 	opt   Operator
 }
 
-func (CalculationNode) Type() nodeType {
-	return NCalculation
+func (BinaryNode) Type() nodeType {
+	return NBinary
 }
 
-func (CalculationNode) Eval(operator Operator, nexNode Node) (interface{}, error) {
-	return nil, nil
+func (it BinaryNode) Eval(env interface{}) (interface{}, error) {
+	var left interface{}
+	var right interface{}
+	var e error
+	if it.left != nil {
+		left, e = it.left.Eval(env)
+		if e != nil {
+			return nil, e
+		}
+	}
+	if it.right != nil {
+		right, e = it.right.Eval(env)
+		if e != nil {
+			return nil, e
+		}
+	}
+	return Eval(it.opt, left, right)
 }
-
-// IntNode opt IntNode Opt IntNode Opt IntNode
-// => CalculationNode

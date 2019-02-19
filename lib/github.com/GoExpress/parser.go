@@ -1,6 +1,7 @@
 package GoExpress
 
 import (
+	"errors"
 	"strconv"
 	"strings"
 )
@@ -18,7 +19,7 @@ const (
 	//比较操作符
 	And       Operator = "&&"
 	Or        Operator = "||"
-	Equal     Operator = "="
+	Equal     Operator = "=="
 	UnEqual   Operator = "!="
 	Less      Operator = "<"
 	LessEqual Operator = "<="
@@ -27,7 +28,9 @@ const (
 )
 
 //乘除优先于加减 计算优于比较,
-var priorityArray = []Operator{Ride, Divide, Add, Reduce, And, Or, Equal, UnEqual, Less, LessEqual, More, MoreEqual}
+var priorityArray = []Operator{Ride, Divide, Add, Reduce,
+	LessEqual, Less, MoreEqual, More,
+	UnEqual, Equal, And, Or}
 
 //操作符优先级
 var priorityMap = map[Operator]int{}
@@ -38,96 +41,141 @@ func init() {
 	}
 }
 
-//节点类型
-type NodeType = int
+func Parser(express string) (node, error) {
+	var opts = ParserOperators(express)
 
-const (
-	Calculation NodeType = iota //计算节点
-	EqualValue                  //比较节点
-	Value                       //值节点
-)
-
-//节点
-type Node struct {
-	NodeType NodeType
-	Operator Operator
-
-	LeftOpt  Operator
-	RightOpt Operator
-
-	Left      interface{}
-	Right     interface{}
-	NodeValue interface{} //节点执行结果
-}
-
-func (it *Node) Run() (interface{}, error) {
-	if it.NodeType == Calculation {
-		return Eval(it.Operator, it.Left, it.Right)
-	} else {
-		return Eval(it.Operator, it.Left, it.Right)
+	var nodes []node
+	for _, v := range opts {
+		var node = parserNode(v)
+		nodes = append(nodes, node)
 	}
-}
 
-//解析
-func Parser(express string) []Node {
-	var nodes []Node
-	var newResult = ParserOperators(express)
-	var tempNode = Node{}
-	for _, v := range newResult {
-		var isOpt = isOperatorsAction(v)
-		if isOpt {
-			tempNode.Operator = v
-		} else {
-			var result interface{}
-			if strings.Index(v, "'") == 0 && strings.LastIndex(v, "'") == (len(v)-1) {
-				var bytes = []byte(v)[1 : len(v)-1]
-				result = string(bytes)
-			} else {
-				var i, e = strconv.ParseInt(v, 0, 64)
-				if e == nil {
-					result = i
-				}
-				u, _ := strconv.ParseUint(v, 0, 64)
-				if e == nil {
-					result = u
-				}
-				f, e := strconv.ParseFloat(v, 64)
-				if e == nil {
-					result = f
-				}
-				b, e := strconv.ParseBool(v)
-				if e == nil {
-					result = b
-				}
-			}
-			tempNode.NodeValue = result
-			if tempNode.LeftOpt != "" {
-				tempNode.RightOpt = v
-			}
-			tempNode.LeftOpt = v
-		}
-		if tempNode.LeftOpt != "" && tempNode.RightOpt != "" {
-			nodes = append(nodes, tempNode)
-			tempNode = Node{}
+	for _, v := range priorityArray {
+		var e = findReplaceOpt(v, &nodes)
+		if e != nil {
+			return nil, e
 		}
 	}
-	return nodes
+	if len(nodes) == 0 || nodes[0] == nil {
+		return nil, errors.New("parser node fail!")
+	}
+	return nodes[0], nil
+}
+
+func parserNode(v Operator) node {
+	var node node
+	if v == "nil" {
+		var inode = NilNode{}
+		node = inode
+	}
+
+	if isOperatorsAction(v) {
+		var optNode = OptNode{
+			value: v,
+		}
+		node = optNode
+	}
+
+	var i, e = strconv.ParseInt(v, 0, 64)
+	if node == nil && e == nil {
+		var inode = IntNode{
+			value: int64(i),
+		}
+		node = inode
+	}
+	u, _ := strconv.ParseUint(v, 0, 64)
+	if node == nil && e == nil {
+		var inode = UIntNode{
+			value: u,
+		}
+		node = inode
+	}
+	f, e := strconv.ParseFloat(v, 64)
+	if node == nil && e == nil {
+		var inode = FloatNode{
+			value: f,
+		}
+		node = inode
+	}
+	b, e := strconv.ParseBool(v)
+	if node == nil && e == nil {
+		var inode = BoolNode{
+			value: b,
+		}
+		node = inode
+	}
+	if node == nil {
+		var argNode = ArgNode{
+			value: v,
+		}
+		node = argNode
+	}
+	if node == nil {
+		panic("uncheck opt " + v)
+	}
+	return node
+}
+func findReplaceOpt(operator Operator, nodearg *[]node) error {
+	var nodes = *nodearg
+	for nIndex, n := range nodes {
+		if n.Type() == NOpt {
+			if nIndex == 0 || (nIndex+1) == len(nodes) {
+				return errors.New("expr operator" + operator + " left or right not have value!")
+			}
+			if nIndex-1 > 0 && nodes[nIndex-1].Type() == NOpt {
+				return errors.New("expr same operator can not have more than 2!")
+			}
+			if nIndex < len(nodes) && nodes[nIndex+1].Type() == NOpt {
+				return errors.New("expr not true!")
+			}
+			var opt = n.(OptNode)
+			if opt.value != operator {
+				continue
+			}
+
+			var newNode = BinaryNode{
+				left:  nodes[nIndex-1],
+				right: nodes[nIndex+1],
+				opt:   opt.value,
+			}
+			var newNodes []node
+			newNodes = append(nodes[:nIndex-1], newNode)
+			newNodes = append(newNodes, nodes[nIndex+2:]...)
+
+			if haveOpt(newNodes) {
+				findReplaceOpt(operator, &newNodes)
+			}
+			*nodearg = newNodes
+			break
+		}
+	}
+
+	return nil
+}
+
+func haveOpt(nodes []node) bool {
+	for _, v := range nodes {
+		if v.Type() == NOpt {
+			return true
+		}
+	}
+	return false
 }
 
 func ParserOperators(express string) []Operator {
 	express = strings.Replace(express, "nil", " nil ", -1)
-	express = strings.Replace(express, Equal, " "+Equal+" ", -1)
+	express = strings.Replace(express, Add, " "+Add+" ", -1)
 	express = strings.Replace(express, Reduce, " "+Reduce+" ", -1)
 	express = strings.Replace(express, Ride, " "+Ride+" ", -1)
 	express = strings.Replace(express, Divide, " "+Divide+" ", -1)
 	express = strings.Replace(express, And, " "+And+" ", -1)
 	express = strings.Replace(express, Or, " "+Or+" ", -1)
-	express = strings.Replace(express, Equal, " "+Equal+" ", -1)
 	express = strings.Replace(express, UnEqual, " "+UnEqual+" ", -1)
-	express = strings.Replace(express, Less, " "+Less+" ", -1)
+	express = strings.Replace(express, Equal, " "+Equal+" ", -1)
 	express = strings.Replace(express, LessEqual, " "+LessEqual+" ", -1)
-	express = strings.Replace(express, More, " "+More+" ", -1)
+	express = strings.Replace(express, Less, " "+Less+" ", -1)
 	express = strings.Replace(express, MoreEqual, " "+MoreEqual+" ", -1)
+	express = strings.Replace(express, More, " "+More+" ", -1)
 
 	var newResult []string
 	var results = strings.Split(express, " ")

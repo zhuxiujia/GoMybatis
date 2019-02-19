@@ -53,23 +53,50 @@ func Eval(operator Operator, a interface{}, b interface{}) (interface{}, error) 
 	var bv = reflect.ValueOf(b)
 
 	switch operator {
+	case And:
+		if a == nil || b == nil {
+			//equal nil
+			return nil, errors.New("eval fail,value can not be nil")
+		}
+		a, av = GetDeepValue(av, a)
+		b, bv = GetDeepValue(bv, b)
+		var ab = a.(bool)
+		var bb = b.(bool)
+		return ab == true && bb == true, nil
+	case Or:
+		if a == nil || b == nil {
+			//equal nil
+			return nil, errors.New("eval fail,value can not be nil")
+		}
+		a, av = GetDeepValue(av, a)
+		b, bv = GetDeepValue(bv, b)
+		var ab = a.(bool)
+		var bb = b.(bool)
+		return ab == true || bb == true, nil
 	case Equal:
 		//a kind == b kind
 		return DoEqual(operator, a, b, av, bv)
 	case UnEqual:
 		//a kind == b kind
-		var result, err = DoEqual(operator, a, b, av, bv)
-		return !result, err
+		var r, e = DoEqual(operator, a, b, av, bv)
+		if e != nil {
+			return nil, e
+		}
+		return !r, nil
 	case Add:
 		return DoAddReduceRideDivide(operator, a, b, av, bv)
+
 	case Reduce:
 		return DoAddReduceRideDivide(operator, a, b, av, bv)
+
 		break
 	case Ride:
 		return DoAddReduceRideDivide(operator, a, b, av, bv)
+
 		break
 	case Divide:
 		return DoAddReduceRideDivide(operator, a, b, av, bv)
+
 		break
 	}
 	return nil, errors.New("find not support operator=" + operator)
@@ -129,10 +156,6 @@ func DoAddReduceRideDivide(operator Operator, a interface{}, b interface{}, av r
 	a, av = GetDeepValue(av, a)
 	b, bv = GetDeepValue(bv, b)
 
-	if av.Kind() != bv.Kind() {
-		return false, nil
-	}
-
 	if av.Kind() == reflect.String {
 		return a.(string) + b.(string), nil
 	}
@@ -147,6 +170,9 @@ func DoAddReduceRideDivide(operator Operator, a interface{}, b interface{}, av r
 		case Ride:
 			return a.(float64) * b.(float64), nil
 		case Divide:
+			if b.(float64) == 0 {
+				return nil, errors.New("can not divide zero value!")
+			}
 			return a.(float64) / b.(float64), nil
 		}
 	}
