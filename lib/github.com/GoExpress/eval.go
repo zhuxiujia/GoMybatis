@@ -102,6 +102,8 @@ func DoEqual(operator Operator, a interface{}, b interface{}, av reflect.Value, 
 	a, av = GetDeepValue(av, a)
 	b, bv = GetDeepValue(bv, b)
 	switch operator {
+	case UnEqual:
+		fallthrough
 	case Equal:
 		if a == nil || b == nil {
 			//equal nil
