@@ -364,11 +364,11 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlB
 			var upperKey = utils.UpperFieldFirstName(tagArgs[argIndex].Name)
 			paramMap[lowerKey] = argInterface
 			paramMap[upperKey] = argInterface
-			paramMap["type_"+lowerKey] = arg.Type()
-			paramMap["type_"+upperKey] = arg.Type()
+			//paramMap["type_"+lowerKey] = arg.Type()
+			//paramMap["type_"+upperKey] = arg.Type()
 		} else {
 			paramMap[DefaultOneArg] = argInterface
-			paramMap["type_"+DefaultOneArg] = arg.Type()
+			//paramMap["type_"+DefaultOneArg] = arg.Type()
 
 		}
 	}
@@ -405,10 +405,10 @@ func scanStructArgFields(v reflect.Value, typeConvert func(arg interface{}) inte
 		var jsonKey = typeValue.Tag.Get(`json`)
 		if jsonKey != "" {
 			parameters[jsonKey] = obj
-			parameters["type_"+jsonKey] = v.Field(i).Type()
+			//parameters["type_"+jsonKey] = v.Field(i).Type()
 		} else {
 			parameters[typeValue.Name] = obj
-			parameters["type_"+typeValue.Name] = v.Field(i).Type()
+			//parameters["type_"+typeValue.Name] = v.Field(i).Type()
 		}
 	}
 	return parameters

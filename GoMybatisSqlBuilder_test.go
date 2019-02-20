@@ -42,12 +42,6 @@ func Benchmark_SqlBuilder(b *testing.B) {
 	paramMap["page"] = 0
 	paramMap["size"] = 0
 
-	//paramMap["type_name"] = StringType
-	//paramMap["type_startTime"] = StringType
-	//paramMap["type_endTime"] = StringType
-	//paramMap["type_page"] = IntType
-	//paramMap["type_size"] = IntType
-
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		builder.BuildSql(paramMap, mapperTree["selectByCondition"])
@@ -85,13 +79,6 @@ func Test_SqlBuilder_Tps(t *testing.T) {
 	paramMap["endTime"] = ""
 	paramMap["page"] = 0
 	paramMap["size"] = 0
-
-	paramMap["type_name"] = StringType
-	paramMap["type_startTime"] = StringType
-	paramMap["type_endTime"] = StringType
-	paramMap["type_page"] = IntType
-	paramMap["type_size"] = IntType
-
 	var startTime = time.Now()
 	for i := 0; i < 100000; i++ {
 		//var sql, e =

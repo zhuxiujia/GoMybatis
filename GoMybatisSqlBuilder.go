@@ -166,10 +166,10 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 					var collectionItem = collectionValue.MapIndex(keyValue)
 					if item != "" {
 						tempArgMap[item] = collectionItem.Interface()
-						tempArgMap["type_"+item] = collectionItem.Type()
+						//tempArgMap["type_"+item] = collectionItem.Type()
 					}
 					tempArgMap[index] = key
-					tempArgMap["type_"+index] = keyValue.Type()
+					//tempArgMap["type_"+index] = keyValue.Type()
 					if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
 						var err = it.createFromElement(v.ElementItems, &tempSql, tempArgMap)
 						if err != nil {
@@ -178,7 +178,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 						tempSql.WriteString(separator)
 					}
 					delete(tempArgMap, item)
-					delete(tempArgMap, "type_"+item)
+					//delete(tempArgMap, "type_"+item)
 				}
 				break
 			case reflect.Slice:
@@ -187,11 +187,11 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 					var collectionItem = collectionValue.Index(i)
 					if item != "" {
 						tempArgMap[item] = collectionItem.Interface()
-						tempArgMap["type_"+item] = collectionItem.Type()
+						//tempArgMap["type_"+item] = collectionItem.Type()
 					}
 					if index != "" {
 						tempArgMap[index] = i
-						tempArgMap["type_"+index] = IntType
+						//tempArgMap["type_"+index] = IntType
 					}
 					if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
 						var err = it.createFromElement(v.ElementItems, &tempSql, tempArgMap)
@@ -201,7 +201,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 						tempSql.WriteString(separator)
 					}
 					delete(tempArgMap, item)
-					delete(tempArgMap, "type_"+item)
+					//delete(tempArgMap, "type_"+item)
 				}
 				break
 			}
@@ -308,7 +308,7 @@ func (it *GoMybatisSqlBuilder) bindBindElementArg(args map[string]interface{}, i
 	}
 	if value == "" {
 		args[name] = value
-		args["type_"+name] = StringType
+		//args["type_"+name] = StringType
 		return args
 	}
 	bindEvalExpression, err := it.expressionEngineProxy.Lexer(value)
@@ -321,7 +321,7 @@ func (it *GoMybatisSqlBuilder) bindBindElementArg(args map[string]interface{}, i
 		return args
 	}
 	args[name] = result
-	args["type_"+name] = StringType
+	//args["type_"+name] = StringType
 	return args
 }
 
