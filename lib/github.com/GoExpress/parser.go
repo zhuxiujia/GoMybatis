@@ -187,6 +187,10 @@ func ParserOperators(express string) []Operator {
 	express = strings.Replace(express, MoreEqual, " "+MoreEqual+" ", -1)
 	express = strings.Replace(express, More, " "+More+" ", -1)
 
+	express = strings.Replace(express, "! =", " "+UnEqual+" ", -1)
+	express = strings.Replace(express, "= =", " "+Equal+" ", -1)
+	express = strings.Replace(express, "< =", " "+LessEqual+" ", -1)
+	express = strings.Replace(express, "> =", " "+MoreEqual+" ", -1)
 	var newResult []string
 	var results = strings.Split(express, " ")
 	for _, v := range results {
