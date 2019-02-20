@@ -44,7 +44,10 @@ func Benchmark_SqlBuilder(b *testing.B) {
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		builder.BuildSql(paramMap, mapperTree["selectByCondition"])
+		_, e := builder.BuildSql(paramMap, mapperTree["selectByCondition"])
+		if e != nil {
+			b.Fatal(e)
+		}
 	}
 }
 
@@ -82,7 +85,10 @@ func Test_SqlBuilder_Tps(t *testing.T) {
 	var startTime = time.Now()
 	for i := 0; i < 100000; i++ {
 		//var sql, e =
-		builder.BuildSql(paramMap, mapperTree["selectByCondition"])
+		_, e := builder.BuildSql(paramMap, mapperTree["selectByCondition"])
+		if e != nil {
+			t.Fatal(e)
+		}
 		//fmt.Println(sql, e)
 	}
 	utils.CountMethodTps(100000, startTime, "Test_SqlBuilder_Tps")

@@ -20,7 +20,7 @@ func Benchmark_One_Transcation(b *testing.B) {
 	//开始压力测试
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		var _, err = exampleActivityMapperImpl.SelectByCondition(&session, nil, nil,nil,nil,nil)
+		var _, err = exampleActivityMapperImpl.SelectByCondition(&session, nil, nil, nil, nil, nil)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -50,7 +50,10 @@ func Benchmark_One_Transcation_multiple_coroutine(b *testing.B) {
 		go func() {
 			var itemCount = total / goruntine
 			for f := 0; f < itemCount; f++ {
-				exampleActivityMapperImpl.SelectByCondition(&session, nil, nil,nil,nil,nil)
+				_, e := exampleActivityMapperImpl.SelectByCondition(&session, nil, nil, nil, nil, nil)
+				if e != nil {
+					b.Fatal(e)
+				}
 			}
 			waitGroup.Done()
 		}()
@@ -65,14 +68,14 @@ func Test_One_Transcation_TPS(t *testing.T) {
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
-	var name="dsa"
-	var times=time.Now()
-	var page=1
+	var name = "dsa"
+	var times = time.Now()
+	var page = 1
 	//开始TPS测试
 	var total = 10000
 	defer utils.CountMethodTps(float64(total), time.Now(), "Test_One_Transcation_TPS")
 	for i := 0; i < total; i++ {
-		var _, err = exampleActivityMapperImpl.SelectByCondition(&session,  &name, &times, &times,&page,&page)
+		var _, err = exampleActivityMapperImpl.SelectByCondition(&session, &name, &times, &times, &page, &page)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -87,9 +90,9 @@ func Test_One_Transcation_multiple_coroutine_TPS(t *testing.T) {
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
 
-	var name="dsa"
-	var times=time.Now()
-	var page=1
+	var name = "dsa"
+	var times = time.Now()
+	var page = 1
 
 	////开始TPS测试
 	var total = 100000   //总数
@@ -103,7 +106,10 @@ func Test_One_Transcation_multiple_coroutine_TPS(t *testing.T) {
 		go func() {
 			var itemCount = total / goruntine
 			for f := 0; f < itemCount; f++ {
-				exampleActivityMapperImpl.SelectByCondition(&session, &name, &times, &times,&page,&page)
+				_, e := exampleActivityMapperImpl.SelectByCondition(&session, &name, &times, &times, &page, &page)
+				if e != nil {
+					t.Fatal(e)
+				}
 			}
 			waitGroup.Done()
 		}()
@@ -118,7 +124,7 @@ func Test_Transcation(t *testing.T) {
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
-	var results, err = exampleActivityMapperImpl.SelectByCondition(&session, nil, nil,nil,nil,nil)
+	var results, err = exampleActivityMapperImpl.SelectByCondition(&session, nil, nil, nil, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
