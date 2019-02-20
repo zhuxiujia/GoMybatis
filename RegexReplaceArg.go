@@ -33,8 +33,8 @@ func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlA
 }
 
 //执行替换操作
-func replace(startChar string, findStrs []string, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine ExpressionEngine) (string, error) {
-	for _, findStr := range findStrs {
+func replace(startChar string, findStrs map[string]int, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine ExpressionEngine) (string, error) {
+	for findStr, _ := range findStrs {
 		var repleaceStr = findStr
 		if strings.Contains(repleaceStr, ",") {
 			repleaceStr = strings.Split(repleaceStr, ",")[0]
@@ -68,8 +68,8 @@ func replace(startChar string, findStrs []string, data string, typeConvert SqlAr
 }
 
 //find like #{*} value *
-func FindAllExpressConvertString(str string) []string {
-	var finds []string
+func FindAllExpressConvertString(str string) map[string]int {
+	var finds = map[string]int{}
 	var item []byte
 	var lastIndex = -1
 	var startIndex = -1
@@ -83,7 +83,7 @@ func FindAllExpressConvertString(str string) []string {
 		}
 		if v == 125 && startIndex != -1 {
 			item = strBytes[startIndex:index]
-			finds = append(finds, string(item))
+			finds[string(item)] = 1
 			item = nil
 			startIndex = -1
 			lastIndex = -1
@@ -95,8 +95,8 @@ func FindAllExpressConvertString(str string) []string {
 }
 
 //find like ${*} value *
-func FindAllExpressString(str string) []string {
-	var finds []string
+func FindAllExpressString(str string) map[string]int {
+	var finds = map[string]int{}
 	var item []byte
 	var lastIndex = -1
 	var startIndex = -1
@@ -110,7 +110,7 @@ func FindAllExpressString(str string) []string {
 		}
 		if v == 125 && startIndex != -1 {
 			item = strBytes[startIndex:index]
-			finds = append(finds, string(item))
+			finds[string(item)] = 1
 			item = nil
 			startIndex = -1
 			lastIndex = -1
