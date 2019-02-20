@@ -81,7 +81,7 @@ func Eval(operator Operator, a interface{}, b interface{}) (interface{}, error) 
 		var ab = a.(bool)
 		var bb = b.(bool)
 		return ab == true || bb == true, nil
-	case Equal:
+	case Equal, MoreEqual, More, Less, LessEqual:
 		//a kind == b kind
 		return DoEqual(operator, a, b, av, bv)
 	case UnEqual:
@@ -91,7 +91,7 @@ func Eval(operator Operator, a interface{}, b interface{}) (interface{}, error) 
 			return nil, e
 		}
 		return !r, nil
-	case Add, Reduce, Ride, Divide, MoreEqual, More, Less, LessEqual:
+	case Add, Reduce, Ride, Divide:
 		return DoAddReduceRideDivide(operator, a, b, av, bv)
 	}
 	return nil, errors.New("find not support operator :" + operator)
@@ -169,18 +169,6 @@ func DoAddReduceRideDivide(operator Operator, a interface{}, b interface{}, av r
 				return nil, errors.New("can not divide zero value!")
 			}
 			return a.(float64) / b.(float64), nil
-		case Equal:
-			return a.(float64) == b.(float64), nil
-		case UnEqual:
-			return !(a.(float64) != b.(float64)), nil
-		case Less:
-			return a.(float64) < b.(float64), nil
-		case More:
-			return a.(float64) > b.(float64), nil
-		case MoreEqual:
-			return a.(float64) >= b.(float64), nil
-		case LessEqual:
-			return a.(float64) <= b.(float64), nil
 		}
 	}
 	return "", errors.New("find not support operator :" + operator)
