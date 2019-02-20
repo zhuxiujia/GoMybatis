@@ -6,20 +6,28 @@ import (
 )
 
 func TestNode_Run(t *testing.T) {
-	var express = "a == 1 && a != 0"
-
-	//express = "1 + 2 > 3 + 6"
-	//express = "1 + 2 != nil"
-
-	var node, e = Parser(express)
-	if e != nil {
-		t.Fatal(e)
+	var expressions = []string{
+		"'a'+c",
+		"b",
+		"a < 1",
+		"a +1 > b*8",
+		"a * b == 2",
+		"a - b == 0",
+		"a == 1 && a != 0",
+		"1 > 3 ",
+		"1 + 2 != nil",
 	}
-	v, e := node.Eval(map[string]interface{}{"a": 1})
-	if e != nil {
-		t.Fatal(e)
+	for _, expr := range expressions {
+		node, e := Parser(expr)
+		if e != nil {
+			t.Fatal(e)
+		}
+		v, e := node.Eval(map[string]interface{}{"a": 1, "b": 2, "c": "c"})
+		if e != nil {
+			t.Fatal(e)
+		}
+		fmt.Println(v)
 	}
-	fmt.Println(v)
 }
 
 func BenchmarkArgNode_Eval(b *testing.B) {

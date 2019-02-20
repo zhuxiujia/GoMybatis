@@ -76,7 +76,7 @@ func parserNode(v Operator) Node {
 		node = optNode
 	}
 
-	var i, e = strconv.ParseInt(v, 0, 64)
+	i, e := strconv.ParseInt(v, 0, 64)
 	if node == nil && e == nil {
 		var inode = IntNode{
 			value: int64(i),
@@ -104,6 +104,16 @@ func parserNode(v Operator) Node {
 		}
 		node = inode
 	}
+	e = nil
+	if node == nil && e == nil &&
+		strings.Index(v, "'") == 0 && strings.LastIndex(v, "'") == (len(v)-1) {
+		var inode = StringNode{
+			value: string([]byte(v)[1 : len(v)-1]),
+		}
+		node = inode
+	}
+	e = nil
+
 	if node == nil {
 		var argNode = ArgNode{
 			value: v,
