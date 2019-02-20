@@ -7,12 +7,15 @@ import (
 
 func TestNode_Run(t *testing.T) {
 	var expressions = []string{
+		"a +1 > b * 8",
+		"a >= 0",
 		"'a'+c",
 		"b",
 		"a < 1",
 		"a +1 > b*8",
 		"a * b == 2",
 		"a - b == 0",
+		"a >= 0 && a != 0",
 		"a == 1 && a != 0",
 		"1 > 3 ",
 		"1 + 2 != nil",

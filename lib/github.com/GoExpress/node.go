@@ -14,6 +14,30 @@ const (
 	NOpt             //操作符节点
 )
 
+func (it nodeType) ToString() string {
+	switch it {
+	case NArg:
+		return "NArg"
+	case NString:
+		return "NString"
+	case NFloat:
+		return "NFloat"
+	case NInt:
+		return "NInt"
+	case NUInt:
+		return "NUInt"
+	case NBool:
+		return "NBool"
+	case NNil:
+		return "NNil"
+	case NBinary:
+		return "NBinary"
+	case NOpt:
+		return "NOpt"
+	}
+	return "Unknow"
+}
+
 //抽象语法树节点
 type Node interface {
 	Type() nodeType
@@ -22,10 +46,11 @@ type Node interface {
 
 type OptNode struct {
 	value Operator
+	t     nodeType
 }
 
-func (OptNode) Type() nodeType {
-	return NOpt
+func (it OptNode) Type() nodeType {
+	return it.t
 }
 func (it OptNode) IsCalculationOperator() bool {
 	//计算操作符
@@ -46,10 +71,11 @@ func (it OptNode) Eval(env interface{}) (interface{}, error) {
 //参数节点
 type ArgNode struct {
 	value string
+	t     nodeType
 }
 
-func (ArgNode) Type() nodeType {
-	return NArg
+func (it ArgNode) Type() nodeType {
+	return it.t
 }
 
 func (it ArgNode) Eval(env interface{}) (interface{}, error) {
@@ -60,10 +86,11 @@ func (it ArgNode) Eval(env interface{}) (interface{}, error) {
 //值节点
 type StringNode struct {
 	value string
+	t     nodeType
 }
 
-func (StringNode) Type() nodeType {
-	return NString
+func (it StringNode) Type() nodeType {
+	return it.t
 }
 
 func (it StringNode) Eval(env interface{}) (interface{}, error) {
@@ -73,10 +100,11 @@ func (it StringNode) Eval(env interface{}) (interface{}, error) {
 //值节点
 type FloatNode struct {
 	value float64
+	t     nodeType
 }
 
-func (FloatNode) Type() nodeType {
-	return NFloat
+func (it FloatNode) Type() nodeType {
+	return it.t
 }
 
 func (it FloatNode) Eval(env interface{}) (interface{}, error) {
@@ -86,10 +114,11 @@ func (it FloatNode) Eval(env interface{}) (interface{}, error) {
 //值节点
 type IntNode struct {
 	value int64
+	t     nodeType
 }
 
-func (IntNode) Type() nodeType {
-	return NInt
+func (it IntNode) Type() nodeType {
+	return it.t
 }
 
 func (it IntNode) Eval(env interface{}) (interface{}, error) {
@@ -98,10 +127,11 @@ func (it IntNode) Eval(env interface{}) (interface{}, error) {
 
 type UIntNode struct {
 	value uint64
+	t     nodeType
 }
 
-func (UIntNode) Type() nodeType {
-	return NUInt
+func (it UIntNode) Type() nodeType {
+	return it.t
 }
 
 func (it UIntNode) Eval(env interface{}) (interface{}, error) {
@@ -111,10 +141,11 @@ func (it UIntNode) Eval(env interface{}) (interface{}, error) {
 //值节点
 type BoolNode struct {
 	value bool
+	t     nodeType
 }
 
-func (BoolNode) Type() nodeType {
-	return NBool
+func (it BoolNode) Type() nodeType {
+	return it.t
 }
 
 func (it BoolNode) Eval(env interface{}) (interface{}, error) {
@@ -123,10 +154,11 @@ func (it BoolNode) Eval(env interface{}) (interface{}, error) {
 
 //空节点
 type NilNode struct {
+	t nodeType
 }
 
-func (NilNode) Type() nodeType {
-	return NNil
+func (it NilNode) Type() nodeType {
+	return it.t
 }
 
 func (NilNode) Eval(env interface{}) (interface{}, error) {
@@ -138,10 +170,11 @@ type BinaryNode struct {
 	left  Node
 	right Node
 	opt   Operator
+	t     nodeType
 }
 
-func (BinaryNode) Type() nodeType {
-	return NBinary
+func (it BinaryNode) Type() nodeType {
+	return it.t
 }
 
 func (it BinaryNode) Eval(env interface{}) (interface{}, error) {

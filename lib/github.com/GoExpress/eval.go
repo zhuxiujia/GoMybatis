@@ -98,46 +98,57 @@ func Eval(operator Operator, a interface{}, b interface{}) (interface{}, error) 
 }
 
 func DoEqual(operator Operator, a interface{}, b interface{}, av reflect.Value, bv reflect.Value) (bool, error) {
-	if a == nil || b == nil {
-		//equal nil
-		if a != nil || b != nil {
-			return false, nil
-		}
-		if a == nil && b == nil {
-			return true, nil
-		}
-	}
-
 	//start equal
 	a, av = GetDeepValue(av, a)
 	b, bv = GetDeepValue(bv, b)
-
-	if strings.Contains(av.String(), bv.String()) || strings.Contains(bv.String(), av.String()) {
-		return false, nil
-	}
-	if av.Kind() == reflect.Bool {
-		return a.(bool) == b.(bool), nil
-	}
-	if av.Kind() == reflect.String {
-		return a.(string) == b.(string), nil
-	}
-	a = toNumberType(av)
-	b = toNumberType(bv)
-	if isNumberType(av.Type()) {
-		switch operator {
-		case Equal:
-			return a.(float64) == b.(float64), nil
-		case UnEqual:
-			return !(a.(float64) != b.(float64)), nil
-		case Less:
-			return a.(float64) < b.(float64), nil
-		case More:
-			return a.(float64) > b.(float64), nil
-		case MoreEqual:
-			return a.(float64) >= b.(float64), nil
-		case LessEqual:
-			return a.(float64) <= b.(float64), nil
+	switch operator {
+	case Equal:
+		if a == nil || b == nil {
+			//equal nil
+			if a != nil || b != nil {
+				return false, nil
+			}
+			if a == nil && b == nil {
+				return true, nil
+			}
 		}
+		if av.Kind() == reflect.Bool {
+			return a.(bool) == b.(bool), nil
+		}
+		if av.Kind() == reflect.String {
+			return a.(string) == b.(string), nil
+		}
+		a = toNumberType(av)
+		b = toNumberType(bv)
+		return a.(float64) == b.(float64), nil
+	case Less:
+		if a == nil || b == nil {
+			return false, errors.New("can not parser '<' , arg have nil object!")
+		}
+		a = toNumberType(av)
+		b = toNumberType(bv)
+		return a.(float64) < b.(float64), nil
+	case More:
+		if a == nil || b == nil {
+			return false, errors.New("can not parser '>' , arg have nil object!")
+		}
+		a = toNumberType(av)
+		b = toNumberType(bv)
+		return a.(float64) > b.(float64), nil
+	case MoreEqual:
+		if a == nil || b == nil {
+			return false, errors.New("can not parser '>=' , arg have nil object!")
+		}
+		a = toNumberType(av)
+		b = toNumberType(bv)
+		return a.(float64) >= b.(float64), nil
+	case LessEqual:
+		if a == nil || b == nil {
+			return false, errors.New("can not parser '<=' , arg have nil object!")
+		}
+		a = toNumberType(av)
+		b = toNumberType(bv)
+		return a.(float64) <= b.(float64), nil
 	}
 	return false, errors.New("find not support equal operator :" + operator)
 }
