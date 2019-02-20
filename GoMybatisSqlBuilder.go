@@ -15,8 +15,8 @@ type GoMybatisSqlBuilder struct {
 	enableLog             bool
 }
 
-func (it *GoMybatisSqlBuilder) ExpressionEngineProxy() ExpressionEngineProxy {
-	return it.expressionEngineProxy
+func (it *GoMybatisSqlBuilder) ExpressionEngineProxy() *ExpressionEngineProxy {
+	return &it.expressionEngineProxy
 }
 func (it *GoMybatisSqlBuilder) SqlArgTypeConvert() SqlArgTypeConvert {
 	return it.sqlArgTypeConvert

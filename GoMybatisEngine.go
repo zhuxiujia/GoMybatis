@@ -161,6 +161,8 @@ func (it *GoMybatisEngine) ExpressionEngine() ExpressionEngine {
 func (it *GoMybatisEngine) SetExpressionEngine(engine ExpressionEngine) {
 	it.initCheck()
 	it.expressionEngine = engine
+	var proxy = it.sqlBuilder.ExpressionEngineProxy()
+	proxy.SetExpressionEngine(it.expressionEngine)
 }
 
 //sql构建器

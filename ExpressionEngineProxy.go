@@ -24,6 +24,11 @@ func (ExpressionEngineProxy) New(engine ExpressionEngine, useLexerCache bool) Ex
 }
 
 //引擎名称
+func (it *ExpressionEngineProxy) SetExpressionEngine(engine ExpressionEngine) {
+	it.expressionEngine = engine
+}
+
+//引擎名称
 func (it ExpressionEngineProxy) Name() string {
 	if it.expressionEngine == nil {
 		return ""
