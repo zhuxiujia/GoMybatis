@@ -50,7 +50,7 @@ type OptNode struct {
 }
 
 func (it OptNode) Type() nodeType {
-	return it.t
+	return NOpt
 }
 func (it OptNode) IsCalculationOperator() bool {
 	//计算操作符
@@ -75,7 +75,7 @@ type ArgNode struct {
 }
 
 func (it ArgNode) Type() nodeType {
-	return it.t
+	return NArg
 }
 
 func (it ArgNode) Eval(env interface{}) (interface{}, error) {
@@ -90,7 +90,7 @@ type StringNode struct {
 }
 
 func (it StringNode) Type() nodeType {
-	return it.t
+	return NString
 }
 
 func (it StringNode) Eval(env interface{}) (interface{}, error) {
@@ -104,7 +104,7 @@ type FloatNode struct {
 }
 
 func (it FloatNode) Type() nodeType {
-	return it.t
+	return NFloat
 }
 
 func (it FloatNode) Eval(env interface{}) (interface{}, error) {
@@ -118,7 +118,7 @@ type IntNode struct {
 }
 
 func (it IntNode) Type() nodeType {
-	return it.t
+	return NInt
 }
 
 func (it IntNode) Eval(env interface{}) (interface{}, error) {
@@ -131,7 +131,7 @@ type UIntNode struct {
 }
 
 func (it UIntNode) Type() nodeType {
-	return it.t
+	return NUInt
 }
 
 func (it UIntNode) Eval(env interface{}) (interface{}, error) {
@@ -145,7 +145,7 @@ type BoolNode struct {
 }
 
 func (it BoolNode) Type() nodeType {
-	return it.t
+	return NBool
 }
 
 func (it BoolNode) Eval(env interface{}) (interface{}, error) {
@@ -158,7 +158,7 @@ type NilNode struct {
 }
 
 func (it NilNode) Type() nodeType {
-	return it.t
+	return NNil
 }
 
 func (NilNode) Eval(env interface{}) (interface{}, error) {
@@ -174,7 +174,7 @@ type BinaryNode struct {
 }
 
 func (it BinaryNode) Type() nodeType {
-	return it.t
+	return NBinary
 }
 
 func (it BinaryNode) Eval(env interface{}) (interface{}, error) {
