@@ -42,3 +42,20 @@ func Test_Access_Arg(t *testing.T) {
 	}
 	fmt.Println(arg)
 }
+
+func BenchmarkSplite(b *testing.B) {
+	b.StopTimer()
+	var str = "#{name}#{name}#{name}#{name}#{name}#{name}#{name}#{name}#{name}#{name}#{name}#{name}"
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		//sqlArgRegex.FindAllString(str,-1)
+		//strings.Split(str,"#{")
+		//strings.SplitAfter()
+		FindAllExpressConvertString(str)
+	}
+}
+
+func TestFindAllExpressConvertString(t *testing.T) {
+	var str = "#{name}#{name}#{name}#{name}#{name}#{name}#{name}#{name}#{name}#{name}#{name}#{name}"
+	fmt.Println(FindAllExpressConvertString(str))
+}

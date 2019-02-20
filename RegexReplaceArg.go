@@ -67,29 +67,56 @@ func replace(startChar string, findStrs []string, data string, typeConvert SqlAr
 	return data, nil
 }
 
-
-func FindAllExpressConvertString(s string) []string {
+//find like #{*} value *
+func FindAllExpressConvertString(str string) []string {
 	var finds []string
-	var sps = strings.Split(s, "#{")
-	for _, v := range sps {
-		var lastIndex = strings.LastIndex(v, "}")
-		if lastIndex != -1 {
-			v = string([]byte(v)[0:lastIndex])
-			finds = append(finds, v)
+	var item []byte
+	var lastIndex = -1
+	var startIndex = -1
+	var strBytes = []byte(str)
+	for index, v := range strBytes {
+		if v == 35 {
+			lastIndex = index
+		}
+		if v == 123 && lastIndex == (index-1) {
+			startIndex = index + 1
+		}
+		if v == 125 && startIndex != -1 {
+			item = strBytes[startIndex:index]
+			finds = append(finds, string(item))
+			item = nil
+			startIndex = -1
+			lastIndex = -1
 		}
 	}
+	item = nil
+	strBytes = nil
 	return finds
 }
 
-func FindAllExpressString(s string) []string {
+//find like ${*} value *
+func FindAllExpressString(str string) []string {
 	var finds []string
-	var sps = strings.Split(s, "${")
-	for _, v := range sps {
-		var lastIndex = strings.LastIndex(v, "}")
-		if lastIndex != -1 {
-			v = string([]byte(v)[0:lastIndex])
-			finds = append(finds, v)
+	var item []byte
+	var lastIndex = -1
+	var startIndex = -1
+	var strBytes = []byte(str)
+	for index, v := range str {
+		if v == 36 {
+			lastIndex = index
+		}
+		if v == 123 && lastIndex == (index-1) {
+			startIndex = index + 1
+		}
+		if v == 125 && startIndex != -1 {
+			item = strBytes[startIndex:index]
+			finds = append(finds, string(item))
+			item = nil
+			startIndex = -1
+			lastIndex = -1
 		}
 	}
+	item = nil
+	strBytes = nil
 	return finds
 }
