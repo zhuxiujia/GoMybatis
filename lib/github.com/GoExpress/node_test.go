@@ -16,6 +16,8 @@ func TestNode_Run(t *testing.T) {
 		"a == 1 && a != 0",
 		"1 > 3 ",
 		"1 + 2 != nil",
+		"1 + 2 != nil && 1 > 0 ",
+		"1 + 2 != nil && 2 < b*8 ",
 	}
 	for _, expr := range expressions {
 		node, e := Parser(expr)
