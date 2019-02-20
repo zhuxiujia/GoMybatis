@@ -23,16 +23,22 @@ func EvalTake(operator Operator, arg interface{}) (interface{}, error) {
 		var m = arg.(map[string]interface{})
 		var result interface{}
 		if strings.Index(operator, ".") != -1 {
-			var sps = strings.Split(operator, ".")
-			result = m[sps[0]]
-			return getObj(sps[len(sps)-1], reflect.ValueOf(result), result)
+			var item []byte
+			for index, v := range operator {
+				if v == 46 {
+					item = []byte(operator)[0:index]
+					break
+				}
+			}
+			result = m[string(item)]
+			var otheritem = string([]byte(operator)[len(item)+1 : len(operator)])
+			return getObj(otheritem, reflect.ValueOf(result), result)
 		} else {
 			result = m[operator]
 			return result, nil
 		}
 	} else {
 		return getObj(operator, av, arg)
-
 	}
 	return arg, nil
 }
