@@ -138,7 +138,7 @@ func main() {
              <td>支持null和nil和指针</td>
              <td>快-实测比expr快</td>
     	     <td>还行</td>
-             <td>一般</td>
+             <td>少</td>
         </tr>
     <tr>
          <td>expr</td>
