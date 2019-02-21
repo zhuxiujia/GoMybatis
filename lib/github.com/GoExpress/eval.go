@@ -21,7 +21,10 @@ func EvalTake(operator Operator, arg interface{}) (interface{}, error) {
 	var av = reflect.ValueOf(arg)
 	if av.Kind() == reflect.Map {
 		var m = arg.(map[string]interface{})
-		var result interface{}
+		var result = m[operator]
+		if result != nil {
+			return result, nil
+		}
 		if strings.Index(operator, ".") != -1 {
 			var item []byte
 			for index, v := range operator {
@@ -33,10 +36,8 @@ func EvalTake(operator Operator, arg interface{}) (interface{}, error) {
 			result = m[string(item)]
 			var otheritem = string([]byte(operator)[len(item)+1 : len(operator)])
 			return getObj(otheritem, reflect.ValueOf(result), result)
-		} else {
-			result = m[operator]
-			return result, nil
 		}
+		return nil, nil
 	} else {
 		return getObj(operator, av, arg)
 	}
