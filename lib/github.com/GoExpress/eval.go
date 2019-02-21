@@ -83,24 +83,21 @@ func Eval(operator Operator, a interface{}, b interface{}) (interface{}, error) 
 		return ab == true || bb == true, nil
 	case Equal, MoreEqual, More, Less, LessEqual:
 		//a kind == b kind
-		return DoEqual(operator, a, b, av, bv)
+		return DoEqualAction(operator, a, b, av, bv)
 	case UnEqual:
 		//a kind == b kind
-		var r, e = DoEqual(operator, a, b, av, bv)
+		var r, e = DoEqualAction(operator, a, b, av, bv)
 		if e != nil {
 			return nil, e
 		}
 		return !r, nil
 	case Add, Reduce, Ride, Divide:
-		return DoAddReduceRideDivide(operator, a, b, av, bv)
+		return DoCalculationAction(operator, a, b, av, bv)
 	}
 	return nil, errors.New("find not support operator :" + operator)
 }
 
-func DoEqual(operator Operator, a interface{}, b interface{}, av reflect.Value, bv reflect.Value) (bool, error) {
-	//start equal
-	a, av = GetDeepValue(av, a)
-	b, bv = GetDeepValue(bv, b)
+func DoEqualAction(operator Operator, a interface{}, b interface{}, av reflect.Value, bv reflect.Value) (bool, error) {
 	switch operator {
 	case UnEqual:
 		fallthrough
@@ -114,6 +111,8 @@ func DoEqual(operator Operator, a interface{}, b interface{}, av reflect.Value, 
 				return true, nil
 			}
 		}
+		a, av = GetDeepValue(av, a)
+		b, bv = GetDeepValue(bv, b)
 		if av.Kind() == reflect.Bool {
 			return a.(bool) == b.(bool), nil
 		}
@@ -127,6 +126,8 @@ func DoEqual(operator Operator, a interface{}, b interface{}, av reflect.Value, 
 		if a == nil || b == nil {
 			return false, errors.New("can not parser '<' , arg have nil object!")
 		}
+		a, av = GetDeepValue(av, a)
+		b, bv = GetDeepValue(bv, b)
 		a = toNumberType(av)
 		b = toNumberType(bv)
 		return a.(float64) < b.(float64), nil
@@ -134,6 +135,8 @@ func DoEqual(operator Operator, a interface{}, b interface{}, av reflect.Value, 
 		if a == nil || b == nil {
 			return false, errors.New("can not parser '>' , arg have nil object!")
 		}
+		a, av = GetDeepValue(av, a)
+		b, bv = GetDeepValue(bv, b)
 		a = toNumberType(av)
 		b = toNumberType(bv)
 		return a.(float64) > b.(float64), nil
@@ -141,6 +144,8 @@ func DoEqual(operator Operator, a interface{}, b interface{}, av reflect.Value, 
 		if a == nil || b == nil {
 			return false, errors.New("can not parser '>=' , arg have nil object!")
 		}
+		a, av = GetDeepValue(av, a)
+		b, bv = GetDeepValue(bv, b)
 		a = toNumberType(av)
 		b = toNumberType(bv)
 		return a.(float64) >= b.(float64), nil
@@ -148,6 +153,8 @@ func DoEqual(operator Operator, a interface{}, b interface{}, av reflect.Value, 
 		if a == nil || b == nil {
 			return false, errors.New("can not parser '<=' , arg have nil object!")
 		}
+		a, av = GetDeepValue(av, a)
+		b, bv = GetDeepValue(bv, b)
 		a = toNumberType(av)
 		b = toNumberType(bv)
 		return a.(float64) <= b.(float64), nil
@@ -155,23 +162,23 @@ func DoEqual(operator Operator, a interface{}, b interface{}, av reflect.Value, 
 	return false, errors.New("find not support equal operator :" + operator)
 }
 
-func DoAddReduceRideDivide(operator Operator, a interface{}, b interface{}, av reflect.Value, bv reflect.Value) (interface{}, error) {
+func DoCalculationAction(operator Operator, a interface{}, b interface{}, av reflect.Value, bv reflect.Value) (interface{}, error) {
 	if a == nil || b == nil {
 		//equal nil
 		return false, errors.New("add operator value can not be nil!")
 	}
+
 	//start equal
 	a, av = GetDeepValue(av, a)
 	b, bv = GetDeepValue(bv, b)
-
-	if av.Kind() == reflect.String {
-		return a.(string) + b.(string), nil
-	}
 	a = toNumberType(av)
 	b = toNumberType(bv)
 	if isNumberType(av.Type()) {
 		switch operator {
 		case Add:
+			if av.Kind() == reflect.String {
+				return a.(string) + b.(string), nil
+			}
 			return a.(float64) + b.(float64), nil
 		case Reduce:
 			return a.(float64) - b.(float64), nil
