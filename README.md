@@ -124,7 +124,7 @@ func main() {
 ```
 
 
-#### 多种表达式引擎可选
+#### 多种表达式引擎可选（表达式引擎接口ExpressionEngine.go 负责表达式("foo != nil"...)的判断和取值）
 <table border="1">
      <tr>
         <td>表达式引擎</td>
