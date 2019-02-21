@@ -34,13 +34,26 @@ func Benchmark_SqlBuilder(b *testing.B) {
 </mapper>`
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
-	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineExpr{}, true), &LogStandard{}, false)
+	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true), &LogStandard{}, false)
 	var paramMap = make(map[string]interface{})
 	paramMap["name"] = ""
 	paramMap["startTime"] = ""
 	paramMap["endTime"] = ""
 	paramMap["page"] = 0
 	paramMap["size"] = 0
+
+	//paramMap["func_name != nil"] = func(arg map[string]interface{}) interface{} {
+	//	return arg["name"] != nil
+	//}
+	//paramMap["func_startTime != nil"] = func(arg map[string]interface{}) interface{} {
+	//	return arg["startTime"] != nil
+	//}
+	//paramMap["func_endTime != nil"] = func(arg map[string]interface{}) interface{} {
+	//	return arg["endTime"] != nil
+	//}
+	//paramMap["func_page >= 0 and size != 0"] = func(arg map[string]interface{}) interface{} {
+	//	return arg["page"] != nil && arg["size"] != nil
+	//}
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
@@ -75,7 +88,7 @@ func Test_SqlBuilder_Tps(t *testing.T) {
 </mapper>`
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
-	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineExpr{}, true), &LogStandard{}, false)
+	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true), &LogStandard{}, false)
 	var paramMap = make(map[string]interface{})
 	paramMap["name"] = ""
 	paramMap["startTime"] = ""
@@ -170,7 +183,7 @@ func TestGoMybatisSqlBuilder_BuildSql(t *testing.T) {
 </mapper>`
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
-	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineExpr{}, true), &LogStandard{}, true)
+	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true), &LogStandard{}, true)
 	var paramMap = make(map[string]interface{})
 	paramMap["name"] = "name"
 	paramMap["type_name"] = StringType
@@ -215,7 +228,7 @@ func Benchmark_SqlBuilder_If_Element(b *testing.B) {
 </mapper>`
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
-	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineExpr{}, true), &LogStandard{}, false)
+	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true), &LogStandard{}, false)
 	var paramMap = make(map[string]interface{})
 	paramMap["name"] = ""
 	paramMap["startTime"] = ""

@@ -90,3 +90,23 @@ func (it *ExpressionEngineProxy) SetUseLexerCache(isUseCache bool) error {
 func (it *ExpressionEngineProxy) LexerCacheable() bool {
 	return it.lexerCacheable
 }
+
+//执行
+func (it *ExpressionEngineProxy) LexerAndEval(expression string, arg map[string]interface{}) (interface{}, error) {
+
+	var funcItem = arg["func_"+expression]
+	if funcItem != nil {
+		var f = funcItem.(func(arg map[string]interface{}) interface{})
+		return f(arg), nil
+	}
+
+	ifElementevalExpression, err := it.Lexer(expression)
+	if err != nil {
+		return false, err
+	}
+	result, err := it.Eval(ifElementevalExpression, arg, 0)
+	if err != nil {
+		return false, err
+	}
+	return result, nil
+}

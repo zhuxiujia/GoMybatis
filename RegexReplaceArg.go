@@ -12,7 +12,7 @@ var defaultArgRegex, _ = regexp.Compile("\\$\\{[^}]*\\}")
 var sqlArgRegex, _ = regexp.Compile("\\#\\{[^}]*\\}")
 
 //替换参数
-func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlArgTypeConvert, engine ExpressionEngine) (string, error) {
+func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlArgTypeConvert, engine *ExpressionEngineProxy) (string, error) {
 	if data == "" {
 		return data, nil
 	}
@@ -33,7 +33,7 @@ func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlA
 }
 
 //执行替换操作
-func replace(startChar string, findStrs map[string]int, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine ExpressionEngine) (string, error) {
+func replace(startChar string, findStrs map[string]int, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine *ExpressionEngineProxy) (string, error) {
 	for findStr, _ := range findStrs {
 		var repleaceStr = findStr
 		if strings.Contains(repleaceStr, ",") {
@@ -46,11 +46,8 @@ func replace(startChar string, findStrs map[string]int, data string, typeConvert
 			evalData = argValue
 		} else {
 			//exec lexer
-			lexer, err := engine.Lexer(repleaceStr)
-			if err != nil {
-				return "", errors.New(engine.Name() + ":" + err.Error())
-			}
-			evalData, err = engine.Eval(lexer, arg, 0)
+			var err error
+			evalData, err = engine.LexerAndEval(repleaceStr, arg)
 			if err != nil {
 				return "", errors.New(engine.Name() + ":" + err.Error())
 			}

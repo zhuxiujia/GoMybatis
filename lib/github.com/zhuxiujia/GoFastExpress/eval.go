@@ -1,4 +1,4 @@
-package GoExpress
+package GoFastExpress
 
 import (
 	"github.com/kataras/iris/core/errors"

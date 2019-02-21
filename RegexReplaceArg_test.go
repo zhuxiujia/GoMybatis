@@ -33,7 +33,8 @@ func Test_Access_Arg(t *testing.T) {
 	defer utils.CountMethodUseTime(time.Now(), "Test_Access_Arg", time.Millisecond)
 	var string = "-----#{bean.Name}------#{bean.Child.Age}---"
 
-	var arg, err = replaceArg(string, param, GoMybatisSqlArgTypeConvert{}, &ExpressionEngineJee{})
+	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineJee{}, true)
+	var arg, err = replaceArg(string, param, GoMybatisSqlArgTypeConvert{}, &engine)
 	if err != nil {
 		t.Fatal(err)
 	}

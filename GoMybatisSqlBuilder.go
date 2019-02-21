@@ -287,15 +287,9 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 }
 
 func (it *GoMybatisSqlBuilder) doIfElement(expression string, param map[string]interface{}) (bool, error) {
-	//it.repleaceExpression(expression, param)
-	ifElementevalExpression, err := it.expressionEngineProxy.Lexer(expression)
-	if err != nil {
-		return false, err
-	}
-	result, err := it.expressionEngineProxy.Eval(ifElementevalExpression, param, 0)
+	var result, err = it.expressionEngineProxy.LexerAndEval(expression, param)
 	if err != nil {
 		err = utils.NewError("GoMybatisSqlBuilder", "[GoMybatis] <test `", expression, `> fail,`, err.Error())
-		return false, err
 	}
 	return result.(bool), nil
 }

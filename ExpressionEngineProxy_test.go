@@ -7,7 +7,7 @@ import (
 )
 
 func TestExpressionEngineProxy_Eval(t *testing.T) {
-	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineExpr{}, false)
+	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, false)
 	var lexer, err = engine.Lexer("foo")
 	if err != nil {
 		t.Fatal(err)
@@ -25,7 +25,7 @@ func TestExpressionEngineProxy_Eval(t *testing.T) {
 }
 
 func TestExpressionEngineProxy_Lexer(t *testing.T) {
-	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineExpr{}, false)
+	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, false)
 	var _, err = engine.Lexer("foo")
 	if err != nil {
 		t.Fatal(err)
@@ -39,7 +39,7 @@ func BenchmarkExpressionEngineProxy_Eval(b *testing.B) {
 		DeleteFlag: 1,
 	}
 
-	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineExpr{}, false)
+	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, false)
 	var evaluateParameters = make(map[string]interface{})
 
 	evaluateParameters["activity"] = &activity
@@ -61,7 +61,6 @@ func BenchmarkExpressionEngineProxy_Eval(b *testing.B) {
 	}
 }
 
-
 func BenchmarkExpressionEngineProxy_Eval_each(b *testing.B) {
 	b.StopTimer()
 	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineGovaluate{}, true)
@@ -71,7 +70,7 @@ func BenchmarkExpressionEngineProxy_Eval_each(b *testing.B) {
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		for run:=0;run<8;run++{
+		for run := 0; run < 8; run++ {
 			var expression = "activity"
 			evalExpression, err := engine.Lexer(expression)
 			if err != nil {

@@ -1,7 +1,7 @@
 package GoMybatis
 
 import (
-	"github.com/zhuxiujia/GoMybatis/lib/github.com/GoExpress"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/zhuxiujia/GoFastExpress"
 	"strings"
 )
 
@@ -18,7 +18,7 @@ func (it *ExpressionEngineGoExpress) Name() string {
 //返回：interface{} 编译结果,error 错误
 func (it *ExpressionEngineGoExpress) Lexer(expression string) (interface{}, error) {
 	expression = it.repleaceExpression(expression)
-	var result, err = GoExpress.Parser(expression)
+	var result, err = GoFastExpress.Parser(expression)
 	return result, err
 }
 
@@ -26,7 +26,7 @@ func (it *ExpressionEngineGoExpress) Lexer(expression string) (interface{}, erro
 //参数：lexerResult=编译结果，arg=参数
 //返回：执行结果，错误
 func (it *ExpressionEngineGoExpress) Eval(lexerResult interface{}, arg interface{}, operation int) (interface{}, error) {
-	output, err := lexerResult.(GoExpress.Node).Eval(arg)
+	output, err := lexerResult.(GoFastExpress.Node).Eval(arg)
 	return output, err
 }
 

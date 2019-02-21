@@ -42,7 +42,7 @@ func (it GoMybatisEngine) New() GoMybatisEngine {
 		it.sqlArgTypeConvert = GoMybatisSqlArgTypeConvert{}
 	}
 	if it.expressionEngine == nil {
-		it.expressionEngine = &ExpressionEngineExpr{}
+		it.expressionEngine = &ExpressionEngineGoExpress{}
 	}
 	if it.sqlResultDecoder == nil {
 		it.sqlResultDecoder = GoMybatisSqlResultDecoder{}
