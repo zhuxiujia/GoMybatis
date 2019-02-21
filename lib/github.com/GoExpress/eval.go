@@ -168,29 +168,32 @@ func DoCalculationAction(operator Operator, a interface{}, b interface{}, av ref
 		//equal nil
 		return false, errors.New("add operator value can not be nil!")
 	}
-
 	//start equal
 	a, av = GetDeepValue(av, a)
 	b, bv = GetDeepValue(bv, b)
-	a = toNumberType(av)
-	b = toNumberType(bv)
-	if isNumberType(av.Type()) {
-		switch operator {
-		case Add:
-			if av.Kind() == reflect.String {
-				return a.(string) + b.(string), nil
-			}
-			return a.(float64) + b.(float64), nil
-		case Reduce:
-			return a.(float64) - b.(float64), nil
-		case Ride:
-			return a.(float64) * b.(float64), nil
-		case Divide:
-			if b.(float64) == 0 {
-				return nil, errors.New("can not divide zero value!")
-			}
-			return a.(float64) / b.(float64), nil
+	switch operator {
+	case Add:
+		if av.Kind() == reflect.String {
+			return a.(string) + b.(string), nil
 		}
+		a = toNumberType(av)
+		b = toNumberType(bv)
+		return a.(float64) + b.(float64), nil
+	case Reduce:
+		a = toNumberType(av)
+		b = toNumberType(bv)
+		return a.(float64) - b.(float64), nil
+	case Ride:
+		a = toNumberType(av)
+		b = toNumberType(bv)
+		return a.(float64) * b.(float64), nil
+	case Divide:
+		a = toNumberType(av)
+		b = toNumberType(bv)
+		if b.(float64) == 0 {
+			return nil, errors.New("can not divide zero value!")
+		}
+		return a.(float64) / b.(float64), nil
 	}
 	return "", errors.New("find not support operator :" + operator)
 }
