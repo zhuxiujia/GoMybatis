@@ -124,10 +124,7 @@ func main() {
 ```
 
 
-#### v2019.1.19 新增了gojee引擎（改进了原作者源码取消了开头的"."符号,例如.a.b变成 a.b）和expr表达式引擎（改进了原作者源码指针的bug,加入字符串相加操作例如'a'+'b'）
-https://github.com/zhuxiujia/GoMybatis/tree/master/lib/github.com/antonmedv/expr
-https://github.com/zhuxiujia/GoMybatis/tree/master/lib/github.com/nytlabs/gojee
-https://github.com/zhuxiujia/GoMybatis/tree/master/lib/github.com/Knetic/govaluate
+#### 多种表达式引擎可选
 <table border="1">
      <tr>
         <td>表达式引擎</td>
@@ -136,11 +133,18 @@ https://github.com/zhuxiujia/GoMybatis/tree/master/lib/github.com/Knetic/govalua
 	<td>and or 命令性能损耗</td>
         <td>表达式功能</td>
     </tr>
+     <tr>
+             <td>GoFastExpress</td>
+             <td>支持null和nil和指针</td>
+             <td>快-实测比expr快</td>
+    	     <td>还行</td>
+             <td>一般</td>
+        </tr>
     <tr>
          <td>expr</td>
          <td>支持null和nil和指针</td>
          <td>快-实测比govaluate快</td>
-	 <td>还行</td>
+	     <td>还行</td>
          <td>一般</td>
     </tr>
     <tr>
@@ -158,7 +162,7 @@ https://github.com/zhuxiujia/GoMybatis/tree/master/lib/github.com/Knetic/govalua
            <td>一般</td>
     </tr>
 </table>
-为了执行效率 框架默认使用 github.com/antonmedv/expr作为默认选项，你也可以自定义调用GoMybatis.WriteMapper()参数中SqlBuilder的参数自行选择加入ExpressionEngine
+为了执行效率 框架默认使用 github.com/zhuxiujia/GoFastExpress 表达式引擎作为默认选项，你也可以自定义调用GoMybatis.WriteMapper()参数中SqlBuilder的参数自行选择加入ExpressionEngine
 
 ## 请及时关注版本，及时升级版本(新的功能，bug修复)
 ## TODO 期待功能路线（预览特性,有可能会更改）
