@@ -263,7 +263,9 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 		var versionData = it.decodeVersionData(resultMapData)
 
 		var sql bytes.Buffer
-		sql.WriteString("update set ")
+		sql.WriteString("update ")
+		sql.WriteString(tables)
+		sql.WriteString(" set ")
 		if columns == "" {
 			mapper.ElementItems = append(mapper.ElementItems, ElementItem{
 				ElementType: Element_String,
@@ -283,9 +285,6 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			sql.Reset()
 			it.DecodeSets(columns, mapper, LogicDeleteData{}, versionData)
 		}
-		sql.WriteString(" from ")
-		sql.WriteString(tables)
-
 		if len(wheres) > 0 || logic.Enable {
 			sql.WriteString(" where ")
 			mapper.ElementItems = append(mapper.ElementItems, ElementItem{
@@ -315,17 +314,15 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 		if logic.Enable {
 			//enable logic delete
 			var sql bytes.Buffer
-			sql.WriteString("update set ")
-
+			sql.WriteString("update ")
+			sql.WriteString(tables)
+			sql.WriteString(" set ")
 			mapper.ElementItems = append(mapper.ElementItems, ElementItem{
 				ElementType: Element_String,
 				DataString:  sql.String(),
 			})
 			sql.Reset()
 			it.DecodeSets("", mapper, logic, nil)
-
-			sql.WriteString(" from ")
-			sql.WriteString(tables)
 			if len(wheres) > 0 {
 				sql.WriteString(" where ")
 				mapper.ElementItems = append(mapper.ElementItems, ElementItem{
