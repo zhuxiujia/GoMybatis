@@ -11,7 +11,7 @@
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/vuetify.png)
 ### website https://zhuxiujia.github.io/gomybatis.io/info.html
 # advantage
-<a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-High concurrency</a>Assuming that the response time of the database is 0, the number of transactions per second in the framework on a 6-core 16GB PC can reach 246982 Tps/s, which takes only 0.4s.<br>
+<a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-High concurrency</a>Assuming that the response time of the database is 0, the number of transactions per second in the framework on a 6-core 16GB PC can reach 412120 Tps/s, which takes only 0.25s.<br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-Transaction support</a>Session flexible plug-in, compatible with transitional micro-services<br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-dynamic sql</a>In xml, you can flexibly use`<if>`，`<foreach>`，`<resultMap>,<bind>`and so on. The 15 practical functions of Mybatis are included in the Java framework.<br>
 `<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<where>,<foreach>,<resultMap>,<bind>,<choose><when><otherwise>,<sql><include>`<br>
