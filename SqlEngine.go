@@ -1,7 +1,5 @@
 package GoMybatis
 
-import "database/sql"
-
 type Result struct {
 	LastInsertId int64
 	RowsAffected int64
@@ -27,8 +25,6 @@ type SessionEngine interface {
 	Name() string
 	//创建session
 	NewSession(mapperName string) (Session, error)
-	//获取数据库map
-	DBMap() map[string]*sql.DB
 	//获取数据源路由
 	DataSourceRouter() DataSourceRouter
 	//设置数据源路由

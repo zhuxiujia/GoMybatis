@@ -6,11 +6,10 @@ import (
 )
 
 type GoMybatisEngine struct {
-	isInit           bool               //是否初始化
-	dbMap            map[string]*sql.DB //数据库map（默认不为nil）
-	dataSourceRouter DataSourceRouter   //动态数据源路由器
-	log              Log                //日志实现
-	logEnable        bool               //是否允许日志输出（默认开启）
+	isInit           bool             //是否初始化
+	dataSourceRouter DataSourceRouter //动态数据源路由器
+	log              Log              //日志实现
+	logEnable        bool             //是否允许日志输出（默认开启）
 
 	sessionFactory *SessionFactory
 
@@ -26,7 +25,6 @@ type GoMybatisEngine struct {
 }
 
 func (it GoMybatisEngine) New() GoMybatisEngine {
-	it.dbMap = make(map[string]*sql.DB)
 	it.logEnable = true
 	it.isInit = true
 
@@ -85,15 +83,7 @@ func (it *GoMybatisEngine) DataSourceRouter() DataSourceRouter {
 }
 func (it *GoMybatisEngine) SetDataSourceRouter(router DataSourceRouter) {
 	it.initCheck()
-	for k, v := range it.dbMap {
-		router.SetDB(k, v)
-	}
 	it.dataSourceRouter = router
-}
-
-func (it *GoMybatisEngine) DBMap() map[string]*sql.DB {
-	it.initCheck()
-	return it.dbMap
 }
 
 func (it *GoMybatisEngine) NewSession(mapperName string) (Session, error) {
@@ -197,7 +187,7 @@ func (it *GoMybatisEngine) Open(driverName, dataSourceName string) error {
 	if err != nil {
 		return err
 	}
-	it.DBMap()[dataSourceName] = db
+	it.dataSourceRouter.SetDB(dataSourceName, db)
 	return nil
 }
 

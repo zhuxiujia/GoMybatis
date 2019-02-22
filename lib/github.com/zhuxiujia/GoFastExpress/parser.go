@@ -25,6 +25,9 @@ const (
 	LessEqual Operator = "<="
 	More      Operator = ">"
 	MoreEqual Operator = ">="
+
+	Nil  Operator = "nil"
+	Null Operator = "null"
 )
 
 //乘除优先于加减 计算优于比较,
@@ -64,7 +67,7 @@ func Parser(express string) (Node, error) {
 
 func parserNode(v Operator) Node {
 	var node Node
-	if v == "nil" {
+	if v == Nil || v == Null {
 		var inode = NilNode{}
 		node = inode
 	}
@@ -173,7 +176,8 @@ func haveOpt(nodes []Node) bool {
 }
 
 func ParserOperators(express string) []Operator {
-	express = strings.Replace(express, "nil", " nil ", -1)
+	express = strings.Replace(express, Null, " "+Null+" ", -1)
+	express = strings.Replace(express, Nil, " "+Nil+" ", -1)
 	express = strings.Replace(express, Add, " "+Add+" ", -1)
 	express = strings.Replace(express, Reduce, " "+Reduce+" ", -1)
 	express = strings.Replace(express, Ride, " "+Ride+" ", -1)
@@ -197,7 +201,7 @@ func ParserOperators(express string) []Operator {
 	var newResult []string
 	var results = strings.Split(express, " ")
 	for _, v := range results {
-		if v != " " && v != "" {
+		if v != "" && v != " " {
 			newResult = append(newResult, v)
 		}
 	}

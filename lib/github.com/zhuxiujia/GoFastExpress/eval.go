@@ -103,6 +103,12 @@ func DoEqualAction(operator Operator, a interface{}, b interface{}, av reflect.V
 	case UnEqual:
 		fallthrough
 	case Equal:
+		if av.Kind() == reflect.Ptr && av.IsNil() == true {
+			a = nil
+		}
+		if bv.Kind() == reflect.Ptr && bv.IsNil() == true {
+			b = nil
+		}
 		if a == nil || b == nil {
 			//equal nil
 			if a != nil || b != nil {
@@ -112,8 +118,12 @@ func DoEqualAction(operator Operator, a interface{}, b interface{}, av reflect.V
 				return true, nil
 			}
 		}
-		a, av = GetDeepValue(av, a)
-		b, bv = GetDeepValue(bv, b)
+		if av.Kind() == reflect.Ptr {
+			a, av = GetDeepValue(av, a)
+		}
+		if bv.Kind() == reflect.Ptr {
+			b, bv = GetDeepValue(bv, b)
+		}
 		if av.Kind() == reflect.Bool {
 			return a.(bool) == b.(bool), nil
 		}

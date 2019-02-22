@@ -10,6 +10,17 @@ func TestEval(t *testing.T) {
 	fmt.Println(Eval("", nil, "a"))
 }
 
+func TestEvalNil(t *testing.T) {
+	var b *string
+	var result, e = Eval("!=", nil, b)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if result.(bool) == true {
+		t.Fatal("express != nil fail")
+	}
+}
+
 func TestEval_number(t *testing.T) {
 	var aa = 2
 	fmt.Println(Eval(Add, &aa, 1))

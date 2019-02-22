@@ -316,7 +316,7 @@ func TestInsertTemplete(t *testing.T) {
 }
 
 //批量插入模板
-func InsertTempleteBatch(t *testing.T) {
+func TestInsertTempleteBatch(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
 		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return

@@ -6,7 +6,9 @@ import (
 )
 
 func TestNode_Run(t *testing.T) {
+
 	var expressions = []string{
+		"a == null",
 		"a +1 > b * 8",
 		"a >= 0",
 		"'a'+c",
@@ -19,6 +21,7 @@ func TestNode_Run(t *testing.T) {
 		"a == 1 && a != 0",
 		"1 > 3 ",
 		"1 + 2 != nil",
+		"1 != null",
 		"1 + 2 != nil && 1 > 0 ",
 		"1 + 2 != nil && 2 < b*8 ",
 	}
