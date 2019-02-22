@@ -2,6 +2,8 @@ package GoFastExpress
 
 import (
 	"errors"
+	"go/scanner"
+	"go/token"
 	"strconv"
 	"strings"
 )
@@ -205,33 +207,22 @@ func haveOpt(nodes []Node) bool {
 }
 
 func ParserOperators(express string) []Operator {
-	express = strings.Replace(express, Null, " "+Null+" ", -1)
-	express = strings.Replace(express, Nil, " "+Nil+" ", -1)
-	express = strings.Replace(express, Add, " "+Add+" ", -1)
-	express = strings.Replace(express, Reduce, " "+Reduce+" ", -1)
-	express = strings.Replace(express, Ride, " "+Ride+" ", -1)
-	express = strings.Replace(express, Divide, " "+Divide+" ", -1)
-	express = strings.Replace(express, And, " "+And+" ", -1)
-	express = strings.Replace(express, Or, " "+Or+" ", -1)
-	express = strings.Replace(express, UnEqual, " "+UnEqual+" ", -1)
-	express = strings.Replace(express, Equal, " "+Equal+" ", -1)
-	express = strings.Replace(express, LessEqual, " "+LessEqual+" ", -1)
-	express = strings.Replace(express, Less, " "+Less+" ", -1)
-	express = strings.Replace(express, MoreEqual, " "+MoreEqual+" ", -1)
-	express = strings.Replace(express, More, " "+More+" ", -1)
-
-	express = strings.Replace(express, "! =", " "+UnEqual+" ", -1)
-	express = strings.Replace(express, "= =", " "+Equal+" ", -1)
-	express = strings.Replace(express, "< =", " "+LessEqual+" ", -1)
-	express = strings.Replace(express, "> =", " "+MoreEqual+" ", -1)
-	express = strings.Replace(express, "& &", " "+And+" ", -1)
-	express = strings.Replace(express, "| |", " "+Or+" ", -1)
-
 	var newResult []string
-	var results = strings.Split(express, " ")
-	for _, v := range results {
-		if v != "" && v != " " {
-			newResult = append(newResult, v)
+	src := []byte(express)
+	var s scanner.Scanner
+	fset := token.NewFileSet()
+	file := fset.AddFile("", fset.Base(), len(src))
+	s.Init(file, src, nil, 0)
+	for {
+		_, tok, lit := s.Scan()
+		if tok == token.EOF || lit=="\n"{
+			break
+		}
+		//fmt.Printf("%-6s%-8s%q\n", fset.Position(pos), tok, lit)
+		if lit==""{
+			newResult = append(newResult, tok.String())
+		}else{
+			newResult = append(newResult, lit)
 		}
 	}
 	return newResult
