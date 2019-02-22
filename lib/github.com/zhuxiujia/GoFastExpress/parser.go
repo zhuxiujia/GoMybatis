@@ -242,7 +242,7 @@ func ParserOperators(express string) []Operator {
 		}
 		//fmt.Printf("%-6s%-8s%q\n", fset.Position(pos), tok, lit)
 		var s = toStr(lit, tok)
-		if lit == "" {
+		if lit == "" && tok != token.ILLEGAL {
 			lastToken = tok
 		}
 		if tok == token.PERIOD || lastToken == token.PERIOD {
