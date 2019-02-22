@@ -37,6 +37,19 @@ var priorityArray = []Operator{Ride, Divide, Add, Reduce,
 	LessEqual, Less, MoreEqual, More,
 	UnEqual, Equal, And, Or}
 
+var NotSupportOptMap = map[string]bool{
+	"=": true,
+	"!": true,
+	"@": true,
+	"#": true,
+	"$": true,
+	"^": true,
+	"&": true,
+	"(": true,
+	")": true,
+	"`": true,
+}
+
 //操作符优先级
 var priorityMap = map[Operator]int{}
 
@@ -104,8 +117,8 @@ func parserNode(express string, v Operator) (Node, error) {
 		}
 		return inode, nil
 	}
-	if v == "=" {
-		return nil, errors.New("find not support opt = '=',express=" + express)
+	if NotSupportOptMap[v] {
+		return nil, errors.New("find not support opt = '" + v + "',express=" + express)
 	}
 	if isOperatorsAction(v) {
 		var optNode = OptNode{
@@ -154,6 +167,13 @@ func parserNode(express string, v Operator) (Node, error) {
 		}
 		return inode, nil
 	}
+	if strings.Index(v, "`") == 0 && strings.LastIndex(v, "`") == (len(v)-1) {
+		var inode = StringNode{
+			value: string([]byte(v)[1 : len(v)-1]),
+			t:     NString,
+		}
+		return inode, nil
+	}
 	e = nil
 	if isOperatorsAction(v) {
 		var optNode = OptNode{
@@ -168,6 +188,7 @@ func parserNode(express string, v Operator) (Node, error) {
 	}
 	return argNode, nil
 }
+
 func findReplaceOpt(express string, operator Operator, nodearg *[]Node) error {
 	var nodes = *nodearg
 	for nIndex, n := range nodes {
@@ -215,13 +236,13 @@ func ParserOperators(express string) []Operator {
 	s.Init(file, src, nil, 0)
 	for {
 		_, tok, lit := s.Scan()
-		if tok == token.EOF || lit=="\n"{
+		if tok == token.EOF || lit == "\n" {
 			break
 		}
 		//fmt.Printf("%-6s%-8s%q\n", fset.Position(pos), tok, lit)
-		if lit==""{
+		if lit == "" {
 			newResult = append(newResult, tok.String())
-		}else{
+		} else {
 			newResult = append(newResult, lit)
 		}
 	}
@@ -234,7 +255,7 @@ func isOperatorsAction(arg string) bool {
 		arg == Reduce ||
 		arg == Ride ||
 		arg == Divide ||
-		//比较操作符
+	//比较操作符
 		arg == And ||
 		arg == Or ||
 		arg == Equal ||

@@ -8,7 +8,7 @@ import (
 func TestNode_Run(t *testing.T) {
 
 	var expressions = []string{
-		"a == null",
+		"`f`+`s`",
 		"a +1 > b * 8",
 		"a >= 0",
 		"'a'+c",
