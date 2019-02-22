@@ -6,7 +6,15 @@ import (
 )
 
 func TestParser(t *testing.T) {
-	Parser("a = 'b'")
+	var e error
+	//_,e=Parser("a = 'b'")
+	//if e!=nil{
+	//	t.Fatal(e)
+	//}
+	_, e = Parser(" a += b")
+	if e != nil {
+		t.Fatal(e)
+	}
 }
 
 func TestParser2(t *testing.T) {

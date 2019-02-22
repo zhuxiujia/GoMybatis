@@ -99,14 +99,13 @@ func (it *ExpressionEngineProxy) LexerAndEval(expression string, arg map[string]
 		var f = funcItem.(func(arg map[string]interface{}) interface{})
 		return f(arg), nil
 	}
-
 	ifElementevalExpression, err := it.Lexer(expression)
 	if err != nil {
-		return false, err
+		return false, utils.NewError("ExpressionEngineProxy", err)
 	}
 	result, err := it.Eval(ifElementevalExpression, arg, 0)
 	if err != nil {
-		return false, err
+		return false, utils.NewError("ExpressionEngineProxy", err)
 	}
 	return result, nil
 }

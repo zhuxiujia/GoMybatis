@@ -46,15 +46,21 @@ func init() {
 
 func Parser(express string) (Node, error) {
 	var opts = ParserOperators(express)
-
 	var nodes []Node
 	for _, v := range opts {
-		var node = parserNode(v)
+		var node, err = parserNode(express, v)
+		if err != nil {
+			return nil, err
+		}
 		nodes = append(nodes, node)
 	}
-
+	//check epress
+	var err = checkeNodes(express, nodes)
+	if err != nil {
+		return nil, err
+	}
 	for _, v := range priorityArray {
-		var e = findReplaceOpt(v, &nodes)
+		var e = findReplaceOpt(express, v, &nodes)
 		if e != nil {
 			return nil, e
 		}
@@ -65,98 +71,121 @@ func Parser(express string) (Node, error) {
 	return nodes[0], nil
 }
 
-func parserNode(v Operator) Node {
-	var node Node
-	if v == Nil || v == Null {
-		var inode = NilNode{}
-		node = inode
-	}
+func checkeNodes(express string, nodes []Node) error {
+	var nodesLen = len(nodes)
+	for nIndex, n := range nodes {
+		if n.Type() == NOpt {
+			var after Node
+			var befor Node
 
+			if nIndex > 0 {
+				befor = nodes[nIndex-1]
+			}
+			if nIndex < (nodesLen - 1) {
+				after = nodes[nIndex+1]
+			}
+			if after != nil && after.Type() == NOpt {
+				return errors.New("express have more than 2 opt!express=" + express)
+			}
+			if befor != nil && befor.Type() == NOpt {
+				return errors.New("express have more than 2 opt!express=" + express)
+			}
+		}
+	}
+	return nil
+}
+
+func parserNode(express string, v Operator) (Node, error) {
+	if v == Nil || v == Null {
+		var inode = NilNode{
+			t: NNil,
+		}
+		return inode, nil
+	}
+	if v == "=" {
+		return nil, errors.New("find not support opt = '=',express=" + express)
+	}
 	if isOperatorsAction(v) {
 		var optNode = OptNode{
 			value: v,
+			t:     NOpt,
 		}
-		node = optNode
+		return optNode, nil
 	}
 
 	i, e := strconv.ParseInt(v, 0, 64)
-	if node == nil && e == nil {
+	if e == nil {
 		var inode = IntNode{
 			value: int64(i),
+			t:     NInt,
 		}
-		node = inode
+		return inode, nil
 	}
 	u, _ := strconv.ParseUint(v, 0, 64)
-	if node == nil && e == nil {
+	if e == nil {
 		var inode = UIntNode{
 			value: u,
+			t:     NUInt,
 		}
-		node = inode
+		return inode, nil
 	}
 	f, e := strconv.ParseFloat(v, 64)
-	if node == nil && e == nil {
+	if e == nil {
 		var inode = FloatNode{
 			value: f,
+			t:     NFloat,
 		}
-		node = inode
+		return inode, nil
 	}
 	b, e := strconv.ParseBool(v)
-	if node == nil && e == nil {
+	if e == nil {
 		var inode = BoolNode{
 			value: b,
+			t:     NBool,
 		}
-		node = inode
+		return inode, nil
 	}
-	e = nil
-	if node == nil && e == nil &&
-		strings.Index(v, "'") == 0 && strings.LastIndex(v, "'") == (len(v)-1) {
+	if strings.Index(v, "'") == 0 && strings.LastIndex(v, "'") == (len(v)-1) {
 		var inode = StringNode{
 			value: string([]byte(v)[1 : len(v)-1]),
+			t:     NString,
 		}
-		node = inode
+		return inode, nil
 	}
 	e = nil
-
-	if node == nil {
-		var argNode = ArgNode{
+	if isOperatorsAction(v) {
+		var optNode = OptNode{
 			value: v,
+			t:     NOpt,
 		}
-		node = argNode
+		return optNode, nil
 	}
-	if node == nil {
-		panic("uncheck opt " + v)
+	var argNode = ArgNode{
+		value: v,
+		t:     NArg,
 	}
-	return node
+	return argNode, nil
 }
-func findReplaceOpt(operator Operator, nodearg *[]Node) error {
+func findReplaceOpt(express string, operator Operator, nodearg *[]Node) error {
 	var nodes = *nodearg
 	for nIndex, n := range nodes {
 		if n.Type() == NOpt {
-			if nIndex == 0 || (nIndex+1) == len(nodes) {
-				return errors.New("expr operator" + operator + " left or right not have value!")
-			}
-			if nIndex-1 > 0 && nodes[nIndex-1].Type() == NOpt {
-				return errors.New("expr same operator can not have more than 2!")
-			}
-			if nIndex < len(nodes) && nodes[nIndex+1].Type() == NOpt {
-				return errors.New("expr not true!")
-			}
 			var opt = n.(OptNode)
 			if opt.value != operator {
 				continue
 			}
-
 			var newNode = BinaryNode{
 				left:  nodes[nIndex-1],
 				right: nodes[nIndex+1],
 				opt:   opt.value,
+				t:     NBinary,
 			}
 			var newNodes []Node
 			newNodes = append(nodes[:nIndex-1], newNode)
 			newNodes = append(newNodes, nodes[nIndex+2:]...)
 
 			if haveOpt(newNodes) {
-				findReplaceOpt(operator, &newNodes)
+				findReplaceOpt(express, operator, &newNodes)
 			}
 			*nodearg = newNodes
 			break
