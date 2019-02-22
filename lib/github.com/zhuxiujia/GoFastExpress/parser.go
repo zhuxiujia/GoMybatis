@@ -234,19 +234,33 @@ func ParserOperators(express string) []Operator {
 	fset := token.NewFileSet()
 	file := fset.AddFile("", fset.Base(), len(src))
 	s.Init(file, src, nil, 0)
+	var lastToken token.Token
 	for {
 		_, tok, lit := s.Scan()
 		if tok == token.EOF || lit == "\n" {
 			break
 		}
 		//fmt.Printf("%-6s%-8s%q\n", fset.Position(pos), tok, lit)
+		var s = toStr(lit, tok)
 		if lit == "" {
-			newResult = append(newResult, tok.String())
-		} else {
-			newResult = append(newResult, lit)
+			lastToken = tok
 		}
+		if tok == token.PERIOD || lastToken == token.PERIOD {
+			//append to last token
+			newResult[len(newResult)-1] = newResult[len(newResult)-1] + s
+			continue
+		}
+		newResult = append(newResult, s)
 	}
 	return newResult
+}
+
+func toStr(lit string, tok token.Token) string {
+	if lit == "" {
+		return tok.String()
+	} else {
+		return lit
+	}
 }
 
 func isOperatorsAction(arg string) bool {
