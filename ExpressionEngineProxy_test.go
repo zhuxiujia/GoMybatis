@@ -63,7 +63,7 @@ func BenchmarkExpressionEngineProxy_Eval(b *testing.B) {
 
 func BenchmarkExpressionEngineProxy_Eval_each(b *testing.B) {
 	b.StopTimer()
-	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineGovaluate{}, true)
+	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true)
 	var evaluateParameters = make(map[string]interface{})
 	var name = "dsafas"
 	evaluateParameters["activity"] = &name
@@ -86,7 +86,7 @@ func BenchmarkExpressionEngineProxy_Eval_each(b *testing.B) {
 
 func BenchmarkExpressionEngineProxy_LexerAndEval(b *testing.B) {
 	b.StopTimer()
-	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineGovaluate{}, true)
+	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true)
 	var evaluateParameters = make(map[string]interface{})
 	var name = "dsafas"
 	evaluateParameters["activity"] = name
