@@ -83,3 +83,25 @@ func BenchmarkExpressionEngineProxy_Eval_each(b *testing.B) {
 		}
 	}
 }
+
+func BenchmarkExpressionEngineProxy_LexerAndEval(b *testing.B) {
+	b.StopTimer()
+	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineGovaluate{}, true)
+	var evaluateParameters = make(map[string]interface{})
+	var name = "dsafas"
+	evaluateParameters["activity"] = name
+	//evaluateParameters["func_activity != nil"] = func(arg map[string]interface{}) interface{} {
+	//	return arg["activity"] != nil
+	//}
+
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		for run := 0; run < 8; run++ {
+			var expression = "activity != nil"
+			_, err := engine.LexerAndEval(expression, evaluateParameters)
+			if err != nil {
+				b.Fatal(err)
+			}
+		}
+	}
+}
