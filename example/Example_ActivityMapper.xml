@@ -27,7 +27,7 @@
     <updateTemplete tables="biz_activity" sets="name?name = #{name}" wheres="name?name = #{name}"/>
     <deleteTemplete tables="biz_activity" wheres="name?name = #{name}"/>
 
-    <!-- 后台查询产品 -->
+    <!--SelectByCondition func(name *string, startTime *time.Time, endTime *time.Time, page *int, size *int) ([]Activity, error) `mapperParams:"name,startTime,endTime,page,size"`-->
     <select id="selectByCondition" resultMap="BaseResultMap">
         <bind name="pattern" value="'%' + name + '%'"/>
         select * from biz_activity
