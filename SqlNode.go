@@ -59,8 +59,11 @@ func (it StringNode) Eval(env map[string]interface{}) (interface{}, error) {
 	if expressionEngineProxy != nil {
 		proxy = expressionEngineProxy.(*ExpressionEngineProxy)
 	}
-	var result, e = replaceArg(it.value, env, convert, proxy)
-	return result, e
+	return replaceArg(it.value, env, convert, proxy)
+	//if convert!=nil&& proxy!=nil{
+	//}
+	//var c=convert.Convert(env["name"],nil)
+	//return c,nil
 }
 
 type IfNode struct {
