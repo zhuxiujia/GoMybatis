@@ -1,10 +1,10 @@
 package GoMybatis
 
-type SqlNodeType int
+type NodeType int
 
 const (
-	NArg    SqlNodeType = iota
-	NString             //string 节点
+	NArg    NodeType = iota
+	NString              //string 节点
 	NIf
 	NTrim
 	NForEach
@@ -13,7 +13,7 @@ const (
 	NWhen
 )
 
-func (it SqlNodeType) ToString() string {
+func (it NodeType) ToString() string {
 	switch it {
 	case NString:
 		return "NString"

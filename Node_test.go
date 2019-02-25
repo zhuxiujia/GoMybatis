@@ -6,7 +6,7 @@ import (
 )
 
 func TestStringNode_Eval(t *testing.T) {
-	var sNode = StringNode{
+	var sNode = NodeString{
 		value: "#{name}",
 		t:     NString,
 	}
@@ -24,7 +24,7 @@ func TestStringNode_Eval(t *testing.T) {
 
 func BenchmarkStringNode_Eval(b *testing.B) {
 	b.StopTimer()
-	var sNode = StringNode{
+	var sNode = NodeString{
 		value: "#{name}",
 		t:     NString,
 	}

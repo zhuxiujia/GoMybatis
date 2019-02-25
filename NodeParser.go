@@ -1,26 +1,27 @@
 package GoMybatis
 
+//节点解析器
 type NodeParser struct {
 }
 
-func (it NodeParser) ParserNodes(mapperXml []ElementItem) []SqlNode {
-	var nodes = []SqlNode{}
+func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
+	var nodes = []Node{}
 	for _, v := range mapperXml {
-		var node SqlNode
+		var node Node
 
 		switch v.ElementType {
 		case "string":
-			n := StringNode{
+			n := NodeString{
 				value: v.DataString,
 				t:     NString,
 			}
 			node = &n
 			break
 		case "if":
-			n := IfNode{
+			n := NodeIf{
 				t:      NIf,
 				test:   v.Propertys["test"],
-				childs: []SqlNode{},
+				childs: []Node{},
 			}
 			if v.ElementItems != nil && len(v.ElementItems) > 0 {
 				var childNodes = it.ParserNodes(v.ElementItems)
@@ -31,13 +32,13 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []SqlNode {
 			node = &n
 			break
 		case "trim":
-			n := TrimNode{
+			n := NodeTrim{
 				t:               NTrim,
 				prefix:          []byte(v.Propertys["prefix"]),
 				suffix:          []byte(v.Propertys["suffix"]),
 				prefixOverrides: []byte(v.Propertys["prefixOverrides"]),
 				suffixOverrides: []byte(v.Propertys["suffixOverrides"]),
-				childs:          []SqlNode{},
+				childs:          []Node{},
 			}
 			if v.ElementItems != nil && len(v.ElementItems) > 0 {
 				var childNodes = it.ParserNodes(v.ElementItems)
@@ -48,9 +49,9 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []SqlNode {
 			node = &n
 			break
 		case "set":
-			n := TrimNode{
+			n := NodeTrim{
 				t:      NTrim,
-				childs: []SqlNode{},
+				childs: []Node{},
 
 				prefix:          []byte(" set "),
 				suffix:          nil,
@@ -66,9 +67,9 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []SqlNode {
 			node = &n
 			break
 		case "foreach":
-			n := ForEachNode{
+			n := NodeForEach{
 				t:          NForEach,
-				childs:     []SqlNode{},
+				childs:     []Node{},
 				collection: v.Propertys["collection"],
 				index:      v.Propertys["index"],
 				item:       v.Propertys["item"],
@@ -85,9 +86,9 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []SqlNode {
 			node = &n
 			break
 		case "choose":
-			n := ChooseNode{
+			n := NodeChoose{
 				t:         NChoose,
-				whenNodes: []SqlNode{},
+				whenNodes: []Node{},
 			}
 			if v.ElementItems != nil && len(v.ElementItems) > 0 {
 				var childNodes = it.ParserNodes(v.ElementItems)
@@ -111,9 +112,9 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []SqlNode {
 			node = &n
 			break
 		case "otherwise":
-			n := OtherwiseNode{
+			n := NodeOtherwise{
 				t:      NOtherwise,
-				childs: []SqlNode{},
+				childs: []Node{},
 			}
 			if v.ElementItems != nil && len(v.ElementItems) > 0 {
 				var childNodes = it.ParserNodes(v.ElementItems)
@@ -124,9 +125,9 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []SqlNode {
 			node = &n
 			break
 		case "when":
-			n := WhenNode{
+			n := NodeWhen{
 				t:      NOtherwise,
-				childs: []SqlNode{},
+				childs: []Node{},
 				test:   v.Propertys["test"],
 			}
 			if v.ElementItems != nil && len(v.ElementItems) > 0 {
@@ -138,13 +139,13 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []SqlNode {
 			node = &n
 			break
 		case "where":
-			n := TrimNode{
+			n := NodeTrim{
 				t:               NTrim,
 				prefix:          []byte(DefaultWhereElement_Prefix),
 				suffix:          []byte(v.Propertys["suffix"]),
 				prefixOverrides: []byte(DefaultWhereElement_PrefixOverrides),
 				suffixOverrides: []byte(v.Propertys["suffixOverrides"]),
-				childs:          []SqlNode{},
+				childs:          []Node{},
 			}
 			if v.ElementItems != nil && len(v.ElementItems) > 0 {
 				var childNodes = it.ParserNodes(v.ElementItems)
