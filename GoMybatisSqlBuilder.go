@@ -305,11 +305,7 @@ func (it *GoMybatisSqlBuilder) bindBindElementArg(args map[string]interface{}, i
 		//args["type_"+name] = StringType
 		return args
 	}
-	bindEvalExpression, err := it.expressionEngineProxy.Lexer(value)
-	if err != nil {
-		return args
-	}
-	result, err := it.expressionEngineProxy.Eval(bindEvalExpression, args, 0)
+	result, err := it.expressionEngineProxy.LexerAndEval(value,args)
 	if err != nil {
 		//TODO send log bind fail
 		return args

@@ -17,10 +17,13 @@ func Benchmark_One_Transcation(b *testing.B) {
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
 	//使用mapper
+	var name = "dsa"
+	var times = time.Now()
+	var page = 1
 	//开始压力测试
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		var _, err = exampleActivityMapperImpl.SelectByCondition(&session, nil, nil, nil, nil, nil)
+		var _, err = exampleActivityMapperImpl.SelectByCondition(&session, &name, &times, &times, &page, &page)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -44,13 +47,16 @@ func Benchmark_One_Transcation_multiple_coroutine(b *testing.B) {
 	}
 	var waitGroup = sync.WaitGroup{}
 	waitGroup.Add(goruntine)
+	var name = "dsa"
+	var times = time.Now()
+	var page = 1
 
 	b.StartTimer()
 	for i := 0; i < goruntine; i++ {
 		go func() {
 			var itemCount = total / goruntine
 			for f := 0; f < itemCount; f++ {
-				_, e := exampleActivityMapperImpl.SelectByCondition(&session, nil, nil, nil, nil, nil)
+				_, e := exampleActivityMapperImpl.SelectByCondition(&session,  &name, &times, &times, &page, &page)
 				if e != nil {
 					b.Fatal(e)
 				}
@@ -123,8 +129,12 @@ func Test_Transcation(t *testing.T) {
 	session := Session(&TestSession{})
 	//初始化mapper文件
 	var exampleActivityMapperImpl = InitMapperByLocalSession()
+
+	var name = "dsa"
+	var times = time.Now()
+	var page = 1
 	//使用mapper
-	var results, err = exampleActivityMapperImpl.SelectByCondition(&session, nil, nil, nil, nil, nil)
+	var results, err = exampleActivityMapperImpl.SelectByCondition(&session,  &name, &times, &times, &page, &page)
 	if err != nil {
 		t.Fatal(err)
 	}
