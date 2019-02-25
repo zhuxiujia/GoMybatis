@@ -3,6 +3,7 @@ package GoMybatis
 import (
 	"bytes"
 	"github.com/zhuxiujia/GoMybatis/utils"
+	"reflect"
 	"strings"
 )
 
@@ -17,6 +18,8 @@ const (
 
 	NIf
 	NTrim
+	NSet
+	NForEach
 )
 
 func (it SqlNodeType) ToString() string {
@@ -60,10 +63,6 @@ func (it StringNode) Eval(env map[string]interface{}) (interface{}, error) {
 		proxy = expressionEngineProxy.(*ExpressionEngineProxy)
 	}
 	return replaceArg(it.value, env, convert, proxy)
-	//if convert!=nil&& proxy!=nil{
-	//}
-	//var c=convert.Convert(env["name"],nil)
-	//return c,nil
 }
 
 type IfNode struct {
@@ -137,6 +136,125 @@ func (it TrimNode) Eval(env map[string]interface{}) (interface{}, error) {
 	return newBuffer.String(), nil
 }
 
+type SetNode struct {
+	childs []SqlNode
+	t      SqlNodeType
+}
+
+func (it SetNode) Type() SqlNodeType {
+	return NSet
+}
+
+func (it SetNode) Eval(env map[string]interface{}) (interface{}, error) {
+	var sql, err = DoChildNodes(it.childs, env)
+	if err != nil {
+		return nil, err
+	}
+	var trim bytes.Buffer
+	if sql != nil {
+		var trimString = strings.Trim(sql.(string), DefaultOverrides)
+		trim.Reset()
+		trim.WriteString(` `)
+		trim.WriteString(` set `)
+		trim.WriteString(trimString)
+		trim.WriteString(` `)
+	}
+	return trim.String(), nil
+}
+
+type ForEachNode struct {
+	childs []SqlNode
+	t      SqlNodeType
+
+	collection string
+	index      string
+	item       string
+	open       string
+	close      string
+	separator  string
+}
+
+func (it ForEachNode) Type() SqlNodeType {
+	return NForEach
+}
+
+func (it ForEachNode) Eval(env map[string]interface{}) (interface{}, error) {
+	if it.collection == "" {
+		panic(`[GoMybatis] collection value can not be "" in <foreach collection=""> !`)
+	}
+	var tempSql bytes.Buffer
+	var datas = env[it.collection]
+	var collectionValue = reflect.ValueOf(datas)
+	if collectionValue.Kind() != reflect.Slice && collectionValue.Kind() != reflect.Map {
+		panic(`[GoMybatis] collection value must be a slice or map !`)
+	}
+	var collectionValueLen = collectionValue.Len()
+	if collectionValueLen == 0 {
+		return nil, nil
+	}
+	if it.index == "" {
+		it.index = "index"
+	}
+	if it.item == "" {
+		it.item = "item"
+	}
+	switch collectionValue.Kind() {
+	case reflect.Map:
+		var mapKeys = collectionValue.MapKeys()
+		var collectionKeyLen = len(mapKeys)
+		if collectionKeyLen == 0 {
+			return nil, nil
+		}
+		var tempArgMap = env
+		for _, keyValue := range mapKeys {
+			var key = keyValue.Interface()
+			var collectionItem = collectionValue.MapIndex(keyValue)
+			if it.item != "" {
+				tempArgMap[it.item] = collectionItem.Interface()
+			}
+			tempArgMap[it.index] = key
+			var r, err = DoChildNodes(it.childs, tempArgMap)
+			if err != nil {
+				return nil, err
+			}
+			if r != nil {
+				tempSql.WriteString(r.(string))
+			}
+			tempSql.WriteString(it.separator)
+			delete(tempArgMap, it.item)
+		}
+		break
+	case reflect.Slice:
+		var tempArgMap = env
+		for i := 0; i < collectionValueLen; i++ {
+			var collectionItem = collectionValue.Index(i)
+			if it.item != "" {
+				tempArgMap[it.item] = collectionItem.Interface()
+			}
+			if it.index != "" {
+				tempArgMap[it.index] = i
+			}
+			var r, err = DoChildNodes(it.childs, tempArgMap)
+			if err != nil {
+				return nil, err
+			}
+			if r != nil {
+				tempSql.WriteString(r.(string))
+			}
+			tempSql.WriteString(it.separator)
+			delete(tempArgMap, it.item)
+		}
+		break
+	}
+	var newTempSql bytes.Buffer
+	var tempSqlString = strings.Trim(strings.Trim(tempSql.String(), " "), it.separator)
+	newTempSql.WriteString(it.open)
+	newTempSql.WriteString(tempSqlString)
+	newTempSql.WriteString(it.close)
+	tempSql.Reset()
+	return newTempSql.String(), nil
+}
+
 //执行子所有节点
 func DoChildNodes(childs []SqlNode, env map[string]interface{}) (interface{}, error) {
 	if childs == nil {
@@ -154,29 +272,3 @@ func DoChildNodes(childs []SqlNode, env map[string]interface{}) (interface{}, er
 	}
 	return sql.String(), nil
 }
-
-////计算节点
-//type ArrayNode struct {
-//	childs []SqlNode
-//	t      SqlNodeType
-//}
-//
-//func (it ArrayNode) Type() SqlNodeType {
-//	return NArray
-//}
-//
-//func (it ArrayNode) Eval(env map[string]interface{}) (interface{}, error) {
-//	var sql bytes.Buffer
-//	if it.childs != nil {
-//		for _, v := range it.childs {
-//			var r, e = v.Eval(env)
-//			if e != nil {
-//				return nil, e
-//			}
-//			if r != nil {
-//				sql.WriteString(r.(string))
-//			}
-//		}
-//	}
-//	return sql.String(), nil
-//}
