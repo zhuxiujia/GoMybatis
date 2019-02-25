@@ -247,3 +247,57 @@ func Benchmark_SqlBuilder_If_Element(b *testing.B) {
 		builder.BuildSql(paramMap, mapperTree["selectByCondition"])
 	}
 }
+
+//压力测试 element嵌套构建情况
+func Benchmark_SqlBuilder_Nested(b *testing.B) {
+	b.StopTimer()
+	var mapper = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper>
+    <!--List<Activity> selectByCondition(@Param("name") String name,@Param("startTime") Date startTime,@Param("endTime") Date endTime,@Param("index") Integer index,@Param("size") Integer size);-->
+    <!-- 后台查询产品 -->
+    <select id="selectByCondition">
+        select * from biz_activity where delete_flag=1
+        <set>
+        <set>
+        <set>
+        <set>
+        <set>
+        <set>
+        <set>
+        <set>
+        <set>
+        <set>
+        <set>
+
+        </set>
+        </set>
+        </set>
+        </set>
+        </set>
+        </set>
+        </set>
+        </set>
+        </set>
+        </set>
+        </set>
+    </select>
+</mapper>`
+	var mapperTree = LoadMapperXml([]byte(mapper))
+
+	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true), &LogStandard{}, false)
+	var paramMap = make(map[string]interface{})
+	paramMap["name"] = ""
+	paramMap["startTime"] = ""
+	paramMap["endTime"] = ""
+	paramMap["page"] = 0
+	paramMap["size"] = 0
+
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		_, e := builder.BuildSql(paramMap, mapperTree["selectByCondition"])
+		if e != nil {
+			b.Fatal(e)
+		}
+	}
+}
