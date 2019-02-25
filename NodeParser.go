@@ -12,7 +12,7 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []SqlNode {
 				value: v.DataString,
 				t:     NString,
 			}
-			node = n
+			node = &n
 		} else if v.ElementType == "if" {
 			n := IfNode{
 				t:      NIf,
@@ -25,7 +25,7 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []SqlNode {
 			} else {
 				n.childs = nil
 			}
-			node = n
+			node = &n
 		}
 		nodes = append(nodes, node)
 	}

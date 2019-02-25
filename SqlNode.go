@@ -19,11 +19,11 @@ type StringNode struct {
 	t     SqlNodeType
 }
 
-func (it StringNode) Type() SqlNodeType {
+func (it *StringNode) Type() SqlNodeType {
 	return NString
 }
 
-func (it StringNode) Eval(env map[string]interface{}) (*bytes.Buffer, error) {
+func (it *StringNode) Eval(env map[string]interface{}) (*bytes.Buffer, error) {
 	var sqlArgTypeConvert = env["SqlArgTypeConvert"]
 	var expressionEngineProxy = env["*ExpressionEngineProxy"]
 
@@ -51,11 +51,11 @@ type IfNode struct {
 	t      SqlNodeType
 }
 
-func (it IfNode) Type() SqlNodeType {
+func (it *IfNode) Type() SqlNodeType {
 	return NIf
 }
 
-func (it IfNode) Eval(env map[string]interface{}) (*bytes.Buffer, error) {
+func (it *IfNode) Eval(env map[string]interface{}) (*bytes.Buffer, error) {
 	var expressionEngineProxy = env["*ExpressionEngineProxy"]
 	var proxy *ExpressionEngineProxy
 	if expressionEngineProxy != nil {
@@ -81,11 +81,11 @@ type TrimNode struct {
 	t               SqlNodeType
 }
 
-func (it TrimNode) Type() SqlNodeType {
+func (it *TrimNode) Type() SqlNodeType {
 	return NTrim
 }
 
-func (it TrimNode) Eval(env map[string]interface{}) (*bytes.Buffer, error) {
+func (it *TrimNode) Eval(env map[string]interface{}) (*bytes.Buffer, error) {
 	var sql, err = DoChildNodes(it.childs, env)
 	if err != nil {
 		return nil, err
@@ -126,11 +126,11 @@ type SetNode struct {
 	t      SqlNodeType
 }
 
-func (it SetNode) Type() SqlNodeType {
+func (it *SetNode) Type() SqlNodeType {
 	return NSet
 }
 
-func (it SetNode) Eval(env map[string]interface{}) (*bytes.Buffer, error) {
+func (it *SetNode) Eval(env map[string]interface{}) (*bytes.Buffer, error) {
 	var sql, err = DoChildNodes(it.childs, env)
 	if err != nil {
 		return nil, err
@@ -163,11 +163,11 @@ type ForEachNode struct {
 	separator  string
 }
 
-func (it ForEachNode) Type() SqlNodeType {
+func (it *ForEachNode) Type() SqlNodeType {
 	return NForEach
 }
 
-func (it ForEachNode) Eval(env map[string]interface{}) (*bytes.Buffer, error) {
+func (it *ForEachNode) Eval(env map[string]interface{}) (*bytes.Buffer, error) {
 	if it.collection == "" {
 		panic(`[GoMybatis] collection value can not be "" in <foreach collection=""> !`)
 	}
