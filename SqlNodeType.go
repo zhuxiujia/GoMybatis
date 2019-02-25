@@ -5,28 +5,30 @@ type SqlNodeType int
 const (
 	NArg    SqlNodeType = iota
 	NString             //string 节点
-	NNil                //空节点
-	NBinary             //二元计算节点
-	NOpt                //操作符节点
-
 	NIf
 	NTrim
-	NSet
 	NForEach
 	NChoose
 	NOtherwise
+	NWhen
 )
 
 func (it SqlNodeType) ToString() string {
 	switch it {
 	case NString:
 		return "NString"
-	case NNil:
-		return "NNil"
-	case NBinary:
-		return "NBinary"
-	case NOpt:
-		return "NOpt"
+	case NIf:
+		return "NIf"
+	case NTrim:
+		return "NTrim"
+	case NForEach:
+		return "NForEach"
+	case NChoose:
+		return "NChoose"
+	case NOtherwise:
+		return "NOtherwise"
+	case NWhen:
+		return "NWhen"
 	}
 	return "Unknow"
 }

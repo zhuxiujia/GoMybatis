@@ -118,36 +118,6 @@ func (it *TrimNode) Eval(env map[string]interface{}) ([]byte, error) {
 	return newBuffer.Bytes(), nil
 }
 
-//set节点
-type SetNode struct {
-	childs []SqlNode
-	t      SqlNodeType
-}
-
-func (it *SetNode) Type() SqlNodeType {
-	return NSet
-}
-
-func (it *SetNode) Eval(env map[string]interface{}) ([]byte, error) {
-	var sql, err = DoChildNodes(it.childs, env)
-	if err != nil {
-		return nil, err
-	}
-	if sql == nil {
-		return nil, nil
-	}
-	var trim bytes.Buffer
-	if sql != nil {
-		var trimString = bytes.Trim(sql, DefaultOverrides)
-		trim.Reset()
-		trim.WriteString(` `)
-		trim.WriteString(` set `)
-		trim.Write(trimString)
-		trim.WriteString(` `)
-	}
-	return trim.Bytes(), nil
-}
-
 //foreach 节点
 type ForEachNode struct {
 	childs []SqlNode
@@ -243,8 +213,9 @@ func (it *ForEachNode) Eval(env map[string]interface{}) ([]byte, error) {
 }
 
 type ChooseNode struct {
-	childs []SqlNode
-	t      SqlNodeType
+	whenNodes     []SqlNode
+	otherwiseNode SqlNode
+	t             SqlNodeType
 }
 
 func (it *ChooseNode) Type() SqlNodeType {
@@ -252,11 +223,19 @@ func (it *ChooseNode) Type() SqlNodeType {
 }
 
 func (it *ChooseNode) Eval(env map[string]interface{}) ([]byte, error) {
-	var r, e = DoChildNodes(it.childs, env)
-	if e != nil {
-		return nil, e
+	if it.whenNodes == nil && it.otherwiseNode == nil {
+		return nil, nil
 	}
-	return r, nil
+	for _, v := range it.whenNodes {
+		var r, e = v.Eval(env)
+		if e != nil {
+			return nil, e
+		}
+		if r != nil {
+			return r, nil
+		}
+	}
+	return it.otherwiseNode.Eval(env)
 }
 
 type OtherwiseNode struct {
@@ -274,6 +253,34 @@ func (it *OtherwiseNode) Eval(env map[string]interface{}) ([]byte, error) {
 		return nil, e
 	}
 	return r, nil
+}
+
+type WhenNode struct {
+	childs []SqlNode
+	test   string
+	t      SqlNodeType
+
+	expressionEngineProxy *ExpressionEngineProxy
+}
+
+func (it *WhenNode) Type() SqlNodeType {
+	return NWhen
+}
+
+func (it *WhenNode) Eval(env map[string]interface{}) ([]byte, error) {
+	var expressionEngineProxy = env["*ExpressionEngineProxy"]
+	var proxy *ExpressionEngineProxy
+	if expressionEngineProxy != nil {
+		proxy = expressionEngineProxy.(*ExpressionEngineProxy)
+	}
+	var result, err = proxy.LexerAndEval(it.test, env)
+	if err != nil {
+		err = utils.NewError("GoMybatisSqlBuilder", "[GoMybatis] <test `", it.test, `> fail,`, err.Error())
+	}
+	if result.(bool) {
+		return DoChildNodes(it.childs, env)
+	}
+	return nil, nil
 }
 
 //执行子所有节点
