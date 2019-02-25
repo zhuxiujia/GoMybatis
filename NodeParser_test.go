@@ -50,7 +50,7 @@ func TestNodeParser_ParserNodes(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	fmt.Println(r)
+	fmt.Println(string(r))
 }
 
 func BenchmarkNodeParser_ParserNodes(b *testing.B) {
@@ -95,6 +95,14 @@ func BenchmarkNodeParser_ParserNodes(b *testing.B) {
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
+
+		if true {
+			var b = []byte(argMap["name"].(string))
+			if b != nil {
+
+			}
+			continue
+		}
 		var _, e = DoChildNodes(sqlNodes, argMap)
 		if e != nil {
 			b.Fatal(e)
