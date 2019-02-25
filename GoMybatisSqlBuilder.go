@@ -59,6 +59,9 @@ func (it *GoMybatisSqlBuilder) EnableLog() bool {
 }
 
 func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *bytes.Buffer, sqlArgMap map[string]interface{}) error {
+	if itemTree == nil || len(itemTree) == 0 {
+		return nil
+	}
 	if it.sqlArgTypeConvert == nil {
 		panic("[GoMybatis] GoMybatisSqlBuilder.sqlArgTypeConvert can not be nil!")
 	}
@@ -111,13 +114,13 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 			}
 			break
 		case Element_Set:
-			if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
+			if loopChildItem {
 				var trim bytes.Buffer
 				var err = it.createFromElement(v.ElementItems, &trim, sqlArgMap)
 				if err != nil {
 					return err
 				}
-				var trimString = strings.Trim(strings.Trim(trim.String(), " "), DefaultOverrides)
+				var trimString = strings.Trim(trim.String(), DefaultOverrides)
 				trim.Reset()
 				trim.WriteString(` `)
 				trim.WriteString(` set `)
@@ -170,7 +173,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 					}
 					tempArgMap[index] = key
 					//tempArgMap["type_"+index] = keyValue.Type()
-					if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
+					if loopChildItem {
 						var err = it.createFromElement(v.ElementItems, &tempSql, tempArgMap)
 						if err != nil {
 							return err
@@ -193,7 +196,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 						tempArgMap[index] = i
 						//tempArgMap["type_"+index] = IntType
 					}
-					if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
+					if loopChildItem {
 						var err = it.createFromElement(v.ElementItems, &tempSql, tempArgMap)
 						if err != nil {
 							return err
@@ -239,7 +242,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 					return err
 				}
 				sql.WriteString(replaceSql)
-				if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
+				if loopChildItem {
 					var err = it.createFromElement(v.ElementItems, sql, sqlArgMap)
 					if err != nil {
 						return err
@@ -253,7 +256,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 			}
 			break
 		case Element_otherwise:
-			if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
+			if loopChildItem {
 				var err = it.createFromElement(v.ElementItems, sql, sqlArgMap)
 				if err != nil {
 					return err
@@ -276,7 +279,7 @@ func (it *GoMybatisSqlBuilder) createFromElement(itemTree []ElementItem, sql *by
 		if breakChildItem {
 			break
 		}
-		if loopChildItem && v.ElementItems != nil && len(v.ElementItems) > 0 {
+		if loopChildItem {
 			var err = it.createFromElement(v.ElementItems, sql, sqlArgMap)
 			if err != nil {
 				return err
@@ -305,7 +308,7 @@ func (it *GoMybatisSqlBuilder) bindBindElementArg(args map[string]interface{}, i
 		//args["type_"+name] = StringType
 		return args
 	}
-	result, err := it.expressionEngineProxy.LexerAndEval(value,args)
+	result, err := it.expressionEngineProxy.LexerAndEval(value, args)
 	if err != nil {
 		//TODO send log bind fail
 		return args
