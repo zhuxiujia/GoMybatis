@@ -7,40 +7,13 @@ import (
 	"strings"
 )
 
-type SqlNodeType int
-
-const (
-	NArg    SqlNodeType = iota
-	NString             //string 节点
-	NNil                //空节点
-	NBinary             //二元计算节点
-	NOpt                //操作符节点
-
-	NIf
-	NTrim
-	NSet
-	NForEach
-)
-
-func (it SqlNodeType) ToString() string {
-	switch it {
-	case NString:
-		return "NString"
-	case NNil:
-		return "NNil"
-	case NBinary:
-		return "NBinary"
-	case NOpt:
-		return "NOpt"
-	}
-	return "Unknow"
-}
-
+//sql构建抽象语法树节点
 type SqlNode interface {
 	Type() SqlNodeType
 	Eval(env map[string]interface{}) (interface{}, error)
 }
 
+//字符串节点
 type StringNode struct {
 	value string
 	t     SqlNodeType
@@ -65,6 +38,7 @@ func (it StringNode) Eval(env map[string]interface{}) (interface{}, error) {
 	return replaceArg(it.value, env, convert, proxy)
 }
 
+//判断节点
 type IfNode struct {
 	childs []SqlNode
 	test   string
@@ -91,6 +65,7 @@ func (it IfNode) Eval(env map[string]interface{}) (interface{}, error) {
 	return nil, nil
 }
 
+//Trim操作节点
 type TrimNode struct {
 	childs          []SqlNode
 	prefix          string
@@ -136,6 +111,7 @@ func (it TrimNode) Eval(env map[string]interface{}) (interface{}, error) {
 	return newBuffer.String(), nil
 }
 
+//set节点
 type SetNode struct {
 	childs []SqlNode
 	t      SqlNodeType
@@ -162,6 +138,7 @@ func (it SetNode) Eval(env map[string]interface{}) (interface{}, error) {
 	return trim.String(), nil
 }
 
+//foreach 节点
 type ForEachNode struct {
 	childs []SqlNode
 	t      SqlNodeType
