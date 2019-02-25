@@ -10,7 +10,7 @@ import (
 //sql构建抽象语法树节点
 type SqlNode interface {
 	Type() SqlNodeType
-	Eval(env map[string]interface{}) (interface{}, error)
+	Eval(env map[string]interface{}) (*bytes.Buffer, error)
 }
 
 //字符串节点
@@ -23,7 +23,7 @@ func (it StringNode) Type() SqlNodeType {
 	return NString
 }
 
-func (it StringNode) Eval(env map[string]interface{}) (interface{}, error) {
+func (it StringNode) Eval(env map[string]interface{}) (*bytes.Buffer, error) {
 	var sqlArgTypeConvert = env["SqlArgTypeConvert"]
 	var expressionEngineProxy = env["*ExpressionEngineProxy"]
 
@@ -35,7 +35,13 @@ func (it StringNode) Eval(env map[string]interface{}) (interface{}, error) {
 	if expressionEngineProxy != nil {
 		proxy = expressionEngineProxy.(*ExpressionEngineProxy)
 	}
-	return replaceArg(it.value, env, convert, proxy)
+	var r, e = replaceArg(it.value, env, convert, proxy)
+	if e != nil {
+		return nil, e
+	}
+	var buf bytes.Buffer
+	buf.WriteString(r)
+	return &buf, nil
 }
 
 //判断节点
@@ -49,7 +55,7 @@ func (it IfNode) Type() SqlNodeType {
 	return NIf
 }
 
-func (it IfNode) Eval(env map[string]interface{}) (interface{}, error) {
+func (it IfNode) Eval(env map[string]interface{}) (*bytes.Buffer, error) {
 	var expressionEngineProxy = env["*ExpressionEngineProxy"]
 	var proxy *ExpressionEngineProxy
 	if expressionEngineProxy != nil {
@@ -79,12 +85,15 @@ func (it TrimNode) Type() SqlNodeType {
 	return NTrim
 }
 
-func (it TrimNode) Eval(env map[string]interface{}) (interface{}, error) {
+func (it TrimNode) Eval(env map[string]interface{}) (*bytes.Buffer, error) {
 	var sql, err = DoChildNodes(it.childs, env)
 	if err != nil {
 		return nil, err
 	}
-	var tempTrimSqlString = strings.Trim(sql.(string), " ")
+	if sql == nil {
+		return nil, nil
+	}
+	var tempTrimSqlString = strings.Trim(sql.String(), " ")
 	if it.prefixOverrides != "" {
 		var prefixOverridesArray = strings.Split(it.prefixOverrides, "|")
 		if len(prefixOverridesArray) > 0 {
@@ -108,7 +117,7 @@ func (it TrimNode) Eval(env map[string]interface{}) (interface{}, error) {
 	newBuffer.WriteString(tempTrimSqlString)
 	newBuffer.WriteString(` `)
 	newBuffer.WriteString(it.suffix)
-	return newBuffer.String(), nil
+	return &newBuffer, nil
 }
 
 //set节点
@@ -121,21 +130,24 @@ func (it SetNode) Type() SqlNodeType {
 	return NSet
 }
 
-func (it SetNode) Eval(env map[string]interface{}) (interface{}, error) {
+func (it SetNode) Eval(env map[string]interface{}) (*bytes.Buffer, error) {
 	var sql, err = DoChildNodes(it.childs, env)
 	if err != nil {
 		return nil, err
 	}
+	if sql == nil {
+		return nil, nil
+	}
 	var trim bytes.Buffer
 	if sql != nil {
-		var trimString = strings.Trim(sql.(string), DefaultOverrides)
+		var trimString = strings.Trim(sql.String(), DefaultOverrides)
 		trim.Reset()
 		trim.WriteString(` `)
 		trim.WriteString(` set `)
 		trim.WriteString(trimString)
 		trim.WriteString(` `)
 	}
-	return trim.String(), nil
+	return &trim, nil
 }
 
 //foreach 节点
@@ -155,7 +167,7 @@ func (it ForEachNode) Type() SqlNodeType {
 	return NForEach
 }
 
-func (it ForEachNode) Eval(env map[string]interface{}) (interface{}, error) {
+func (it ForEachNode) Eval(env map[string]interface{}) (*bytes.Buffer, error) {
 	if it.collection == "" {
 		panic(`[GoMybatis] collection value can not be "" in <foreach collection=""> !`)
 	}
@@ -195,7 +207,7 @@ func (it ForEachNode) Eval(env map[string]interface{}) (interface{}, error) {
 				return nil, err
 			}
 			if r != nil {
-				tempSql.WriteString(r.(string))
+				tempSql.WriteString(r.String())
 			}
 			tempSql.WriteString(it.separator)
 			delete(tempArgMap, it.item)
@@ -216,7 +228,7 @@ func (it ForEachNode) Eval(env map[string]interface{}) (interface{}, error) {
 				return nil, err
 			}
 			if r != nil {
-				tempSql.WriteString(r.(string))
+				tempSql.WriteString(r.String())
 			}
 			tempSql.WriteString(it.separator)
 			delete(tempArgMap, it.item)
@@ -229,11 +241,11 @@ func (it ForEachNode) Eval(env map[string]interface{}) (interface{}, error) {
 	newTempSql.WriteString(tempSqlString)
 	newTempSql.WriteString(it.close)
 	tempSql.Reset()
-	return newTempSql.String(), nil
+	return &newTempSql, nil
 }
 
 //执行子所有节点
-func DoChildNodes(childs []SqlNode, env map[string]interface{}) (interface{}, error) {
+func DoChildNodes(childs []SqlNode, env map[string]interface{}) (*bytes.Buffer, error) {
 	if childs == nil {
 		return nil, nil
 	}
@@ -244,8 +256,8 @@ func DoChildNodes(childs []SqlNode, env map[string]interface{}) (interface{}, er
 			return nil, e
 		}
 		if r != nil {
-			sql.WriteString(r.(string))
+			sql.WriteString(r.String())
 		}
 	}
-	return sql.String(), nil
+	return &sql, nil
 }

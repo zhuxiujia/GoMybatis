@@ -38,7 +38,10 @@ func (it GoMybatisSqlBuilder) New(SqlArgTypeConvert SqlArgTypeConvert, expressio
 
 func (it *GoMybatisSqlBuilder) BuildSql(paramMap map[string]interface{}, mapperXml *MapperXml) (string, error) {
 	var sql bytes.Buffer
+	//递归构建
 	err := it.createFromElement(mapperXml.ElementItems, &sql, paramMap)
+	//抽象语法树节点构建
+
 	if err != nil {
 		return "", err
 	}
