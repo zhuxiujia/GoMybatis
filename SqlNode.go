@@ -93,12 +93,11 @@ func (it *TrimNode) Eval(env map[string]interface{}) ([]byte, error) {
 	if sql == nil {
 		return nil, nil
 	}
-	var tempTrimSqlString = string(sql)
 	if it.prefixOverrides != "" {
 		var prefixOverridesArray = strings.Split(it.prefixOverrides, "|")
 		if len(prefixOverridesArray) > 0 {
 			for _, v := range prefixOverridesArray {
-				tempTrimSqlString = strings.TrimPrefix(tempTrimSqlString, v)
+				sql = bytes.TrimPrefix(sql, []byte(v))
 			}
 		}
 	}
@@ -106,7 +105,7 @@ func (it *TrimNode) Eval(env map[string]interface{}) ([]byte, error) {
 		var suffixOverrideArray = strings.Split(it.suffixOverrides, "|")
 		if len(suffixOverrideArray) > 0 {
 			for _, v := range suffixOverrideArray {
-				tempTrimSqlString = strings.TrimSuffix(tempTrimSqlString, v)
+				sql = bytes.TrimSuffix(sql, []byte(v))
 			}
 		}
 	}
@@ -114,7 +113,7 @@ func (it *TrimNode) Eval(env map[string]interface{}) ([]byte, error) {
 	newBuffer.WriteString(` `)
 	newBuffer.WriteString(it.prefix)
 	newBuffer.WriteString(` `)
-	newBuffer.WriteString(tempTrimSqlString)
+	newBuffer.Write(sql)
 	newBuffer.WriteString(` `)
 	newBuffer.WriteString(it.suffix)
 	return newBuffer.Bytes(), nil
@@ -140,11 +139,11 @@ func (it *SetNode) Eval(env map[string]interface{}) ([]byte, error) {
 	}
 	var trim bytes.Buffer
 	if sql != nil {
-		var trimString = strings.Trim(string(sql), DefaultOverrides)
+		var trimString = bytes.Trim(sql, DefaultOverrides)
 		trim.Reset()
 		trim.WriteString(` `)
 		trim.WriteString(` set `)
-		trim.WriteString(trimString)
+		trim.Write(trimString)
 		trim.WriteString(` `)
 	}
 	return trim.Bytes(), nil
@@ -236,9 +235,9 @@ func (it *ForEachNode) Eval(env map[string]interface{}) ([]byte, error) {
 		break
 	}
 	var newTempSql bytes.Buffer
-	var tempSqlString = strings.Trim(strings.Trim(tempSql.String(), " "), it.separator)
+	var tempSqlString = bytes.Trim(tempSql.Bytes(), it.separator)
 	newTempSql.WriteString(it.open)
-	newTempSql.WriteString(tempSqlString)
+	newTempSql.Write(tempSqlString)
 	newTempSql.WriteString(it.close)
 	tempSql.Reset()
 	return newTempSql.Bytes(), nil
