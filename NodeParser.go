@@ -79,6 +79,33 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []SqlNode {
 			}
 			node = &n
 			break
+		case "choose":
+			n := ChooseNode{
+				t:      NChoose,
+				childs: []SqlNode{},
+			}
+			if v.ElementItems != nil && len(v.ElementItems) > 0 {
+				var childNodes = it.ParserNodes(v.ElementItems)
+				n.childs = append(n.childs, childNodes...)
+			} else {
+				n.childs = nil
+			}
+			node = &n
+			break
+		case "otherwise":
+			n := OtherwiseNode{
+				t:      NOtherwise,
+				childs: []SqlNode{},
+			}
+			if v.ElementItems != nil && len(v.ElementItems) > 0 {
+				var childNodes = it.ParserNodes(v.ElementItems)
+				n.childs = append(n.childs, childNodes...)
+			} else {
+				n.childs = nil
+			}
+			node = &n
+			break
+
 		}
 		nodes = append(nodes, node)
 	}

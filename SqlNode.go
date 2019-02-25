@@ -242,6 +242,40 @@ func (it *ForEachNode) Eval(env map[string]interface{}) ([]byte, error) {
 	return newTempSql.Bytes(), nil
 }
 
+type ChooseNode struct {
+	childs []SqlNode
+	t      SqlNodeType
+}
+
+func (it *ChooseNode) Type() SqlNodeType {
+	return NChoose
+}
+
+func (it *ChooseNode) Eval(env map[string]interface{}) ([]byte, error) {
+	var r, e = DoChildNodes(it.childs, env)
+	if e != nil {
+		return nil, e
+	}
+	return r, nil
+}
+
+type OtherwiseNode struct {
+	childs []SqlNode
+	t      SqlNodeType
+}
+
+func (it *OtherwiseNode) Type() SqlNodeType {
+	return NOtherwise
+}
+
+func (it *OtherwiseNode) Eval(env map[string]interface{}) ([]byte, error) {
+	var r, e = DoChildNodes(it.childs, env)
+	if e != nil {
+		return nil, e
+	}
+	return r, nil
+}
+
 //执行子所有节点
 func DoChildNodes(childs []SqlNode, env map[string]interface{}) ([]byte, error) {
 	if childs == nil {

@@ -13,6 +13,8 @@ const (
 	NTrim
 	NSet
 	NForEach
+	NChoose
+	NOtherwise
 )
 
 func (it SqlNodeType) ToString() string {
