@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
-	"strings"
 )
 
 //sql构建抽象语法树节点
@@ -74,10 +73,10 @@ func (it *IfNode) Eval(env map[string]interface{}) ([]byte, error) {
 //Trim操作节点
 type TrimNode struct {
 	childs          []SqlNode
-	prefix          string
-	suffix          string
-	suffixOverrides string
-	prefixOverrides string
+	prefix          []byte
+	suffix          []byte
+	suffixOverrides []byte
+	prefixOverrides []byte
 	t               SqlNodeType
 }
 
@@ -93,16 +92,16 @@ func (it *TrimNode) Eval(env map[string]interface{}) ([]byte, error) {
 	if sql == nil {
 		return nil, nil
 	}
-	if it.prefixOverrides != "" {
-		var prefixOverridesArray = strings.Split(it.prefixOverrides, "|")
+	if it.prefixOverrides != nil {
+		var prefixOverridesArray = bytes.Split(it.prefixOverrides, []byte("|"))
 		if len(prefixOverridesArray) > 0 {
 			for _, v := range prefixOverridesArray {
 				sql = bytes.TrimPrefix(sql, []byte(v))
 			}
 		}
 	}
-	if it.suffixOverrides != "" {
-		var suffixOverrideArray = strings.Split(it.suffixOverrides, "|")
+	if it.suffixOverrides != nil {
+		var suffixOverrideArray = bytes.Split(it.suffixOverrides, []byte("|"))
 		if len(suffixOverrideArray) > 0 {
 			for _, v := range suffixOverrideArray {
 				sql = bytes.TrimSuffix(sql, []byte(v))
@@ -111,11 +110,11 @@ func (it *TrimNode) Eval(env map[string]interface{}) ([]byte, error) {
 	}
 	var newBuffer bytes.Buffer
 	newBuffer.WriteString(` `)
-	newBuffer.WriteString(it.prefix)
+	newBuffer.Write(it.prefix)
 	newBuffer.WriteString(` `)
 	newBuffer.Write(sql)
 	newBuffer.WriteString(` `)
-	newBuffer.WriteString(it.suffix)
+	newBuffer.Write(it.suffix)
 	return newBuffer.Bytes(), nil
 }
 
