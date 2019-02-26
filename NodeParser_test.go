@@ -34,7 +34,7 @@ func TestNodeParser_ParserNodes(t *testing.T) {
 	var convert = GoMybatisSqlArgTypeConvert{}
 
 	var nodePar = NodeParser{
-		holder: &NodeConfigHolder{
+		holder: NodeConfigHolder{
 			convert: &convert,
 			proxy:   &proxy,
 		},
