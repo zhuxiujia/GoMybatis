@@ -47,10 +47,10 @@
         <if test="name != ''">
             and name like concat('%',#{name},'%')
         </if>
-        <if test="startTime != ''">
+        <if test="startTime != nil">
             and create_time >= #{startTime}
         </if>
-        <if test="endTime != ''">
+        <if test="endTime != nil">
             and create_time &lt;= #{endTime}
         </if>
     </select>
@@ -94,12 +94,12 @@
     <update id="updateById">
         update biz_activity
         <set>
-            <if test="name != ''">name = #{name},</if>
-            <if test="pcLink != ''">pc_link = #{pcLink},</if>
-            <if test="h5Link != ''">h5_link = #{h5Link},</if>
-            <if test="remark != ''">remark = #{remark},</if>
-            <if test="createTime != ''">create_time = #{createTime},</if>
-            <if test="deleteFlag != ''">delete_flag = #{deleteFlag},</if>
+            <if test="name != nil">name = #{name},</if>
+            <if test="pcLink != nil">pc_link = #{pcLink},</if>
+            <if test="h5Link != nil">h5_link = #{h5Link},</if>
+            <if test="remark != nil">remark = #{remark},</if>
+            <if test="createTime != nil">create_time = #{createTime},</if>
+            <if test="deleteFlag != nil ">delete_flag = #{deleteFlag},</if>
         </set>
         where id = #{id} and delete_flag = 1
     </update>

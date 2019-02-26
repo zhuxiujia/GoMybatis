@@ -468,7 +468,7 @@ func (it *GoMybatisTempleteDecoder) makeIfNotNull(arg string) string {
 			return arg
 		}
 	}
-	return arg + ` != null`
+	return arg + ` != nil`
 }
 
 func (it *GoMybatisTempleteDecoder) decodeLogicDelete(xml *MapperXml) LogicDeleteData {

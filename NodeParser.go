@@ -14,6 +14,25 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 	for _, v := range mapperXml {
 		var node Node
 
+		var childItems []ElementItem = nil
+
+		if v.DataString != "" {
+			if childItems == nil {
+				childItems = make([]ElementItem, 0)
+			}
+			childItems = append(childItems, ElementItem{
+				ElementType: Element_String,
+				DataString:  v.DataString,
+			})
+		}
+		if v.ElementItems != nil && len(v.ElementItems) > 0 {
+			if childItems == nil {
+				childItems = make([]ElementItem, 0)
+			}
+			childItems = append(childItems, v.ElementItems...)
+		}
+
+		//start
 		switch v.ElementType {
 		case "string":
 			n := NodeString{
@@ -35,11 +54,9 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 				childs: []Node{},
 				holder: &it.holder,
 			}
-			if v.ElementItems != nil && len(v.ElementItems) > 0 {
-				var childNodes = it.ParserNodes(v.ElementItems)
+			if childItems != nil {
+				var childNodes = it.ParserNodes(childItems)
 				n.childs = append(n.childs, childNodes...)
-			} else {
-				n.childs = nil
 			}
 			node = &n
 			break
@@ -52,11 +69,9 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 				suffixOverrides: []byte(v.Propertys["suffixOverrides"]),
 				childs:          []Node{},
 			}
-			if v.ElementItems != nil && len(v.ElementItems) > 0 {
-				var childNodes = it.ParserNodes(v.ElementItems)
+			if childItems != nil {
+				var childNodes = it.ParserNodes(childItems)
 				n.childs = append(n.childs, childNodes...)
-			} else {
-				n.childs = nil
 			}
 			node = &n
 			break
@@ -70,11 +85,9 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 				prefixOverrides: []byte(","),
 				suffixOverrides: []byte(","),
 			}
-			if v.ElementItems != nil && len(v.ElementItems) > 0 {
-				var childNodes = it.ParserNodes(v.ElementItems)
+			if childItems != nil {
+				var childNodes = it.ParserNodes(childItems)
 				n.childs = append(n.childs, childNodes...)
-			} else {
-				n.childs = nil
 			}
 			node = &n
 			break
@@ -89,11 +102,9 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 				close:      v.Propertys["close"],
 				separator:  v.Propertys["separator"],
 			}
-			if v.ElementItems != nil && len(v.ElementItems) > 0 {
-				var childNodes = it.ParserNodes(v.ElementItems)
+			if childItems != nil {
+				var childNodes = it.ParserNodes(childItems)
 				n.childs = append(n.childs, childNodes...)
-			} else {
-				n.childs = nil
 			}
 			node = &n
 			break
@@ -102,8 +113,8 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 				t:         NChoose,
 				whenNodes: []Node{},
 			}
-			if v.ElementItems != nil && len(v.ElementItems) > 0 {
-				var childNodes = it.ParserNodes(v.ElementItems)
+			if childItems != nil {
+				var childNodes = it.ParserNodes(childItems)
 				for _, v := range childNodes {
 					if v.Type() == NWhen {
 						n.whenNodes = append(n.whenNodes, childNodes...)
@@ -130,11 +141,9 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 				test:   v.Propertys["test"],
 				holder: &it.holder,
 			}
-			if v.ElementItems != nil && len(v.ElementItems) > 0 {
-				var childNodes = it.ParserNodes(v.ElementItems)
+			if childItems != nil {
+				var childNodes = it.ParserNodes(childItems)
 				n.childs = append(n.childs, childNodes...)
-			} else {
-				n.childs = nil
 			}
 			node = &n
 			break
@@ -143,11 +152,9 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 				t:      NOtherwise,
 				childs: []Node{},
 			}
-			if v.ElementItems != nil && len(v.ElementItems) > 0 {
-				var childNodes = it.ParserNodes(v.ElementItems)
+			if childItems != nil {
+				var childNodes = it.ParserNodes(childItems)
 				n.childs = append(n.childs, childNodes...)
-			} else {
-				n.childs = nil
 			}
 			node = &n
 			break
@@ -160,11 +167,9 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 				suffixOverrides: []byte(v.Propertys["suffixOverrides"]),
 				childs:          []Node{},
 			}
-			if v.ElementItems != nil && len(v.ElementItems) > 0 {
-				var childNodes = it.ParserNodes(v.ElementItems)
+			if childItems != nil {
+				var childNodes = it.ParserNodes(childItems)
 				n.childs = append(n.childs, childNodes...)
-			} else {
-				n.childs = nil
 			}
 			node = &n
 			break

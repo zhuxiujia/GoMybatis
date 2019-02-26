@@ -4,8 +4,8 @@ import "bytes"
 
 //Trim操作节点
 type NodeTrim struct {
-	childs          []Node
-	t               NodeType
+	childs []Node
+	t      NodeType
 
 	prefix          []byte
 	suffix          []byte
@@ -25,6 +25,7 @@ func (it *NodeTrim) Eval(env map[string]interface{}) ([]byte, error) {
 	if sql == nil {
 		return nil, nil
 	}
+	sql = bytes.Trim(sql, " ")
 	if it.prefixOverrides != nil {
 		var prefixOverridesArray = bytes.Split(it.prefixOverrides, []byte("|"))
 		if len(prefixOverridesArray) > 0 {
@@ -50,4 +51,3 @@ func (it *NodeTrim) Eval(env map[string]interface{}) ([]byte, error) {
 	newBuffer.Write(it.suffix)
 	return newBuffer.Bytes(), nil
 }
-
