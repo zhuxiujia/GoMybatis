@@ -4,6 +4,7 @@ package GoMybatis
 type NodeParser struct {
 }
 
+//界面为node
 func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 	var nodes = []Node{}
 	for _, v := range mapperXml {
@@ -12,8 +13,13 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 		switch v.ElementType {
 		case "string":
 			n := NodeString{
-				value: v.DataString,
-				t:     NString,
+				value:               v.DataString,
+				t:                   NString,
+				expressMap:          FindAllExpressConvertString(v.DataString), //表达式需要替换的string
+				noConvertExpressMap: FindAllExpressString(v.DataString),
+			}
+			if len(n.expressMap) == 0 {
+				n.expressMap = nil
 			}
 			node = &n
 			break

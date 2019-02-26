@@ -1,10 +1,13 @@
 package GoMybatis
 
-
 //字符串节点
 type NodeString struct {
 	value string
 	t     NodeType
+
+	//args
+	expressMap          map[string]int //express表 key：name
+	noConvertExpressMap map[string]int
 }
 
 func (it *NodeString) Type() NodeType {
@@ -23,9 +26,20 @@ func (it *NodeString) Eval(env map[string]interface{}) ([]byte, error) {
 	if expressionEngineProxy != nil {
 		proxy = expressionEngineProxy.(*ExpressionEngineProxy)
 	}
-	var r, e = replaceArg(it.value, env, convert, proxy)
-	if e != nil {
-		return nil, e
+
+	var data = it.value
+	var err error
+	if it.expressMap != nil {
+		data, err = Replace(`#{`, it.expressMap, data, convert, env, proxy)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return []byte(r), nil
+	if it.noConvertExpressMap != nil {
+		data, err = Replace(`${`, it.noConvertExpressMap, data, convert, env, proxy)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return []byte(data), nil
 }

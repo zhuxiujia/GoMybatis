@@ -24,16 +24,16 @@ func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlA
 		data = sqlArgRegex.ReplaceAllString(data, str)
 	}
 	if strings.Index(data, `#`) != -1 {
-		data, err = replace(`#{`, FindAllExpressConvertString(data), data, typeConvert, parameters, engine)
+		data, err = Replace(`#{`, FindAllExpressConvertString(data), data, typeConvert, parameters, engine)
 	}
 	if strings.Index(data, `$`) != -1 {
-		data, err = replace(`${`, FindAllExpressString(data), data, nil, parameters, engine)
+		data, err = Replace(`${`, FindAllExpressString(data), data, nil, parameters, engine)
 	}
 	return data, err
 }
 
 //执行替换操作
-func replace(startChar string, findStrs map[string]int, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine *ExpressionEngineProxy) (string, error) {
+func Replace(startChar string, findStrs map[string]int, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine *ExpressionEngineProxy) (string, error) {
 	for findStr, _ := range findStrs {
 		var repleaceStr = findStr
 		if strings.Contains(repleaceStr, ",") {
