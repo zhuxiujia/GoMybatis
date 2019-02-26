@@ -165,8 +165,9 @@ func main() {
 为了执行效率 框架默认使用 github.com/zhuxiujia/GoFastExpress 表达式引擎作为默认选项，你也可以自定义调用GoMybatis.WriteMapper()参数中SqlBuilder的参数自行选择加入ExpressionEngine
 
 ## 请及时关注版本，及时升级版本(新的功能，bug修复)
-## TODO 期待功能路线（预览特性,有可能会更改）
--专属简化模板标签,媲美语言层orm框架的开发效率，和java端的mybatis啰嗦的语法告别（进行中）
--逻辑删除
--乐观锁
+## TODO 未来新特性（可能会更改）
+* 模板标签,一行代码crud（已完成）
+* 逻辑删除(已完成)
+* 乐观锁（已完成）
+* 重构SqlBuilder，使用抽象语法树代替递归，获得更好的维护性可读性(进行中)
 ## 喜欢的老铁欢迎在右上角点下 star 关注和支持我们哈
