@@ -32,9 +32,12 @@ func Benchmark_SqlBuilder(b *testing.B) {
         <if test="page >= 0 and size != 0">limit #{page}, #{size}</if>
     </select>
 </mapper>`
-	var mapperTree = LoadMapperXml([]byte(mapper))
 
 	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true), &LogStandard{}, false)
+
+	var mapperTree = LoadMapperXml([]byte(mapper))
+	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].ElementItems)
+
 	var paramMap = make(map[string]interface{})
 	paramMap["name"] = ""
 	paramMap["startTime"] = ""
@@ -57,7 +60,7 @@ func Benchmark_SqlBuilder(b *testing.B) {
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		_, e := builder.BuildSql(paramMap, mapperTree["selectByCondition"])
+		_, e := builder.BuildSql(paramMap, nodes)
 		if e != nil {
 			b.Fatal(e)
 		}
@@ -95,10 +98,13 @@ func Test_SqlBuilder_Tps(t *testing.T) {
 	paramMap["endTime"] = ""
 	paramMap["page"] = 0
 	paramMap["size"] = 0
+
+	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].ElementItems)
+
 	var startTime = time.Now()
 	for i := 0; i < 100000; i++ {
 		//var sql, e =
-		_, e := builder.BuildSql(paramMap, mapperTree["selectByCondition"])
+		_, e := builder.BuildSql(paramMap, nodes)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -184,6 +190,8 @@ func TestGoMybatisSqlBuilder_BuildSql(t *testing.T) {
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
 	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true), &LogStandard{}, true)
+	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].ElementItems)
+
 	var paramMap = make(map[string]interface{})
 	paramMap["name"] = "name"
 	paramMap["type_name"] = StringType
@@ -191,7 +199,7 @@ func TestGoMybatisSqlBuilder_BuildSql(t *testing.T) {
 	paramMap["endTime"] = nil
 	paramMap["page"] = 0
 	paramMap["size"] = 0
-	var sql, err = builder.BuildSql(paramMap, mapperTree["selectByCondition"])
+	var sql, err = builder.BuildSql(paramMap, nodes)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -229,6 +237,8 @@ func Benchmark_SqlBuilder_If_Element(b *testing.B) {
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
 	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true), &LogStandard{}, false)
+	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].ElementItems)
+
 	var paramMap = make(map[string]interface{})
 	paramMap["name"] = ""
 	paramMap["startTime"] = ""
@@ -244,7 +254,7 @@ func Benchmark_SqlBuilder_If_Element(b *testing.B) {
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		builder.BuildSql(paramMap, mapperTree["selectByCondition"])
+		builder.BuildSql(paramMap, nodes)
 	}
 }
 
@@ -286,6 +296,8 @@ func Benchmark_SqlBuilder_Nested(b *testing.B) {
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
 	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true), &LogStandard{}, false)
+	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].ElementItems)
+
 	var paramMap = make(map[string]interface{})
 	paramMap["name"] = ""
 	paramMap["startTime"] = ""
@@ -295,7 +307,7 @@ func Benchmark_SqlBuilder_Nested(b *testing.B) {
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		_, e := builder.BuildSql(paramMap, mapperTree["selectByCondition"])
+		_, e := builder.BuildSql(paramMap, nodes)
 		if e != nil {
 			b.Fatal(e)
 		}

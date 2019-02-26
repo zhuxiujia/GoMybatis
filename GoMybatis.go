@@ -44,7 +44,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 	var mapperTree = LoadMapperXml(xml)
 	templeteDecoder.DecodeTree(mapperTree, bean.Type())
 	//make a map[method]xml
-	var methodXmlMap = makeMethodXmlMap(bean, mapperTree)
+	var methodXmlMap = makeMethodXmlMap(bean, mapperTree, sqlBuilder)
 	var resultMaps = makeResultMaps(mapperTree)
 	var returnTypeMap = makeReturnTypeMap(bean)
 	var beanName = bean.Type().PkgPath() + bean.Type().String()
@@ -84,15 +84,15 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 		}
 
 		//resultMaps
-		var mapperXml = methodXmlMap[method]
+		var mapper = methodXmlMap[method]
 		var resultMap map[string]*ResultProperty
-		var resultMapId = mapperXml.Propertys[Element_ResultMap]
+		var resultMapId = mapper.xml.Propertys[Element_ResultMap]
 		if resultMapId != "" {
 			resultMap = resultMaps[resultMapId]
 		}
 
 		//exe sql
-		var e = exeMethodByXml(beanName, sessionFactory, tagArgs, args, mapperXml, resultMap, returnValue, decoder, sqlBuilder, enableLog)
+		var e = exeMethodByXml(mapper.xml.Tag, beanName, sessionFactory, tagArgs, args, mapper.nodes, resultMap, returnValue, decoder, sqlBuilder, enableLog)
 
 		return buildReturnValues(returnType, returnValue, e)
 	}
@@ -212,14 +212,19 @@ func makeResultMaps(xmls map[string]*MapperXml) map[string]map[string]*ResultPro
 	return resultMaps
 }
 
+type Mapper struct {
+	xml   *MapperXml
+	nodes []Node
+}
+
 //return a map map[`method`]*MapperXml
-func makeMethodXmlMap(bean reflect.Value, mapperTree map[string]*MapperXml) map[string]*MapperXml {
+func makeMethodXmlMap(bean reflect.Value, mapperTree map[string]*MapperXml, sqlBuilder SqlBuilder) map[string]*Mapper {
 	var beanType = bean.Type()
 	if beanType.Kind() == reflect.Ptr {
 		beanType = beanType.Elem()
 	}
 
-	var methodXmlMap = make(map[string]*MapperXml)
+	var methodXmlMap = make(map[string]*Mapper)
 	var totalField = beanType.NumField()
 	for i := 0; i < totalField; i++ {
 		var fieldItem = beanType.Field(i)
@@ -228,7 +233,10 @@ func makeMethodXmlMap(bean reflect.Value, mapperTree map[string]*MapperXml) map[
 			methodFieldCheck(&beanType, &fieldItem)
 			var mapperXml = findMapperXml(mapperTree, fieldItem.Name)
 			if mapperXml != nil {
-				methodXmlMap[fieldItem.Name] = mapperXml
+				methodXmlMap[fieldItem.Name] = &Mapper{
+					xml:   mapperXml,
+					nodes: sqlBuilder.NodeParser().ParserNodes(mapperXml.ElementItems),
+				}
 			} else {
 				if fieldItem.Name == NewSessionFunc {
 					//过滤NewSession方法
@@ -280,12 +288,12 @@ func findMapperXml(mapperTree map[string]*MapperXml, methodName string) *MapperX
 	return nil
 }
 
-func exeMethodByXml(beanName string, sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, mapperXml *MapperXml, resultMap map[string]*ResultProperty, returnValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) error {
+func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, nodes []Node, resultMap map[string]*ResultProperty, returnValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) error {
 	//build sql string
 	var session Session
 	var sql string
 	var err error
-	session, sql, err = buildSql(tagParamMap, args, mapperXml, sqlBuilder, enableLog)
+	session, sql, err = buildSql(tagParamMap, args, nodes, sqlBuilder, enableLog)
 	if err != nil {
 		return err
 	}
@@ -300,7 +308,7 @@ func exeMethodByXml(beanName string, sessionFactory *SessionFactory, tagParamMap
 	}
 	var haveLastReturnValue = returnValue != nil && (*returnValue).IsNil() == false
 	//do CRUD
-	if mapperXml.Tag == Element_Select && haveLastReturnValue {
+	if elementType == Element_Select && haveLastReturnValue {
 		//is select and have return value
 		results, err := session.Query(sql)
 		if err != nil {
@@ -330,7 +338,7 @@ func closeSession(factory *SessionFactory, session Session) {
 	session.Close()
 }
 
-func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlBuilder SqlBuilder, enableLog bool) (Session, string, error) {
+func buildSql(tagArgs []TagArg, args []reflect.Value, nodes []Node, sqlBuilder SqlBuilder, enableLog bool) (Session, string, error) {
 	var session Session
 	var paramMap = make(map[string]interface{})
 	var tagArgsLen = len(tagArgs)
@@ -377,7 +385,7 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, mapperXml *MapperXml, sqlB
 		paramMap = scanStructArgFields(args[customIndex], nil)
 	}
 
-	result, err := sqlBuilder.BuildSql(paramMap, mapperXml)
+	result, err := sqlBuilder.BuildSql(paramMap, nodes)
 	return session, result, err
 }
 
