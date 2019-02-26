@@ -161,6 +161,13 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 			}
 			node = &n
 			break
+		case "bind":
+			n := NodeBind{
+				t:     NBind,
+				value: v.Propertys["value"],
+				name:  v.Propertys["name"],
+			}
+			node = &n
 		}
 		nodes = append(nodes, node)
 	}

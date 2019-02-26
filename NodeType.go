@@ -4,13 +4,14 @@ type NodeType int
 
 const (
 	NArg    NodeType = iota
-	NString              //string 节点
+	NString          //string 节点
 	NIf
 	NTrim
 	NForEach
 	NChoose
 	NOtherwise
 	NWhen
+	NBind
 )
 
 func (it NodeType) ToString() string {
@@ -29,6 +30,8 @@ func (it NodeType) ToString() string {
 		return "NOtherwise"
 	case NWhen:
 		return "NWhen"
+	case NBind:
+		return "NBind"
 	}
 	return "Unknow"
 }
