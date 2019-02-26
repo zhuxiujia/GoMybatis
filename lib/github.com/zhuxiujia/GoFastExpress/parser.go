@@ -120,6 +120,13 @@ func parserNode(express string, v Operator) (Node, error) {
 	if NotSupportOptMap[v] {
 		return nil, errors.New("find not support opt = '" + v + "',express=" + express)
 	}
+	if isOperatorsAction(v) {
+		var optNode = OptNode{
+			value: v,
+			t:     NOpt,
+		}
+		return optNode, nil
+	}
 	if v == "true" || v == "false" {
 		b, e := strconv.ParseBool(v)
 		if e == nil {
@@ -169,13 +176,6 @@ func parserNode(express string, v Operator) (Node, error) {
 		return inode, nil
 	}
 	e = nil
-	if isOperatorsAction(v) {
-		var optNode = OptNode{
-			value: v,
-			t:     NOpt,
-		}
-		return optNode, nil
-	}
 	var argNode = ArgNode{
 		value: v,
 		t:     NArg,
