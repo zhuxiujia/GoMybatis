@@ -3,11 +3,12 @@ package GoFastExpress
 import (
 	"fmt"
 	"testing"
+	"time"
 )
 
 func TestNode_Run(t *testing.T) {
-
 	var expressions = []string{
+		"'2019-02-26' == '2019-02-26'",
 		"`f`+`s`",
 		"a +1 > b * 8",
 		"a >= 0",
@@ -30,7 +31,7 @@ func TestNode_Run(t *testing.T) {
 		if e != nil {
 			t.Fatal(e)
 		}
-		v, e := node.Eval(map[string]interface{}{"a": 1, "b": 2, "c": "c"})
+		v, e := node.Eval(map[string]interface{}{"a": 1, "b": 2, "c": "c", "t": time.Now()})
 		if e != nil {
 			t.Fatal(e)
 		}

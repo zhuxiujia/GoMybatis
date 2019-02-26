@@ -120,14 +120,30 @@ func parserNode(express string, v Operator) (Node, error) {
 	if NotSupportOptMap[v] {
 		return nil, errors.New("find not support opt = '" + v + "',express=" + express)
 	}
-	if isOperatorsAction(v) {
-		var optNode = OptNode{
-			value: v,
-			t:     NOpt,
+	if v == "true" || v == "false" {
+		b, e := strconv.ParseBool(v)
+		if e == nil {
+			var inode = BoolNode{
+				value: b,
+				t:     NBool,
+			}
+			return inode, nil
 		}
-		return optNode, nil
 	}
-
+	if strings.Index(v, "'") == 0 && strings.LastIndex(v, "'") == (len(v)-1) {
+		var inode = StringNode{
+			value: string([]byte(v)[1 : len(v)-1]),
+			t:     NString,
+		}
+		return inode, nil
+	}
+	if strings.Index(v, "`") == 0 && strings.LastIndex(v, "`") == (len(v)-1) {
+		var inode = StringNode{
+			value: string([]byte(v)[1 : len(v)-1]),
+			t:     NString,
+		}
+		return inode, nil
+	}
 	i, e := strconv.ParseInt(v, 0, 64)
 	if e == nil {
 		var inode = IntNode{
@@ -149,28 +165,6 @@ func parserNode(express string, v Operator) (Node, error) {
 		var inode = FloatNode{
 			value: f,
 			t:     NFloat,
-		}
-		return inode, nil
-	}
-	b, e := strconv.ParseBool(v)
-	if e == nil {
-		var inode = BoolNode{
-			value: b,
-			t:     NBool,
-		}
-		return inode, nil
-	}
-	if strings.Index(v, "'") == 0 && strings.LastIndex(v, "'") == (len(v)-1) {
-		var inode = StringNode{
-			value: string([]byte(v)[1 : len(v)-1]),
-			t:     NString,
-		}
-		return inode, nil
-	}
-	if strings.Index(v, "`") == 0 && strings.LastIndex(v, "`") == (len(v)-1) {
-		var inode = StringNode{
-			value: string([]byte(v)[1 : len(v)-1]),
-			t:     NString,
 		}
 		return inode, nil
 	}
@@ -269,7 +263,7 @@ func isOperatorsAction(arg string) bool {
 		arg == Reduce ||
 		arg == Ride ||
 		arg == Divide ||
-	//比较操作符
+		//比较操作符
 		arg == And ||
 		arg == Or ||
 		arg == Equal ||

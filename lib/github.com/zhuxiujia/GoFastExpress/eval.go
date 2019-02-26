@@ -1,6 +1,7 @@
 package GoFastExpress
 
 import (
+	"fmt"
 	"github.com/kataras/iris/core/errors"
 	"reflect"
 	"strings"
@@ -124,11 +125,38 @@ func DoEqualAction(operator Operator, a interface{}, b interface{}, av reflect.V
 		if bv.Kind() == reflect.Ptr {
 			b, bv = GetDeepValue(bv, b)
 		}
-		if av.Kind() == reflect.Bool {
+		if av.Kind() == reflect.Float64 && bv.Kind() == reflect.Float64 {
+			return a.(float64) == b.(float64), nil
+		}
+		if av.Kind() == reflect.Float32 && bv.Kind() == reflect.Float32 {
+			return a.(float32) == b.(float32), nil
+		}
+		if av.Kind() == reflect.Int && bv.Kind() == reflect.Int {
+			return a.(int) == b.(int), nil
+		}
+		if av.Kind() == reflect.Int8 && bv.Kind() == reflect.Int8 {
+			return a.(int8) == b.(int8), nil
+		}
+		if av.Kind() == reflect.Int16 && bv.Kind() == reflect.Int16 {
+			return a.(int16) == b.(int16), nil
+		}
+		if av.Kind() == reflect.Int32 && bv.Kind() == reflect.Int32 {
+			return a.(int32) == b.(int32), nil
+		}
+		if av.Kind() == reflect.Int64 && bv.Kind() == reflect.Int64 {
+			return a.(int64) == b.(int64), nil
+		}
+		if av.Kind() == reflect.Bool && bv.Kind() == reflect.Bool {
 			return a.(bool) == b.(bool), nil
 		}
-		if av.Kind() == reflect.String {
+		if av.Kind() == reflect.String && bv.Kind() == reflect.String {
 			return a.(string) == b.(string), nil
+		}
+		if av.Kind() == reflect.Struct && bv.Kind() == reflect.String {
+			return fmt.Sprint(a) == b.(string), nil
+		}
+		if bv.Kind() == reflect.Struct && av.Kind() == reflect.String {
+			return fmt.Sprint(b) == a.(string), nil
 		}
 		a = toNumberType(av)
 		b = toNumberType(bv)
