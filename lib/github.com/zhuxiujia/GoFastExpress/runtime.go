@@ -48,7 +48,11 @@ func toNumberType(v reflect.Value) float64 {
 	if ok {
 		return r
 	}
-	panic(fmt.Sprintf("cannot convert v (type T) to type float64"))
+	var vValue interface{}
+	if v.IsValid() && v.CanInterface() {
+		vValue = v.Interface()
+	}
+	panic(fmt.Sprintf("[GoFastExpress] cannot convert ", vValue, " (type "+v.Type().String()+") to type float64"))
 }
 
 func castType(v reflect.Value) (float64, bool) {
