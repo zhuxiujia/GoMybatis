@@ -6,8 +6,8 @@ type NodeString struct {
 	t     NodeType
 
 	//args
-	expressMap          map[string]int //express表 key：name
-	noConvertExpressMap map[string]int
+	expressMap          map[string]int //去重的，需要替换的express map
+	noConvertExpressMap map[string]int //去重的，需要替换的express map
 
 	holder *NodeConfigHolder
 }
