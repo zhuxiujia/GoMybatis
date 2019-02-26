@@ -29,17 +29,22 @@ func TestNodeParser_ParserNodes(t *testing.T) {
 	var mapperTree = LoadMapperXml([]byte(mapper))
 	//fmt.Println(mapperTree)
 
-	var nodePar = NodeParser{}
+	var proxy = ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true)
+
+	var convert = GoMybatisSqlArgTypeConvert{}
+
+	var nodePar = NodeParser{
+		holder: &NodeConfigHolder{
+			convert: &convert,
+			proxy:   &proxy,
+		},
+	}
 	var sqlNodes = nodePar.ParserNodes(mapperTree["selectByCondition"].ElementItems)
 
 	fmt.Println(sqlNodes)
 
-	var proxy = ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true)
-
 	var argMap = map[string]interface{}{
-		"SqlArgTypeConvert":      &GoMybatisSqlArgTypeConvert{},
-		"*ExpressionEngineProxy": &proxy,
-		"name":                   "sadf",
+		"name": "sadf",
 	}
 	argMap["name"] = ""
 	argMap["startTime"] = ""
@@ -78,14 +83,20 @@ func BenchmarkNodeParser_ParserNodes(b *testing.B) {
 	var mapperTree = LoadMapperXml([]byte(mapper))
 	//fmt.Println(mapperTree)
 
-	var nodePar = NodeParser{}
-	var sqlNodes = nodePar.ParserNodes(mapperTree["selectByCondition"].ElementItems)
 	var proxy = ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true)
 
+	var convert = GoMybatisSqlArgTypeConvert{}
+
+	var nodePar = NodeParser{
+		holder: &NodeConfigHolder{
+			convert: &convert,
+			proxy:   &proxy,
+		},
+	}
+	var sqlNodes = nodePar.ParserNodes(mapperTree["selectByCondition"].ElementItems)
+
 	var argMap = map[string]interface{}{
-		"SqlArgTypeConvert":      &GoMybatisSqlArgTypeConvert{},
-		"*ExpressionEngineProxy": &proxy,
-		"name":                   "sadf",
+		"name": "sadf",
 	}
 	argMap["name"] = ""
 	argMap["startTime"] = ""

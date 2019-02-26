@@ -2,10 +2,14 @@ package GoMybatis
 
 //节点解析器
 type NodeParser struct {
+	holder *NodeConfigHolder
 }
 
 //界面为node
 func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
+	if it.holder == nil {
+		panic("NodeParser need a NodeConfigHolder{}!")
+	}
 	var nodes = []Node{}
 	for _, v := range mapperXml {
 		var node Node
@@ -17,6 +21,7 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 				t:                   NString,
 				expressMap:          FindAllExpressConvertString(v.DataString), //表达式需要替换的string
 				noConvertExpressMap: FindAllExpressString(v.DataString),
+				holder:              it.holder,
 			}
 			if len(n.expressMap) == 0 {
 				n.expressMap = nil
@@ -28,6 +33,7 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 				t:      NIf,
 				test:   v.Propertys["test"],
 				childs: []Node{},
+				holder: it.holder,
 			}
 			if v.ElementItems != nil && len(v.ElementItems) > 0 {
 				var childNodes = it.ParserNodes(v.ElementItems)
@@ -135,6 +141,7 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 				t:      NOtherwise,
 				childs: []Node{},
 				test:   v.Propertys["test"],
+				holder: it.holder,
 			}
 			if v.ElementItems != nil && len(v.ElementItems) > 0 {
 				var childNodes = it.ParserNodes(v.ElementItems)
@@ -163,9 +170,10 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 			break
 		case "bind":
 			n := NodeBind{
-				t:     NBind,
-				value: v.Propertys["value"],
-				name:  v.Propertys["name"],
+				t:      NBind,
+				value:  v.Propertys["value"],
+				name:   v.Propertys["name"],
+				holder: it.holder,
 			}
 			node = &n
 		}

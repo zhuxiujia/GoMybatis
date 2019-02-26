@@ -7,7 +7,7 @@ type NodeWhen struct {
 	test   string
 	t      NodeType
 
-	expressionEngineProxy *ExpressionEngineProxy
+	holder *NodeConfigHolder
 }
 
 func (it *NodeWhen) Type() NodeType {
@@ -15,12 +15,7 @@ func (it *NodeWhen) Type() NodeType {
 }
 
 func (it *NodeWhen) Eval(env map[string]interface{}) ([]byte, error) {
-	var expressionEngineProxy = env["*ExpressionEngineProxy"]
-	var proxy *ExpressionEngineProxy
-	if expressionEngineProxy != nil {
-		proxy = expressionEngineProxy.(*ExpressionEngineProxy)
-	}
-	var result, err = proxy.LexerAndEval(it.test, env)
+	var result, err = it.holder.GetExpressionEngineProxy().LexerAndEval(it.test, env)
 	if err != nil {
 		err = utils.NewError("GoMybatisSqlBuilder", "[GoMybatis] <test `", it.test, `> fail,`, err.Error())
 	}
@@ -29,4 +24,3 @@ func (it *NodeWhen) Eval(env map[string]interface{}) ([]byte, error) {
 	}
 	return nil, nil
 }
-
