@@ -1,6 +1,7 @@
 package GoMybatis
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"reflect"
@@ -35,10 +36,6 @@ func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlA
 //执行替换操作
 func Replace(startChar string, findStrs map[string]int, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine *ExpressionEngineProxy) (string, error) {
 	for findStr, _ := range findStrs {
-		var repleaceStr = findStr
-		if strings.Contains(repleaceStr, ",") {
-			repleaceStr = strings.Split(repleaceStr, ",")[0]
-		}
 		var evalData interface{}
 		//find param arg
 		var argValue = arg[findStr]
@@ -47,17 +44,18 @@ func Replace(startChar string, findStrs map[string]int, data string, typeConvert
 		} else {
 			//exec lexer
 			var err error
-			evalData, err = engine.LexerAndEval(repleaceStr, arg)
+			evalData, err = engine.LexerAndEval(findStr, arg)
 			if err != nil {
 				return "", errors.New(engine.Name() + ":" + err.Error())
 			}
 		}
+		var resultStr string
 		if typeConvert != nil {
-			repleaceStr = typeConvert.Convert(evalData, nil)
+			resultStr = typeConvert.Convert(evalData, nil)
 		} else {
-			repleaceStr = fmt.Sprint(evalData)
+			resultStr = fmt.Sprint(evalData)
 		}
-		data = strings.Replace(data, startChar+findStr+"}", repleaceStr, -1)
+		data = strings.Replace(data, startChar+findStr+"}", resultStr, -1)
 	}
 	arg = nil
 	typeConvert = nil
@@ -80,6 +78,12 @@ func FindAllExpressConvertString(str string) map[string]int {
 		}
 		if v == 125 && startIndex != -1 {
 			item = strBytes[startIndex:index]
+
+			//去掉逗号之后的部分
+			if bytes.Contains(item, []byte(",")) {
+				item = bytes.Split(item, []byte(","))[0]
+			}
+
 			finds[string(item)] = 1
 			item = nil
 			startIndex = -1
@@ -107,6 +111,12 @@ func FindAllExpressString(str string) map[string]int {
 		}
 		if v == 125 && startIndex != -1 {
 			item = strBytes[startIndex:index]
+
+			//去掉逗号之后的部分
+			if bytes.Contains(item, []byte(",")) {
+				item = bytes.Split(item, []byte(","))[0]
+			}
+
 			finds[string(item)] = 1
 			item = nil
 			startIndex = -1

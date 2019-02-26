@@ -6,34 +6,43 @@ import (
 )
 
 func TestStringNode_Eval(t *testing.T) {
-	var sNode = NodeString{
-		value: "#{name}",
-		t:     NString,
-	}
 	var proxy = ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true)
-	var r, e = sNode.Eval(map[string]interface{}{
-		"SqlArgTypeConvert":      &GoMybatisSqlArgTypeConvert{},
-		"*ExpressionEngineProxy": &proxy,
-		"name":                   "sadf",
-	})
+	var sNode = NodeString{
+		value:      "#{name}",
+		t:          NString,
+		expressMap: map[string]int{"name": 1},
+		holder: &NodeConfigHolder{
+			convert: &GoMybatisSqlArgTypeConvert{},
+			proxy:   &proxy,
+		},
+	}
+
+	var argMap = map[string]interface{}{
+		"name": "sadf",
+	}
+	var r, e = sNode.Eval(argMap)
 	if e != nil {
 		t.Fatal(e)
 	}
-	fmt.Println(r)
+	fmt.Println(string(r))
 }
 
 func BenchmarkStringNode_Eval(b *testing.B) {
 	b.StopTimer()
-	var sNode = NodeString{
-		value: "#{name}",
-		t:     NString,
-	}
+
 	var proxy = ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true)
+	var sNode = NodeString{
+		value:      "#{name}",
+		t:          NString,
+		expressMap: map[string]int{"name": 1},
+		holder: &NodeConfigHolder{
+			convert: &GoMybatisSqlArgTypeConvert{},
+			proxy:   &proxy,
+		},
+	}
 
 	var argMap = map[string]interface{}{
-		"SqlArgTypeConvert":      &GoMybatisSqlArgTypeConvert{},
-		"*ExpressionEngineProxy": &proxy,
-		"name":                   "sadf",
+		"name": "sadf",
 	}
 	//var lex,e=proxy.Lexer("name")
 	//if e!=nil{
