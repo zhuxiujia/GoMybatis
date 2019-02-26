@@ -34,8 +34,8 @@ func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlA
 }
 
 //执行替换操作
-func Replace(startChar string, findStrs map[string]int, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine *ExpressionEngineProxy) (string, error) {
-	for findStr, _ := range findStrs {
+func Replace(startChar string, findStrs []string, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine *ExpressionEngineProxy) (string, error) {
+	for _, findStr := range findStrs {
 		var evalData interface{}
 		//find param arg
 		var argValue = arg[findStr]
@@ -63,7 +63,7 @@ func Replace(startChar string, findStrs map[string]int, data string, typeConvert
 }
 
 //find like #{*} value *
-func FindAllExpressConvertString(str string) map[string]int {
+func FindAllExpressConvertString(str string) []string {
 	var finds = map[string]int{}
 	var item []byte
 	var lastIndex = -1
@@ -92,11 +92,16 @@ func FindAllExpressConvertString(str string) map[string]int {
 	}
 	item = nil
 	strBytes = nil
-	return finds
+
+	var strs = []string{}
+	for k, _ := range finds {
+		strs = append(strs, k)
+	}
+	return strs
 }
 
 //find like ${*} value *
-func FindAllExpressString(str string) map[string]int {
+func FindAllExpressString(str string) []string {
 	var finds = map[string]int{}
 	var item []byte
 	var lastIndex = -1
@@ -125,5 +130,10 @@ func FindAllExpressString(str string) map[string]int {
 	}
 	item = nil
 	strBytes = nil
-	return finds
+
+	var strs = []string{}
+	for k, _ := range finds {
+		strs = append(strs, k)
+	}
+	return strs
 }

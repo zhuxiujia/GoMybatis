@@ -10,7 +10,7 @@ func TestStringNode_Eval(t *testing.T) {
 	var sNode = NodeString{
 		value:      "#{name}",
 		t:          NString,
-		expressMap: map[string]int{"name": 1},
+		expressMap: []string{"name"},
 		holder: &NodeConfigHolder{
 			convert: &GoMybatisSqlArgTypeConvert{},
 			proxy:   &proxy,
@@ -34,7 +34,7 @@ func BenchmarkStringNode_Eval(b *testing.B) {
 	var sNode = NodeString{
 		value:      "#{name}",
 		t:          NString,
-		expressMap: map[string]int{"name": 1},
+		expressMap: []string{"name"},
 		holder: &NodeConfigHolder{
 			convert: &GoMybatisSqlArgTypeConvert{},
 			proxy:   &proxy,
