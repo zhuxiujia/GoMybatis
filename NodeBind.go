@@ -21,6 +21,9 @@ func (it *NodeBind) Eval(env map[string]interface{}) ([]byte, error) {
 		env[it.name] = it.value
 		return nil, nil
 	}
+	if it.holder == nil {
+		return nil, nil
+	}
 	result, err := it.holder.GetExpressionEngineProxy().LexerAndEval(it.value, env)
 	if err != nil {
 		//TODO send log bind fail

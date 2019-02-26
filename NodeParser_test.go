@@ -88,7 +88,7 @@ func BenchmarkNodeParser_ParserNodes(b *testing.B) {
 	var convert = GoMybatisSqlArgTypeConvert{}
 
 	var nodePar = NodeParser{
-		holder: &NodeConfigHolder{
+		holder: NodeConfigHolder{
 			convert: &convert,
 			proxy:   &proxy,
 		},

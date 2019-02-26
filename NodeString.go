@@ -17,6 +17,9 @@ func (it *NodeString) Type() NodeType {
 }
 
 func (it *NodeString) Eval(env map[string]interface{}) ([]byte, error) {
+	if it.holder == nil {
+		return nil, nil
+	}
 	var data = it.value
 	var err error
 	if it.expressMap != nil {

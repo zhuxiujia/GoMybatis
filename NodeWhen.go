@@ -15,6 +15,9 @@ func (it *NodeWhen) Type() NodeType {
 }
 
 func (it *NodeWhen) Eval(env map[string]interface{}) ([]byte, error) {
+	if it.holder == nil {
+		return nil, nil
+	}
 	var result, err = it.holder.GetExpressionEngineProxy().LexerAndEval(it.test, env)
 	if err != nil {
 		err = utils.NewError("GoMybatisSqlBuilder", "[GoMybatis] <test `", it.test, `> fail,`, err.Error())
