@@ -7,6 +7,26 @@ import (
 )
 
 func TestNode_Run(t *testing.T) {
+	var results = []interface{}{
+		true,
+		"fs",
+		false,
+		true,
+		"ac",
+		2,
+		false,
+		false,
+		true,
+		false,
+		true,
+		true,
+		false,
+		true,
+		true,
+		true,
+		true,
+	}
+
 	var expressions = []string{
 		"'2019-02-26' == '2019-02-26'",
 		"`f`+`s`",
@@ -26,7 +46,7 @@ func TestNode_Run(t *testing.T) {
 		"1 + 2 != nil && 1 > 0 ",
 		"1 + 2 != nil && 2 < b*8 ",
 	}
-	for _, expr := range expressions {
+	for index, expr := range expressions {
 		node, e := Parser(expr)
 		if e != nil {
 			t.Fatal(e)
@@ -35,7 +55,10 @@ func TestNode_Run(t *testing.T) {
 		if e != nil {
 			t.Fatal(e)
 		}
-		fmt.Println(v)
+		fmt.Println(v, " <===== ", expr)
+		if v != results[index] {
+			t.Fatal("express not pass!:'", expr, "',", "result must be:'", results[index], "'")
+		}
 	}
 }
 
