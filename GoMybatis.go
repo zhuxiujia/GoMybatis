@@ -2,12 +2,18 @@ package GoMybatis
 
 import (
 	"bytes"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
 	"strings"
 )
 
 const NewSessionFunc = "NewSession" //NewSession method,auto write implement body code
+
+type Mapper struct {
+	xml   *etree.Element
+	nodes []Node
+}
 
 //推荐默认使用单例传入
 //根据sessionEngine写入到mapperPtr，value:指向mapper指针反射对象，xml：xml数据，sessionEngine：session引擎，enableLog:是否允许日志输出，log：日志实现
@@ -86,7 +92,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 		//resultMaps
 		var mapper = methodXmlMap[method]
 		var resultMap map[string]*ResultProperty
-		var resultMapId = mapper.xml.Propertys[Element_ResultMap]
+		var resultMapId = mapper.xml.SelectAttrValue(Element_ResultMap, "")
 		if resultMapId != "" {
 			resultMap = resultMaps[resultMapId]
 		}
@@ -192,33 +198,28 @@ func makeReturnTypeMap(value reflect.Value) (returnMap map[string]*ReturnType) {
 }
 
 //map[id]map[cloum]Property
-func makeResultMaps(xmls map[string]*MapperXml) map[string]map[string]*ResultProperty {
+func makeResultMaps(xmls map[string]*etree.Element) map[string]map[string]*ResultProperty {
 	var resultMaps = make(map[string]map[string]*ResultProperty)
 	for _, xmlItem := range xmls {
 		if xmlItem.Tag == Element_ResultMap {
 			var resultPropertyMap = make(map[string]*ResultProperty)
-			for _, elementItem := range xmlItem.ElementItems {
+			for _, elementItem := range xmlItem.ChildElements() {
 				var property = ResultProperty{
-					XMLName:  elementItem.ElementType,
-					Column:   elementItem.Propertys["column"],
-					Property: elementItem.Propertys["property"],
-					GoType:   elementItem.Propertys["goType"],
+					XMLName:  elementItem.Tag,
+					Column:   elementItem.SelectAttrValue("column", ""),
+					Property: elementItem.SelectAttrValue("property", ""),
+					GoType:   elementItem.SelectAttrValue("goType", ""),
 				}
 				resultPropertyMap[property.Column] = &property
 			}
-			resultMaps[xmlItem.Id] = resultPropertyMap
+			resultMaps[xmlItem.SelectAttrValue("id", "")] = resultPropertyMap
 		}
 	}
 	return resultMaps
 }
 
-type Mapper struct {
-	xml   *MapperXml
-	nodes []Node
-}
-
 //return a map map[`method`]*MapperXml
-func makeMethodXmlMap(bean reflect.Value, mapperTree map[string]*MapperXml, sqlBuilder SqlBuilder) map[string]*Mapper {
+func makeMethodXmlMap(bean reflect.Value, mapperTree map[string]*etree.Element, sqlBuilder SqlBuilder) map[string]*Mapper {
 	var beanType = bean.Type()
 	if beanType.Kind() == reflect.Ptr {
 		beanType = beanType.Elem()
@@ -235,7 +236,7 @@ func makeMethodXmlMap(bean reflect.Value, mapperTree map[string]*MapperXml, sqlB
 			if mapperXml != nil {
 				methodXmlMap[fieldItem.Name] = &Mapper{
 					xml:   mapperXml,
-					nodes: sqlBuilder.NodeParser().ParserNodes(mapperXml.ElementItems),
+					nodes: sqlBuilder.NodeParser().ParserNodes(mapperXml.Child),
 				}
 			} else {
 				if fieldItem.Name == NewSessionFunc {
@@ -278,10 +279,11 @@ func methodFieldCheck(beanType *reflect.Type, methodType *reflect.StructField) {
 	}
 }
 
-func findMapperXml(mapperTree map[string]*MapperXml, methodName string) *MapperXml {
+func findMapperXml(mapperTree map[string]*etree.Element, methodName string) *etree.Element {
 	for _, mapperXml := range mapperTree {
 		//exec sql,return data
-		if strings.EqualFold(mapperXml.Id, methodName) {
+		var key = mapperXml.SelectAttrValue("id", "")
+		if strings.EqualFold(key, methodName) {
 			return mapperXml
 		}
 	}

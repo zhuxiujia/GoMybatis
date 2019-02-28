@@ -1,56 +1,65 @@
 package GoMybatis
 
+import (
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
+	"reflect"
+)
+
+const EtreeCharData = `*etree.CharData`
+const EtreeElement = `*etree.Element`
+
 //节点解析器
 type NodeParser struct {
 	holder NodeConfigHolder
 }
 
 //界面为node
-func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
+func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
 	if it.holder.proxy == nil {
 		panic("NodeParser need a *ExpressionEngineProxy{}!")
 	}
 	var nodes = []Node{}
-	for _, v := range mapperXml {
+	for _, item := range mapperXml {
 		var node Node
+		var typeString = reflect.TypeOf(item).String()
 
-		var childItems []ElementItem = nil
-
-		if v.DataString != "" {
-			if childItems == nil {
-				childItems = make([]ElementItem, 0)
-			}
-			childItems = append(childItems, ElementItem{
-				ElementType: Element_String,
-				DataString:  v.DataString,
-			})
-		}
-		if v.ElementItems != nil && len(v.ElementItems) > 0 {
-			if childItems == nil {
-				childItems = make([]ElementItem, 0)
-			}
-			childItems = append(childItems, v.ElementItems...)
-		}
-
-		//start
-		switch v.ElementType {
-		case "string":
+		if typeString == EtreeCharData {
+			charData := item.(*etree.CharData)
 			n := NodeString{
-				value:               v.DataString,
+				value:               charData.Data,
 				t:                   NString,
-				expressMap:          FindAllExpressConvertString(v.DataString), //表达式需要替换的string
-				noConvertExpressMap: FindAllExpressString(v.DataString),
+				expressMap:          FindAllExpressConvertString(charData.Data), //表达式需要替换的string
+				noConvertExpressMap: FindAllExpressString(charData.Data),
 				holder:              &it.holder,
 			}
 			if len(n.expressMap) == 0 {
 				n.expressMap = nil
 			}
 			node = &n
-			break
+			continue
+		}
+
+		var v = item.(*etree.Element)
+		var childItems = v.Child
+		//start
+		switch v.Tag {
+		//case "string":
+		//	n := NodeString{
+		//		value:               v.Text(),
+		//		t:                   NString,
+		//		expressMap:          FindAllExpressConvertString(v.Text()), //表达式需要替换的string
+		//		noConvertExpressMap: FindAllExpressString(v.Text()),
+		//		holder:              &it.holder,
+		//	}
+		//	if len(n.expressMap) == 0 {
+		//		n.expressMap = nil
+		//	}
+		//	node = &n
+		//	break
 		case "if":
 			n := NodeIf{
 				t:      NIf,
-				test:   v.Propertys["test"],
+				test:   v.SelectAttrValue("test", ""),
 				childs: []Node{},
 				holder: &it.holder,
 			}
@@ -63,10 +72,10 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 		case "trim":
 			n := NodeTrim{
 				t:               NTrim,
-				prefix:          []byte(v.Propertys["prefix"]),
-				suffix:          []byte(v.Propertys["suffix"]),
-				prefixOverrides: []byte(v.Propertys["prefixOverrides"]),
-				suffixOverrides: []byte(v.Propertys["suffixOverrides"]),
+				prefix:          []byte(v.SelectAttrValue("prefix", "")),
+				suffix:          []byte(v.SelectAttrValue("suffix", "")),
+				prefixOverrides: []byte(v.SelectAttrValue("prefixOverrides", "")),
+				suffixOverrides: []byte(v.SelectAttrValue("suffixOverrides", "")),
 				childs:          []Node{},
 			}
 			if childItems != nil {
@@ -95,12 +104,12 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 			n := NodeForEach{
 				t:          NForEach,
 				childs:     []Node{},
-				collection: v.Propertys["collection"],
-				index:      v.Propertys["index"],
-				item:       v.Propertys["item"],
-				open:       v.Propertys["open"],
-				close:      v.Propertys["close"],
-				separator:  v.Propertys["separator"],
+				collection: v.SelectAttrValue("collection", ""),
+				index:      v.SelectAttrValue("index", ""),
+				item:       v.SelectAttrValue("item", ""),
+				open:       v.SelectAttrValue("open", ""),
+				close:      v.SelectAttrValue("close", ""),
+				separator:  v.SelectAttrValue("separator", ""),
 			}
 			if childItems != nil {
 				var childNodes = it.ParserNodes(childItems)
@@ -138,7 +147,7 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 			n := NodeWhen{
 				t:      NOtherwise,
 				childs: []Node{},
-				test:   v.Propertys["test"],
+				test:   v.SelectAttrValue("test", ""),
 				holder: &it.holder,
 			}
 			if childItems != nil {
@@ -162,9 +171,9 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 			n := NodeTrim{
 				t:               NTrim,
 				prefix:          []byte(DefaultWhereElement_Prefix),
-				suffix:          []byte(v.Propertys["suffix"]),
+				suffix:          []byte(v.SelectAttrValue("suffix", "")),
 				prefixOverrides: []byte(DefaultWhereElement_PrefixOverrides),
-				suffixOverrides: []byte(v.Propertys["suffixOverrides"]),
+				suffixOverrides: []byte(v.SelectAttrValue("suffixOverrides", "")),
 				childs:          []Node{},
 			}
 			if childItems != nil {
@@ -176,8 +185,8 @@ func (it NodeParser) ParserNodes(mapperXml []ElementItem) []Node {
 		case "bind":
 			n := NodeBind{
 				t:      NBind,
-				value:  v.Propertys["value"],
-				name:   v.Propertys["name"],
+				value:  v.SelectAttrValue("value", ""),
+				name:   v.SelectAttrValue("name", ""),
 				holder: &it.holder,
 			}
 			node = &n

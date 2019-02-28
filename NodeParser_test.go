@@ -39,7 +39,7 @@ func TestNodeParser_ParserNodes(t *testing.T) {
 			proxy:   &proxy,
 		},
 	}
-	var sqlNodes = nodePar.ParserNodes(mapperTree["selectByCondition"].ElementItems)
+	var sqlNodes = nodePar.ParserNodes(mapperTree["selectByCondition"].Child)
 
 	fmt.Println(sqlNodes)
 
@@ -93,7 +93,7 @@ func BenchmarkNodeParser_ParserNodes(b *testing.B) {
 			proxy:   &proxy,
 		},
 	}
-	var sqlNodes = nodePar.ParserNodes(mapperTree["selectByCondition"].ElementItems)
+	var sqlNodes = nodePar.ParserNodes(mapperTree["selectByCondition"].Child)
 
 	var argMap = map[string]interface{}{
 		"name": "sadf",

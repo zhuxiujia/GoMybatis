@@ -36,7 +36,7 @@ func Benchmark_SqlBuilder(b *testing.B) {
 	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true), &LogStandard{}, false)
 
 	var mapperTree = LoadMapperXml([]byte(mapper))
-	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].ElementItems)
+	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].Child)
 
 	var paramMap = make(map[string]interface{})
 	paramMap["name"] = ""
@@ -99,7 +99,7 @@ func Test_SqlBuilder_Tps(t *testing.T) {
 	paramMap["page"] = 0
 	paramMap["size"] = 0
 
-	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].ElementItems)
+	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].Child)
 
 	var startTime = time.Now()
 	for i := 0; i < 100000; i++ {
@@ -190,7 +190,7 @@ func TestGoMybatisSqlBuilder_BuildSql(t *testing.T) {
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
 	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true), &LogStandard{}, true)
-	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].ElementItems)
+	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].Child)
 
 	var paramMap = make(map[string]interface{})
 	paramMap["name"] = "name"
@@ -237,7 +237,7 @@ func Benchmark_SqlBuilder_If_Element(b *testing.B) {
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
 	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true), &LogStandard{}, false)
-	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].ElementItems)
+	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].Child)
 
 	var paramMap = make(map[string]interface{})
 	paramMap["name"] = ""
@@ -296,7 +296,7 @@ func Benchmark_SqlBuilder_Nested(b *testing.B) {
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
 	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true), &LogStandard{}, false)
-	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].ElementItems)
+	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].Child)
 
 	var paramMap = make(map[string]interface{})
 	paramMap["name"] = ""

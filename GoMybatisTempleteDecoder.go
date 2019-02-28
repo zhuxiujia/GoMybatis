@@ -2,6 +2,7 @@ package GoMybatis
 
 import (
 	"bytes"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
 	"strings"
@@ -9,6 +10,9 @@ import (
 
 var equalOperator = []string{"/", "+", "-", "*", "**", "|", "^", "&", "%", "<", ">", ">=", "<=", " in ", " not in ", " or ", "||", " and ", "&&", "==", "!="}
 
+/**
+ TODO sqlTemplete解析器，目前直接操作*etree.Element实现，后期应该改成操作xml，换取更好的维护性
+ */
 type GoMybatisTempleteDecoder struct {
 }
 
@@ -28,7 +32,7 @@ type VersionData struct {
 	LangType string
 }
 
-func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]*MapperXml, beanType reflect.Type) error {
+func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]*etree.Element, beanType reflect.Type) error {
 	if tree == nil {
 		return utils.NewError("GoMybatisTempleteDecoder", "decode data map[string]*MapperXml cant be nil!")
 	}
@@ -41,7 +45,7 @@ func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]*MapperXml, beanT
 		var method *reflect.StructField
 		if beanType != nil {
 			if isMethodElement(v.Tag) {
-				var upperId = utils.UpperFieldFirstName(v.Id)
+				var upperId = utils.UpperFieldFirstName(v.SelectAttrValue("id", ""))
 				m, haveMethod := beanType.FieldByName(upperId)
 				if haveMethod {
 					method = &m
@@ -53,18 +57,23 @@ func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]*MapperXml, beanT
 	return nil
 }
 
-func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *MapperXml, tree map[string]*MapperXml) error {
+func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *etree.Element, tree map[string]*etree.Element) error {
 
 	switch mapper.Tag {
 
 	case "selectTemplete":
 		mapper.Tag = Element_Select
 
-		var tables = mapper.Propertys["tables"]
-		var columns = mapper.Propertys["columns"]
-		var wheres = mapper.Propertys["wheres"]
+		var id = mapper.SelectAttrValue("id", "")
+		if id == "" {
+			mapper.CreateAttr("id", "selectTemplete")
+		}
 
-		var resultMap = mapper.Propertys["resultMap"]
+		var tables = mapper.SelectAttrValue("tables", "")
+		var columns = mapper.SelectAttrValue("columns", "")
+		var wheres = mapper.SelectAttrValue("wheres", "")
+
+		var resultMap = mapper.SelectAttrValue("resultMap", "")
 		if resultMap == "" {
 			resultMap = "BaseResultMap"
 		}
@@ -84,9 +93,8 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 		sql.WriteString(tables)
 		if len(wheres) > 0 {
 			sql.WriteString(" where ")
-			mapper.ElementItems = append(mapper.ElementItems, ElementItem{
-				ElementType: Element_String,
-				DataString:  sql.String(),
+			mapper.Child = append(mapper.Child, &etree.CharData{
+				Data: sql.String(),
 			})
 			//TODO decode wheres
 			it.DecodeWheres(wheres, mapper, logic, nil)
@@ -95,10 +103,15 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 	case "insertTemplete":
 		mapper.Tag = Element_Insert
 
-		var tables = mapper.Propertys["tables"]
-		var inserts = mapper.Propertys["inserts"]
+		var id = mapper.SelectAttrValue("id", "")
+		if id == "" {
+			mapper.CreateAttr("id", "insertTemplete")
+		}
 
-		var resultMap = mapper.Propertys["resultMap"]
+		var tables = mapper.SelectAttrValue("tables", "")
+		var inserts = mapper.SelectAttrValue("inserts", "")
+
+		var resultMap = mapper.SelectAttrValue("resultMap", "")
 		if resultMap == "" {
 			resultMap = "BaseResultMap"
 		}
@@ -131,124 +144,132 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 		sql.WriteString("insert into ")
 		sql.WriteString(tables)
 
-		mapper.ElementItems = append(mapper.ElementItems, ElementItem{
-			ElementType: Element_String,
-			DataString:  sql.String(),
+		mapper.Child = append(mapper.Child, &etree.CharData{
+			Data: sql.String(),
 		})
 
 		//add insert column
-		var trimColumn = ElementItem{
-			ElementType:  Element_Trim,
-			Propertys:    map[string]string{"prefix": "(", "suffix": ")", "suffixOverrides": ","},
-			ElementItems: []ElementItem{},
+		var trimColumn = etree.Element{
+			Tag: Element_Trim,
+			Attr: []etree.Attr{
+				{Key: "prefix", Value: "("},
+				{Key: "suffix", Value: ")"},
+				{Key: "suffixOverrides", Value: ","},
+			},
+			Child: []etree.Token{},
 		}
 
 		//cloumns
 		if collection != "" {
-			for _, v := range resultMapData.ElementItems {
+			for _, v := range resultMapData.ChildElements() {
 				if inserts == "*" || inserts == "*?*" {
-					trimColumn.ElementItems = append(trimColumn.ElementItems, ElementItem{
-						ElementType: Element_String,
-						DataString:  v.Propertys["column"] + ",",
+					trimColumn.Child = append(trimColumn.Child, &etree.CharData{
+						Data: v.SelectAttrValue("column", "") + ",",
 					})
 				}
 			}
 		} else {
-			for _, v := range resultMapData.ElementItems {
+			for _, v := range resultMapData.ChildElements() {
 				if collection == "" && inserts == "*?*" {
-					trimColumn.ElementItems = append(trimColumn.ElementItems, ElementItem{
-						ElementType: Element_If,
-						Propertys:   map[string]string{"test": it.makeIfNotNull(v.Propertys["property"])},
-						ElementItems: []ElementItem{
-							{
-								ElementType: Element_String,
-								DataString:  v.Propertys["column"] + ",",
+					trimColumn.Child = append(trimColumn.Child, &etree.Element{
+						Tag: Element_If,
+						Attr: []etree.Attr{
+							{Key: "test", Value: it.makeIfNotNull(v.SelectAttrValue("property", ""))},
+						},
+						Child: []etree.Token{
+							&etree.CharData{
+								Data: v.SelectAttrValue("column", "") + ",",
 							},
 						},
 					})
 				} else if inserts == "*" {
-					trimColumn.ElementItems = append(trimColumn.ElementItems, ElementItem{
-						ElementType: Element_String,
-						DataString:  v.Propertys["column"] + ",",
+					trimColumn.Child = append(trimColumn.Child, &etree.CharData{
+						Data: v.SelectAttrValue("column", "") + ",",
 					})
 				}
 			}
 		}
 
-		mapper.ElementItems = append(mapper.ElementItems, trimColumn)
+		mapper.Child = append(mapper.Child, &trimColumn)
 
 		//args
-		var trimArg = ElementItem{
-			ElementType:  Element_Trim,
-			Propertys:    map[string]string{"prefix": "values (", "suffix": ")", "suffixOverrides": ","},
-			ElementItems: []ElementItem{},
+		var trimArg = etree.Element{
+			Tag:   Element_Trim,
+			Attr:  []etree.Attr{{Key: "prefix", Value: "values ("}, {Key: "suffix", Value: ")"}, {Key: "suffixOverrides", Value: ","}},
+			Child: []etree.Token{},
 		}
 
 		if collection == "" {
-			for _, v := range resultMapData.ElementItems {
-				if logic.Enable && v.Propertys["property"] == logic.Property {
-					trimArg.ElementItems = append(trimArg.ElementItems, ElementItem{
-						ElementType: Element_String,
-						DataString:  logic.Undelete_value + ",",
+			for _, v := range resultMapData.ChildElements() {
+				if logic.Enable && v.SelectAttrValue("property", "") == logic.Property {
+					trimArg.Child = append(trimArg.Child, &etree.CharData{
+						Data: logic.Undelete_value + ",",
 					})
 					continue
 				}
 				if inserts == "*?*" {
-					trimArg.ElementItems = append(trimArg.ElementItems, ElementItem{
-						ElementType: Element_If,
-						Propertys:   map[string]string{"test": it.makeIfNotNull(v.Propertys["property"])},
-						DataString:  "#{" + v.Propertys["property"] + "},",
+					trimArg.Child = append(trimArg.Child, &etree.Element{
+						Tag:  Element_If,
+						Attr: []etree.Attr{{Key: "test", Value: it.makeIfNotNull(v.SelectAttrValue("property", ""))},},
+						Child: []etree.Token{
+							&etree.CharData{
+								Data: "#{" + v.SelectAttrValue("property", "") + "},",
+							},
+						},
 					})
 				} else if inserts == "*" {
-					trimArg.ElementItems = append(trimArg.ElementItems, ElementItem{
-						ElementType: Element_String,
-						DataString:  "#{" + v.Propertys["property"] + "},",
+					trimArg.Child = append(trimArg.Child, &etree.CharData{
+						Data: "#{" + v.SelectAttrValue("property", "") + "},",
 					})
 				}
 			}
 		} else {
-			trimArg.Propertys["prefix"] = "values "
-			trimArg.Propertys["suffix"] = ""
-			trimArg.Propertys["suffixOverrides"] = ","
+			trimArg.Attr[0] = etree.Attr{Key: "prefix", Value: "values "}
+			trimArg.Attr[1] = etree.Attr{Key: "suffix", Value: ""}
+			trimArg.Attr[2] = etree.Attr{Key: "suffixOverrides", Value: ","}
 
-			var forEach = ElementItem{
-				ElementType:  Element_Foreach,
-				Propertys:    map[string]string{"open": "", "close": "", "separator": ",", "collection": collection},
-				ElementItems: []ElementItem{},
+			var forEach = &etree.Element{
+				Tag:   Element_Foreach,
+				Attr:  []etree.Attr{{Key: "open", Value: ""}, {Key: "close", Value: ""}, {Key: "separator", Value: ","}, {Key: "collection", Value: collection}},
+				Child: []  etree.Token{},
 			}
 
-			for index, v := range resultMapData.ElementItems {
+			for index, v := range resultMapData.ChildElements() {
 				var prefix = ""
 				if index == 0 {
 					prefix = "("
 				}
-				var value = prefix + "#{" + "item." + utils.UpperFieldFirstName(v.Propertys["property"]) + "}"
-				if logic.Enable && v.Propertys["property"] == logic.Property {
+				var value = prefix + "#{" + "item." + utils.UpperFieldFirstName(v.SelectAttrValue("property", "")) + "}"
+				if logic.Enable && v.SelectAttrValue("property", "") == logic.Property {
 					value = `'` + logic.Undelete_value + "'"
 				}
-				if index+1 == len(resultMapData.ElementItems) {
+				if index+1 == len(resultMapData.Child) {
 					value += ")"
 				} else {
 					value += ","
 				}
-				forEach.ElementItems = append(forEach.ElementItems, ElementItem{
-					ElementType: Element_String,
-					DataString:  value,
+				forEach.Child = append(forEach.Child, &etree.CharData{
+					Data: value,
 				})
 			}
-			trimArg.ElementItems = append(trimArg.ElementItems, forEach)
+			trimArg.Child = append(trimArg.Child, forEach)
 		}
-		mapper.ElementItems = append(mapper.ElementItems, trimArg)
+		mapper.Child = append(mapper.Child, &trimArg)
 
 		break
 	case "updateTemplete":
 		mapper.Tag = Element_Update
 
-		var tables = mapper.Propertys["tables"]
-		var columns = mapper.Propertys["sets"]
-		var wheres = mapper.Propertys["wheres"]
+		var id = mapper.SelectAttrValue("id", "")
+		if id == "" {
+			mapper.CreateAttr("id", "updateTemplete")
+		}
 
-		var resultMap = mapper.Propertys["resultMap"]
+		var tables = mapper.SelectAttrValue("tables", "")
+		var columns = mapper.SelectAttrValue("sets", "")
+		var wheres = mapper.SelectAttrValue("wheres", "")
+
+		var resultMap = mapper.SelectAttrValue("resultMap", "")
 		if resultMap == "" {
 			resultMap = "BaseResultMap"
 		}
@@ -267,29 +288,26 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 		sql.WriteString(tables)
 		sql.WriteString(" set ")
 		if columns == "" {
-			mapper.ElementItems = append(mapper.ElementItems, ElementItem{
-				ElementType: Element_String,
-				DataString:  sql.String(),
+			mapper.Child = append(mapper.Child, &etree.CharData{
+				Data: sql.String(),
 			})
 			sql.Reset()
-			for _, v := range resultMapData.ElementItems {
-				columns += v.Propertys["property"] + "?" + v.Propertys["column"] + ","
+			for _, v := range resultMapData.ChildElements() {
+				columns += v.SelectAttrValue("property", "") + "?" + v.SelectAttrValue("column", "") + ","
 			}
 			columns = strings.Trim(columns, ",")
 			it.DecodeSets(columns, mapper, LogicDeleteData{}, versionData)
 		} else {
-			mapper.ElementItems = append(mapper.ElementItems, ElementItem{
-				ElementType: Element_String,
-				DataString:  sql.String(),
+			mapper.Child = append(mapper.Child, &etree.CharData{
+				Data: sql.String(),
 			})
 			sql.Reset()
 			it.DecodeSets(columns, mapper, LogicDeleteData{}, versionData)
 		}
 		if len(wheres) > 0 || logic.Enable {
 			sql.WriteString(" where ")
-			mapper.ElementItems = append(mapper.ElementItems, ElementItem{
-				ElementType: Element_String,
-				DataString:  sql.String(),
+			mapper.Child = append(mapper.Child, &etree.CharData{
+				Data: sql.String(),
 			})
 			it.DecodeWheres(wheres, mapper, logic, versionData)
 		}
@@ -297,10 +315,15 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 	case "deleteTemplete":
 		mapper.Tag = Element_Delete
 
-		var tables = mapper.Propertys["tables"]
-		var wheres = mapper.Propertys["wheres"]
+		var id = mapper.SelectAttrValue("id", "")
+		if id == "" {
+			mapper.CreateAttr("id", "deleteTemplete")
+		}
 
-		var resultMap = mapper.Propertys["resultMap"]
+		var tables = mapper.SelectAttrValue("tables", "")
+		var wheres = mapper.SelectAttrValue("wheres", "")
+
+		var resultMap = mapper.SelectAttrValue("resultMap", "")
 		if resultMap == "" {
 			resultMap = "BaseResultMap"
 		}
@@ -317,17 +340,15 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			sql.WriteString("update ")
 			sql.WriteString(tables)
 			sql.WriteString(" set ")
-			mapper.ElementItems = append(mapper.ElementItems, ElementItem{
-				ElementType: Element_String,
-				DataString:  sql.String(),
+			mapper.Child = append(mapper.Child, &etree.CharData{
+				Data: sql.String(),
 			})
 			sql.Reset()
 			it.DecodeSets("", mapper, logic, nil)
 			if len(wheres) > 0 {
 				sql.WriteString(" where ")
-				mapper.ElementItems = append(mapper.ElementItems, ElementItem{
-					ElementType: Element_String,
-					DataString:  sql.String(),
+				mapper.Child = append(mapper.Child, &etree.CharData{
+					Data: sql.String(),
 				})
 				//TODO decode wheres
 				it.DecodeWheres(wheres, mapper, logic, nil)
@@ -340,9 +361,8 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			sql.WriteString(tables)
 			if len(wheres) > 0 {
 				sql.WriteString(" where ")
-				mapper.ElementItems = append(mapper.ElementItems, ElementItem{
-					ElementType: Element_String,
-					DataString:  sql.String(),
+				mapper.Child = append(mapper.Child, &etree.CharData{
+					Data: sql.String(),
 				})
 				//TODO decode wheres
 				it.DecodeWheres(wheres, mapper, LogicDeleteData{}, nil)
@@ -354,7 +374,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 }
 
 //解码逗号分隔的where
-func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *MapperXml, logic LogicDeleteData, versionData *VersionData) {
+func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Element, logic LogicDeleteData, versionData *VersionData) {
 	var wheres = strings.Split(arg, ",")
 	for index, v := range wheres {
 		var expressions = strings.Split(v, "?")
@@ -365,23 +385,22 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *MapperXml, 
 				newWheres.WriteString(" and ")
 			}
 			newWheres.WriteString(expressions[1])
-			var item = ElementItem{
-				ElementType: Element_If,
-				Propertys:   map[string]string{"test": it.makeIfNotNull(expressions[0])},
-				DataString:  newWheres.String(),
+			var item = &etree.Element{
+				Tag:   Element_If,
+				Attr:  []etree.Attr{{Key: "test", Value: it.makeIfNotNull(expressions[0])}},
+				Child: []etree.Token{&etree.CharData{Data: newWheres.String()}},
 			}
-			mapper.ElementItems = append(mapper.ElementItems, item)
+			mapper.Child = append(mapper.Child, item)
 		} else {
 			var newWheres bytes.Buffer
 			if index > 0 {
 				newWheres.WriteString(" and ")
 			}
 			newWheres.WriteString(v)
-			var item = ElementItem{
-				ElementType: Element_String,
-				DataString:  newWheres.String(),
+			var item = &etree.CharData{
+				Data: newWheres.String(),
 			}
-			mapper.ElementItems = append(mapper.ElementItems, item)
+			mapper.Child = append(mapper.Child, item)
 		}
 	}
 	if logic.Enable == true {
@@ -389,26 +408,24 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *MapperXml, 
 		if len(wheres) >= 1 && arg != "" {
 			appendAdd = " and "
 		}
-		var item = ElementItem{
-			ElementType: Element_String,
-			DataString:  appendAdd + logic.Column + " = " + logic.Undelete_value,
+		var item = &etree.CharData{
+			Data: appendAdd + logic.Column + " = " + logic.Undelete_value,
 		}
-		mapper.ElementItems = append(mapper.ElementItems, item)
+		mapper.Child = append(mapper.Child, item)
 	}
 	if versionData != nil {
 		var appendAdd = ""
 		if len(wheres) >= 1 && arg != "" {
 			appendAdd = " and "
 		}
-		var item = ElementItem{
-			ElementType: Element_String,
-			DataString:  appendAdd + versionData.Column + " = #{" + versionData.Property + "}",
+		var item = &etree.CharData{
+			Data: appendAdd + versionData.Column + " = #{" + versionData.Property + "}",
 		}
-		mapper.ElementItems = append(mapper.ElementItems, item)
+		mapper.Child = append(mapper.Child, item)
 	}
 }
 
-func (it *GoMybatisTempleteDecoder) DecodeSets(arg string, mapper *MapperXml, logic LogicDeleteData, versionData *VersionData) {
+func (it *GoMybatisTempleteDecoder) DecodeSets(arg string, mapper *etree.Element, logic LogicDeleteData, versionData *VersionData) {
 	var sets = strings.Split(arg, ",")
 	for index, v := range sets {
 		var expressions = strings.Split(v, "?")
@@ -419,23 +436,22 @@ func (it *GoMybatisTempleteDecoder) DecodeSets(arg string, mapper *MapperXml, lo
 				newWheres.WriteString(",")
 			}
 			newWheres.WriteString(expressions[1])
-			var item = ElementItem{
-				ElementType: Element_If,
-				Propertys:   map[string]string{"test": it.makeIfNotNull(expressions[0])},
-				DataString:  newWheres.String(),
+			var item = &etree.Element{
+				Tag:  Element_If,
+				Attr: []etree.Attr{{Key: "test", Value: it.makeIfNotNull(expressions[0])}},
 			}
-			mapper.ElementItems = append(mapper.ElementItems, item)
+			item.SetText(newWheres.String())
+			mapper.Child = append(mapper.Child, item)
 		} else {
 			var newWheres bytes.Buffer
 			if index > 0 {
 				newWheres.WriteString(" and ")
 			}
 			newWheres.WriteString(v)
-			var item = ElementItem{
-				ElementType: Element_String,
-				DataString:  newWheres.String(),
+			var item = &etree.CharData{
+				Data: newWheres.String(),
 			}
-			mapper.ElementItems = append(mapper.ElementItems, item)
+			mapper.Child = append(mapper.Child, item)
 		}
 	}
 	if logic.Enable == true {
@@ -443,22 +459,20 @@ func (it *GoMybatisTempleteDecoder) DecodeSets(arg string, mapper *MapperXml, lo
 		if len(sets) >= 1 && arg != "" {
 			appendAdd = ","
 		}
-		var item = ElementItem{
-			ElementType: Element_String,
-			DataString:  appendAdd + logic.Column + " = " + logic.Deleted_value,
+		var item = &etree.CharData{
+			Data: appendAdd + logic.Column + " = " + logic.Deleted_value,
 		}
-		mapper.ElementItems = append(mapper.ElementItems, item)
+		mapper.Child = append(mapper.Child, item)
 	}
 	if versionData != nil {
 		var appendAdd = ""
 		if len(sets) >= 1 && arg != "" {
 			appendAdd = ","
 		}
-		var item = ElementItem{
-			ElementType: Element_String,
-			DataString:  appendAdd + versionData.Column + " = #{" + versionData.Property + "+1}",
+		var item = &etree.CharData{
+			Data: appendAdd + versionData.Column + " = #{" + versionData.Property + "+1}",
 		}
-		mapper.ElementItems = append(mapper.ElementItems, item)
+		mapper.Child = append(mapper.Child, item)
 	}
 }
 
@@ -471,19 +485,19 @@ func (it *GoMybatisTempleteDecoder) makeIfNotNull(arg string) string {
 	return arg + ` != nil`
 }
 
-func (it *GoMybatisTempleteDecoder) decodeLogicDelete(xml *MapperXml) LogicDeleteData {
-	if xml == nil || len(xml.ElementItems) == 0 {
+func (it *GoMybatisTempleteDecoder) decodeLogicDelete(xml *etree.Element) LogicDeleteData {
+	if xml == nil || len(xml.Child) == 0 {
 		return LogicDeleteData{}
 	}
 	var logicData = LogicDeleteData{}
-	for _, v := range xml.ElementItems {
-		if v.Propertys["logic_enable"] == "true" {
+	for _, v := range xml.ChildElements() {
+		if v.SelectAttrValue("logic_enable", "") == "true" {
 			logicData.Enable = true
-			logicData.Deleted_value = v.Propertys["logic_deleted"]
-			logicData.Undelete_value = v.Propertys["logic_undelete"]
-			logicData.Column = v.Propertys["column"]
-			logicData.Property = v.Propertys["property"]
-			logicData.LangType = v.Propertys["langType"]
+			logicData.Deleted_value = v.SelectAttrValue("logic_deleted", "")
+			logicData.Undelete_value = v.SelectAttrValue("logic_undelete", "")
+			logicData.Column = v.SelectAttrValue("column", "")
+			logicData.Property = v.SelectAttrValue("property", "")
+			logicData.LangType = v.SelectAttrValue("langType", "")
 			//check
 			if logicData.Deleted_value == "" {
 				panic(utils.NewError("GoMybatisTempleteDecoder", `<resultMap> logic_deleted="" can't be empty !`))
@@ -500,17 +514,17 @@ func (it *GoMybatisTempleteDecoder) decodeLogicDelete(xml *MapperXml) LogicDelet
 	return logicData
 }
 
-func (it *GoMybatisTempleteDecoder) decodeVersionData(xml *MapperXml) *VersionData {
-	if xml == nil || len(xml.ElementItems) == 0 {
+func (it *GoMybatisTempleteDecoder) decodeVersionData(xml *etree.Element) *VersionData {
+	if xml == nil || len(xml.Child) == 0 {
 		return nil
 	}
-	for _, v := range xml.ElementItems {
-		if v.Propertys["version_enable"] == "true" {
+	for _, v := range xml.ChildElements() {
+		if v.SelectAttrValue("version_enable", "") == "true" {
 
 			var versionData = VersionData{}
-			versionData.Column = v.Propertys["column"]
-			versionData.Property = v.Propertys["property"]
-			versionData.LangType = v.Propertys["langType"]
+			versionData.Column = v.SelectAttrValue("column", "")
+			versionData.Property = v.SelectAttrValue("property", "")
+			versionData.LangType = v.SelectAttrValue("langType", "")
 			//check
 			if !(strings.Contains(versionData.LangType, "int") || strings.Contains(versionData.LangType, "time.Time")) {
 				panic(utils.NewError("GoMybatisTempleteDecoder", `version_enable only support int...,time.Time... number type!`))

@@ -1,7 +1,10 @@
 package GoMybatis
 
-import "reflect"
+import (
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
+	"reflect"
+)
 
 type TempleteDecoder interface {
-	DecodeTree(tree map[string]*MapperXml, beanType reflect.Type) error
+	DecodeTree(tree map[string]*etree.Element, beanType reflect.Type) error
 }
