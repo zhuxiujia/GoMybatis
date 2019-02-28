@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"reflect"
 	"regexp"
 	"strings"
 )
@@ -12,26 +11,26 @@ import (
 var defaultArgRegex, _ = regexp.Compile("\\$\\{[^}]*\\}")
 var sqlArgRegex, _ = regexp.Compile("\\#\\{[^}]*\\}")
 
-//替换参数
-func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlArgTypeConvert, engine *ExpressionEngineProxy) (string, error) {
-	if data == "" {
-		return data, nil
-	}
-	var err error
-	var defaultValue = parameters[DefaultOneArg]
-	//replace default value
-	if defaultValue != nil {
-		var str = typeConvert.Convert(defaultValue, reflect.TypeOf(defaultValue))
-		data = sqlArgRegex.ReplaceAllString(data, str)
-	}
-	if strings.Index(data, `#`) != -1 {
-		data, err = Replace(`#{`, FindAllExpressConvertString(data), data, typeConvert, parameters, engine)
-	}
-	if strings.Index(data, `$`) != -1 {
-		data, err = Replace(`${`, FindAllExpressString(data), data, nil, parameters, engine)
-	}
-	return data, err
-}
+////替换参数
+//func replaceArg(data string, parameters map[string]interface{}, typeConvert SqlArgTypeConvert, engine *ExpressionEngineProxy) (string, error) {
+//	if data == "" {
+//		return data, nil
+//	}
+//	var err error
+//	var defaultValue = parameters[DefaultOneArg]
+//	//replace default value
+//	if defaultValue != nil {
+//		var str = typeConvert.Convert(defaultValue, reflect.TypeOf(defaultValue))
+//		data = sqlArgRegex.ReplaceAllString(data, str)
+//	}
+//	if strings.Index(data, `#`) != -1 {
+//		data, err = Replace(`#{`, FindAllExpressConvertString(data), data, typeConvert, parameters, engine)
+//	}
+//	if strings.Index(data, `$`) != -1 {
+//		data, err = Replace(`${`, FindAllExpressString(data), data, nil, parameters, engine)
+//	}
+//	return data, nil
+//}
 
 //执行替换操作
 func Replace(startChar string, findStrs []string, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine *ExpressionEngineProxy) (string, error) {

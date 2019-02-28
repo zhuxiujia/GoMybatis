@@ -29,7 +29,7 @@ func (it *NodeString) Eval(env map[string]interface{}) ([]byte, error) {
 		}
 	}
 	if it.noConvertExpressMap != nil {
-		data, err = Replace(`${`, it.noConvertExpressMap, data, it.holder.GetSqlArgTypeConvert(), env, it.holder.GetExpressionEngineProxy())
+		data, err = Replace(`${`, it.noConvertExpressMap, data, nil, env, it.holder.GetExpressionEngineProxy())
 		if err != nil {
 			return nil, err
 		}

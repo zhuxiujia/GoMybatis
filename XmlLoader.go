@@ -3,18 +3,19 @@ package GoMybatis
 import (
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 	"github.com/zhuxiujia/GoMybatis/utils"
+	"reflect"
 )
 
 const Element_Mapper = "mapper"
 const ID = `id`
 
-func LoadMapperXml(bytes []byte) (items map[string]*etree.Element) {
+func LoadMapperXml(bytes []byte) (items map[string]etree.Token) {
 	utils.FixTestExpressionSymbol(&bytes)
 	doc := etree.NewDocument()
 	if err := doc.ReadFromBytes(bytes); err != nil {
 		panic(err)
 	}
-	items = make(map[string]*etree.Element)
+	items = make(map[string]etree.Token)
 	root := doc.SelectElement(Element_Mapper)
 	for _, s := range root.ChildElements() {
 		var attrMap = attrToProperty(s.Attr)
@@ -44,20 +45,19 @@ func LoadMapperXml(bytes []byte) (items map[string]*etree.Element) {
 			items[elementID] = s
 		}
 	}
-	for itemsIndex, mapperXml := range items {
-		for key, v := range mapperXml.ChildElements() {
-			var isChanged = includeElementReplace(v, &items)
-			if isChanged {
-				mapperXml.Child[key] = v
+	for _, mapperXml := range items {
+		var typeString = reflect.TypeOf(mapperXml).String()
+		if typeString == "*etree.Element" {
+			var el = mapperXml.(*etree.Element)
+			for _, v := range el.ChildElements() {
+				includeElementReplace(v, &items)
 			}
 		}
-		items[itemsIndex] = mapperXml
 	}
 	return items
 }
 
-func includeElementReplace(xml *etree.Element, xmlMap *map[string]*etree.Element) bool {
-	var changed = false
+func includeElementReplace(xml *etree.Element, xmlMap *map[string]etree.Token) {
 	if xml.Tag == Element_Include {
 		var refid = xml.SelectAttr("refid").Value
 		if refid == "" {
@@ -68,19 +68,14 @@ func includeElementReplace(xml *etree.Element, xmlMap *map[string]*etree.Element
 			panic(`[GoMybatis] xml <includ refid="` + refid + `"> element can not find !`)
 		}
 		if xml != nil {
-			(*xml).Child = mapperXml.Child
-			changed = true
+			(*xml).Child = mapperXml.(*etree.Element).Child
 		}
 	}
 	if xml.Child != nil {
-		for index, v := range xml.ChildElements() {
-			var isChanged = includeElementReplace(v, xmlMap)
-			if isChanged {
-				xml.Child[index] = v
-			}
+		for _, v := range xml.ChildElements() {
+			includeElementReplace(v, xmlMap)
 		}
 	}
-	return changed
 }
 
 func attrToProperty(attrs []etree.Attr) map[string]string {

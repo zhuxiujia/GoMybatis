@@ -2,6 +2,7 @@ package GoMybatis
 
 import (
 	"fmt"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 	"testing"
 )
 
@@ -39,7 +40,7 @@ func TestNodeParser_ParserNodes(t *testing.T) {
 			proxy:   &proxy,
 		},
 	}
-	var sqlNodes = nodePar.ParserNodes(mapperTree["selectByCondition"].Child)
+	var sqlNodes = nodePar.ParserNodes(mapperTree["selectByCondition"].(*etree.Element).Child)
 
 	fmt.Println(sqlNodes)
 
@@ -93,7 +94,7 @@ func BenchmarkNodeParser_ParserNodes(b *testing.B) {
 			proxy:   &proxy,
 		},
 	}
-	var sqlNodes = nodePar.ParserNodes(mapperTree["selectByCondition"].Child)
+	var sqlNodes = nodePar.ParserNodes(mapperTree["selectByCondition"].(*etree.Element).Child)
 
 	var argMap = map[string]interface{}{
 		"name": "sadf",

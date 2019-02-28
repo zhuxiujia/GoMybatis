@@ -32,7 +32,7 @@ type VersionData struct {
 	LangType string
 }
 
-func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]*etree.Element, beanType reflect.Type) error {
+func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]etree.Token, beanType reflect.Type) error {
 	if tree == nil {
 		return utils.NewError("GoMybatisTempleteDecoder", "decode data map[string]*MapperXml cant be nil!")
 	}
@@ -41,23 +41,27 @@ func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]*etree.Element, b
 			beanType = beanType.Elem()
 		}
 	}
-	for _, v := range tree {
-		var method *reflect.StructField
-		if beanType != nil {
-			if isMethodElement(v.Tag) {
-				var upperId = utils.UpperFieldFirstName(v.SelectAttrValue("id", ""))
-				m, haveMethod := beanType.FieldByName(upperId)
-				if haveMethod {
-					method = &m
+	for _, item := range tree {
+		var typeString = reflect.TypeOf(item).String()
+		if typeString == "*etree.Element" {
+			var v = item.(*etree.Element)
+			var method *reflect.StructField
+			if beanType != nil {
+				if isMethodElement(v.Tag) {
+					var upperId = utils.UpperFieldFirstName(v.SelectAttrValue("id", ""))
+					m, haveMethod := beanType.FieldByName(upperId)
+					if haveMethod {
+						method = &m
+					}
 				}
 			}
+			it.Decode(method, v, tree)
 		}
-		it.Decode(method, v, tree)
 	}
 	return nil
 }
 
-func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *etree.Element, tree map[string]*etree.Element) error {
+func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *etree.Element, tree map[string]etree.Token) error {
 
 	switch mapper.Tag {
 
@@ -77,7 +81,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 		if resultMap == "" {
 			resultMap = "BaseResultMap"
 		}
-		var resultMapData = tree[resultMap]
+		var resultMapData = tree[resultMap].(*etree.Element)
 		if resultMapData == nil {
 			panic(utils.NewError("GoMybatisTempleteDecoder", "resultMap not define! id = ", resultMap))
 		}
@@ -119,7 +123,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			inserts = "*?*"
 		}
 
-		var resultMapData = tree[resultMap]
+		var resultMapData = tree[resultMap].(*etree.Element)
 		if resultMapData == nil {
 			panic(utils.NewError("GoMybatisTempleteDecoder", "resultMap not define! id = ", resultMap))
 		}
@@ -274,7 +278,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			resultMap = "BaseResultMap"
 		}
 
-		var resultMapData = tree[resultMap]
+		var resultMapData = tree[resultMap].(*etree.Element)
 		if resultMapData == nil {
 			panic(utils.NewError("GoMybatisTempleteDecoder", "resultMap not define! id = ", resultMap))
 		}
@@ -328,7 +332,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			resultMap = "BaseResultMap"
 		}
 
-		var resultMapData = tree[resultMap]
+		var resultMapData = tree[resultMap].(*etree.Element)
 		if resultMapData == nil {
 			panic(utils.NewError("GoMybatisTempleteDecoder", "resultMap not define! id = ", resultMap))
 		}

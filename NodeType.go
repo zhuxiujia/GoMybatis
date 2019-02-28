@@ -12,6 +12,7 @@ const (
 	NOtherwise
 	NWhen
 	NBind
+	NInclude
 )
 
 func (it NodeType) ToString() string {
@@ -32,6 +33,8 @@ func (it NodeType) ToString() string {
 		return "NWhen"
 	case NBind:
 		return "NBind"
+	case NInclude:
+		return "NInclude"
 	}
 	return "Unknow"
 }
