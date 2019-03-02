@@ -92,10 +92,12 @@ func (it *NodeForEach) Eval(env map[string]interface{}) ([]byte, error) {
 	}
 	var newTempSql bytes.Buffer
 	var tempSqlString = bytes.Trim(tempSql.Bytes(), it.separator)
+	tempSql.Reset()
 	newTempSql.WriteString(it.open)
 	newTempSql.Write(tempSqlString)
 	newTempSql.WriteString(it.close)
-	tempSql.Reset()
-	return newTempSql.Bytes(), nil
+	var newTempSqlBytes=newTempSql.Bytes()
+	newTempSql.Reset()
+	return newTempSqlBytes, nil
 }
 

@@ -49,5 +49,8 @@ func (it *NodeTrim) Eval(env map[string]interface{}) ([]byte, error) {
 	newBuffer.Write(sql)
 	newBuffer.WriteString(` `)
 	newBuffer.Write(it.suffix)
-	return newBuffer.Bytes(), nil
+
+	var newBufferBytes=newBuffer.Bytes()
+	newBuffer.Reset()
+	return newBufferBytes, nil
 }

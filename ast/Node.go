@@ -25,5 +25,7 @@ func DoChildNodes(childNodes []Node, env map[string]interface{}) ([]byte, error)
 			sql.Write(r)
 		}
 	}
-	return sql.Bytes(), nil
+	var bytes = sql.Bytes()
+	sql.Reset()
+	return bytes, nil
 }
