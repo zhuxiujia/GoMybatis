@@ -5,6 +5,7 @@ import (
 	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
+//动态数据源路由
 type GoMybatisDataSourceRouter struct {
 	dbMap      map[string]*sql.DB
 	routerFunc func(mapperName string) *string
