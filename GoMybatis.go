@@ -56,15 +56,27 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 	var beanName = bean.Type().PkgPath() + bean.Type().String()
 
 	UseMapperValue(bean, func(funcField reflect.StructField) func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
+		//构建期
 		var funcName = funcField.Name
 		var returnType = returnTypeMap[funcName]
 		if returnType == nil {
 			panic("[GoMybatis] struct have no return values!")
 		}
+		//mapper
 		var mapper = methodXmlMap[funcName]
+		//resultMaps
+		var resultMap map[string]*ResultProperty
+
+		if funcName != NewSessionFunc {
+			var resultMapId = mapper.xml.SelectAttrValue(Element_ResultMap, "")
+			if resultMapId != "" {
+				resultMap = resultMaps[resultMapId]
+			}
+		}
+
+		//执行期
 		if funcName == NewSessionFunc {
 			var proxyFunc = func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
-				//执行期
 				var returnValue *reflect.Value = nil
 				//build return Type
 				if returnType.ReturnOutType != nil {
@@ -93,14 +105,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 			}
 			return proxyFunc
 		} else {
-			//resultMaps
-			var resultMap map[string]*ResultProperty
-			var resultMapId = mapper.xml.SelectAttrValue(Element_ResultMap, "")
-			if resultMapId != "" {
-				resultMap = resultMaps[resultMapId]
-			}
 			var proxyFunc = func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
-				//执行期
 				var returnValue *reflect.Value = nil
 				//build return Type
 				if returnType.ReturnOutType != nil {
