@@ -2,7 +2,6 @@ package GoMybatis
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
@@ -58,7 +57,6 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 
 	UseMapperValue(bean, func(funcField reflect.StructField) func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
 		var funcName = funcField.Name
-		fmt.Println("funcName:", funcField.Name)
 		var returnType = returnTypeMap[funcName]
 		if returnType == nil {
 			panic("[GoMybatis] struct have no return values!")
