@@ -46,7 +46,7 @@ func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine SessionEn
 //func的结构体参数无需指定mapperParams的tag，框架会自动扫描它的属性，封装为map处理掉
 //使用WriteMapper函数设置代理后即可正常使用。
 func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, templeteDecoder TempleteDecoder, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) {
-	beanCheck(bean, sqlBuilder)
+	beanCheck(bean)
 	var mapperTree = LoadMapperXml(xml)
 	templeteDecoder.DecodeTree(mapperTree, bean.Type())
 	//make a map[method]xml
@@ -61,6 +61,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 		if returnType == nil {
 			panic("[GoMybatis] struct have no return values!")
 		}
+		//mapper
 		var mapper = methodXmlMap[funcName]
 		if funcName == NewSessionFunc {
 			var proxyFunc = func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
@@ -92,6 +93,12 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 			}
 			return proxyFunc
 		} else {
+			//resultMaps
+			var resultMap map[string]*ResultProperty
+			var resultMapId = mapper.xml.SelectAttrValue(Element_ResultMap, "")
+			if resultMapId != "" {
+				resultMap = resultMaps[resultMapId]
+			}
 			var proxyFunc = func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
 				var returnValue *reflect.Value = nil
 				//build return Type
@@ -105,12 +112,6 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 					}
 					returnValue = &returnV
 				}
-				//resultMaps
-				var resultMap map[string]*ResultProperty
-				var resultMapId = mapper.xml.SelectAttrValue(Element_ResultMap, "")
-				if resultMapId != "" {
-					resultMap = resultMaps[resultMapId]
-				}
 				//exe sql
 				var e = exeMethodByXml(mapper.xml.Tag, beanName, sessionFactory, tagArgs, args, mapper.nodes, resultMap, returnValue, decoder, sqlBuilder, enableLog)
 				return buildReturnValues(returnType, returnValue, e)
@@ -121,7 +122,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 }
 
 //check beans
-func beanCheck(value reflect.Value, builder SqlBuilder) {
+func beanCheck(value reflect.Value) {
 	var t = value.Type()
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
