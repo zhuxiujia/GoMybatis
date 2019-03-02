@@ -49,7 +49,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 	beanCheck(bean)
 	var mapperTree = LoadMapperXml(xml)
 	templeteDecoder.DecodeTree(mapperTree, bean.Type())
-	//构建期使用的map，无需考虑并发存取问题
+	//构建期使用的map，无需考虑并发安全
 	var methodXmlMap = makeMethodXmlMap(bean, mapperTree, sqlBuilder)
 	var resultMaps = makeResultMaps(mapperTree)
 	var returnTypeMap = makeReturnTypeMap(bean)
