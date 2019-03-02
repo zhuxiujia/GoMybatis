@@ -1,4 +1,6 @@
-package GoMybatis
+package ast
+
+
 
 type NodeBind struct {
 	t NodeType

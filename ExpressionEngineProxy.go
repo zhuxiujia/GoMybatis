@@ -1,17 +1,18 @@
 package GoMybatis
 
 import (
+	"github.com/zhuxiujia/GoMybatis/ast"
 	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
 type ExpressionEngineProxy struct {
 	expressionEngineLexerCache ExpressionEngineLexerCache //lexer缓存接口，默认使用ExpressionEngineLexerMapCache
-	expressionEngine           ExpressionEngine
+	expressionEngine           ast.ExpressionEngine
 	lexerCacheable             bool //是否使用lexer缓存,默认false
 }
 
 //engine ：表达式引擎,useLexerCache：是否缓存Lexer表达式编译结果
-func (ExpressionEngineProxy) New(engine ExpressionEngine, useLexerCache bool) ExpressionEngineProxy {
+func (ExpressionEngineProxy) New(engine ast.ExpressionEngine, useLexerCache bool) ExpressionEngineProxy {
 	var it = ExpressionEngineProxy{
 		expressionEngine: engine,
 		lexerCacheable:   useLexerCache,
@@ -24,7 +25,7 @@ func (ExpressionEngineProxy) New(engine ExpressionEngine, useLexerCache bool) Ex
 }
 
 //引擎名称
-func (it *ExpressionEngineProxy) SetExpressionEngine(engine ExpressionEngine) {
+func (it *ExpressionEngineProxy) SetExpressionEngine(engine ast.ExpressionEngine) {
 	it.expressionEngine = engine
 }
 
@@ -92,12 +93,12 @@ func (it *ExpressionEngineProxy) LexerCacheable() bool {
 }
 
 //执行
-func (it *ExpressionEngineProxy) LexerAndEval(expression string, arg map[string]interface{}) (interface{}, error) {
+func (it *ExpressionEngineProxy) LexerAndEval(expression string, arg interface{}) (interface{}, error) {
 
-	var funcItem = arg["func_"+expression]
+	var funcItem = arg.(map[string]interface{})["func_"+expression]
 	if funcItem != nil {
 		var f = funcItem.(func(arg map[string]interface{}) interface{})
-		return f(arg), nil
+		return f(arg.(map[string]interface{})), nil
 	}
 	ifElementevalExpression, err := it.Lexer(expression)
 	if err != nil {

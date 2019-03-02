@@ -1,5 +1,7 @@
 package GoMybatis
 
+import "github.com/zhuxiujia/GoMybatis/ast"
+
 type Result struct {
 	LastInsertId int64
 	RowsAffected int64
@@ -49,16 +51,16 @@ type SessionEngine interface {
 	SetSessionFactory(factory *SessionFactory)
 
 	//sql类型转换器
-	SqlArgTypeConvert() SqlArgTypeConvert
+	SqlArgTypeConvert() ast.SqlArgTypeConvert
 
 	//设置sql类型转换器
-	SetSqlArgTypeConvert(convert SqlArgTypeConvert)
+	SetSqlArgTypeConvert(convert ast.SqlArgTypeConvert)
 
 	//表达式执行引擎
-	ExpressionEngine() ExpressionEngine
+	ExpressionEngine() ast.ExpressionEngine
 
 	//设置表达式执行引擎
-	SetExpressionEngine(engine ExpressionEngine)
+	SetExpressionEngine(engine ast.ExpressionEngine)
 
 	//sql构建器
 	SqlBuilder() SqlBuilder

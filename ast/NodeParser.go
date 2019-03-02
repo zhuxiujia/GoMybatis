@@ -1,4 +1,4 @@
-package GoMybatis
+package ast
 
 import (
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
@@ -6,14 +6,18 @@ import (
 	"strings"
 )
 
+const DefaultOverrides = ","
+const DefaultWhereElement_Prefix = "where"
+const DefaultWhereElement_PrefixOverrides = "and |or |And |Or |AND |OR "
+
 //节点解析器
 type NodeParser struct {
-	holder NodeConfigHolder
+	Holder NodeConfigHolder
 }
 
 //界面为node
 func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
-	if it.holder.proxy == nil {
+	if it.Holder.Proxy == nil {
 		panic("NodeParser need a *ExpressionEngineProxy{}!")
 	}
 	var nodes = []Node{}
@@ -33,7 +37,7 @@ func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
 				t:                   NString,
 				expressMap:          FindAllExpressConvertString(charData.Data), //表达式需要替换的string
 				noConvertExpressMap: FindAllExpressString(charData.Data),
-				holder:              &it.holder,
+				holder:              &it.Holder,
 			}
 			if len(n.expressMap) == 0 {
 				n.expressMap = nil
@@ -48,7 +52,7 @@ func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
 					t:      NIf,
 					test:   v.SelectAttrValue("test", ""),
 					childs: []Node{},
-					holder: &it.holder,
+					holder: &it.Holder,
 				}
 				if childItems != nil {
 					var childNodes = it.ParserNodes(childItems)
@@ -137,7 +141,7 @@ func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
 					t:      NOtherwise,
 					childs: []Node{},
 					test:   v.SelectAttrValue("test", ""),
-					holder: &it.holder,
+					holder: &it.Holder,
 				}
 				if childItems != nil {
 					var childNodes = it.ParserNodes(childItems)
@@ -176,7 +180,7 @@ func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
 					t:      NBind,
 					value:  v.SelectAttrValue("value", ""),
 					name:   v.SelectAttrValue("name", ""),
-					holder: &it.holder,
+					holder: &it.Holder,
 				}
 				node = &n
 			case "include":

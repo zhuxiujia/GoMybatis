@@ -1,4 +1,4 @@
-package GoMybatis
+package ast
 
 //字符串节点
 type NodeString struct {

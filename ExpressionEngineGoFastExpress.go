@@ -30,6 +30,15 @@ func (it *ExpressionEngineGoExpress) Eval(lexerResult interface{}, arg interface
 	return output, err
 }
 
+func (it *ExpressionEngineGoExpress) LexerAndEval(lexerArg string,arg interface{})  (interface{}, error)  {
+	var lex,err=it.Lexer(lexerArg)
+	if err!=nil{
+		return nil,err
+	}
+	return it.Eval(lex,arg,0)
+}
+
+
 //替换表达式中的值 and,or,参数 替换为实际值
 func (it *ExpressionEngineGoExpress) repleaceExpression(expression string) string {
 	if expression == "" {

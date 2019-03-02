@@ -72,6 +72,14 @@ func (it *ExpressionEngineJee) Eval(compileResult interface{}, arg interface{}, 
 	return result, nil
 }
 
+func (it *ExpressionEngineJee) LexerAndEval(lexerArg string,arg interface{})  (interface{}, error)  {
+	var lex,err=it.Lexer(lexerArg)
+	if err!=nil{
+		return nil,err
+	}
+	return it.Eval(lex,arg,0)
+}
+
 //编译后立即执行
 func (it *ExpressionEngineJee) LexerEval(lexerArg string, arg interface{}, operation int) (interface{}, error) {
 	var lexer, error = it.Lexer(lexerArg)

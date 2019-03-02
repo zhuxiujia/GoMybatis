@@ -1,26 +1,27 @@
 package GoMybatis
 
 import (
+	"github.com/zhuxiujia/GoMybatis/ast"
 	"time"
 )
 
 type GoMybatisSqlBuilder struct {
-	sqlArgTypeConvert     SqlArgTypeConvert
+	sqlArgTypeConvert     ast.SqlArgTypeConvert
 	expressionEngineProxy ExpressionEngineProxy
 	logSystem             *LogSystem
 	enableLog             bool
 
-	nodeParser NodeParser
+	nodeParser ast.NodeParser
 }
 
 func (it *GoMybatisSqlBuilder) ExpressionEngineProxy() *ExpressionEngineProxy {
 	return &it.expressionEngineProxy
 }
-func (it *GoMybatisSqlBuilder) SqlArgTypeConvert() SqlArgTypeConvert {
+func (it *GoMybatisSqlBuilder) SqlArgTypeConvert() ast.SqlArgTypeConvert {
 	return it.sqlArgTypeConvert
 }
 
-func (it GoMybatisSqlBuilder) New(SqlArgTypeConvert SqlArgTypeConvert, expressionEngine ExpressionEngineProxy, log Log, enableLog bool) GoMybatisSqlBuilder {
+func (it GoMybatisSqlBuilder) New(SqlArgTypeConvert ast.SqlArgTypeConvert, expressionEngine ExpressionEngineProxy, log Log, enableLog bool) GoMybatisSqlBuilder {
 	it.sqlArgTypeConvert = SqlArgTypeConvert
 	it.expressionEngineProxy = expressionEngine
 	it.enableLog = enableLog
@@ -31,18 +32,18 @@ func (it GoMybatisSqlBuilder) New(SqlArgTypeConvert SqlArgTypeConvert, expressio
 		}
 		it.logSystem = &logSystem
 	}
-	it.nodeParser = NodeParser{
-		holder: NodeConfigHolder{
-			convert: SqlArgTypeConvert,
-			proxy:   &expressionEngine,
+	it.nodeParser = ast.NodeParser{
+		Holder: ast.NodeConfigHolder{
+			Convert: SqlArgTypeConvert,
+			Proxy:   &expressionEngine,
 		},
 	}
 	return it
 }
 
-func (it *GoMybatisSqlBuilder) BuildSql(paramMap map[string]interface{}, nodes []Node) (string, error) {
+func (it *GoMybatisSqlBuilder) BuildSql(paramMap map[string]interface{}, nodes []ast.Node) (string, error) {
 	//抽象语法树节点构建
-	var sql, err = DoChildNodes(nodes, paramMap)
+	var sql, err = ast.DoChildNodes(nodes, paramMap)
 	if err != nil {
 		return "", err
 	}
@@ -65,6 +66,6 @@ func (it *GoMybatisSqlBuilder) LogSystem() *LogSystem {
 	return it.logSystem
 }
 
-func (it *GoMybatisSqlBuilder) NodeParser() NodeParser {
+func (it *GoMybatisSqlBuilder) NodeParser() ast.NodeParser {
 	return it.nodeParser
 }

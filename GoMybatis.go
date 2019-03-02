@@ -2,6 +2,7 @@ package GoMybatis
 
 import (
 	"bytes"
+	"github.com/zhuxiujia/GoMybatis/ast"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
@@ -12,7 +13,7 @@ const NewSessionFunc = "NewSession" //NewSession method,auto write implement bod
 
 type Mapper struct {
 	xml   *etree.Element
-	nodes []Node
+	nodes []ast.Node
 }
 
 //推荐默认使用单例传入
@@ -316,7 +317,7 @@ func findMapperXml(mapperTree map[string]etree.Token, methodName string) *etree.
 	return nil
 }
 
-func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, nodes []Node, resultMap map[string]*ResultProperty, returnValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) error {
+func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, nodes []ast.Node, resultMap map[string]*ResultProperty, returnValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) error {
 	//build sql string
 	var session Session
 	var sql string
@@ -366,7 +367,7 @@ func closeSession(factory *SessionFactory, session Session) {
 	session.Close()
 }
 
-func buildSql(tagArgs []TagArg, args []reflect.Value, nodes []Node, sqlBuilder SqlBuilder, enableLog bool) (Session, string, error) {
+func buildSql(tagArgs []TagArg, args []reflect.Value, nodes []ast.Node, sqlBuilder SqlBuilder, enableLog bool) (Session, string, error) {
 	var session Session
 	var paramMap = make(map[string]interface{})
 	var tagArgsLen = len(tagArgs)

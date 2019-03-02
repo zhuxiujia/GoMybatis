@@ -2,6 +2,7 @@ package GoMybatis
 
 import (
 	"database/sql"
+	"github.com/zhuxiujia/GoMybatis/ast"
 	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
@@ -13,9 +14,9 @@ type GoMybatisEngine struct {
 
 	sessionFactory *SessionFactory
 
-	sqlArgTypeConvert SqlArgTypeConvert
+	sqlArgTypeConvert ast.SqlArgTypeConvert
 
-	expressionEngine ExpressionEngine
+	expressionEngine ast.ExpressionEngine
 
 	sqlBuilder SqlBuilder
 
@@ -130,25 +131,25 @@ func (it *GoMybatisEngine) SetSessionFactory(factory *SessionFactory) {
 }
 
 //sql类型转换器
-func (it *GoMybatisEngine) SqlArgTypeConvert() SqlArgTypeConvert {
+func (it *GoMybatisEngine) SqlArgTypeConvert() ast.SqlArgTypeConvert {
 	it.initCheck()
 	return it.sqlArgTypeConvert
 }
 
 //设置sql类型转换器
-func (it *GoMybatisEngine) SetSqlArgTypeConvert(convert SqlArgTypeConvert) {
+func (it *GoMybatisEngine) SetSqlArgTypeConvert(convert ast.SqlArgTypeConvert) {
 	it.initCheck()
 	it.sqlArgTypeConvert = convert
 }
 
 //表达式执行引擎
-func (it *GoMybatisEngine) ExpressionEngine() ExpressionEngine {
+func (it *GoMybatisEngine) ExpressionEngine() ast.ExpressionEngine {
 	it.initCheck()
 	return it.expressionEngine
 }
 
 //设置表达式执行引擎
-func (it *GoMybatisEngine) SetExpressionEngine(engine ExpressionEngine) {
+func (it *GoMybatisEngine) SetExpressionEngine(engine ast.ExpressionEngine) {
 	it.initCheck()
 	it.expressionEngine = engine
 	var proxy = it.sqlBuilder.ExpressionEngineProxy()

@@ -1,4 +1,4 @@
-package GoMybatis
+package ast
 
 import "github.com/zhuxiujia/GoMybatis/utils"
 
