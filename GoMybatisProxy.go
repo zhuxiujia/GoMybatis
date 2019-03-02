@@ -11,20 +11,20 @@ type TagArg struct {
 }
 
 // UseService 可写入每个函数代理方法
-func UseMapper(mapper interface{}, proxyFunc func(method string, args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
+func UseMapper(mapper interface{}, buildFunc func(funcField reflect.StructField) func(args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
 	v := reflect.ValueOf(mapper)
 	if v.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
-	buildMapper(v, proxyFunc)
+	buildMapper(v, buildFunc)
 }
 
 // UseService 可写入每个函数代理方法
-func UseMapperValue(mapperValue reflect.Value, proxyFunc func(method string, args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
-	buildMapper(mapperValue, proxyFunc)
+func UseMapperValue(mapperValue reflect.Value, buildFunc func(funcField reflect.StructField) func(args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
+	buildMapper(mapperValue, buildFunc)
 }
 
-func buildMapper(v reflect.Value, proxyFunc func(method string, args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
+func buildMapper(v reflect.Value, buildFunc func(funcField reflect.StructField) func(args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
@@ -47,7 +47,9 @@ func buildMapper(v reflect.Value, proxyFunc func(method string, args []reflect.V
 			switch ft.Kind() {
 			case reflect.Struct:
 			case reflect.Func:
-				buildRemoteMethod(f, ft, sf, proxyFunc)
+				if buildFunc != nil {
+					buildRemoteMethod(f, ft, sf, buildFunc(sf))
+				}
 			}
 		}
 	}
@@ -58,7 +60,7 @@ func buildMapper(v reflect.Value, proxyFunc func(method string, args []reflect.V
 	}
 }
 
-func buildRemoteMethod(f reflect.Value, ft reflect.Type, sf reflect.StructField, proxyFunc func(method string, args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
+func buildRemoteMethod(f reflect.Value, ft reflect.Type, sf reflect.StructField, proxyFunc func(args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
 	var tagParams []string
 	var mapperParams = sf.Tag.Get(`mapperParams`)
 	if mapperParams != `` {
@@ -83,7 +85,7 @@ func buildRemoteMethod(f reflect.Value, ft reflect.Type, sf reflect.StructField,
 		panic(`[GoMybatisProxy] method fail! the tag "mapperParams" length  != args length ! filed = ` + sf.Name)
 	}
 	var fn = func(args []reflect.Value) (results []reflect.Value) {
-		proxyResults := proxyFunc(sf.Name, args, tagArgs)
+		proxyResults := proxyFunc(args, tagArgs)
 		for _, returnV := range proxyResults {
 			results = append(results, returnV)
 		}

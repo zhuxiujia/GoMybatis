@@ -12,21 +12,20 @@ type TestMapper struct {
 
 func TestUseMapperValue(t *testing.T) {
 	var test = TestMapper{}
-	UseMapperValue(reflect.ValueOf(&test), func(method string, args []reflect.Value, tagArgs []TagArg) []reflect.Value {
-		if method == "" {
-			t.Fatal("UseMapper() method == ''")
+	UseMapperValue(reflect.ValueOf(&test), func(funcField reflect.StructField) func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
+		return func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
+			if len(args) <= 0 {
+				t.Fatal("UseMapper() args len = 0")
+			}
+			if len(tagArgs) <= 0 {
+				t.Fatal("UseMapper() tagArgs len = 0")
+			}
+			var e error
+			var returns = make([]reflect.Value, 0)
+			returns = append(returns, reflect.ValueOf("yes return string="+args[0].Interface().(string)))
+			returns = append(returns, reflect.Zero(reflect.TypeOf(&e).Elem()))
+			return returns
 		}
-		if len(args) <= 0 {
-			t.Fatal("UseMapper() args len = 0")
-		}
-		if len(tagArgs) <= 0 {
-			t.Fatal("UseMapper() tagArgs len = 0")
-		}
-		var e error
-		var returns = make([]reflect.Value, 0)
-		returns = append(returns, reflect.ValueOf("yes return string="+args[0].Interface().(string)))
-		returns = append(returns, reflect.Zero(reflect.TypeOf(&e).Elem()))
-		return returns
 	})
 
 	var result, e = test.SelectByIds("1234")
@@ -38,21 +37,20 @@ func TestUseMapperValue(t *testing.T) {
 
 func TestUseMapper(t *testing.T) {
 	var test = TestMapper{}
-	UseMapper(&test, func(method string, args []reflect.Value, tagArgs []TagArg) []reflect.Value {
-		if method == "" {
-			t.Fatal("UseMapper() method == ''")
+	UseMapper(&test, func(funcField reflect.StructField) func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
+		return func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
+			if len(args) <= 0 {
+				t.Fatal("UseMapper() args len = 0")
+			}
+			if len(tagArgs) <= 0 {
+				t.Fatal("UseMapper() tagArgs len = 0")
+			}
+			var e error
+			var returns = make([]reflect.Value, 0)
+			returns = append(returns, reflect.ValueOf("yes return string="+args[0].Interface().(string)))
+			returns = append(returns, reflect.Zero(reflect.TypeOf(&e).Elem()))
+			return returns
 		}
-		if len(args) <= 0 {
-			t.Fatal("UseMapper() args len = 0")
-		}
-		if len(tagArgs) <= 0 {
-			t.Fatal("UseMapper() tagArgs len = 0")
-		}
-		var e error
-		var returns = make([]reflect.Value, 0)
-		returns = append(returns, reflect.ValueOf("yes return string="+args[0].Interface().(string)))
-		returns = append(returns, reflect.Zero(reflect.TypeOf(&e).Elem()))
-		return returns
 	})
 
 	var result, e = test.SelectByIds("1234")

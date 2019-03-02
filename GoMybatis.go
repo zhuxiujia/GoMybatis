@@ -2,6 +2,7 @@ package GoMybatis
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
@@ -54,54 +55,71 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 	var resultMaps = makeResultMaps(mapperTree)
 	var returnTypeMap = makeReturnTypeMap(bean)
 	var beanName = bean.Type().PkgPath() + bean.Type().String()
-	var proxyFunc = func(method string, args []reflect.Value, tagArgs []TagArg) []reflect.Value {
-		var returnValue *reflect.Value = nil
-		var returnType = returnTypeMap[method]
+
+	UseMapperValue(bean, func(funcField reflect.StructField) func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
+		var funcName = funcField.Name
+		fmt.Println("funcName:", funcField.Name)
+		var returnType = returnTypeMap[funcName]
 		if returnType == nil {
 			panic("[GoMybatis] struct have no return values!")
 		}
-		//build return Type
-		if returnType.ReturnOutType != nil {
-			var returnV = reflect.New(*returnType.ReturnOutType)
-			switch (*returnType.ReturnOutType).Kind() {
-			case reflect.Map:
-				returnV.Elem().Set(reflect.MakeMap(*returnType.ReturnOutType))
-			case reflect.Slice:
-				returnV.Elem().Set(reflect.MakeSlice(*returnType.ReturnOutType, 0, 0))
+		var mapper = methodXmlMap[funcName]
+		if funcName == NewSessionFunc {
+			var proxyFunc = func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
+				var returnValue *reflect.Value = nil
+				//build return Type
+				if returnType.ReturnOutType != nil {
+					var returnV = reflect.New(*returnType.ReturnOutType)
+					switch (*returnType.ReturnOutType).Kind() {
+					case reflect.Map:
+						returnV.Elem().Set(reflect.MakeMap(*returnType.ReturnOutType))
+					case reflect.Slice:
+						returnV.Elem().Set(reflect.MakeSlice(*returnType.ReturnOutType, 0, 0))
+					}
+					returnValue = &returnV
+				}
+				var session Session
+				var err error
+				if len(args) == 1 && args[0].IsValid() == true && !args[0].IsNil() {
+					session = sessionFactory.NewSession(beanName, SessionType_TransationRM, args[0].Interface().(*TransationRMClientConfig))
+				} else {
+					session = sessionFactory.NewSession(beanName, SessionType_Default, nil)
+				}
+				if session != nil {
+					returnValue.Elem().Set(reflect.ValueOf(session).Elem().Addr().Convert(*returnType.ReturnOutType))
+				} else {
+					err = utils.NewError("GoMybatis", "Create Session fail.")
+				}
+				return buildReturnValues(returnType, returnValue, err)
 			}
-			returnValue = &returnV
-		}
-
-		if method == NewSessionFunc {
-			var session Session
-			var err error
-			if len(args) == 1 && args[0].IsValid() == true && !args[0].IsNil() {
-				session = sessionFactory.NewSession(beanName, SessionType_TransationRM, args[0].Interface().(*TransationRMClientConfig))
-			} else {
-				session = sessionFactory.NewSession(beanName, SessionType_Default, nil)
+			return proxyFunc
+		} else {
+			var proxyFunc = func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
+				var returnValue *reflect.Value = nil
+				//build return Type
+				if returnType.ReturnOutType != nil {
+					var returnV = reflect.New(*returnType.ReturnOutType)
+					switch (*returnType.ReturnOutType).Kind() {
+					case reflect.Map:
+						returnV.Elem().Set(reflect.MakeMap(*returnType.ReturnOutType))
+					case reflect.Slice:
+						returnV.Elem().Set(reflect.MakeSlice(*returnType.ReturnOutType, 0, 0))
+					}
+					returnValue = &returnV
+				}
+				//resultMaps
+				var resultMap map[string]*ResultProperty
+				var resultMapId = mapper.xml.SelectAttrValue(Element_ResultMap, "")
+				if resultMapId != "" {
+					resultMap = resultMaps[resultMapId]
+				}
+				//exe sql
+				var e = exeMethodByXml(mapper.xml.Tag, beanName, sessionFactory, tagArgs, args, mapper.nodes, resultMap, returnValue, decoder, sqlBuilder, enableLog)
+				return buildReturnValues(returnType, returnValue, e)
 			}
-			if session != nil {
-				returnValue.Elem().Set(reflect.ValueOf(session).Elem().Addr().Convert(*returnType.ReturnOutType))
-			} else {
-				err = utils.NewError("GoMybatis", "Create Session fail.")
-			}
-			return buildReturnValues(returnType, returnValue, err)
+			return proxyFunc
 		}
-
-		//resultMaps
-		var mapper = methodXmlMap[method]
-		var resultMap map[string]*ResultProperty
-		var resultMapId = mapper.xml.SelectAttrValue(Element_ResultMap, "")
-		if resultMapId != "" {
-			resultMap = resultMaps[resultMapId]
-		}
-
-		//exe sql
-		var e = exeMethodByXml(mapper.xml.Tag, beanName, sessionFactory, tagArgs, args, mapper.nodes, resultMap, returnValue, decoder, sqlBuilder, enableLog)
-
-		return buildReturnValues(returnType, returnValue, e)
-	}
-	UseMapperValue(bean, proxyFunc)
+	})
 }
 
 //check beans
