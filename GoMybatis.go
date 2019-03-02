@@ -49,7 +49,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 	beanCheck(bean)
 	var mapperTree = LoadMapperXml(xml)
 	templeteDecoder.DecodeTree(mapperTree, bean.Type())
-	//make a map[method]xml
+	//构建期使用的map，无需考虑并发存取问题
 	var methodXmlMap = makeMethodXmlMap(bean, mapperTree, sqlBuilder)
 	var resultMaps = makeResultMaps(mapperTree)
 	var returnTypeMap = makeReturnTypeMap(bean)
@@ -61,10 +61,10 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 		if returnType == nil {
 			panic("[GoMybatis] struct have no return values!")
 		}
-		//mapper
 		var mapper = methodXmlMap[funcName]
 		if funcName == NewSessionFunc {
 			var proxyFunc = func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
+				//执行期
 				var returnValue *reflect.Value = nil
 				//build return Type
 				if returnType.ReturnOutType != nil {
@@ -100,6 +100,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 				resultMap = resultMaps[resultMapId]
 			}
 			var proxyFunc = func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
+				//执行期
 				var returnValue *reflect.Value = nil
 				//build return Type
 				if returnType.ReturnOutType != nil {
