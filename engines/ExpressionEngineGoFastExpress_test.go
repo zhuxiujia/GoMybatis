@@ -1,4 +1,4 @@
-package GoMybatis
+package engines
 
 import (
 	"github.com/zhuxiujia/GoMybatis/example"

@@ -1,4 +1,4 @@
-package GoMybatis
+package engines
 
 import (
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
@@ -84,7 +84,4 @@ func (it *ExpressionEngineGovaluate) split(str string) (stringItems []string) {
 	return newStrings
 }
 
-//Lexer缓存,可不提供。
-func (it *ExpressionEngineGovaluate) LexerCache() ExpressionEngineLexerCache {
-	return nil
-}
+

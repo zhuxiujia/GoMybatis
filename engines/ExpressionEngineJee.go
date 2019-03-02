@@ -1,4 +1,4 @@
-package GoMybatis
+package engines
 
 import (
 	"bytes"
@@ -123,9 +123,4 @@ func (it *ExpressionEngineJee) LexerAndOrSupport(lexerArg string) string {
 		buf.Reset()
 	}
 	return lexerArg
-}
-
-//Lexer缓存,可不提供。
-func (it *ExpressionEngineJee) LexerCache() ExpressionEngineLexerCache {
-	return nil
 }

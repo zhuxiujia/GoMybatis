@@ -2,12 +2,13 @@ package GoMybatis
 
 import (
 	"fmt"
+	"github.com/zhuxiujia/GoMybatis/engines"
 	"github.com/zhuxiujia/GoMybatis/example"
 	"testing"
 )
 
 func TestExpressionEngineProxy_Eval(t *testing.T) {
-	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, false)
+	var engine = ExpressionEngineProxy{}.New(&engines.ExpressionEngineGoExpress{}, false)
 	var lexer, err = engine.Lexer("foo")
 	if err != nil {
 		t.Fatal(err)
@@ -25,7 +26,7 @@ func TestExpressionEngineProxy_Eval(t *testing.T) {
 }
 
 func TestExpressionEngineProxy_Lexer(t *testing.T) {
-	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, false)
+	var engine = ExpressionEngineProxy{}.New(&engines.ExpressionEngineGoExpress{}, false)
 	var _, err = engine.Lexer("foo")
 	if err != nil {
 		t.Fatal(err)
@@ -39,7 +40,7 @@ func BenchmarkExpressionEngineProxy_Eval(b *testing.B) {
 		DeleteFlag: 1,
 	}
 
-	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, false)
+	var engine = ExpressionEngineProxy{}.New(&engines.ExpressionEngineGoExpress{}, false)
 	var evaluateParameters = make(map[string]interface{})
 
 	evaluateParameters["activity"] = &activity
@@ -63,7 +64,7 @@ func BenchmarkExpressionEngineProxy_Eval(b *testing.B) {
 
 func BenchmarkExpressionEngineProxy_Eval_each(b *testing.B) {
 	b.StopTimer()
-	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true)
+	var engine = ExpressionEngineProxy{}.New(&engines.ExpressionEngineGoExpress{}, true)
 	var evaluateParameters = make(map[string]interface{})
 	var name = "dsafas"
 	evaluateParameters["activity"] = &name
@@ -86,7 +87,7 @@ func BenchmarkExpressionEngineProxy_Eval_each(b *testing.B) {
 
 func BenchmarkExpressionEngineProxy_LexerAndEval(b *testing.B) {
 	b.StopTimer()
-	var engine = ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true)
+	var engine = ExpressionEngineProxy{}.New(&engines.ExpressionEngineGoExpress{}, true)
 	var evaluateParameters = make(map[string]interface{})
 	var name = "dsafas"
 	evaluateParameters["activity"] = name

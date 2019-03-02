@@ -2,6 +2,7 @@ package GoMybatis
 
 import (
 	"fmt"
+	"github.com/zhuxiujia/GoMybatis/engines"
 	"github.com/zhuxiujia/GoMybatis/example"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
@@ -34,7 +35,7 @@ func Benchmark_SqlBuilder(b *testing.B) {
     </select>
 </mapper>`
 
-	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true), &LogStandard{}, false)
+	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&engines.ExpressionEngineGoExpress{}, true), &LogStandard{}, false)
 
 	var mapperTree = LoadMapperXml([]byte(mapper))
 	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].(*etree.Element).Child)
@@ -92,7 +93,7 @@ func Test_SqlBuilder_Tps(t *testing.T) {
 </mapper>`
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
-	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true), &LogStandard{}, false)
+	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&engines.ExpressionEngineGoExpress{}, true), &LogStandard{}, false)
 	var paramMap = make(map[string]interface{})
 	paramMap["name"] = ""
 	paramMap["startTime"] = ""
@@ -190,7 +191,7 @@ func TestGoMybatisSqlBuilder_BuildSql(t *testing.T) {
 </mapper>`
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
-	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true), &LogStandard{}, true)
+	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&engines.ExpressionEngineGoExpress{}, true), &LogStandard{}, true)
 	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].(*etree.Element).Child)
 
 	var paramMap = make(map[string]interface{})
@@ -237,7 +238,7 @@ func Benchmark_SqlBuilder_If_Element(b *testing.B) {
 </mapper>`
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
-	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true), &LogStandard{}, false)
+	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&engines.ExpressionEngineGoExpress{}, true), &LogStandard{}, false)
 	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].(*etree.Element).Child)
 
 	var paramMap = make(map[string]interface{})
@@ -296,7 +297,7 @@ func Benchmark_SqlBuilder_Nested(b *testing.B) {
 </mapper>`
 	var mapperTree = LoadMapperXml([]byte(mapper))
 
-	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&ExpressionEngineGoExpress{}, true), &LogStandard{}, false)
+	var builder = GoMybatisSqlBuilder{}.New(GoMybatisSqlArgTypeConvert{}, ExpressionEngineProxy{}.New(&engines.ExpressionEngineGoExpress{}, true), &LogStandard{}, false)
 	var nodes = builder.nodeParser.ParserNodes(mapperTree["selectByCondition"].(*etree.Element).Child)
 
 	var paramMap = make(map[string]interface{})

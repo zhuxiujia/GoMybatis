@@ -3,6 +3,7 @@ package GoMybatis
 import (
 	"database/sql"
 	"github.com/zhuxiujia/GoMybatis/ast"
+	"github.com/zhuxiujia/GoMybatis/engines"
 	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
@@ -41,7 +42,7 @@ func (it GoMybatisEngine) New() GoMybatisEngine {
 		it.sqlArgTypeConvert = GoMybatisSqlArgTypeConvert{}
 	}
 	if it.expressionEngine == nil {
-		it.expressionEngine = &ExpressionEngineGoExpress{}
+		it.expressionEngine = &engines.ExpressionEngineGoExpress{}
 	}
 	if it.sqlResultDecoder == nil {
 		it.sqlResultDecoder = GoMybatisSqlResultDecoder{}
