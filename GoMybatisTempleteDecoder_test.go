@@ -17,7 +17,12 @@ type ExampleActivityMapper struct {
 //初始化mapper文件和结构体
 var exampleActivityMapper = ExampleActivityMapper{}
 
-func init() {
+func getMapper()  ExampleActivityMapper{
+	initMapper()
+	return exampleActivityMapper
+}
+
+func initMapper() {
 	bytes := []byte(`<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://raw.githubusercontent.com/zhuxiujia/GoMybatis/master/mybatis-3-mapper.dtd">
@@ -184,7 +189,7 @@ func TestGoMybatisTempleteDecoder_Create(t *testing.T) {
 		act,
 	}
 	var session = TempleteSession{}
-	n, err := exampleActivityMapper.InsertTemplete(args, &session)
+	n, err := getMapper().InsertTemplete(args, &session)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -194,7 +199,7 @@ func TestGoMybatisTempleteDecoder_Create(t *testing.T) {
 
 func TestGoMybatisTempleteDecoder_Select(t *testing.T) {
 	var session = TempleteSession{}
-	n, err := exampleActivityMapper.SelectTemplete("test", &session)
+	n, err := getMapper().SelectTemplete("test", &session)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -208,7 +213,7 @@ func TestGoMybatisTempleteDecoder_Update(t *testing.T) {
 		Name: "test",
 	}
 	var session = TempleteSession{}
-	n, err := exampleActivityMapper.UpdateTemplete(act, &session)
+	n, err := getMapper().UpdateTemplete(act, &session)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -218,7 +223,7 @@ func TestGoMybatisTempleteDecoder_Update(t *testing.T) {
 
 func TestGoMybatisTempleteDecoder_Delete(t *testing.T) {
 	var session = TempleteSession{}
-	n, err := exampleActivityMapper.DeleteTemplete("test", &session)
+	n, err := getMapper().DeleteTemplete("test", &session)
 	if err != nil {
 		t.Fatal(err)
 	}

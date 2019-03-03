@@ -18,7 +18,6 @@ func LoadMapperXml(bytes []byte) (items map[string]etree.Token) {
 	items = make(map[string]etree.Token)
 	root := doc.SelectElement(Element_Mapper)
 	for _, s := range root.ChildElements() {
-		var attrMap = attrToProperty(s.Attr)
 		if s.Tag == Element_Insert ||
 			s.Tag == Element_Delete ||
 			s.Tag == Element_Update ||
@@ -29,11 +28,10 @@ func LoadMapperXml(bytes []byte) (items map[string]etree.Token) {
 			s.Tag == Element_Delete_Templete ||
 			s.Tag == Element_Update_Templete ||
 			s.Tag == Element_Select_Templete {
-			var elementID = attrMap[ID]
+			var elementID = s.SelectAttrValue(ID,"")
 
 			if elementID == "" {
 				//如果id不存在，id设置为tag
-				attrMap[ID] = s.Tag
 				elementID = s.Tag
 			}
 			if elementID != "" {
@@ -77,15 +75,6 @@ func includeElementReplace(xml *etree.Element, xmlMap *map[string]etree.Token) {
 		}
 	}
 }
-
-func attrToProperty(attrs []etree.Attr) map[string]string {
-	var m = make(map[string]string)
-	for _, v := range attrs {
-		m[v.Key] = v.Value
-	}
-	return m
-}
-
 ////标签上下级关系检查
 //func elementRuleCheck(fatherElement *etree.Element, childElementItem ElementItem) {
 //	if fatherElement.Tag != Element_choose && (childElementItem.ElementType == Element_when || childElementItem.ElementType == Element_otherwise) {

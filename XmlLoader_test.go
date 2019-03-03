@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+	"time"
 )
 
 func Test_Load_Xml(t *testing.T) {
@@ -19,5 +20,6 @@ func Test_Load_Xml(t *testing.T) {
 	if xmlItems == nil {
 		t.Fatal(`Test_Load_Xml fail,LoadMapperXml "example/Example_ActivityMapper.xml"`)
 	}
+	time.Sleep(time.Second)
 	fmt.Println(xmlItems)
 }
