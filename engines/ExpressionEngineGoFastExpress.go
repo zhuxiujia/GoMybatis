@@ -30,14 +30,13 @@ func (it *ExpressionEngineGoExpress) Eval(lexerResult interface{}, arg interface
 	return output, err
 }
 
-func (it *ExpressionEngineGoExpress) LexerAndEval(lexerArg string,arg interface{})  (interface{}, error)  {
-	var lex,err=it.Lexer(lexerArg)
-	if err!=nil{
-		return nil,err
+func (it *ExpressionEngineGoExpress) LexerAndEval(lexerArg string, arg interface{}) (interface{}, error) {
+	var lex, err = it.Lexer(lexerArg)
+	if err != nil {
+		return nil, err
 	}
-	return it.Eval(lex,arg,0)
+	return it.Eval(lex, arg, 0)
 }
-
 
 //替换表达式中的值 and,or,参数 替换为实际值
 func (it *ExpressionEngineGoExpress) repleaceExpression(expression string) string {
@@ -47,31 +46,4 @@ func (it *ExpressionEngineGoExpress) repleaceExpression(expression string) strin
 	expression = strings.Replace(expression, ` and `, " && ", -1)
 	expression = strings.Replace(expression, ` or `, " || ", -1)
 	return expression
-}
-
-func (it *ExpressionEngineGoExpress) split(str string) (stringItems []string) {
-	if str == "" {
-		return nil
-	}
-	var andStrings = strings.Split(str, " && ")
-	if andStrings == nil {
-		return nil
-	}
-	var newStrings []string
-	for _, v := range andStrings {
-		var orStrings = strings.Split(v, " || ")
-		if orStrings == nil {
-			continue
-		}
-		for _, orStr := range orStrings {
-			if newStrings == nil {
-				newStrings = make([]string, 0)
-			}
-			if orStr == "" {
-				continue
-			}
-			newStrings = append(newStrings, orStr)
-		}
-	}
-	return newStrings
 }

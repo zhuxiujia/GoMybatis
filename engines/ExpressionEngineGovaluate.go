@@ -25,26 +25,26 @@ func (it *ExpressionEngineGovaluate) Lexer(expression string) (interface{}, erro
 //参数：lexerResult=编译结果，arg=参数
 //返回：执行结果，错误
 func (it *ExpressionEngineGovaluate) Eval(compileResult interface{}, arg interface{}, operation int) (interface{}, error) {
-	var argMap=arg.(map[string]interface{})
-	for k,v:=range argMap{
-		if v!=nil{
-			var reflectV=reflect.ValueOf(v)
-			if reflectV.IsValid()==false || (reflectV.Kind()==reflect.Ptr && reflectV.IsNil()){
-				argMap[k]=nil
+	var argMap = arg.(map[string]interface{})
+	for k, v := range argMap {
+		if v != nil {
+			var reflectV = reflect.ValueOf(v)
+			if reflectV.IsValid() == false || (reflectV.Kind() == reflect.Ptr && reflectV.IsNil()) {
+				argMap[k] = nil
 			}
 		}
 	}
-	argMap["nil"]=nil
-	argMap["null"]=nil
+	argMap["nil"] = nil
+	argMap["null"] = nil
 	return compileResult.(*govaluate.EvaluableExpression).Evaluate(argMap)
 }
 
-func (it *ExpressionEngineGovaluate) LexerAndEval(lexerArg string,arg interface{})  (interface{}, error)  {
-	var lex,err=it.Lexer(lexerArg)
-	if err!=nil{
-		return nil,err
+func (it *ExpressionEngineGovaluate) LexerAndEval(lexerArg string, arg interface{}) (interface{}, error) {
+	var lex, err = it.Lexer(lexerArg)
+	if err != nil {
+		return nil, err
 	}
-	return it.Eval(lex,arg,0)
+	return it.Eval(lex, arg, 0)
 }
 
 //替换表达式中的值 and,or,参数 替换为实际值
@@ -56,32 +56,3 @@ func (it *ExpressionEngineGovaluate) repleaceExpression(expression string) strin
 	expression = strings.Replace(expression, ` or `, " || ", -1)
 	return expression
 }
-
-func (it *ExpressionEngineGovaluate) split(str string) (stringItems []string) {
-	if str == "" {
-		return nil
-	}
-	var andStrings = strings.Split(str, " && ")
-	if andStrings == nil {
-		return nil
-	}
-	var newStrings []string
-	for _, v := range andStrings {
-		var orStrings = strings.Split(v, " || ")
-		if orStrings == nil {
-			continue
-		}
-		for _, orStr := range orStrings {
-			if newStrings == nil {
-				newStrings = make([]string, 0)
-			}
-			if orStr == "" {
-				continue
-			}
-			newStrings = append(newStrings, orStr)
-		}
-	}
-	return newStrings
-}
-
-
