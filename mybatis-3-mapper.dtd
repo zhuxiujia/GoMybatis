@@ -16,7 +16,7 @@
                limitations under the License.
 
         -->
-        <!ELEMENT mapper (cache-ref | cache | resultMap* | parameterMap* | sql* | insert* | update* |updateTemplete* | delete* |deleteTemplete* | select* | selectTemplete* | insertTemplete* )+>
+        <!ELEMENT mapper (cache-ref | cache | resultMap*  | sql* | insert* | update* |updateTemplete* | delete* |deleteTemplete* | select* | selectTemplete* | insertTemplete* )+>
         <!ATTLIST mapper
                 >
 
@@ -35,12 +35,6 @@
                 blocking CDATA #IMPLIED
                 >
 
-        <!ELEMENT parameterMap (parameter+)?>
-        <!ATTLIST parameterMap
-                id CDATA #REQUIRED
-                type CDATA #REQUIRED
-                >
-
         <!ELEMENT parameter EMPTY>
         <!ATTLIST parameter
                 property CDATA #REQUIRED
@@ -55,6 +49,7 @@
         <!ELEMENT resultMap (constructor?,id*,result*,association*,collection*, discriminator?)>
         <!ATTLIST resultMap
                 id CDATA #REQUIRED
+                tables  #REQUIRED
                 extends CDATA #IMPLIED
                 autoMapping (true|false) #IMPLIED
                 >
@@ -171,16 +166,9 @@
         <!ELEMENT select (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST select
                 id CDATA #REQUIRED
-                parameterMap CDATA #IMPLIED
-                parameterType CDATA #IMPLIED
                 resultMap CDATA #IMPLIED
                 resultType CDATA #IMPLIED
-                
-               
-                fetchSize CDATA #IMPLIED
-                timeout CDATA #IMPLIED
-                flushCache (true|false) #IMPLIED
-                useCache (true|false) #IMPLIED
+
                 
                 lang CDATA #IMPLIED
                 
@@ -190,21 +178,14 @@
         <!ELEMENT selectTemplete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST selectTemplete
                 id CDATA #IMPLIED
-                parameterMap CDATA #IMPLIED
-                parameterType CDATA #IMPLIED
                 resultMap (BaseResultMap) #IMPLIED
                 resultType CDATA #IMPLIED
 
 
-                fetchSize CDATA #IMPLIED
-                timeout CDATA #IMPLIED
-                flushCache (true|false) #IMPLIED
-                useCache (true|false) #IMPLIED
-
                 lang CDATA #IMPLIED
 
 
-                tables CDATA #REQUIRED
+                tables CDATA #IMPLIED
                 columns CDATA #IMPLIED
                 wheres CDATA #IMPLIED
                 >
@@ -213,10 +194,6 @@
         <!ELEMENT insert (#PCDATA | selectKey | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST insert
                 id CDATA #REQUIRED
-                parameterMap CDATA #IMPLIED
-                parameterType CDATA #IMPLIED
-                timeout CDATA #IMPLIED
-                flushCache (true|false) #IMPLIED
                
                 
                 useGeneratedKeys (true|false) #IMPLIED
@@ -229,7 +206,7 @@
         <!ATTLIST insertTemplete
                 id CDATA #IMPLIED
                 resultMap CDATA #IMPLIED
-                tables CDATA #REQUIRED
+                tables CDATA #IMPLIED
                 inserts CDATA #IMPLIED
                 resultMap (BaseResultMap) #IMPLIED
                 >
@@ -247,10 +224,6 @@
         <!ELEMENT update (#PCDATA | selectKey | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST update
                 id CDATA #REQUIRED
-                parameterMap CDATA #IMPLIED
-                parameterType CDATA #IMPLIED
-                timeout CDATA #IMPLIED
-                flushCache (true|false) #IMPLIED
                
                 
                 useGeneratedKeys (true|false) #IMPLIED
@@ -261,17 +234,13 @@
         <!ELEMENT updateTemplete (#PCDATA | selectKey | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST updateTemplete
                 id CDATA #IMPLIED
-                parameterMap CDATA #IMPLIED
-                parameterType CDATA #IMPLIED
-                timeout CDATA #IMPLIED
-                flushCache (true|false) #IMPLIED
                 resultMap (BaseResultMap) #IMPLIED
 
                 useGeneratedKeys (true|false) #IMPLIED
 
 
                 lang CDATA #IMPLIED
-                tables CDATA #REQUIRED
+                tables CDATA #IMPLIED
                 sets CDATA #IMPLIED
                 wheres CDATA #IMPLIED
                 >
@@ -279,10 +248,6 @@
         <!ELEMENT delete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST delete
                 id CDATA #REQUIRED
-                parameterMap CDATA #IMPLIED
-                parameterType CDATA #IMPLIED
-                timeout CDATA #IMPLIED
-                flushCache (true|false) #IMPLIED
                
                 
                 lang CDATA #IMPLIED
@@ -290,14 +255,10 @@
         <!ELEMENT deleteTemplete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST deleteTemplete
                 id CDATA #IMPLIED
-                parameterMap CDATA #IMPLIED
-                parameterType CDATA #IMPLIED
-                timeout CDATA #IMPLIED
-                flushCache (true|false) #IMPLIED
 
 
                 lang CDATA #IMPLIED
-                tables CDATA #REQUIRED
+                tables CDATA #IMPLIED
                 wheres CDATA #IMPLIED
                 resultMap (BaseResultMap) #IMPLIED
                 >

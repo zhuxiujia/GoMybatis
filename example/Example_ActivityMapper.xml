@@ -6,34 +6,37 @@
     <!--logic_deleted 逻辑删除已删除字段-->
     <!--logic_undelete 逻辑删除 未删除字段-->
     <!--version_enable 乐观锁版本字段,支持int,int8,int16,int32,int64-->
-    <resultMap id="BaseResultMap">
+    <resultMap id="BaseResultMap" tables="biz_activity">
         <id column="id" property="id"/>
         <result column="name" property="name" langType="string"/>
         <result column="pc_link" property="pcLink" langType="string"/>
         <result column="h5_link" property="h5Link" langType="string"/>
         <result column="remark" property="remark" langType="string"/>
-        <result column="version" property="version" langType="int" version_enable="true"/>
+        <result column="version" property="version" langType="int"
+                version_enable="true"/>
         <result column="create_time" property="createTime" langType="time.Time"/>
-        <result column="delete_flag" property="deleteFlag" langType="int" logic_enable="true" logic_undelete="1"
+        <result column="delete_flag" property="deleteFlag" langType="int"
+                logic_enable="true"
+                logic_undelete="1"
                 logic_deleted="0"/>
     </resultMap>
 
-    <!--模板标签: columns wheres sets 支持逗号','分隔表达式，name?name = #{name}为判空表达式-->
+    <!--模板标签: columns wheres sets 支持逗号,分隔表达式，*?* 为判空表达式-->
+
     <!--插入模板:默认id="insertTemplete,test="field != null",where自动设置逻辑删除字段,支持批量插入" -->
-    <insertTemplete tables="biz_activity"/>
+    <insertTemplete/>
     <!--查询模板:默认id="selectTemplete,where自动设置逻辑删除字段-->
-    <selectTemplete tables="biz_activity" wheres="name?name = #{name}"/>
+    <selectTemplete wheres="name?name = #{name}"/>
     <!--更新模板:默认id="updateTemplete,set自动设置乐观锁版本号-->
-    <updateTemplete tables="biz_activity" sets="name?name = #{name}" wheres="name?name = #{name}"/>
+    <updateTemplete sets="name?name = #{name}" wheres="name?name = #{name}"/>
     <!--删除模板:默认id="deleteTemplete,where自动设置逻辑删除字段-->
-    <deleteTemplete tables="biz_activity" wheres="name?name = #{name}"/>
+    <deleteTemplete wheres="name?name = #{name}"/>
 
 
-    <!--批量插入例子: -->
-    <insertTemplete id="InsertTempleteBatch" tables="biz_activity"/>
+    <!--批量插入例子: 因为上面已经有id="insertTemplete" 需要指定id -->
+    <insertTemplete id="InsertTempleteBatch"/>
     <!--统计模板例子:-->
-    <selectTemplete id="selectCountTemplete" tables="biz_activity" columns="count(*)" wheres="name?name = #{name}"/>
-
+    <selectTemplete id="selectCountTemplete" columns="count(*)" wheres="name?name = #{name}"/>
 
 
     <!--SelectByCondition func(name *string, startTime *time.Time, endTime *time.Time, page *int, size *int) ([]Activity, error) `mapperParams:"name,startTime,endTime,page,size"`-->
