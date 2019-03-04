@@ -29,9 +29,9 @@
     <deleteTemplete tables="biz_activity" wheres="name?name = #{name}"/>
 
 
-    <!--批量插入模板:默认id="insertTemplete,test="field != null",where自动设置逻辑删除字段,支持批量插入" -->
+    <!--批量插入例子: -->
     <insertTemplete id="InsertTempleteBatch" tables="biz_activity"/>
-    <!--select count(*)统计-->
+    <!--统计模板例子:-->
     <selectTemplete id="selectCountTemplete" tables="biz_activity" columns="count(*)" wheres="name?name = #{name}"/>
 
 
