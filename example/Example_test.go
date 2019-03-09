@@ -17,6 +17,7 @@ import (
 // 函数return必须为error 为返回错误信息
 type ExampleActivityMapper struct {
 	SelectTemplete      func(name string) ([]Activity, error) `mapperParams:"name"`
+	SelectCountTemplete func(name string) (int64, error)      `mapperParams:"name"`
 	InsertTemplete      func(arg Activity) (int64, error)
 	InsertTempleteBatch func(args []Activity) (int64, error) `mapperParams:"args"`
 	UpdateTemplete      func(arg Activity) (int64, error)    `mapperParams:"name"`
@@ -296,6 +297,19 @@ func TestSelectTemplete(t *testing.T) {
 	}
 	//使用mapper
 	var result, err = exampleActivityMapper.SelectTemplete("hello")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("result=", result)
+}
+
+func TestSelectCountTemplete(t *testing.T) {
+	if MysqlUri == "" || MysqlUri == "*" {
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		return
+	}
+	//使用mapper
+	var result, err = exampleActivityMapper.SelectCountTemplete("hello")
 	if err != nil {
 		panic(err)
 	}

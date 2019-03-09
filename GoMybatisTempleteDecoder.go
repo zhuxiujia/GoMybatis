@@ -11,8 +11,8 @@ import (
 var equalOperator = []string{"/", "+", "-", "*", "**", "|", "^", "&", "%", "<", ">", ">=", "<=", " in ", " not in ", " or ", "||", " and ", "&&", "==", "!="}
 
 /**
- TODO sqlTemplete解析器，目前直接操作*etree.Element实现，后期应该改成操作xml，换取更好的维护性
- */
+TODO sqlTemplete解析器，目前直接操作*etree.Element实现，后期应该改成操作xml，换取更好的维护性
+*/
 type GoMybatisTempleteDecoder struct {
 }
 
@@ -85,6 +85,8 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 		if resultMapData == nil {
 			panic(utils.NewError("GoMybatisTempleteDecoder", "resultMap not define! id = ", resultMap))
 		}
+		checkTablesValue(mapper, &tables, resultMapData)
+
 		var logic = it.decodeLogicDelete(resultMapData)
 
 		var sql bytes.Buffer
@@ -127,6 +129,8 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 		if resultMapData == nil {
 			panic(utils.NewError("GoMybatisTempleteDecoder", "resultMap not define! id = ", resultMap))
 		}
+		checkTablesValue(mapper, &tables, resultMapData)
+
 		var logic = it.decodeLogicDelete(resultMapData)
 
 		var collection string
@@ -214,7 +218,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 				if inserts == "*?*" {
 					trimArg.Child = append(trimArg.Child, &etree.Element{
 						Tag:  Element_If,
-						Attr: []etree.Attr{{Key: "test", Value: it.makeIfNotNull(v.SelectAttrValue("property", ""))},},
+						Attr: []etree.Attr{{Key: "test", Value: it.makeIfNotNull(v.SelectAttrValue("property", ""))}},
 						Child: []etree.Token{
 							&etree.CharData{
 								Data: "#{" + v.SelectAttrValue("property", "") + "},",
@@ -235,7 +239,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			var forEach = &etree.Element{
 				Tag:   Element_Foreach,
 				Attr:  []etree.Attr{{Key: "open", Value: ""}, {Key: "close", Value: ""}, {Key: "separator", Value: ","}, {Key: "collection", Value: collection}},
-				Child: []  etree.Token{},
+				Child: []etree.Token{},
 			}
 
 			for index, v := range resultMapData.ChildElements() {
@@ -282,6 +286,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 		if resultMapData == nil {
 			panic(utils.NewError("GoMybatisTempleteDecoder", "resultMap not define! id = ", resultMap))
 		}
+		checkTablesValue(mapper, &tables, resultMapData)
 
 		var logic = it.decodeLogicDelete(resultMapData)
 
@@ -336,6 +341,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 		if resultMapData == nil {
 			panic(utils.NewError("GoMybatisTempleteDecoder", "resultMap not define! id = ", resultMap))
 		}
+		checkTablesValue(mapper, &tables, resultMapData)
 
 		var logic = it.decodeLogicDelete(resultMapData)
 		if logic.Enable {
@@ -375,6 +381,15 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 	}
 
 	return nil
+}
+
+func checkTablesValue(mapper *etree.Element, tables *string, resultMapData *etree.Element) {
+	if *tables == "" {
+		*tables = resultMapData.SelectAttrValue("tables", "")
+		if *tables == "" {
+			panic("[GoMybatisTempleteDecoder] attribute 'tables' can not be empty! need define in <resultMap> or <" + mapper.Tag + "Templete>,mapper id=" + mapper.SelectAttrValue("id", ""))
+		}
+	}
 }
 
 //解码逗号分隔的where
