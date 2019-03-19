@@ -71,6 +71,8 @@ func (it OptNode) Eval(env interface{}) (interface{}, error) {
 //参数节点
 type ArgNode struct {
 	value string
+	values []string
+	valuesLen int
 	t     nodeType
 }
 
@@ -79,8 +81,7 @@ func (it ArgNode) Type() nodeType {
 }
 
 func (it ArgNode) Eval(env interface{}) (interface{}, error) {
-	//TODO do arg
-	return EvalTake(it.value, env)
+	return EvalTakes(it, env)
 }
 
 //值节点

@@ -1,61 +1,69 @@
 package GoFastExpress
 
 import (
+	"errors"
 	"fmt"
-	"github.com/kataras/iris/core/errors"
 	"reflect"
-	"strings"
 )
 
-func EvalMap(arg map[string]interface{}) {
-
-}
-
 //取值
-func EvalTake(operator Operator, arg interface{}) (interface{}, error) {
-	if arg == nil {
+func EvalTakes(argNode ArgNode, arg interface{}) (interface{}, error) {
+	if arg == nil || argNode.values == nil {
 		return nil, nil
 	}
-	if operator == "" {
+	if argNode.value == "" || argNode.valuesLen == 0 {
 		return arg, nil
 	}
 	var av = reflect.ValueOf(arg)
 	if av.Kind() == reflect.Map {
 		var m = arg.(map[string]interface{})
-		var result = m[operator]
-		if result != nil {
-			return result, nil
+		if argNode.valuesLen == 1 {
+			return m[argNode.value], nil
 		}
-		if strings.Index(operator, ".") != -1 {
-			var item []byte
-			for index, v := range operator {
-				if v == 46 {
-					item = []byte(operator)[0:index]
-					break
-				}
-			}
-			result = m[string(item)]
-			var otheritem = string([]byte(operator)[len(item)+1 : len(operator)])
-			return getObj(otheritem, reflect.ValueOf(result), result)
-		}
-		return nil, nil
+		return takeValue(av.MapIndex(reflect.ValueOf(argNode.values[0])), argNode.values[1:])
 	} else {
-		return getObj(operator, av, arg)
+		if argNode.valuesLen == 1 {
+			return arg, nil
+		}
+		return takeValue(av, argNode.values[1:])
 	}
-	return arg, nil
 }
 
-func getObj(operator Operator, av reflect.Value, arg interface{}) (interface{}, error) {
-	if av.Kind() == reflect.Ptr {
-		av = GetDeepPtr(av)
-	}
-	var v = av.FieldByName(operator)
-	if v.IsValid() && v.CanInterface() {
-		return v.Interface(), nil
-	} else {
+func takeValue(arg reflect.Value, feilds []string) (interface{}, error) {
+	if arg.IsValid() == false {
 		return nil, nil
 	}
-	return arg, nil
+	var e error
+	for _, v := range feilds {
+		arg, e = getObjV(v, arg)
+		if e != nil {
+			return nil, e
+		}
+	}
+	return arg.Interface(), nil
+
+}
+
+func getObjV(operator Operator, av reflect.Value) (reflect.Value, error) {
+	if av.Kind() == reflect.Ptr || av.Kind() == reflect.Interface {
+		av = GetDeepPtr(av)
+	}
+	if av.Kind() != reflect.Struct {
+		if av.IsValid() && av.CanInterface() {
+			return av, nil
+		} else {
+			return av, errors.New("not valid value!")
+		}
+	}
+	av = av.FieldByName(operator)
+	if av.Kind() == reflect.Ptr || av.Kind() == reflect.Interface {
+		av = GetDeepPtr(av)
+	}
+	if av.IsValid() && av.CanInterface() {
+		return av, nil
+	} else {
+		return av, errors.New("not valid value!")
+	}
 }
 
 func Eval(operator Operator, a interface{}, b interface{}) (interface{}, error) {

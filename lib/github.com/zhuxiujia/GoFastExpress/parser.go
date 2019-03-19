@@ -176,8 +176,12 @@ func parserNode(express string, v Operator) (Node, error) {
 		return inode, nil
 	}
 	e = nil
+
+	var values=strings.Split(v,".")
 	var argNode = ArgNode{
 		value: v,
+		values:values,
+		valuesLen: len(values),
 		t:     NArg,
 	}
 	return argNode, nil
