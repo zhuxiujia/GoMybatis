@@ -20,7 +20,7 @@
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">无依赖</a>基于反射动态代理,无需go generate生成*.go等中间代码，xml读取后可直接调用函数<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">智能表达式</a>`#{foo.Bar}``#{arg+1}``#{arg*1}``#{arg/1}``#{arg-1}`不但可以处理简单判断和计算任务，同时在取值时 假如foo.Bar 这个属性是指针,那么调用 foo.Bar 则会取指针指向的实际值,完全避免解引用操作<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">动态数据源</a>可以使用路由engine.SetDataSourceRouter自定义多数据源规则<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">模板标签</a>高开发效率的模板，一行代码实现增删改查，逻辑删除，乐观锁版本号<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">模板标签</a>一行代码实现增删改查，逻辑删除，乐观锁（基于版本号更新）极大减轻CRUD操作的心智负担<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">乐观锁</a>`<updateTemplete>`支持通过修改版本号实现的乐观锁<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">逻辑删除</a>`<insertTemplete>``<updateTemplete>``<deleteTemplete>``<selectTemplete>`均支持逻辑删除<br>
 
