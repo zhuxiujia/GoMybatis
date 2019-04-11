@@ -10,7 +10,7 @@
 
 
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/vuetify.png)
-### 网站 https://zhuxiujia.github.io/gomybatis.io/info.html
+### 使用教程请仔细阅读文档网站 https://zhuxiujia.github.io/gomybatis.io/info.html
 # 优势
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">高性能</a>，设数据库响应时间为0，并发数1000，总数100000，在6核16GB PC上框架每秒事务数可达456621Tps/s,耗时仅仅0.22s<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">事务</a>，session灵活插拔，兼容过渡期微服务<br>
