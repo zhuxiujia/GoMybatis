@@ -1,7 +1,7 @@
 package GoMybatis
 
 import (
-	"github.com/zhuxiujia/GoMybatis/utils"
+	"GoMybatis/utils"
 	"net/rpc"
 	"net/rpc/jsonrpc"
 )

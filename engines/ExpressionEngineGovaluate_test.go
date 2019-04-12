@@ -1,9 +1,9 @@
 package engines
 
 import (
+	"GoMybatis/example"
+	"GoMybatis/utils"
 	"fmt"
-	"github.com/zhuxiujia/GoMybatis/example"
-	"github.com/zhuxiujia/GoMybatis/utils"
 	"testing"
 	"time"
 )
@@ -106,7 +106,6 @@ func TestTpsExpressionEngineGovaluate(t *testing.T) {
 	}
 }
 
-
 func TestExpress_nil(t *testing.T) {
 	var engine = ExpressionEngineGovaluate{}
 	var evaluateParameters = make(map[string]interface{})
@@ -114,8 +113,6 @@ func TestExpress_nil(t *testing.T) {
 	var namePtr *string
 
 	evaluateParameters["name"] = namePtr
-
-
 
 	var expression = "name != nil"
 	evalExpression, err := engine.Lexer(expression)

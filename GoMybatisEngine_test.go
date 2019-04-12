@@ -1,9 +1,9 @@
 package GoMybatis
 
 import (
+	"GoMybatis/example"
+	"GoMybatis/utils"
 	"fmt"
-	"github.com/zhuxiujia/GoMybatis/example"
-	"github.com/zhuxiujia/GoMybatis/utils"
 	"sync"
 	"testing"
 	"time"
@@ -56,7 +56,7 @@ func Benchmark_One_Transcation_multiple_coroutine(b *testing.B) {
 		go func() {
 			var itemCount = total / goruntine
 			for f := 0; f < itemCount; f++ {
-				_, e := exampleActivityMapperImpl.SelectByCondition(&session,  &name, &times, &times, &page, &page)
+				_, e := exampleActivityMapperImpl.SelectByCondition(&session, &name, &times, &times, &page, &page)
 				if e != nil {
 					b.Fatal(e)
 				}
@@ -134,7 +134,7 @@ func Test_Transcation(t *testing.T) {
 	var times = time.Now()
 	var page = 1
 	//使用mapper
-	var results, err = exampleActivityMapperImpl.SelectByCondition(&session,  &name, &times, &times, &page, &page)
+	var results, err = exampleActivityMapperImpl.SelectByCondition(&session, &name, &times, &times, &page, &page)
 	if err != nil {
 		t.Fatal(err)
 	}

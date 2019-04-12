@@ -1,10 +1,8 @@
 package expr_test
 
 import (
-	"github.com/zhuxiujia/GoMybatis/lib/github.com/antonmedv/expr"
+	"GoMybatis/lib/github.com/antonmedv/expr"
 	"testing"
-
-
 )
 
 type Segment struct {

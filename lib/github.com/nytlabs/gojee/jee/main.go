@@ -1,9 +1,9 @@
 package main
 
 import (
+	"GoMybatis/lib/github.com/nytlabs/gojee"
 	"encoding/json"
 	"fmt"
-	"github.com/zhuxiujia/GoMybatis/lib/github.com/nytlabs/gojee"
 
 	"io/ioutil"
 	"os"

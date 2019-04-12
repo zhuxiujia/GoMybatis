@@ -1,15 +1,16 @@
 package GoMybatis
 
 import (
+	"GoMybatis/utils"
 	"bytes"
-	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
 type LogSystem struct {
-	log       Log
-	logChan   chan []byte
-	started   bool
+	log     Log
+	logChan chan []byte
+	started bool
 }
+
 //logImpl:日志实现类,queueLen:消息队列缓冲长度
 func (it LogSystem) New(logImpl Log, queueLen int) (LogSystem, error) {
 	if it.started == true {

@@ -1,7 +1,7 @@
 package GoMybatis
 
 import (
-	"github.com/zhuxiujia/GoMybatis/utils"
+	"GoMybatis/utils"
 )
 
 type TransationRMSession struct {
