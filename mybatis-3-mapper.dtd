@@ -191,7 +191,7 @@
                 >
 
 
-        <!ELEMENT insert (#PCDATA | selectKey | include | trim | where | set | foreach | choose | if | bind)*>
+        <!ELEMENT insert (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST insert
                 id CDATA #REQUIRED
                
@@ -202,7 +202,7 @@
                 lang CDATA #IMPLIED
                 >
 
-        <!ELEMENT insertTemplete (#PCDATA | selectKey | include | trim | where | set | foreach | choose | if | bind)*>
+        <!ELEMENT insertTemplete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST insertTemplete
                 id CDATA #IMPLIED
                 resultMap CDATA #IMPLIED
@@ -211,17 +211,7 @@
                 resultMap (BaseResultMap) #IMPLIED
                 >
 
-        <!ELEMENT selectKey (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
-        <!ATTLIST selectKey
-                resultType CDATA #IMPLIED
-               
-                
-                
-                order (BEFORE|AFTER) #IMPLIED
-                
-                >
-
-        <!ELEMENT update (#PCDATA | selectKey | include | trim | where | set | foreach | choose | if | bind)*>
+        <!ELEMENT update (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST update
                 id CDATA #REQUIRED
                
@@ -231,7 +221,7 @@
                 
                 lang CDATA #IMPLIED
                 >
-        <!ELEMENT updateTemplete (#PCDATA | selectKey | include | trim | where | set | foreach | choose | if | bind)*>
+        <!ELEMENT updateTemplete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST updateTemplete
                 id CDATA #IMPLIED
                 resultMap (BaseResultMap) #IMPLIED
