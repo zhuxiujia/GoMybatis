@@ -1,7 +1,7 @@
 package example
 
 import (
-
+	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/zhuxiujia/GoMybatis"
@@ -150,7 +150,8 @@ func Test_select_all(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("result=", result)
+	var b,_=json.Marshal(result)
+	fmt.Println("result=", string(b))
 }
 
 //查询
