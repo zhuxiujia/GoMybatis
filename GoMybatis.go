@@ -90,14 +90,9 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 					}
 					returnValue = &returnV
 				}
-				var session Session
+				var session = sessionFactory.NewSession(beanName, SessionType_Default)
 				var err error
-				if session != nil {
-					returnValue.Elem().Set(reflect.ValueOf(session).Elem().Addr().Convert(*returnType.ReturnOutType))
-				} else {
-					//err = utils.NewError("GoMybatis", "Create Session fail.arg session not exist!")
-					session = sessionFactory.NewSession(beanName, SessionType_Default)
-				}
+				returnValue.Elem().Set(reflect.ValueOf(session).Elem().Addr().Convert(*returnType.ReturnOutType))
 				return buildReturnValues(returnType, returnValue, err)
 			}
 			return proxyFunc
