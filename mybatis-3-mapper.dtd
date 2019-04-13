@@ -16,34 +16,8 @@
                limitations under the License.
 
         -->
-        <!ELEMENT mapper (cache-ref | cache | resultMap*  | sql* | insert* | update* |updateTemplete* | delete* |deleteTemplete* | select* | selectTemplete* | insertTemplete* )+>
+        <!ELEMENT mapper (resultMap*  | sql* | insert* | update* |updateTemplete* | delete* |deleteTemplete* | select* | selectTemplete* | insertTemplete* )+>
         <!ATTLIST mapper
-                >
-
-        <!ELEMENT cache-ref EMPTY>
-        <!ATTLIST cache-ref
-                namespace CDATA #REQUIRED
-                >
-
-        <!ELEMENT cache (property*)>
-        <!ATTLIST cache
-                type CDATA #IMPLIED
-                eviction CDATA #IMPLIED
-                flushInterval CDATA #IMPLIED
-                size CDATA #IMPLIED
-                readOnly CDATA #IMPLIED
-                blocking CDATA #IMPLIED
-                >
-
-        <!ELEMENT parameter EMPTY>
-        <!ATTLIST parameter
-                property CDATA #REQUIRED
-                langType CDATA #IMPLIED
-                <!--jdbcType CDATA #IMPLIED-->
-                mode (IN | OUT | INOUT) #IMPLIED
-                resultMap CDATA #IMPLIED
-                scale CDATA #IMPLIED
-                typeHandler CDATA #IMPLIED
                 >
 
         <!ELEMENT resultMap (constructor?,id*,result*,association*,collection*, discriminator?)>
@@ -119,32 +93,7 @@
                 fetchType (lazy|eager) #IMPLIED
                 >
 
-        <!ELEMENT association (constructor?,id*,result*,association*,collection*, discriminator?)>
-        <!ATTLIST association
-                property CDATA #REQUIRED
-                column CDATA #IMPLIED
-                langType CDATA #IMPLIED
-                <!--jdbcType CDATA #IMPLIED-->
-                select CDATA #IMPLIED
-                resultMap CDATA #IMPLIED
-                typeHandler CDATA #IMPLIED
-                notNullColumn CDATA #IMPLIED
-                columnPrefix CDATA #IMPLIED
-                resultSet CDATA #IMPLIED
-                foreignColumn CDATA #IMPLIED
-                autoMapping (true|false) #IMPLIED
-                fetchType (lazy|eager) #IMPLIED
-                >
-
-        <!ELEMENT discriminator (case+)>
-        <!ATTLIST discriminator
-                column CDATA #IMPLIED
-                langType CDATA #REQUIRED
-                <!--jdbcType CDATA #IMPLIED-->
-                typeHandler CDATA #IMPLIED
-                >
-
-        <!ELEMENT case (constructor?,id*,result*,association*,collection*, discriminator?)>
+        <!ELEMENT case (constructor?,id*,result*,collection*)>
         <!ATTLIST case
                 value CDATA #REQUIRED
                 resultMap CDATA #IMPLIED
