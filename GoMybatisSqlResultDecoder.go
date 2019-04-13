@@ -51,8 +51,8 @@ func (it GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultProperty,
 		case reflect.Slice:
 			//slice
 			var resultTItemType = resultT.Elem().Elem()
-			var isBasicTypeSlice = it.isGoBasicType(resultTItemType)
-			if isBasicTypeSlice {
+			var isGoBasicType = it.isGoBasicType(resultTItemType)
+			if isGoBasicType {
 				it.convertToBasicTypeCollection(sqlResult, &resultV, resultTItemType, resultMap)
 			} else {
 				for index, sItemMap := range sqlResult {
@@ -64,9 +64,9 @@ func (it GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultProperty,
 						var valueV = value.Elem()
 						//map
 						var resultTItemType = resultTItemType.Elem() //int,string,time.Time.....
-						var isBasicTypeSlice = it.isGoBasicType(resultTItemType)
+						var isGoBasicType = it.isGoBasicType(resultTItemType)
 						var isInterface = resultTItemType.String() == "interface {}"
-						if isBasicTypeSlice && isInterface == false {
+						if isGoBasicType && isInterface == false {
 							it.convertToBasicTypeCollection(sqlResult, &valueV, resultTItemType, resultMap)
 							resultV = reflect.Append(resultV, valueV)
 						} else {
@@ -81,9 +81,9 @@ func (it GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultProperty,
 		case reflect.Map:
 			//map
 			var resultTItemType = resultT.Elem().Elem() //int,string,time.Time.....
-			var isBasicTypeSlice = it.isGoBasicType(resultTItemType)
+			var isGoBasicType = it.isGoBasicType(resultTItemType)
 			var isInterface = resultTItemType.String() == "interface {}"
-			if isBasicTypeSlice && isInterface == false {
+			if isGoBasicType && isInterface == false {
 				if sqlResultLen > 1 {
 					return utils.NewError("SqlResultDecoder", " Decode one result,but find database result size find > 1!")
 				}
