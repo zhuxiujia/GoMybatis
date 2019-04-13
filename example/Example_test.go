@@ -51,7 +51,7 @@ func init() {
 		panic(err.Error())
 	}
 
-	//动态数据源路由
+	//动态数据源路由(可选)
 	//GoMybatis.Open("mysql", MysqlUri)//添加第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
 	//var router = GoMybatis.GoMybatisDataSourceRouter{}.New(func(mapperName string) *string {
 	//	//根据包名路由指向数据源
@@ -64,7 +64,7 @@ func init() {
 	//})
 	//engine.SetDataSourceRouter(&router)
 
-	//自定义日志实现
+	//自定义日志实现(可选)
 	//engine.SetLogEnable(true)
 	//engine.SetLog(&GoMybatis.LogStandard{
 	//	PrintlnFunc: func(messages []byte) {
