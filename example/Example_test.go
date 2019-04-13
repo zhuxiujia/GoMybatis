@@ -15,6 +15,8 @@ import (
 //自定义结构体参数（属性必须大写）
 //方法 return 必须包含有error ,为了返回错误信息
 type ExampleActivityMapper struct {
+	GoMybatis.SessionSupport                     //session事务操作 写法1.  ExampleActivityMapper.SessionSupport.NewSession()
+	NewSession func() (GoMybatis.Session, error) //session事务操作.写法2   ExampleActivityMapper.NewSession()
 	//模板示例
 	SelectTemplete      func(name string) ([]Activity, error) `mapperParams:"name"`
 	SelectCountTemplete func(name string) (int64, error)      `mapperParams:"name"`
@@ -30,11 +32,10 @@ type ExampleActivityMapper struct {
 	SelectByCondition func(name *string, startTime *time.Time, endTime *time.Time, page *int, size *int) ([]Activity, error) `mapperParams:"name,startTime,endTime,page,size"`
 	UpdateById        func(session *GoMybatis.Session, arg Activity) (int64, error)
 	Insert            func(arg Activity) (int64, error)
-	CountByCondition  func(name string, startTime time.Time, endTime time.Time) (int, error)      `mapperParams:"name,startTime,endTime"`
-	DeleteById        func(id string) (int64, error)                                              `mapperParams:"id"`
-	Choose            func(deleteFlag int) ([]Activity, error)                                    `mapperParams:"deleteFlag"`
-	SelectLinks       func(column string) ([]Activity, error)                                     `mapperParams:"column"`
-	NewSession        func() (GoMybatis.Session, error)  //session为事务操作
+	CountByCondition  func(name string, startTime time.Time, endTime time.Time) (int, error) `mapperParams:"name,startTime,endTime"`
+	DeleteById        func(id string) (int64, error)                                         `mapperParams:"id"`
+	Choose            func(deleteFlag int) ([]Activity, error)                               `mapperParams:"deleteFlag"`
+	SelectLinks       func(column string) ([]Activity, error)                                `mapperParams:"column"`
 }
 
 //初始化mapper文件和结构体
@@ -150,7 +151,7 @@ func Test_select_all(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	var b,_=json.Marshal(result)
+	var b, _ = json.Marshal(result)
 	fmt.Println("result=", string(b))
 }
 
@@ -205,7 +206,7 @@ func Test_local_Transation(t *testing.T) {
 		return
 	}
 	//使用事务
-	var session, err = exampleActivityMapper.NewSession()
+	var session, err = exampleActivityMapper.SessionSupport.NewSession()
 	if err != nil {
 		t.Fatal(err)
 	}

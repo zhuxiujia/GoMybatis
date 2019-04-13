@@ -46,9 +46,12 @@ func buildMapper(v reflect.Value, buildFunc func(funcField reflect.StructField) 
 		if f.CanSet() {
 			switch ft.Kind() {
 			case reflect.Struct:
+				if buildFunc != nil {
+					buildMapper(f,buildFunc)//循环扫描
+				}
 			case reflect.Func:
 				if buildFunc != nil {
-					buildRemoteMethod(f, ft, sf, buildFunc(sf))
+					buildRemoteMethod(v,f, ft, sf, buildFunc(sf))
 				}
 			}
 		}
@@ -60,7 +63,7 @@ func buildMapper(v reflect.Value, buildFunc func(funcField reflect.StructField) 
 	}
 }
 
-func buildRemoteMethod(f reflect.Value, ft reflect.Type, sf reflect.StructField, proxyFunc func(args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
+func buildRemoteMethod(source reflect.Value,f reflect.Value, ft reflect.Type, sf reflect.StructField, proxyFunc func(args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
 	var tagParams []string
 	var mapperParams = sf.Tag.Get(`mapperParams`)
 	if mapperParams != `` {
@@ -98,5 +101,6 @@ func buildRemoteMethod(f reflect.Value, ft reflect.Type, sf reflect.StructField,
 	} else {
 		f.Set(reflect.MakeFunc(ft, fn))
 	}
+	println("[GoMybatis] write method success:"+source.Type().Name()+" > "+sf.Name+" "+f.Type().String())
 	tagParams = nil
 }
