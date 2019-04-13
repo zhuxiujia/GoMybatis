@@ -25,21 +25,6 @@
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">逻辑删除</a>`<insertTemplete>``<updateTemplete>``<deleteTemplete>``<selectTemplete>`均支持逻辑删除<br>
 
 
-#### 异步消息队列日志系统
-![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/log_system.png)
-数据库驱动列表
-```
- Mysql: github.com/go-sql-driver/mysql
- MyMysql: github.com/ziutek/mymysql/godrv
- Postgres: github.com/lib/pq
- Tidb: github.com/pingcap/tidb
- SQLite: github.com/mattn/go-sqlite3
- MsSql: github.com/denisenkom/go-mssqldb
- MsSql: github.com/lunny/godbc
- Oracle: github.com/mattn/go-oci8
- CockroachDB(Postgres): github.com/lib/pq
- ```
- 
 ## 使用教程
 
 > 示例源码https://github.com/zhuxiujia/GoMybatis/tree/master/example
@@ -119,6 +104,20 @@ func main() {
 		},
 	})
 ```
+#### 异步日志-基于消息队列日志
+![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/log_system.png)
+数据库驱动列表
+```
+ Mysql: github.com/go-sql-driver/mysql
+ MyMysql: github.com/ziutek/mymysql/godrv
+ Postgres: github.com/lib/pq
+ Tidb: github.com/pingcap/tidb
+ SQLite: github.com/mattn/go-sqlite3
+ MsSql: github.com/denisenkom/go-mssqldb
+ MsSql: github.com/lunny/godbc
+ Oracle: github.com/mattn/go-oci8
+ CockroachDB(Postgres): github.com/lib/pq
+ ```
 
 
 #### 多种表达式引擎可选（表达式引擎接口ExpressionEngine.go 负责表达式("foo != nil"...)的判断和取值）
