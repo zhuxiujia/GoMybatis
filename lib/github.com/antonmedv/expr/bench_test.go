@@ -1,7 +1,7 @@
 package expr_test
 
 import (
-	"GoMybatis/lib/github.com/antonmedv/expr"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/antonmedv/expr"
 	"testing"
 )
 

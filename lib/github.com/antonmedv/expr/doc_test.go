@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"GoMybatis/lib/github.com/antonmedv/expr"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/antonmedv/expr"
 )
 
 func ExampleEval() {

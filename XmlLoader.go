@@ -1,8 +1,8 @@
 package GoMybatis
 
 import (
-	"GoMybatis/lib/github.com/beevik/etree"
-	"GoMybatis/utils"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
+	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
 )
 

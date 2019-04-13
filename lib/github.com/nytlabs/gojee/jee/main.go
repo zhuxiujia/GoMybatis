@@ -1,7 +1,7 @@
 package main
 
 import (
-	"GoMybatis/lib/github.com/nytlabs/gojee"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/nytlabs/gojee"
 	"encoding/json"
 	"fmt"
 

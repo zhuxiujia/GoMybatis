@@ -1,6 +1,6 @@
 package ast
 
-import "GoMybatis/utils"
+import "github.com/zhuxiujia/GoMybatis/utils"
 
 type NodeWhen struct {
 	childs []Node

@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"GoMybatis/lib/github.com/google/uuid"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/google/uuid"
 )
 
 func CreateUUID() string {

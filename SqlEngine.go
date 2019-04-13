@@ -1,6 +1,6 @@
 package GoMybatis
 
-import "GoMybatis/ast"
+import "github.com/zhuxiujia/GoMybatis/ast"
 
 type Result struct {
 	LastInsertId int64

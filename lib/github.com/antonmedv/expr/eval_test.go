@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"GoMybatis/lib/github.com/antonmedv/expr"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/antonmedv/expr"
 )
 
 type evalTest struct {

@@ -1,7 +1,7 @@
 package engines
 
 import (
-	"GoMybatis/lib/github.com/Knetic/govaluate"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
 	"reflect"
 	"strings"
 )

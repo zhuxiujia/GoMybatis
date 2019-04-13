@@ -1,7 +1,7 @@
 package GoMybatis
 
 import (
-	"GoMybatis/example"
+	"github.com/zhuxiujia/GoMybatis/example"
 	"fmt"
 	"testing"
 	"time"
