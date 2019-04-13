@@ -53,7 +53,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 	//构建期使用的map，无需考虑并发安全
 	var methodXmlMap = makeMethodXmlMap(bean, mapperTree, sqlBuilder)
 	var resultMaps = makeResultMaps(mapperTree)
-	var returnTypeMap = makeReturnTypeMap(bean)
+	var returnTypeMap = makeReturnTypeMap(bean.Elem().Type())
 	var beanName = bean.Type().PkgPath() + bean.Type().String()
 
 	UseMapperValue(bean, func(funcField reflect.StructField) func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
@@ -164,14 +164,20 @@ func buildReturnValues(returnType *ReturnType, returnValue *reflect.Value, e err
 	return returnValues
 }
 
-func makeReturnTypeMap(value reflect.Value) (returnMap map[string]*ReturnType) {
+func makeReturnTypeMap(value reflect.Type) (returnMap map[string]*ReturnType) {
 	returnMap = make(map[string]*ReturnType)
-	var proxyType = value.Elem().Type()
+	var proxyType = value
 	for i := 0; i < proxyType.NumField(); i++ {
 		var funcType = proxyType.Field(i).Type
 		var funcName = proxyType.Field(i).Name
 
 		if funcType.Kind() != reflect.Func {
+			if funcType.Kind() == reflect.Struct{
+				var childMap=makeReturnTypeMap(funcType)
+				for k,v:=range childMap{
+					returnMap[k]=v
+				}
+			}
 			continue
 		}
 
@@ -198,11 +204,12 @@ func makeReturnTypeMap(value reflect.Value) (returnMap map[string]*ReturnType) {
 				returnMap[funcName].ReturnIndex = f
 				returnMap[funcName].ReturnOutType = &outType
 			} else {
-				if returnMap[funcName].ErrorType != nil {
-					panic("[GoMybatis] func '" + funcName + "()' must only return one 'error'!")
-				}
+				//error
 				returnMap[funcName].ErrorType = &outType
 			}
+		}
+		if returnMap[funcName].ErrorType == nil {
+			panic("[GoMybatis] func '" + funcName + "()' must return an 'error'!")
 		}
 	}
 	return returnMap
