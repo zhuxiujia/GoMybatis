@@ -10,13 +10,12 @@ import (
 	"time"
 )
 
-//定义mapper文件的接口和结构体
-// 支持基本类型(int,string,time.Time,float...且需要指定参数名称`mapperParams:"name"以逗号隔开，且位置要和实际参数相同)
+//支持基本类型和指针(int,string,time.Time,float...且需要指定参数名称`mapperParams:"name"以逗号隔开，且位置要和实际参数相同)
 //参数中包含有*GoMybatis.Session的类型，用于自定义事务
 //自定义结构体参数（属性必须大写）
-//返回中必须有error
-// 函数return必须为error 为返回错误信息
+//方法 return 必须包含有error ,为了返回错误信息
 type ExampleActivityMapper struct {
+	//模板示例
 	SelectTemplete      func(name string) ([]Activity, error) `mapperParams:"name"`
 	SelectCountTemplete func(name string) (int64, error)      `mapperParams:"name"`
 	InsertTemplete      func(arg Activity) (int64, error)
@@ -24,6 +23,7 @@ type ExampleActivityMapper struct {
 	UpdateTemplete      func(arg Activity) (int64, error)    `mapperParams:"name"`
 	DeleteTemplete      func(name string) (int64, error)     `mapperParams:"name"`
 
+	//传统mybatis示例
 	SelectByIds       func(ids []string) ([]Activity, error)       `mapperParams:"ids"`
 	SelectByIdMaps    func(ids map[int]string) ([]Activity, error) `mapperParams:"ids"`
 	SelectAll         func() ([]map[string]string, error)
