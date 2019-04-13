@@ -18,16 +18,13 @@ func (it GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultProperty,
 	}
 	var resultV = reflect.ValueOf(result)
 	var resultValue = resultV
-	var resultT = resultV.Type()
 	if resultV.Kind() == reflect.Ptr {
 		resultV = resultV.Elem()
 	} else {
 		panic("[GoMybatis] Decode only support ptr value!")
 	}
 	var sqlResultLen = len(sqlResult)
-
 	var renameMapArray = it.getRenameMapArray(sqlResult)
-
 	if it.isGoBasicType(resultV.Type()) {
 		//single basic type
 		if sqlResultLen > 1 {
@@ -35,69 +32,13 @@ func (it GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultProperty,
 		} else if sqlResultLen == 1 && len(sqlResult[0]) > 1 {
 			return utils.NewError("SqlResultDecoder", " Decode one result,but find database result size find > 1 !")
 		}
-		it.convertToBasicTypeCollection(sqlResult[0], &resultV, resultV.Type(), resultMap)
+		it.convertToBasicTypeCollection(sqlResult[0], &resultV, resultMap, renameMapArray[0])
 	} else {
-		switch resultV.Kind() {
-		case reflect.Struct:
-			//single struct
-			if sqlResultLen > 1 {
-				return utils.NewError("SqlResultDecoder", " Decode one result,but find database result size find > 1 !")
-			}
-			for index, sItemMap := range sqlResult {
-				var value = it.sqlStructConvert(resultMap, resultT.Elem(), sItemMap, renameMapArray[index])
-				resultV.Set(value)
-			}
-			break
-		case reflect.Slice:
-			//slice
-			var resultTItemType = resultT.Elem().Elem()
-			var isGoBasicType = it.isGoBasicType(resultTItemType)
-			if isGoBasicType {
-				for _,item := range sqlResult{
-					it.convertToBasicTypeCollection(item, &resultV, resultTItemType, resultMap)
-				}
-			} else {
-				for index, sItemMap := range sqlResult {
-					if resultTItemType.Kind() == reflect.Struct {
-						resultV = reflect.Append(resultV, it.sqlStructConvert(resultMap, resultTItemType, sItemMap, renameMapArray[index]))
-					} else if resultTItemType.Kind() == reflect.Map {
-
-						var value = reflect.New(resultTItemType)
-						var valueV = value.Elem()
-						//map
-						var resultTItemType = resultTItemType.Elem() //int,string,time.Time.....
-						var isGoBasicType = it.isGoBasicType(resultTItemType)
-						var isInterface = resultTItemType.String() == "interface {}"
-						if isGoBasicType && isInterface == false {
-							it.convertToBasicTypeCollection(sItemMap, &valueV, resultTItemType, resultMap)
-							resultV = reflect.Append(resultV, valueV)
-						} else {
-							panic("[GoMybatis] Decode result type not support " + resultTItemType.String() + "!")
-						}
-					} else {
-						panic("[GoMybatis] Decode result type not support " + resultTItemType.String() + "!")
-					}
-				}
-			}
-			break
-		case reflect.Map:
-			//map
-			var resultTItemType = resultT.Elem().Elem() //int,string,time.Time.....
-			var isGoBasicType = it.isGoBasicType(resultTItemType)
-			var isInterface = resultTItemType.String() == "interface {}"
-			if isGoBasicType && isInterface == false {
-				if sqlResultLen > 1 {
-					return utils.NewError("SqlResultDecoder", " Decode one result,but find database result size find > 1!")
-				}
-				for _,item := range sqlResult{
-					it.convertToBasicTypeCollection(item, &resultV, resultTItemType, resultMap)
-				}
-			} else {
-				panic("[GoMybatis] Decode result type not support map[string]interface{}!")
-			}
-			break
-		default:
-			panic("[GoMybatis] Decode result type not support " + resultT.String() + "!")
+		if resultV.Kind() == reflect.Struct && sqlResultLen > 1 {
+			return utils.NewError("SqlResultDecoder", " Decode one result,but find database result size find > 1 !")
+		}
+		for index, sItemMap := range sqlResult {
+			it.convertToBasicTypeCollection(sItemMap, &resultV, resultMap, renameMapArray[index])
 		}
 	}
 	resultValue.Elem().Set(resultV)
@@ -249,29 +190,105 @@ func (it GoMybatisSqlResultDecoder) isGoBasicType(tItemTypeFieldType reflect.Typ
 	return false
 }
 
-func (it GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceMap map[string][]byte, resultV *reflect.Value, itemType reflect.Type, resultMap map[string]*ResultProperty) {
-	if resultV.Type().Kind() == reflect.Slice && resultV.IsValid() {
-		*resultV = reflect.MakeSlice(resultV.Type(), 0, 0)
-	} else if resultV.Type().Kind() == reflect.Map && resultV.IsValid() {
-		*resultV = reflect.MakeMap(resultV.Type())
-	} else {
-      panic("[GoMybatis] convertToBasicTypeCollection not support other type!")
+//resultV:  struct,int,float,map[string]string,[]string,[]struct
+func (it GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceMap map[string][]byte, resultV *reflect.Value, resultMap map[string]*ResultProperty, renameMap map[string][]byte) {
+
+	var isSlice = resultV.Type().Kind() == reflect.Slice
+	var isMap = resultV.Type().Kind() == reflect.Map
+	var isBasicType = it.isGoBasicType(resultV.Type())
+	var isStruct = resultV.Type().Kind() == reflect.Struct
+
+	var isChildBasicType = false
+	var isChildStruct = false
+	var isChildMap = false
+	if isMap || isSlice {
+		var itemType = resultV.Type().Elem()
+		isChildBasicType = it.isGoBasicType(itemType)
+		isChildStruct = (itemType.Kind() == reflect.Struct) && !isChildBasicType
+		isChildMap = !isChildBasicType && itemType.Kind()==reflect.Map
 	}
-	for key, value := range sourceMap {
-		if value == nil || len(value) == 0 {
-			continue
-		}
-		var tItemTypeFieldTypeValue = reflect.New(itemType)
-		var tItemTypeFieldTypeValueElem = tItemTypeFieldTypeValue.Elem()
-		var success = it.sqlBasicTypeConvert(key, resultMap, itemType, value, &tItemTypeFieldTypeValueElem)
-		if success {
-			if resultV.Type().Kind() == reflect.Slice {
-				*resultV = reflect.Append(*resultV, tItemTypeFieldTypeValue.Elem())
-			} else if resultV.Type().Kind() == reflect.Map {
-				resultV.SetMapIndex(reflect.ValueOf(key), tItemTypeFieldTypeValue.Elem())
-			} else {
-				//resultV.Set(tItemTypeFieldTypeValue.Elem())
+
+	if isSlice && !resultV.IsValid() {
+		//slice
+		*resultV = reflect.MakeSlice(resultV.Type(), 0, 0)
+	} else if isMap && !resultV.IsValid() {
+		//map
+		*resultV = reflect.MakeMap(resultV.Type())
+	} else if isBasicType {
+		//basic type
+	} else if isStruct {
+		//struct
+	} else {
+
+	}
+	var itemType = resultV.Type()
+	if isBasicType {
+		for key, value := range sourceMap {
+			if value == nil || len(value) == 0 {
+				continue
 			}
+			var tItemTypeFieldTypeValue = reflect.New(itemType)
+			var tItemTypeFieldTypeValueElem = tItemTypeFieldTypeValue.Elem()
+			var success = it.sqlBasicTypeConvert(key, resultMap, itemType, value, &tItemTypeFieldTypeValueElem)
+			if success {
+				resultV.Set(tItemTypeFieldTypeValue.Elem())
+			}
+		}
+	} else if isStruct {
+		var value = it.sqlStructConvert(resultMap, itemType, sourceMap, renameMap)
+		resultV.Set(value)
+	} else if isMap {
+		itemType = resultV.Type().Elem()
+		if isChildBasicType {
+			for key, value := range sourceMap {
+				if value == nil || len(value) == 0 {
+					continue
+				}
+				var tItemTypeFieldTypeValue = reflect.New(itemType)
+				var tItemTypeFieldTypeValueElem = tItemTypeFieldTypeValue.Elem()
+				var success = it.sqlBasicTypeConvert(key, resultMap, itemType, value, &tItemTypeFieldTypeValueElem)
+				if success {
+					resultV.SetMapIndex(reflect.ValueOf(key), tItemTypeFieldTypeValue.Elem())
+				}
+			}
+		} else if isChildStruct {
+			panic("[GoMybatis] not supprot type struct:" + resultV.Elem().Type().String())
+		} else {
+			panic("[GoMybatis] not supprot type map[*]" + resultV.Elem().Type().String())
+		}
+	} else if isSlice {
+		itemType = resultV.Type().Elem()
+		if isChildBasicType {
+			for key, value := range sourceMap {
+				if value == nil || len(value) == 0 {
+					continue
+				}
+				var tItemTypeFieldTypeValue = reflect.New(itemType)
+				var tItemTypeFieldTypeValueElem = tItemTypeFieldTypeValue.Elem()
+				var success = it.sqlBasicTypeConvert(key, resultMap, itemType, value, &tItemTypeFieldTypeValueElem)
+				if success {
+					*resultV = reflect.Append(*resultV, tItemTypeFieldTypeValue.Elem())
+				}
+			}
+		} else if isChildStruct {
+			var value = it.sqlStructConvert(resultMap, itemType, sourceMap, renameMap)
+			*resultV = reflect.Append(*resultV, value)
+		} else if isChildMap {
+			var mapItem=reflect.MakeMap(itemType)//todo support map[string]string -> map[string]interface{}
+			for key, value := range sourceMap {
+				if value == nil || len(value) == 0 {
+					continue
+				}
+				var tItemTypeFieldTypeValue = reflect.New(mapItem.Type().Elem())
+				var tItemTypeFieldTypeValueElem = tItemTypeFieldTypeValue.Elem()
+				var success = it.sqlBasicTypeConvert(key, resultMap, tItemTypeFieldTypeValueElem.Type(), value, &tItemTypeFieldTypeValueElem)
+				if success {
+					mapItem.SetMapIndex(reflect.ValueOf(key), tItemTypeFieldTypeValueElem)
+				}
+			}
+			*resultV = reflect.Append(*resultV, mapItem)
+		} else{
+			panic("[GoMybatis] not supprot type []" + itemType.String())
 		}
 	}
 }
