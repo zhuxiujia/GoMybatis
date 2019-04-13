@@ -1,7 +1,7 @@
 package ast
 
 import (
-	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
+	"GoMybatis/lib/github.com/beevik/etree"
 	"reflect"
 	"strings"
 )
@@ -24,7 +24,7 @@ func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
 	for _, item := range mapperXml {
 		var node Node
 		var typeString = reflect.TypeOf(item).String()
-		if typeString == "*etree.CharData"{
+		if typeString == "*etree.CharData" {
 			charData := item.(*etree.CharData)
 			var str = charData.Data
 
@@ -185,7 +185,7 @@ func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
 				node = &n
 			case "include":
 				n := NodeInclude{
-					t:      NInclude,
+					t: NInclude,
 				}
 				if childItems != nil {
 					var childNodes = it.ParserNodes(childItems)

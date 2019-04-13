@@ -1,8 +1,8 @@
 package GoMybatis
 
 import (
+	"GoMybatis/example"
 	"fmt"
-	"github.com/zhuxiujia/GoMybatis/example"
 	"testing"
 	"time"
 )
@@ -17,7 +17,7 @@ type ExampleActivityMapper struct {
 //初始化mapper文件和结构体
 var exampleActivityMapper = ExampleActivityMapper{}
 
-func getMapper()  ExampleActivityMapper{
+func getMapper() ExampleActivityMapper {
 	initMapper()
 	return exampleActivityMapper
 }

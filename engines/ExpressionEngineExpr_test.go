@@ -1,9 +1,9 @@
 package engines
 
 import (
+	"GoMybatis/example"
+	"GoMybatis/utils"
 	"fmt"
-	"github.com/zhuxiujia/GoMybatis/example"
-	"github.com/zhuxiujia/GoMybatis/utils"
 	"testing"
 	"time"
 )
@@ -84,7 +84,7 @@ func BenchmarkExpressionEngineExprNil_Null(b *testing.B) {
 		b.Fatal(err)
 	}
 	b.StartTimer()
-	for i:=0;i<b.N ;i++  {
+	for i := 0; i < b.N; i++ {
 		_, err := engine.Eval(evalExpression, nmap, 0)
 		if err != nil {
 			b.Fatal(err)
@@ -96,11 +96,11 @@ func BenchmarkExpressionEngineExprNilTakeValue(b *testing.B) {
 	b.StopTimer()
 	var engine = ExpressionEngineExpr{}
 	var evaluateParameters = make(map[string]interface{})
-	var startTime * string
-	var startTimeV * string
+	var startTime *string
+	var startTimeV *string
 
-	var s="12345"
-	startTimeV=&s
+	var s = "12345"
+	startTimeV = &s
 	evaluateParameters["startTime"] = startTime
 	evaluateParameters["startTimeValue"] = startTimeV
 	var nmap = makeArgInterfaceMap(evaluateParameters)
@@ -113,13 +113,13 @@ func BenchmarkExpressionEngineExprNilTakeValue(b *testing.B) {
 		b.Fatal(err)
 	}
 	b.StartTimer()
-	for i:=0;i<b.N ;i++  {
-		for k:=0;k<8;k++{
+	for i := 0; i < b.N; i++ {
+		for k := 0; k < 8; k++ {
 			_, err := engine.Eval(evalExpression, nmap, 0)
 			if err != nil {
 				b.Fatal(err)
 			}
-			_, err=engine.Eval(takeValueExpression,nmap,0)
+			_, err = engine.Eval(takeValueExpression, nmap, 0)
 			if err != nil {
 				b.Fatal(err)
 			}

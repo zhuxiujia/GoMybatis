@@ -1,8 +1,8 @@
 package GoMybatis
 
 import (
+	"GoMybatis/utils"
 	"bytes"
-	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
 	"strings"
 	"time"

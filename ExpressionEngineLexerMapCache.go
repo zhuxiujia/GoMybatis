@@ -1,7 +1,7 @@
 package GoMybatis
 
 import (
-	"github.com/zhuxiujia/GoMybatis/utils"
+	"GoMybatis/utils"
 	"sync"
 )
 
@@ -33,6 +33,6 @@ func (it *ExpressionEngineLexerMapCache) Get(expression string) (interface{}, er
 	result = it.mapCache[expression]
 	return result, nil
 }
-func (it *ExpressionEngineLexerMapCache) Name() string  {
+func (it *ExpressionEngineLexerMapCache) Name() string {
 	return "ExpressionEngineLexerMapCache"
 }

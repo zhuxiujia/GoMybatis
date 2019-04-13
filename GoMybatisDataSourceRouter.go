@@ -1,8 +1,8 @@
 package GoMybatis
 
 import (
+	"GoMybatis/utils"
 	"database/sql"
-	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
 //动态数据源路由
@@ -55,6 +55,6 @@ func (it *GoMybatisDataSourceRouter) Router(mapperName string) (Session, error) 
 	return session, nil
 }
 
-func (it *GoMybatisDataSourceRouter) Name() string  {
+func (it *GoMybatisDataSourceRouter) Name() string {
 	return "GoMybatisDataSourceRouter"
 }

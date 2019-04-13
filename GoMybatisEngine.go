@@ -1,10 +1,10 @@
 package GoMybatis
 
 import (
+	"GoMybatis/ast"
+	"GoMybatis/engines"
+	"GoMybatis/utils"
 	"database/sql"
-	"github.com/zhuxiujia/GoMybatis/ast"
-	"github.com/zhuxiujia/GoMybatis/engines"
-	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
 type GoMybatisEngine struct {

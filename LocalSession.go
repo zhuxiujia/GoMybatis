@@ -1,8 +1,8 @@
 package GoMybatis
 
 import (
+	"GoMybatis/utils"
 	"database/sql"
-	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
 //本地直连session

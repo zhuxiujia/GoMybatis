@@ -1,9 +1,9 @@
 package engines
 
 import (
+	"GoMybatis/example"
+	"GoMybatis/utils"
 	"fmt"
-	"github.com/zhuxiujia/GoMybatis/example"
-	"github.com/zhuxiujia/GoMybatis/utils"
 	"testing"
 	"time"
 )
