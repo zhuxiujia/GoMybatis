@@ -7,6 +7,7 @@ import (
 	"sync"
 	"testing"
 	"time"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 //假设Mysql 数据库查询时间为0，框架单协程的Benchmark性能

@@ -22,9 +22,6 @@
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-Template element</a>High development efficiency template, one line of code to achieve additions, deletions, modifications, logical deletions, optimistic lock version number<br>
 #### Asynchronous Message Queue Logging System
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/log_system.png)
-#### Over-remote substitution for micro-service members to handle transactions supports micro-services during the transition from single database (Mysql, postgresql) to distributed database (TiDB, cockroachdb...)
-![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/tx.png)
-
 Database Driven List
 ```
  Mysql: github.com/go-sql-driver/mysql

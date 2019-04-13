@@ -27,9 +27,6 @@
 
 #### 异步消息队列日志系统
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/log_system.png)
-#### 通过远程代替微服务成员 处理事务支持  处于 单数据库(Mysql,postgresql)-分布式数据库（TiDB,cockroachdb...）过渡期间的微服务
-![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/tx.png)
-
 数据库驱动列表
 ```
  Mysql: github.com/go-sql-driver/mysql

@@ -92,15 +92,11 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 				}
 				var session Session
 				var err error
-				if len(args) == 1 && args[0].IsValid() == true && !args[0].IsNil() {
-					session = sessionFactory.NewSession(beanName, SessionType_TransationRM, args[0].Interface().(*TransationRMClientConfig))
-				} else {
-					session = sessionFactory.NewSession(beanName, SessionType_Default, nil)
-				}
 				if session != nil {
 					returnValue.Elem().Set(reflect.ValueOf(session).Elem().Addr().Convert(*returnType.ReturnOutType))
 				} else {
-					err = utils.NewError("GoMybatis", "Create Session fail.")
+					//err = utils.NewError("GoMybatis", "Create Session fail.arg session not exist!")
+					session = sessionFactory.NewSession(beanName, SessionType_Default)
 				}
 				return buildReturnValues(returnType, returnValue, err)
 			}
@@ -331,7 +327,7 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *Se
 	}
 	//session
 	if session == nil {
-		session = sessionFactory.NewSession(beanName, SessionType_Default, nil)
+		session = sessionFactory.NewSession(beanName, SessionType_Default)
 		//not arg session,just close!
 		defer closeSession(sessionFactory, session)
 	}

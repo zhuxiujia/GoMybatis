@@ -33,8 +33,7 @@ type ExampleActivityMapper struct {
 	DeleteById        func(id string) (int64, error)                                              `mapperParams:"id"`
 	Choose            func(deleteFlag int) ([]Activity, error)                                    `mapperParams:"deleteFlag"`
 	SelectLinks       func(column string) ([]Activity, error)                                     `mapperParams:"column"`
-	NewSession        func(config *GoMybatis.TransationRMClientConfig) (GoMybatis.Session, error) //参数：config，传nil为本地session,传值则为远程 remote session
-	//NewSession      func() (GoMybatis.Session, error)    //NewSession也可以无参数写法
+	NewSession        func() (GoMybatis.Session, error)  //session为事务操作
 }
 
 //初始化mapper文件和结构体
@@ -201,7 +200,7 @@ func Test_local_Transation(t *testing.T) {
 		return
 	}
 	//使用事务
-	var session, err = exampleActivityMapper.NewSession(nil)
+	var session, err = exampleActivityMapper.NewSession()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -217,50 +216,6 @@ func Test_local_Transation(t *testing.T) {
 	}
 	session.Commit() //提交事务
 	session.Close()  //关闭事务
-}
-
-//远程事务示例，可用于分布式微服务(单数据库，多个微服务)
-func Test_Remote_Transation(t *testing.T) {
-	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
-		return
-	}
-	//启动GoMybatis独立节点事务服务器，通过rpc调用
-	var remoteAddr = "127.0.0.1:17235"
-	//go GoMybatis.ServerTransationTcp(remoteAddr, "mysql", MysqlUri)
-
-	//开始使用
-	//关键，使用远程Session替换本地Session调用
-	var transationRMSession, err = exampleActivityMapper.NewSession(&GoMybatis.TransationRMClientConfig{
-		Addr:          remoteAddr,
-		RetryTime:     3,
-		TransactionId: "12345678",
-		Status:        GoMybatis.Transaction_Status_NO,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	//开启远程事务
-	err = transationRMSession.Begin()
-	if err != nil {
-		t.Fatal(err)
-	}
-	//使用mapper
-	var activityBean = Activity{
-		Id:   "170",
-		Name: "rs168-11",
-	}
-	_, err = exampleActivityMapper.UpdateById(&transationRMSession, activityBean)
-	if err != nil {
-		panic(err)
-	}
-	//提交远程事务
-	transationRMSession.Commit()
-	//回滚远程事务
-	//transationRMSession.Rollback()
-
-	transationRMSession.Close()
 }
 
 func Test_choose(t *testing.T) {

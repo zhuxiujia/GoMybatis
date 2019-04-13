@@ -11,7 +11,7 @@ func (it SessionFactory) New(Engine SessionEngine) SessionFactory {
 	return it
 }
 
-func (it *SessionFactory) NewSession(mapperName string, sessionType SessionType, config *TransationRMClientConfig) Session {
+func (it *SessionFactory) NewSession(mapperName string, sessionType SessionType) Session {
 	if it.SessionMap == nil || it.Engine == nil {
 		panic("[GoMybatis] SessionFactory not init! you must call method SessionFactory.New(*)")
 	}
@@ -34,16 +34,6 @@ func (it *SessionFactory) NewSession(mapperName string, sessionType SessionType,
 		if err != nil {
 			panic(err)
 		}
-		break
-	case SessionType_TransationRM:
-		if config == nil {
-			panic("[GoMybatis] SessionFactory can not create TransationRMSession,config *TransationRMClientConfig is nil!")
-		}
-		var transationRMSession = TransationRMSession{}.New(mapperName, config.TransactionId, &TransationRMClient{
-			RetryTime: config.RetryTime,
-			Addr:      config.Addr,
-		}, config.Status)
-		newSession = Session(*transationRMSession)
 		break
 	default:
 		panic("[GoMybatis] newSession() must have a SessionType!")
