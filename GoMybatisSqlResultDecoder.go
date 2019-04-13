@@ -205,15 +205,19 @@ func (it GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceMap map[s
 		var itemType = resultV.Type().Elem()
 		isChildBasicType = it.isGoBasicType(itemType)
 		isChildStruct = (itemType.Kind() == reflect.Struct) && !isChildBasicType
-		isChildMap = !isChildBasicType && itemType.Kind()==reflect.Map
+		isChildMap = !isChildBasicType && itemType.Kind() == reflect.Map
 	}
 
-	if isSlice && !resultV.IsValid() {
+	if isSlice {
 		//slice
-		*resultV = reflect.MakeSlice(resultV.Type(), 0, 0)
-	} else if isMap && !resultV.IsValid() {
+		if !resultV.IsValid() || resultV.IsNil() {
+			*resultV = reflect.MakeSlice(resultV.Type(), 0, 0)
+		}
+	} else if isMap {
 		//map
-		*resultV = reflect.MakeMap(resultV.Type())
+		if !resultV.IsValid() || resultV.IsNil() {
+			*resultV = reflect.MakeMap(resultV.Type())
+		}
 	} else if isBasicType {
 		//basic type
 	} else if isStruct {
@@ -274,7 +278,7 @@ func (it GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceMap map[s
 			var value = it.sqlStructConvert(resultMap, itemType, sourceMap, renameMap)
 			*resultV = reflect.Append(*resultV, value)
 		} else if isChildMap {
-			var mapItem=reflect.MakeMap(itemType)//todo support map[string]string -> map[string]interface{}
+			var mapItem = reflect.MakeMap(itemType) //todo support map[string]string -> map[string]interface{}
 			for key, value := range sourceMap {
 				if value == nil || len(value) == 0 {
 					continue
@@ -287,7 +291,7 @@ func (it GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceMap map[s
 				}
 			}
 			*resultV = reflect.Append(*resultV, mapItem)
-		} else{
+		} else {
 			panic("[GoMybatis] not supprot type []" + itemType.String())
 		}
 	}
