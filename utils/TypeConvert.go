@@ -94,31 +94,31 @@ func caseType(arg interface{}, types reflect.Type) string {
 	case reflect.String:
 		return arg.(string)
 	case reflect.Int:
-		return strconv.FormatInt(int64(arg.(int)), 8)
+		return strconv.FormatInt(int64(arg.(int)), 10)
 	case reflect.Int8:
-		return strconv.FormatInt(int64(arg.(int8)), 8)
+		return strconv.FormatInt(int64(arg.(int8)), 10)
 	case reflect.Int16:
-		return strconv.FormatInt(int64(arg.(int16)), 16)
+		return strconv.FormatInt(int64(arg.(int16)), 10)
 	case reflect.Int32:
-		return strconv.FormatInt(int64(arg.(int32)), 32)
+		return strconv.FormatInt(int64(arg.(int32)), 10)
 	case reflect.Int64:
-		return strconv.FormatInt(int64(arg.(int64)), 64)
+		return strconv.FormatInt(int64(arg.(int64)), 10)
 	case reflect.Float32:
-		return strconv.FormatFloat(float64(arg.(float32)), 'f', -1, 32)
+		return strconv.FormatFloat(float64(arg.(float32)), 'f', -1, 64)
 	case reflect.Float64:
 		return strconv.FormatFloat(float64(arg.(float64)), 'f', -1, 64)
 	case reflect.Bool:
 		return strconv.FormatBool(arg.(bool))
 	case reflect.Uint:
-		return strconv.FormatUint(uint64(arg.(uint)), 2)
+		return strconv.FormatUint(uint64(arg.(uint)), 10)
 	case reflect.Uint8:
-		return strconv.FormatUint(uint64(arg.(uint8)), 8)
+		return strconv.FormatUint(uint64(arg.(uint8)), 10)
 	case reflect.Uint16:
-		return strconv.FormatUint(uint64(arg.(uint16)), 16)
+		return strconv.FormatUint(uint64(arg.(uint16)), 10)
 	case reflect.Uint32:
-		return strconv.FormatUint(uint64(arg.(uint32)), 32)
+		return strconv.FormatUint(uint64(arg.(uint32)), 10)
 	case reflect.Uint64:
-		return strconv.FormatUint(uint64(arg.(uint64)), 64)
+		return strconv.FormatUint(uint64(arg.(uint64)), 10)
 	case reflect.Struct:
 		if types.String() == "time.Time" {
 			return arg.(time.Time).Format(`2006-01-02 15:04:05`)
