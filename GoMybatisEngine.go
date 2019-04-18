@@ -1,29 +1,26 @@
 package GoMybatis
 
 import (
+	"database/sql"
 	"github.com/zhuxiujia/GoMybatis/ast"
 	"github.com/zhuxiujia/GoMybatis/engines"
 	"github.com/zhuxiujia/GoMybatis/utils"
-	"database/sql"
+	"sync"
 )
 
 type GoMybatisEngine struct {
-	isInit           bool             //是否初始化
-	dataSourceRouter DataSourceRouter //动态数据源路由器
-	log              Log              //日志实现
-	logEnable        bool             //是否允许日志输出（默认开启）
-
-	sessionFactory *SessionFactory
-
-	sqlArgTypeConvert ast.SqlArgTypeConvert
-
-	expressionEngine ast.ExpressionEngine
-
-	sqlBuilder SqlBuilder
-
-	sqlResultDecoder SqlResultDecoder
-
-	templeteDecoder TempleteDecoder
+	mutex             sync.RWMutex          //读写锁
+	isInit            bool                  //是否初始化
+	dataSourceRouter  DataSourceRouter      //动态数据源路由器
+	log               Log                   //日志实现
+	logEnable         bool                  //是否允许日志输出（默认开启）
+	sessionFactory    *SessionFactory       //session 工厂
+	sqlArgTypeConvert ast.SqlArgTypeConvert //sql参数转换
+	expressionEngine  ast.ExpressionEngine  //表达式解析引擎
+	sqlBuilder        SqlBuilder            //sql 构建
+	sqlResultDecoder  SqlResultDecoder      //sql查询结果解析引擎
+	templeteDecoder   TempleteDecoder       //模板解析引擎
+	callBackChain     []*CallBack           //回调链
 }
 
 func (it GoMybatisEngine) New() GoMybatisEngine {
@@ -201,4 +198,18 @@ func (it *GoMybatisEngine) TempleteDecoder() TempleteDecoder {
 //设置模板解析器
 func (it *GoMybatisEngine) SetTempleteDecoder(decoder TempleteDecoder) {
 	it.templeteDecoder = decoder
+}
+
+//注册回调函数
+func (it *GoMybatisEngine) RegisterCallBack(arg *CallBack) {
+	it.mutex.Lock()
+	if it.callBackChain == nil {
+		it.callBackChain = make([]*CallBack, 0)
+	}
+	it.callBackChain = append(it.callBackChain, arg)
+	it.mutex.Unlock()
+}
+
+func (it *GoMybatisEngine) CallBackChan() []*CallBack {
+	return it.callBackChain
 }

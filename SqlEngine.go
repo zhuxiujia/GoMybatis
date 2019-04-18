@@ -79,4 +79,7 @@ type SessionEngine interface {
 
 	//设置模板解析器
 	SetTempleteDecoder(decoder TempleteDecoder)
+
+	//回调链
+	CallBackChan() []*CallBack
 }

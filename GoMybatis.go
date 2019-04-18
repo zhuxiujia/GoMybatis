@@ -7,10 +7,9 @@ import (
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
 	"strings"
-	"sync"
 )
 
-var callBackChain []*CallBack
+
 
 const NewSessionFunc = "NewSession" //NewSession method,auto write implement body code
 
@@ -19,16 +18,6 @@ type Mapper struct {
 	nodes []ast.Node
 }
 
-//注册回调函数
-func RegisterCallBack(arg *CallBack) {
-	var mutex = sync.RWMutex{}
-	mutex.Lock()
-	if callBackChain == nil {
-		callBackChain = make([]*CallBack, 0)
-	}
-	callBackChain = append(callBackChain, arg)
-	mutex.Unlock()
-}
 
 //推荐默认使用单例传入
 //根据sessionEngine写入到mapperPtr，value:指向mapper指针反射对象，xml：xml数据，sessionEngine：session引擎，enableLog:是否允许日志输出，log：日志实现
@@ -36,7 +25,7 @@ func WriteMapperByValue(value reflect.Value, xml []byte, sessionEngine SessionEn
 	if value.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
 	}
-	WriteMapper(value, xml, sessionEngine.SessionFactory(), sessionEngine.TempleteDecoder(), sessionEngine.SqlResultDecoder(), sessionEngine.SqlBuilder(), sessionEngine.LogEnable())
+	WriteMapper(value, xml, sessionEngine.SessionFactory(), sessionEngine.TempleteDecoder(), sessionEngine.SqlResultDecoder(), sessionEngine.SqlBuilder(), sessionEngine.CallBackChan())
 }
 
 //推荐默认使用单例传入
@@ -60,7 +49,7 @@ func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine SessionEn
 //func的基本类型的参数（例如string,int,time.Time,int64,float....）个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，返回值必须有error
 //func的结构体参数无需指定mapperParams的tag，框架会自动扫描它的属性，封装为map处理掉
 //使用WriteMapper函数设置代理后即可正常使用。
-func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, templeteDecoder TempleteDecoder, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) {
+func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, templeteDecoder TempleteDecoder, decoder SqlResultDecoder, sqlBuilder SqlBuilder,  callBackChain []*CallBack) {
 	beanCheck(bean)
 	var mapperTree = LoadMapperXml(xml)
 	templeteDecoder.DecodeTree(mapperTree, bean.Type())
@@ -125,7 +114,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 					returnValue = &returnV
 				}
 				//exe sql
-				var e = exeMethodByXml(mapper.xml.Tag, beanName, sessionFactory, tagArgs, args, mapper.nodes, resultMap, returnValue, decoder, sqlBuilder, enableLog)
+				var e = exeMethodByXml(mapper.xml.Tag, beanName, sessionFactory, tagArgs, args, mapper.nodes, resultMap, returnValue, decoder, sqlBuilder,callBackChain)
 				return buildReturnValues(returnType, returnValue, e)
 			}
 			return proxyFunc
@@ -329,7 +318,7 @@ func findMapperXml(mapperTree map[string]etree.Token, methodName string) *etree.
 	return nil
 }
 
-func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, nodes []ast.Node, resultMap map[string]*ResultProperty, returnValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) error {
+func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, nodes []ast.Node, resultMap map[string]*ResultProperty, returnValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder, callBackChain []*CallBack) error {
 	//TODO　CallBack and Session must Location in build step!
 	var session Session
 	var sql string

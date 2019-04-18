@@ -72,6 +72,7 @@ func init() {
 	//	},
 	//})
 
+	engine.CallBackChan()
 	//读取mapper xml文件
 	bytes, _ := ioutil.ReadFile("Example_ActivityMapper.xml")
 	//设置对应的mapper xml文件
