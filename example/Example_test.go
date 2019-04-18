@@ -72,7 +72,21 @@ func init() {
 	//	},
 	//})
 
-	engine.CallBackChan()
+	//注册回调(可选) 以监控sql执行情况
+	//engine.RegisterCallBack(&GoMybatis.CallBack{
+	//	BeforeExec: func(args []reflect.Value, sqlString *string) {
+    //      //do something
+	//	},
+	//	BeforeQuery: func(args []reflect.Value, sqlorArgs *string) {
+	//		//do something
+	//	},
+	//	AfterExec: func(args []reflect.Value, sqlorArgs string, result *GoMybatis.Result, err *error) {
+	//		//do something
+	//	},
+	//	AfterQuery: func(args []reflect.Value, sqlorArgs string, result *[]map[string][]byte, err *error) {
+	//		//do something
+	//	},
+	//})
 	//读取mapper xml文件
 	bytes, _ := ioutil.ReadFile("Example_ActivityMapper.xml")
 	//设置对应的mapper xml文件
