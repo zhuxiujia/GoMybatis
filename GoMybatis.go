@@ -1,10 +1,10 @@
 package GoMybatis
 
 import (
+	"bytes"
 	"github.com/zhuxiujia/GoMybatis/ast"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 	"github.com/zhuxiujia/GoMybatis/utils"
-	"bytes"
 	"reflect"
 	"strings"
 )
@@ -172,10 +172,10 @@ func makeReturnTypeMap(value reflect.Type) (returnMap map[string]*ReturnType) {
 		var funcName = proxyType.Field(i).Name
 
 		if funcType.Kind() != reflect.Func {
-			if funcType.Kind() == reflect.Struct{
-				var childMap=makeReturnTypeMap(funcType)
-				for k,v:=range childMap{
-					returnMap[k]=v
+			if funcType.Kind() == reflect.Struct {
+				var childMap = makeReturnTypeMap(funcType)
+				for k, v := range childMap {
+					returnMap[k] = v
 				}
 			}
 			continue
@@ -316,7 +316,8 @@ func findMapperXml(mapperTree map[string]etree.Token, methodName string) *etree.
 }
 
 func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, nodes []ast.Node, resultMap map[string]*ResultProperty, returnValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) error {
-	//build sql string
+	//TODO　CallBack and Session must Location in build step!
+	var callBack *CallBack
 	var session Session
 	var sql string
 	var err error
@@ -337,7 +338,13 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *Se
 	//do CRUD
 	if elementType == Element_Select && haveLastReturnValue {
 		//is select and have return value
+		if callBack != nil && callBack.BeforeQuery != nil {
+			callBack.BeforeQuery(&sql)
+		}
 		results, err := session.Query(sql)
+		if callBack != nil && callBack.AfterQuery != nil {
+			callBack.AfterQuery(sql, &results, &err)
+		}
 		if err != nil {
 			return err
 		}
@@ -346,7 +353,13 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *Se
 			return err
 		}
 	} else {
+		if callBack != nil && callBack.BeforeExec != nil {
+			callBack.BeforeExec(&sql)
+		}
 		var res, err = session.Exec(sql)
+		if callBack != nil && callBack.AfterExec != nil {
+			callBack.AfterExec(sql, res, &err)
+		}
 		if err != nil {
 			return err
 		}
