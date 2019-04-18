@@ -72,7 +72,7 @@ func init() {
 	//	},
 	//})
 
-	//注册回调(可选) 以监控sql执行情况
+	//注册回调(可选)
 	//engine.RegisterCallBack(&GoMybatis.CallBack{
 	//	BeforeExec: func(args []reflect.Value, sqlString *string) {
     //      //do something
