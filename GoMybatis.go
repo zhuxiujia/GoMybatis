@@ -334,7 +334,7 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *Se
 	var session Session
 	var sql string
 	var err error
-	session, sql, err = buildSql(tagParamMap, args, nodes, sqlBuilder, enableLog)
+	session, sql, err = buildSql(tagParamMap, args, nodes, sqlBuilder)
 	if err != nil {
 		return err
 	}
@@ -407,7 +407,7 @@ func closeSession(factory *SessionFactory, session Session) {
 	session.Close()
 }
 
-func buildSql(tagArgs []TagArg, args []reflect.Value, nodes []ast.Node, sqlBuilder SqlBuilder, enableLog bool) (Session, string, error) {
+func buildSql(tagArgs []TagArg, args []reflect.Value, nodes []ast.Node, sqlBuilder SqlBuilder) (Session, string, error) {
 	var session Session
 	var paramMap = make(map[string]interface{})
 	var tagArgsLen = len(tagArgs)
