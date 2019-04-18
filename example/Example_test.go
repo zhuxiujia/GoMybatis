@@ -53,40 +53,46 @@ func init() {
 	}
 
 	//动态数据源路由(可选)
-	//GoMybatis.Open("mysql", MysqlUri)//添加第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
-	//var router = GoMybatis.GoMybatisDataSourceRouter{}.New(func(mapperName string) *string {
-	//	//根据包名路由指向数据源
-	//	if strings.Contains(mapperName, "example.") {
-	//		var url = MysqlUri//第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
-	//		fmt.Println(url)
-	//		return &url
-	//	}
-	//	return nil
-	//})
-	//engine.SetDataSourceRouter(&router)
+	/**
+	GoMybatis.Open("mysql", MysqlUri)//添加第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
+	var router = GoMybatis.GoMybatisDataSourceRouter{}.New(func(mapperName string) *string {
+		//根据包名路由指向数据源
+		if strings.Contains(mapperName, "example.") {
+			var url = MysqlUri//第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
+			fmt.Println(url)
+			return &url
+		}
+		return nil
+	})
+	engine.SetDataSourceRouter(&router)
+	**/
 
 	//自定义日志实现(可选)
-	//engine.SetLogEnable(true)
-	//engine.SetLog(&GoMybatis.LogStandard{
-	//	PrintlnFunc: func(messages []byte) {
-	//	},
-	//})
+	/**
+	engine.SetLogEnable(true)
+	engine.SetLog(&GoMybatis.LogStandard{
+		PrintlnFunc: func(messages []byte) {
+		},
+	})
+    **/
 
 	//注册回调(可选)
-	//engine.RegisterCallBack(&GoMybatis.CallBack{
-	//	BeforeExec: func(args []reflect.Value, sqlString *string) {
-    //      //do something
-	//	},
-	//	BeforeQuery: func(args []reflect.Value, sqlorArgs *string) {
-	//		//do something
-	//	},
-	//	AfterExec: func(args []reflect.Value, sqlorArgs string, result *GoMybatis.Result, err *error) {
-	//		//do something
-	//	},
-	//	AfterQuery: func(args []reflect.Value, sqlorArgs string, result *[]map[string][]byte, err *error) {
-	//		//do something
-	//	},
-	//})
+	/**
+	engine.RegisterCallBack(&GoMybatis.CallBack{
+		BeforeExec: func(args []reflect.Value, sqlString *string) {
+         //do something
+		},
+		BeforeQuery: func(args []reflect.Value, sqlString *string) {
+			//do something
+		},
+		AfterExec: func(args []reflect.Value, sqlString string, result *GoMybatis.Result, err *error) {
+			//do something
+		},
+		AfterQuery: func(args []reflect.Value, sqlString string, result *[]map[string][]byte, err *error) {
+			//do something
+		},
+	})
+	**/
 	//读取mapper xml文件
 	bytes, _ := ioutil.ReadFile("Example_ActivityMapper.xml")
 	//设置对应的mapper xml文件
