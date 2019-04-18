@@ -12,17 +12,17 @@ type TestMapper struct {
 
 func TestUseMapperValue(t *testing.T) {
 	var test = TestMapper{}
-	UseMapperValue(reflect.ValueOf(&test), func(funcField reflect.StructField) func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
-		return func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
-			if len(args) <= 0 {
+	UseMapperValue(reflect.ValueOf(&test), func(funcField reflect.StructField) func(arg ProxyArg) []reflect.Value {
+		return func(arg ProxyArg) []reflect.Value {
+			if len(arg.Args) <= 0 {
 				t.Fatal("UseMapper() args len = 0")
 			}
-			if len(tagArgs) <= 0 {
+			if len(arg.TagArgs) <= 0 {
 				t.Fatal("UseMapper() tagArgs len = 0")
 			}
 			var e error
 			var returns = make([]reflect.Value, 0)
-			returns = append(returns, reflect.ValueOf("yes return string="+args[0].Interface().(string)))
+			returns = append(returns, reflect.ValueOf("yes return string="+arg.Args[0].Interface().(string)))
 			returns = append(returns, reflect.Zero(reflect.TypeOf(&e).Elem()))
 			return returns
 		}
@@ -37,17 +37,17 @@ func TestUseMapperValue(t *testing.T) {
 
 func TestUseMapper(t *testing.T) {
 	var test = TestMapper{}
-	UseMapper(&test, func(funcField reflect.StructField) func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
-		return func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
-			if len(args) <= 0 {
+	UseMapper(&test, func(funcField reflect.StructField) func(arg ProxyArg) []reflect.Value {
+		return func(arg ProxyArg) []reflect.Value {
+			if len(arg.Args) <= 0 {
 				t.Fatal("UseMapper() args len = 0")
 			}
-			if len(tagArgs) <= 0 {
+			if len(arg.TagArgs) <= 0 {
 				t.Fatal("UseMapper() tagArgs len = 0")
 			}
 			var e error
 			var returns = make([]reflect.Value, 0)
-			returns = append(returns, reflect.ValueOf("yes return string="+args[0].Interface().(string)))
+			returns = append(returns, reflect.ValueOf("yes return string="+arg.Args[0].Interface().(string)))
 			returns = append(returns, reflect.Zero(reflect.TypeOf(&e).Elem()))
 			return returns
 		}

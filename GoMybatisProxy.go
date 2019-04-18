@@ -11,7 +11,7 @@ type TagArg struct {
 }
 
 // UseService 可写入每个函数代理方法
-func UseMapper(mapper interface{}, buildFunc func(funcField reflect.StructField) func(args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
+func UseMapper(mapper interface{}, buildFunc func(funcField reflect.StructField) func(arg ProxyArg) []reflect.Value) {
 	v := reflect.ValueOf(mapper)
 	if v.Kind() != reflect.Ptr {
 		panic("UseMapper: UseMapper arg must be a pointer")
@@ -20,11 +20,11 @@ func UseMapper(mapper interface{}, buildFunc func(funcField reflect.StructField)
 }
 
 // UseService 可写入每个函数代理方法
-func UseMapperValue(mapperValue reflect.Value, buildFunc func(funcField reflect.StructField) func(args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
+func UseMapperValue(mapperValue reflect.Value, buildFunc func(funcField reflect.StructField) func(arg ProxyArg) []reflect.Value) {
 	buildMapper(mapperValue, buildFunc)
 }
 
-func buildMapper(v reflect.Value, buildFunc func(funcField reflect.StructField) func(args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
+func buildMapper(v reflect.Value, buildFunc func(funcField reflect.StructField) func(arg ProxyArg) []reflect.Value) {
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
@@ -63,7 +63,7 @@ func buildMapper(v reflect.Value, buildFunc func(funcField reflect.StructField) 
 	}
 }
 
-func buildRemoteMethod(source reflect.Value,f reflect.Value, ft reflect.Type, sf reflect.StructField, proxyFunc func(args []reflect.Value, tagArgs []TagArg) []reflect.Value) {
+func buildRemoteMethod(source reflect.Value,f reflect.Value, ft reflect.Type, sf reflect.StructField, proxyFunc func(arg ProxyArg) []reflect.Value) {
 	var tagParams []string
 	var mapperParams = sf.Tag.Get(`mapperParams`)
 	if mapperParams != `` {
@@ -88,7 +88,7 @@ func buildRemoteMethod(source reflect.Value,f reflect.Value, ft reflect.Type, sf
 		panic(`[GoMybatisProxy] method fail! the tag "mapperParams" length  != args length ! filed = ` + sf.Name)
 	}
 	var fn = func(args []reflect.Value) (results []reflect.Value) {
-		proxyResults := proxyFunc(args, tagArgs)
+		proxyResults := proxyFunc(ProxyArg{}.New(tagArgs,args))
 		for _, returnV := range proxyResults {
 			results = append(results, returnV)
 		}

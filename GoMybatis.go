@@ -59,7 +59,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 	var returnTypeMap = makeReturnTypeMap(bean.Elem().Type())
 	var beanName = bean.Type().PkgPath() + bean.Type().String()
 
-	UseMapperValue(bean, func(funcField reflect.StructField) func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
+	UseMapperValue(bean, func(funcField reflect.StructField) func(arg ProxyArg) []reflect.Value {
 		//构建期
 		var funcName = funcField.Name
 		var returnType = returnTypeMap[funcName]
@@ -80,7 +80,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 
 		//执行期
 		if funcName == NewSessionFunc {
-			var proxyFunc = func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
+			var proxyFunc = func(arg ProxyArg) []reflect.Value {
 				var returnValue *reflect.Value = nil
 				//build return Type
 				if returnType.ReturnOutType != nil {
@@ -100,7 +100,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 			}
 			return proxyFunc
 		} else {
-			var proxyFunc = func(args []reflect.Value, tagArgs []TagArg) []reflect.Value {
+			var proxyFunc = func(arg ProxyArg) []reflect.Value {
 				var returnValue *reflect.Value = nil
 				//build return Type
 				if returnType.ReturnOutType != nil {
@@ -114,7 +114,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 					returnValue = &returnV
 				}
 				//exe sql
-				var e = exeMethodByXml(mapper.xml.Tag, beanName, sessionFactory, tagArgs, args, mapper.nodes, resultMap, returnValue, decoder, sqlBuilder,callBackChain)
+				var e = exeMethodByXml(mapper.xml.Tag, beanName, sessionFactory, arg, mapper.nodes, resultMap, returnValue, decoder, sqlBuilder,callBackChain)
 				return buildReturnValues(returnType, returnValue, e)
 			}
 			return proxyFunc
@@ -318,12 +318,12 @@ func findMapperXml(mapperTree map[string]etree.Token, methodName string) *etree.
 	return nil
 }
 
-func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, nodes []ast.Node, resultMap map[string]*ResultProperty, returnValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder, callBackChain []*CallBack) error {
+func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *SessionFactory, proxyArg ProxyArg, nodes []ast.Node, resultMap map[string]*ResultProperty, returnValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder, callBackChain []*CallBack) error {
 	//TODO　CallBack and Session must Location in build step!
 	var session Session
 	var sql string
 	var err error
-	session, sql, err = buildSql(tagParamMap, args, nodes, sqlBuilder)
+	session, sql, err = buildSql(proxyArg, nodes, sqlBuilder)
 	if err != nil {
 		return err
 	}
@@ -343,7 +343,7 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *Se
 		if callBackChain != nil {
 			for _, item := range callBackChain {
 				if item != nil && item.BeforeQuery != nil {
-					item.BeforeQuery(args, &sql)
+					item.BeforeQuery(proxyArg.Args, &sql)
 				}
 			}
 		}
@@ -351,7 +351,7 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *Se
 		if callBackChain != nil {
 			for _, item := range callBackChain {
 				if item != nil && item.AfterQuery != nil {
-					item.AfterQuery(args, sql, &results, &err)
+					item.AfterQuery(proxyArg.Args, sql, &results, &err)
 				}
 			}
 		}
@@ -366,7 +366,7 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *Se
 		if callBackChain != nil {
 			for _, item := range callBackChain {
 				if item != nil && item.BeforeExec != nil {
-					item.BeforeExec(args, &sql)
+					item.BeforeExec(proxyArg.Args, &sql)
 				}
 			}
 		}
@@ -374,7 +374,7 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *Se
 		if callBackChain != nil {
 			for _, item := range callBackChain {
 				if item != nil && item.AfterExec != nil {
-					item.AfterExec(args, sql, res, &err)
+					item.AfterExec(proxyArg.Args, sql, res, &err)
 				}
 			}
 		}
@@ -396,14 +396,14 @@ func closeSession(factory *SessionFactory, session Session) {
 	session.Close()
 }
 
-func buildSql(tagArgs []TagArg, args []reflect.Value, nodes []ast.Node, sqlBuilder SqlBuilder) (Session, string, error) {
+func buildSql(proxyArg ProxyArg, nodes []ast.Node, sqlBuilder SqlBuilder) (Session, string, error) {
 	var session Session
 	var paramMap = make(map[string]interface{})
-	var tagArgsLen = len(tagArgs)
-	var argsLen = len(args) //参数长度，除session参数外。
+	var tagArgsLen = proxyArg.TagArgsLen
+	var argsLen = proxyArg.ArgsLen //参数长度，除session参数外。
 	var customLen = 0
 	var customIndex = -1
-	for argIndex, arg := range args {
+	for argIndex, arg := range proxyArg.Args {
 		var argInterface = arg.Interface()
 		if arg.Kind() == reflect.Ptr && arg.IsNil() == false && argInterface != nil && arg.Type().String() == GoMybatis_Session_Ptr {
 			session = *(argInterface.(*Session))
@@ -424,23 +424,19 @@ func buildSql(tagArgs []TagArg, args []reflect.Value, nodes []ast.Node, sqlBuild
 				tagArgsLen--
 			}
 		}
-		if tagArgsLen > 0 && argIndex < tagArgsLen && tagArgs[argIndex].Name != "" {
+		if tagArgsLen > 0 && argIndex < tagArgsLen && proxyArg.TagArgs[argIndex].Name != "" {
 			//插入2份参数，兼容大小写不敏感的参数
-			var lowerKey = utils.LowerFieldFirstName(tagArgs[argIndex].Name)
-			var upperKey = utils.UpperFieldFirstName(tagArgs[argIndex].Name)
+			var lowerKey = utils.LowerFieldFirstName(proxyArg.TagArgs[argIndex].Name)
+			var upperKey = utils.UpperFieldFirstName(proxyArg.TagArgs[argIndex].Name)
 			paramMap[lowerKey] = argInterface
 			paramMap[upperKey] = argInterface
-			//paramMap["type_"+lowerKey] = arg.Type()
-			//paramMap["type_"+upperKey] = arg.Type()
 		} else {
 			paramMap[DefaultOneArg] = argInterface
-			//paramMap["type_"+DefaultOneArg] = arg.Type()
-
 		}
 	}
 	if customLen == 1 && customIndex != -1 {
 		//只有一个结构体参数，需要展开它的成员变量 加入到map
-		paramMap = scanStructArgFields(args[customIndex], nil)
+		paramMap = scanStructArgFields(proxyArg.Args[customIndex], nil)
 	}
 
 	result, err := sqlBuilder.BuildSql(paramMap, nodes)
