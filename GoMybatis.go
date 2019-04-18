@@ -10,7 +10,7 @@ import (
 	"sync"
 )
 
-var callBack []*CallBack
+var callBackChain []*CallBack
 
 const NewSessionFunc = "NewSession" //NewSession method,auto write implement body code
 
@@ -23,10 +23,10 @@ type Mapper struct {
 func RegisterCallBack(arg *CallBack) {
 	var mutex = sync.RWMutex{}
 	mutex.Lock()
-	if callBack == nil {
-		callBack = make([]*CallBack, 0)
+	if callBackChain == nil {
+		callBackChain = make([]*CallBack, 0)
 	}
-	callBack = append(callBack, arg)
+	callBackChain = append(callBackChain, arg)
 	mutex.Unlock()
 }
 
@@ -351,16 +351,16 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *Se
 	//do CRUD
 	if elementType == Element_Select && haveLastReturnValue {
 		//is select and have return value
-		if callBack != nil {
-			for _, item := range callBack {
+		if callBackChain != nil {
+			for _, item := range callBackChain {
 				if item != nil && item.BeforeQuery != nil {
 					item.BeforeQuery(args, &sql)
 				}
 			}
 		}
 		results, err := session.Query(sql)
-		if callBack != nil {
-			for _, item := range callBack {
+		if callBackChain != nil {
+			for _, item := range callBackChain {
 				if item != nil && item.AfterQuery != nil {
 					item.AfterQuery(args, sql, &results, &err)
 				}
@@ -374,16 +374,16 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *Se
 			return err
 		}
 	} else {
-		if callBack != nil {
-			for _, item := range callBack {
+		if callBackChain != nil {
+			for _, item := range callBackChain {
 				if item != nil && item.BeforeExec != nil {
 					item.BeforeExec(args, &sql)
 				}
 			}
 		}
 		var res, err = session.Exec(sql)
-		if callBack != nil {
-			for _, item := range callBack {
+		if callBackChain != nil {
+			for _, item := range callBackChain {
 				if item != nil && item.AfterExec != nil {
 					item.AfterExec(args, sql, res, &err)
 				}
