@@ -7,13 +7,27 @@ import (
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
 	"strings"
+	"sync"
 )
+
+var callBack []*CallBack
 
 const NewSessionFunc = "NewSession" //NewSession method,auto write implement body code
 
 type Mapper struct {
 	xml   *etree.Element
 	nodes []ast.Node
+}
+
+//注册回调函数
+func RegisterCallBack(arg *CallBack) {
+	var mutex = sync.RWMutex{}
+	mutex.Lock()
+	if callBack == nil {
+		callBack = make([]*CallBack, 0)
+	}
+	callBack = append(callBack, arg)
+	mutex.Unlock()
 }
 
 //推荐默认使用单例传入
@@ -317,7 +331,6 @@ func findMapperXml(mapperTree map[string]etree.Token, methodName string) *etree.
 
 func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *SessionFactory, tagParamMap []TagArg, args []reflect.Value, nodes []ast.Node, resultMap map[string]*ResultProperty, returnValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder, enableLog bool) error {
 	//TODO　CallBack and Session must Location in build step!
-	var callBack *CallBack
 	var session Session
 	var sql string
 	var err error
@@ -338,12 +351,20 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *Se
 	//do CRUD
 	if elementType == Element_Select && haveLastReturnValue {
 		//is select and have return value
-		if callBack != nil && callBack.BeforeQuery != nil {
-			callBack.BeforeQuery(&sql)
+		if callBack != nil {
+			for _, item := range callBack {
+				if item != nil && item.BeforeQuery != nil {
+					item.BeforeQuery(args, &sql)
+				}
+			}
 		}
 		results, err := session.Query(sql)
-		if callBack != nil && callBack.AfterQuery != nil {
-			callBack.AfterQuery(sql, &results, &err)
+		if callBack != nil {
+			for _, item := range callBack {
+				if item != nil && item.AfterQuery != nil {
+					item.AfterQuery(args, sql, &results, &err)
+				}
+			}
 		}
 		if err != nil {
 			return err
@@ -353,12 +374,20 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *Se
 			return err
 		}
 	} else {
-		if callBack != nil && callBack.BeforeExec != nil {
-			callBack.BeforeExec(&sql)
+		if callBack != nil {
+			for _, item := range callBack {
+				if item != nil && item.BeforeExec != nil {
+					item.BeforeExec(args, &sql)
+				}
+			}
 		}
 		var res, err = session.Exec(sql)
-		if callBack != nil && callBack.AfterExec != nil {
-			callBack.AfterExec(sql, res, &err)
+		if callBack != nil {
+			for _, item := range callBack {
+				if item != nil && item.AfterExec != nil {
+					item.AfterExec(args, sql, res, &err)
+				}
+			}
 		}
 		if err != nil {
 			return err
