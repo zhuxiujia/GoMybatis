@@ -8,22 +8,19 @@ import (
 
 type Service struct {
 	FindName func() error
-
 	SayHello func() error
 }
 
 func TestService(t *testing.T) {
-	var s Service
-	s = Service{
-		FindName: func() error {
-			println("TestService")
-			s.SayHello()
-			return nil
-		},
-		SayHello: func() error {
-			println("hello")
-			return nil
-		},
+	var s = Service{}
+	s.FindName = func() error {
+		println("TestService")
+		s.SayHello()
+		return nil
+	}
+	s.SayHello = func() error {
+		println("hello")
+		return nil
 	}
 	AopProxyService(&s)
 	s.FindName()
