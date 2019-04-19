@@ -10,21 +10,21 @@ type TagArg struct {
 	Index int
 }
 
-// UseService 可写入每个函数代理方法
-func UseMapper(mapper interface{}, buildFunc func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value) {
-	v := reflect.ValueOf(mapper)
+// AopProxy 可写入每个函数代理方法.proxyPtr:代理对象指针，buildFunc:构建代理函数
+func AopProxy(proxyPtr interface{}, buildFunc func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value) {
+	v := reflect.ValueOf(proxyPtr)
 	if v.Kind() != reflect.Ptr {
-		panic("UseMapper: UseMapper arg must be a pointer")
+		panic("AopProxy: AopProxy arg must be a pointer")
 	}
-	buildMapper(v, buildFunc)
+	buildProxy(v, buildFunc)
 }
 
-// UseService 可写入每个函数代理方法
-func UseMapperValue(mapperValue reflect.Value, buildFunc func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value) {
-	buildMapper(mapperValue, buildFunc)
+// AopProxy 可写入每个函数代理方法
+func AopProxyValue(mapperValue reflect.Value, buildFunc func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value) {
+	buildProxy(mapperValue, buildFunc)
 }
 
-func buildMapper(v reflect.Value, buildFunc func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value) {
+func buildProxy(v reflect.Value, buildFunc func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value) {
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
@@ -52,7 +52,7 @@ func buildMapper(v reflect.Value, buildFunc func(funcField reflect.StructField, 
 			switch ft.Kind() {
 			case reflect.Struct:
 				if buildFunc != nil {
-					buildMapper(f, buildFunc) //循环扫描
+					buildProxy(f, buildFunc) //循环扫描
 				}
 			case reflect.Func:
 				if buildFunc != nil {

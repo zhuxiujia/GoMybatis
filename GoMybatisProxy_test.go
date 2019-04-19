@@ -12,13 +12,13 @@ type TestMapper struct {
 
 func TestUseMapperValue(t *testing.T) {
 	var test = TestMapper{}
-	UseMapperValue(reflect.ValueOf(&test), func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
+	AopProxyValue(reflect.ValueOf(&test), func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
 		return func(arg ProxyArg) []reflect.Value {
 			if len(arg.Args) <= 0 {
-				t.Fatal("UseMapper() args len = 0")
+				t.Fatal("AopProxy() args len = 0")
 			}
 			if len(arg.TagArgs) <= 0 {
-				t.Fatal("UseMapper() tagArgs len = 0")
+				t.Fatal("AopProxy() tagArgs len = 0")
 			}
 			var e error
 			var returns = make([]reflect.Value, 0)
@@ -37,13 +37,13 @@ func TestUseMapperValue(t *testing.T) {
 
 func TestUseMapper(t *testing.T) {
 	var test = TestMapper{}
-	UseMapper(&test, func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
+	AopProxy(&test, func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
 		return func(arg ProxyArg) []reflect.Value {
 			if len(arg.Args) <= 0 {
-				t.Fatal("UseMapper() args len = 0")
+				t.Fatal("AopProxy() args len = 0")
 			}
 			if len(arg.TagArgs) <= 0 {
-				t.Fatal("UseMapper() tagArgs len = 0")
+				t.Fatal("AopProxy() tagArgs len = 0")
 			}
 			var e error
 			var returns = make([]reflect.Value, 0)

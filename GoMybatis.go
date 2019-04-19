@@ -20,7 +20,7 @@ type Mapper struct {
 //根据sessionEngine写入到mapperPtr，value:指向mapper指针反射对象，xml：xml数据，sessionEngine：session引擎，enableLog:是否允许日志输出，log：日志实现
 func WriteMapperByValue(value reflect.Value, xml []byte, sessionEngine SessionEngine) {
 	if value.Kind() != reflect.Ptr {
-		panic("UseMapper: UseMapper arg must be a pointer")
+		panic("AopProxy: AopProxy arg must be a pointer")
 	}
 	WriteMapper(value, xml, sessionEngine.SessionFactory(), sessionEngine.TempleteDecoder(), sessionEngine.SqlResultDecoder(), sessionEngine.SqlBuilder(), sessionEngine.CallBackChan())
 }
@@ -30,7 +30,7 @@ func WriteMapperByValue(value reflect.Value, xml []byte, sessionEngine SessionEn
 func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine SessionEngine) {
 	v := reflect.ValueOf(ptr)
 	if v.Kind() != reflect.Ptr {
-		panic("UseMapper: UseMapper arg must be a pointer")
+		panic("AopProxy: AopProxy arg must be a pointer")
 	}
 	WriteMapperByValue(v, xml, sessionEngine)
 }
@@ -56,7 +56,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 	var returnTypeMap = makeReturnTypeMap(bean.Elem().Type())
 	var beanName = bean.Type().PkgPath() + bean.Type().String()
 
-	UseMapperValue(bean, func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
+	AopProxyValue(bean, func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
 		//构建期
 		var funcName = funcField.Name
 		var returnType = returnTypeMap[funcName]
