@@ -35,11 +35,12 @@ func AopProxyService(service interface{}) {
 		//拷贝老方法，否则会循环调用导致栈溢出
 		var oldFunc = reflect.ValueOf(field.Interface())
 		var fn = func(arg GoMybatis.ProxyArg) []reflect.Value {
-			txStack.Push(funcField.PkgPath + funcField.Name)
-			println("start:" + funcField.Name)
+			txStack.Push(funcField)
 			var oldFuncResults = oldFunc.Call(arg.Args)
-			println("end:" + funcField.Name)
 			txStack.Pop()
+			if txStack.Len() == 0 {
+				//todo rollback
+			}
 			return oldFuncResults
 		}
 		return fn
