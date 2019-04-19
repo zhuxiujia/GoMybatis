@@ -7,23 +7,24 @@ import (
 )
 
 type Service struct {
-	FindName func() error
-	SayHello func() error
+	FindName func(it *Service) error `transaction:"PROPAGATION_REQUIRED"`
+	SayHello func(it *Service) error
 }
 
 func TestService(t *testing.T) {
-	var s = Service{}
-	s.FindName = func() error {
-		println("TestService")
-		s.SayHello()
-		return nil
-	}
-	s.SayHello = func() error {
-		println("hello")
-		return nil
+	var s = Service{
+		FindName: func(it *Service) error {
+			println("TestService")
+			it.SayHello(it)
+			return nil
+		},
+		SayHello: func(it *Service) error {
+			println("hello")
+			return nil
+		},
 	}
 	AopProxyService(&s)
-	s.FindName()
+	s.FindName(&s)
 }
 
 func AopProxyService(service interface{}) {
