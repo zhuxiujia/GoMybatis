@@ -33,8 +33,13 @@ func buildMapper(v reflect.Value, buildFunc func(funcField reflect.StructField, 
 	if et.Kind() == reflect.Ptr {
 		et = et.Elem()
 	}
-	ptr := reflect.New(et)
-	obj := ptr.Elem()
+	ptr := v
+	var obj reflect.Value
+	if ptr.Kind() == reflect.Ptr {
+		obj = ptr.Elem()
+	} else {
+		obj = ptr
+	}
 	count := obj.NumField()
 	for i := 0; i < count; i++ {
 		f := obj.Field(i)
