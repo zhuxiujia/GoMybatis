@@ -9,15 +9,12 @@ import (
 	"strings"
 )
 
-
-
 const NewSessionFunc = "NewSession" //NewSession method,auto write implement body code
 
 type Mapper struct {
 	xml   *etree.Element
 	nodes []ast.Node
 }
-
 
 //推荐默认使用单例传入
 //根据sessionEngine写入到mapperPtr，value:指向mapper指针反射对象，xml：xml数据，sessionEngine：session引擎，enableLog:是否允许日志输出，log：日志实现
@@ -49,7 +46,7 @@ func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine SessionEn
 //func的基本类型的参数（例如string,int,time.Time,int64,float....）个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，返回值必须有error
 //func的结构体参数无需指定mapperParams的tag，框架会自动扫描它的属性，封装为map处理掉
 //使用WriteMapper函数设置代理后即可正常使用。
-func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, templeteDecoder TempleteDecoder, decoder SqlResultDecoder, sqlBuilder SqlBuilder,  callBackChain []*CallBack) {
+func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, templeteDecoder TempleteDecoder, decoder SqlResultDecoder, sqlBuilder SqlBuilder, callBackChain []*CallBack) {
 	beanCheck(bean)
 	var mapperTree = LoadMapperXml(xml)
 	templeteDecoder.DecodeTree(mapperTree, bean.Type())
@@ -59,7 +56,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 	var returnTypeMap = makeReturnTypeMap(bean.Elem().Type())
 	var beanName = bean.Type().PkgPath() + bean.Type().String()
 
-	UseMapperValue(bean, func(funcField reflect.StructField) func(arg ProxyArg) []reflect.Value {
+	UseMapperValue(bean, func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
 		//构建期
 		var funcName = funcField.Name
 		var returnType = returnTypeMap[funcName]
@@ -114,7 +111,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 					returnValue = &returnV
 				}
 				//exe sql
-				var e = exeMethodByXml(mapper.xml.Tag, beanName, sessionFactory, arg, mapper.nodes, resultMap, returnValue, decoder, sqlBuilder,callBackChain)
+				var e = exeMethodByXml(mapper.xml.Tag, beanName, sessionFactory, arg, mapper.nodes, resultMap, returnValue, decoder, sqlBuilder, callBackChain)
 				return buildReturnValues(returnType, returnValue, e)
 			}
 			return proxyFunc

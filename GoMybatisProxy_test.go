@@ -12,7 +12,7 @@ type TestMapper struct {
 
 func TestUseMapperValue(t *testing.T) {
 	var test = TestMapper{}
-	UseMapperValue(reflect.ValueOf(&test), func(funcField reflect.StructField) func(arg ProxyArg) []reflect.Value {
+	UseMapperValue(reflect.ValueOf(&test), func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
 		return func(arg ProxyArg) []reflect.Value {
 			if len(arg.Args) <= 0 {
 				t.Fatal("UseMapper() args len = 0")
@@ -37,7 +37,7 @@ func TestUseMapperValue(t *testing.T) {
 
 func TestUseMapper(t *testing.T) {
 	var test = TestMapper{}
-	UseMapper(&test, func(funcField reflect.StructField) func(arg ProxyArg) []reflect.Value {
+	UseMapper(&test, func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
 		return func(arg ProxyArg) []reflect.Value {
 			if len(arg.Args) <= 0 {
 				t.Fatal("UseMapper() args len = 0")
