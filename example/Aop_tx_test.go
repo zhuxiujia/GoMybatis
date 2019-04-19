@@ -2,6 +2,7 @@ package example
 
 import (
 	"github.com/zhuxiujia/GoMybatis"
+	"github.com/zhuxiujia/GoMybatis/tx"
 	"reflect"
 	"testing"
 )
@@ -29,13 +30,16 @@ func TestService(t *testing.T) {
 }
 
 func AopProxyService(service interface{}) {
+	var txStack = tx.TxStack{}.New()
 	GoMybatis.AopProxy(service, func(funcField reflect.StructField, field reflect.Value) func(arg GoMybatis.ProxyArg) []reflect.Value {
 		//拷贝老方法，否则会循环调用导致栈溢出
 		var oldFunc = reflect.ValueOf(field.Interface())
 		var fn = func(arg GoMybatis.ProxyArg) []reflect.Value {
+			txStack.Push(funcField.PkgPath + funcField.Name)
 			println("start:" + funcField.Name)
 			var oldFuncResults = oldFunc.Call(arg.Args)
 			println("end:" + funcField.Name)
+			txStack.Pop()
 			return oldFuncResults
 		}
 		return fn
