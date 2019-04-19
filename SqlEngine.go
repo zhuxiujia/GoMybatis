@@ -83,5 +83,7 @@ type SessionEngine interface {
 	//回调链
 	CallBackChan() []*CallBack
 
-	//TODO　RegisterAOPBean(bean interface{}) // bean必须为struct的指针，且包含首字母大写的func属性，才能真正被GoMybatis AOP代理
+	//TODO　RegisterBean(bean interface{}) // bean必须为struct的指针，且包含首字母大写的func属性，才能真正被GoMybatis AOP代理
+
+	//TODO　RegisterAOPFunc(funcChan []func..) //注册AOP方法到引擎Aop方法链
 }
