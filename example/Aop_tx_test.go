@@ -7,14 +7,14 @@ import (
 	"testing"
 )
 
-type Service struct {
+type TestService struct {
 	FindName func() error `transaction:"PROPAGATION_REQUIRED"`
 	SayHello func() error
 }
 
-func TestService(t *testing.T) {
-	var it Service
-	it = Service{
+func TestTestService(t *testing.T) {
+	var it TestService
+	it = TestService{
 		FindName: func() error {
 			println("TestService")
 			it.SayHello()
@@ -30,7 +30,8 @@ func TestService(t *testing.T) {
 }
 
 func AopProxyService(service interface{}) {
-	var txStack = tx.TxStack{}.New()
+	//调用方法栈
+	var txStack = tx.StructField{}.New()
 	GoMybatis.AopProxy(service, func(funcField reflect.StructField, field reflect.Value) func(arg GoMybatis.ProxyArg) []reflect.Value {
 		//拷贝老方法，否则会循环调用导致栈溢出
 		var oldFunc = reflect.ValueOf(field.Interface())
