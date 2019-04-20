@@ -56,7 +56,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 	var returnTypeMap = makeReturnTypeMap(bean.Elem().Type())
 	var beanName = bean.Type().PkgPath() + bean.Type().String()
 
-	AopProxyValue(bean, func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
+	ProxyValue(bean, func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
 		//构建期
 		var funcName = funcField.Name
 		var returnType = returnTypeMap[funcName]

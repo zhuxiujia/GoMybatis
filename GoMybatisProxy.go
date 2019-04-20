@@ -11,7 +11,7 @@ type TagArg struct {
 }
 
 // AopProxy 可写入每个函数代理方法.proxyPtr:代理对象指针，buildFunc:构建代理函数
-func AopProxy(proxyPtr interface{}, buildFunc func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value) {
+func Proxy(proxyPtr interface{}, buildFunc func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value) {
 	v := reflect.ValueOf(proxyPtr)
 	if v.Kind() != reflect.Ptr {
 		panic("AopProxy: AopProxy arg must be a pointer")
@@ -20,7 +20,7 @@ func AopProxy(proxyPtr interface{}, buildFunc func(funcField reflect.StructField
 }
 
 // AopProxy 可写入每个函数代理方法
-func AopProxyValue(mapperValue reflect.Value, buildFunc func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value) {
+func ProxyValue(mapperValue reflect.Value, buildFunc func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value) {
 	buildProxy(mapperValue, buildFunc)
 }
 

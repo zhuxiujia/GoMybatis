@@ -12,7 +12,7 @@ type TestMapper struct {
 
 func TestUseMapperValue(t *testing.T) {
 	var test = TestMapper{}
-	AopProxyValue(reflect.ValueOf(&test), func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
+	ProxyValue(reflect.ValueOf(&test), func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
 		return func(arg ProxyArg) []reflect.Value {
 			if len(arg.Args) <= 0 {
 				t.Fatal("AopProxy() args len = 0")
@@ -37,7 +37,7 @@ func TestUseMapperValue(t *testing.T) {
 
 func TestUseMapper(t *testing.T) {
 	var test = TestMapper{}
-	AopProxy(&test, func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
+	Proxy(&test, func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
 		return func(arg ProxyArg) []reflect.Value {
 			if len(arg.Args) <= 0 {
 				t.Fatal("AopProxy() args len = 0")
