@@ -31,6 +31,7 @@ func TestTestService(t *testing.T) {
 
 func AopProxyService(service interface{}) {
 	//调用方法栈
+	var engine = GoMybatis.GoMybatisEngine{}
 	var beanType = reflect.TypeOf(service).Elem()
 	var beanName = beanType.PkgPath() + beanType.Name()
 	var session GoMybatis.Session
@@ -44,7 +45,7 @@ func AopProxyService(service interface{}) {
 				//PROPAGATION_REQUIRED
 				if session == nil {
 					//todo newSession is use service bean name?
-					session, _ = GoMybatis.GoMybatisEngine{}.NewSession(beanName)
+					session, _ = engine.NewSession(beanName)
 					session.Begin()
 				}
 			}
@@ -82,4 +83,5 @@ func haveError(v []reflect.Value) bool {
 			}
 		}
 	}
+	return false
 }
