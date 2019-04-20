@@ -25,13 +25,12 @@ func TestTestService(t *testing.T) {
 			return nil
 		},
 	}
-	AopProxyService(&it)
+	AopProxyService(&it, &GoMybatis.GoMybatisEngine{})
 	it.FindName()
 }
 
-func AopProxyService(service interface{}) {
+func AopProxyService(service interface{}, engine *GoMybatis.GoMybatisEngine) {
 	//调用方法栈
-	var engine = GoMybatis.GoMybatisEngine{}
 	var beanType = reflect.TypeOf(service).Elem()
 	var beanName = beanType.PkgPath() + beanType.Name()
 	var session GoMybatis.Session
@@ -45,29 +44,50 @@ func AopProxyService(service interface{}) {
 				//PROPAGATION_REQUIRED
 				if session == nil {
 					//todo newSession is use service bean name?
-					session, _ = engine.NewSession(beanName)
-					session.Begin()
+					var err error
+					session, err = engine.NewSession(beanName)
+					if err != nil {
+						panic(err)
+					}
+					err = session.Begin()
+					if err != nil {
+						panic(err)
+					}
 				}
 			}
-			defer func() {
-				err := recover()
-				if err != nil {
-					session.Rollback()
-				}
-			}()
-			var nativeImplResult = nativeImplFunc.Call(arg.Args)
+			var nativeImplResult = doNativeMethod(arg,nativeImplFunc,session)
 			txStack.Pop()
 			if txStack.Len() == 0 {
 				if haveError(nativeImplResult) {
-					session.Commit()
+					var err = session.Commit()
+					if err != nil {
+						panic(err)
+					}
 				} else {
-					session.Rollback()
+					var err = session.Rollback()
+					if err != nil {
+						panic(err)
+					}
 				}
 			}
 			return nativeImplResult
 		}
 		return fn
 	})
+}
+
+func doNativeMethod(arg GoMybatis.ProxyArg,nativeImplFunc reflect.Value,session GoMybatis.Session) []reflect.Value {
+	defer func() {
+		err := recover()
+		if err != nil {
+			var err = session.Rollback()
+			if err != nil {
+				panic(err)
+			}
+		}
+	}()
+	return nativeImplFunc.Call(arg.Args)
+
 }
 
 func haveError(v []reflect.Value) bool {
