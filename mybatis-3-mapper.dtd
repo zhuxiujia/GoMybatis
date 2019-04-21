@@ -180,6 +180,7 @@
 
                 lang CDATA #IMPLIED
                 tables CDATA #IMPLIED
+                <!--sets指定值会更新对应值，否则为""设置全部属性-->
                 sets CDATA #IMPLIED
                 wheres CDATA #IMPLIED
                 >
