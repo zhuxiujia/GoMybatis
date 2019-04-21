@@ -6,6 +6,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/zhuxiujia/GoMybatis"
 	"io/ioutil"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -38,14 +39,26 @@ type ExampleActivityMapper struct {
 	SelectLinks       func(column string) ([]Activity, error)                                `mapperParams:"column"`
 }
 
+var engine  GoMybatis.GoMybatisEngine
+
 //初始化mapper文件和结构体
 var exampleActivityMapper = ExampleActivityMapper{}
 
+
+type TestService struct {
+	exampleActivityMapper *ExampleActivityMapper
+	FindName func() error `transaction:"PROPAGATION_REQUIRED","rollback":"error"`
+	SayHello func() error
+}
+
+
+
 func init() {
 	if MysqlUri == "*" {
+		println("GoMybatisEngine not init! because MysqlUri is * or MysqlUri is ''")
 		return
 	}
-	var engine = GoMybatis.GoMybatisEngine{}.New()
+	engine = GoMybatis.GoMybatisEngine{}.New()
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
 	err := engine.Open("mysql", MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
 	if err != nil {
@@ -371,4 +384,24 @@ func TestDeleteTemplete(t *testing.T) {
 		panic(err)
 	}
 	fmt.Println("result=", result)
+}
+
+
+
+func TestTestService(t *testing.T) {
+	var testService TestService
+	testService = TestService{
+		FindName: func() error {
+			println("TestService")
+			testService.SayHello()
+			return nil
+		},
+		SayHello: func() error {
+			println("hello")
+			return nil
+		},
+	}
+	GoMybatis.AopProxyService(reflect.ValueOf(&testService),&engine)
+
+	testService.FindName()
 }
