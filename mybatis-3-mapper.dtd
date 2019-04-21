@@ -170,7 +170,7 @@
                 
                 lang CDATA #IMPLIED
                 >
-        <!--sets指定值会更新对应值，否则为""设置全部属性-->
+        <!--sets指定值(例如 sets="name?name = #{name}"  )会更新对应值，否则为""设置全部属性-->
         <!ELEMENT updateTemplete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST updateTemplete
                 id CDATA #IMPLIED
