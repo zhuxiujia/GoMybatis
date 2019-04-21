@@ -17,14 +17,10 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 		var propagation = tx.PROPAGATION_NEVER
 		var nativeImplFunc = reflect.ValueOf(field.Interface())
 		var txTag, haveTx = funcField.Tag.Lookup("tx")
-		var rollbackTag, haveRollback = funcField.Tag.Lookup("rollback")
+		var rollbackTag = funcField.Tag.Get("rollback")
 		if haveTx {
 			propagation = tx.NewPropagation(txTag)
 		}
-		if haveRollback {
-			//todo dosthing
-		}
-
 		var fn = func(arg ProxyArg) []reflect.Value {
 			txStack.Push(funcField)
 			if txStack.Len() == 1 {
@@ -82,7 +78,7 @@ func doNativeMethod(arg ProxyArg, nativeImplFunc reflect.Value, session Session)
 }
 
 func haveRollBackType(v []reflect.Value, typeString string) bool {
-	if v == nil || len(v) == 0 {
+	if v == nil || len(v) == 0 || typeString == ""{
 		return false
 	}
 	for _, item := range v {
