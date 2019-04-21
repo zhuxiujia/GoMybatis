@@ -39,22 +39,25 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 						if err != nil {
 							panic(err)
 						}
+						println("Begin in session:",session.Id())
 					}
 				}
 			}
 			var nativeImplResult = doNativeMethod(arg, nativeImplFunc, session)
 			txStack.Pop()
-			if txStack.Len() == 0 {
+			if txStack.Len() == 0 && session != nil {
 				if !haveRollBackType(nativeImplResult, rollbackTag) {
 					var err = session.Commit()
 					if err != nil {
 						panic(err)
 					}
+					println("Commit in session:",session.Id())
 				} else {
 					var err = session.Rollback()
 					if err != nil {
 						panic(err)
 					}
+					println("Rollback in session:",session.Id())
 				}
 			}
 			return nativeImplResult
