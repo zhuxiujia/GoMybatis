@@ -46,7 +46,7 @@ var exampleActivityMapper = ExampleActivityMapper{}
 
 type TestService struct {
 	exampleActivityMapper *ExampleActivityMapper
-	UpdateName            func(id string, name string) error `transaction:"PROPAGATION_REQUIRED","rollback":"error"`
+	UpdateName            func(id string, name string) error `transaction:"REQUIRED,error"` //事务注解,`transaction:"" 开启事务，`transaction:"REQUIRED,error"` 指定传播行为为REQUIRED，回滚操作为error类型
 	UpdateRemark          func(id string, remark string) error
 }
 

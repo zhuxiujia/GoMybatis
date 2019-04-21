@@ -5,6 +5,7 @@ import (
 	"reflect"
 )
 
+//使用AOP切面 代理目标服务，如果服务painc()它的事务会回滚
 func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 	//调用方法栈
 	var beanType = service.Type().Elem()
