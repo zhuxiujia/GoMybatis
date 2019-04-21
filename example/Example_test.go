@@ -383,6 +383,8 @@ func TestDeleteTemplete(t *testing.T) {
 	fmt.Println("result=", result)
 }
 
+
+//嵌套事务/带有传播行为的事务
 func TestTestService(t *testing.T) {
 	var testService TestService
 	testService = TestService{
