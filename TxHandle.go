@@ -11,7 +11,7 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 	var beanType = service.Type().Elem()
 	var beanName = beanType.PkgPath() + beanType.Name()
 	var session Session
-	var txStack = tx.StructField{}.New()
+	var structStack = tx.StructField{}.New()
 	ProxyValue(service, func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
 		//init data
 		var propagation = tx.PROPAGATION_NEVER
@@ -22,8 +22,8 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 			propagation = tx.NewPropagation(txTag)
 		}
 		var fn = func(arg ProxyArg) []reflect.Value {
-			txStack.Push(funcField)
-			if txStack.Len() == 1 {
+			structStack.Push(funcField)
+			if structStack.Len() == 1 {
 				if propagation == tx.PROPAGATION_NEVER{
 
 				} else if propagation == tx.PROPAGATION_REQUIRED {
@@ -44,8 +44,8 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 				}
 			}
 			var nativeImplResult = doNativeMethod(arg, nativeImplFunc, session)
-			txStack.Pop()
-			if txStack.Len() == 0 && session != nil {
+			structStack.Pop()
+			if structStack.Len() == 0 && session != nil {
 				if !haveRollBackType(nativeImplResult, rollbackTag) {
 					var err = session.Commit()
 					if err != nil {
