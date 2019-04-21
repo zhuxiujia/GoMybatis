@@ -39,19 +39,16 @@ type ExampleActivityMapper struct {
 	SelectLinks       func(column string) ([]Activity, error)                                `mapperParams:"column"`
 }
 
-var engine  GoMybatis.GoMybatisEngine
+var engine GoMybatis.GoMybatisEngine
 
 //初始化mapper文件和结构体
 var exampleActivityMapper = ExampleActivityMapper{}
 
-
 type TestService struct {
 	exampleActivityMapper *ExampleActivityMapper
-	FindName func() error `transaction:"PROPAGATION_REQUIRED","rollback":"error"`
-	SayHello func() error
+	UpdateName            func(id string, name string) error `transaction:"PROPAGATION_REQUIRED","rollback":"error"`
+	UpdateRemark          func(id string, remark string) error
 }
-
-
 
 func init() {
 	if MysqlUri == "*" {
@@ -386,22 +383,33 @@ func TestDeleteTemplete(t *testing.T) {
 	fmt.Println("result=", result)
 }
 
-
-
 func TestTestService(t *testing.T) {
 	var testService TestService
 	testService = TestService{
-		FindName: func() error {
-			println("TestService")
-			testService.SayHello()
+		exampleActivityMapper: &exampleActivityMapper,
+		UpdateRemark: func(id string, remark string) error {
+			println("UpdateRemark start")
+
 			return nil
 		},
-		SayHello: func() error {
-			println("hello")
+		UpdateName: func(id string, name string) error {
+			println("UpdateName start")
+			var activitys, err = testService.exampleActivityMapper.SelectByIds([]string{id})
+			if err != nil {
+				panic(err)
+			}
+			var activity = activitys[0]
+			activity.Name=name
+			updateNum,err:=testService.exampleActivityMapper.UpdateTemplete(activity)
+			if err != nil {
+				panic(err)
+			}
+			println("success updateNum:",updateNum)
+			testService.UpdateRemark(id, "updated remark")
 			return nil
 		},
 	}
-	GoMybatis.AopProxyService(reflect.ValueOf(&testService),&engine)
+	GoMybatis.AopProxyService(reflect.ValueOf(&testService), &engine)
 
-	testService.FindName()
+	testService.UpdateName("167", "updated name")
 }
