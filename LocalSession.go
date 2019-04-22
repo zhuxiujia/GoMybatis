@@ -95,11 +95,13 @@ func (it *LocalSession) Begin() error {
 			if it.txStack.Len() > 0 {
 				//TODO stop old tx
 			}
+			//TODO new session(tx)
 			break
 		case tx.PROPAGATION_NOT_SUPPORTED://TODO
 			if it.txStack.Len() > 0 {
 				//TODO stop old tx
 			}
+			//TODO new session( no tx)
 			break
 		case tx.PROPAGATION_NEVER://END
 			if it.txStack.Len() > 0 {
