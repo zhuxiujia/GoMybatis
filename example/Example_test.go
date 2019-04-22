@@ -389,12 +389,20 @@ func TestTestService(t *testing.T) {
 		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
 		return
 	}
-	var testService TestService
+	var testService = initTestService()
+
+	//go testService.UpdateName("167", "updated name1")
+	testService.UpdateName("167", "updated name2")
+
+	time.Sleep(5 * time.Second)
+}
+
+func initTestService() TestService {
+	var testService  TestService
 	testService = TestService{
 		exampleActivityMapper: &exampleActivityMapper,
 		UpdateRemark: func(id string, remark string) error {
 			println("UpdateRemark start")
-
 			return nil
 		},
 		UpdateName: func(id string, name string) error {
@@ -415,9 +423,5 @@ func TestTestService(t *testing.T) {
 		},
 	}
 	GoMybatis.AopProxyService(reflect.ValueOf(&testService), &engine)
-
-	//go testService.UpdateName("167", "updated name1")
-	testService.UpdateName("167", "updated name2")
-
-	time.Sleep(5 * time.Second)
+	return testService
 }
