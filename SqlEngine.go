@@ -80,8 +80,11 @@ type SessionEngine interface {
 	//设置模板解析器
 	SetTempleteDecoder(decoder TempleteDecoder)
 
-	//回调链
-	CallBackChan() []*CallBack
+	RegisterObj(ptr interface{},name string)
+
+	GetObj(name string) interface{}
+
+	GoroutineSessionMap() *GoroutineSessionMap
 
 	//TODO　RegisterBean(bean interface{}) // bean必须为struct的指针，且包含首字母大写的func属性，才能真正被GoMybatis AOP代理
 

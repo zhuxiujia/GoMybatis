@@ -22,7 +22,8 @@ func WriteMapperByValue(value reflect.Value, xml []byte, sessionEngine SessionEn
 	if value.Kind() != reflect.Ptr {
 		panic("AopProxy: AopProxy arg must be a pointer")
 	}
-	WriteMapper(value, xml, sessionEngine.SessionFactory(), sessionEngine.TempleteDecoder(), sessionEngine.SqlResultDecoder(), sessionEngine.SqlBuilder(), sessionEngine.CallBackChan())
+	WriteMapper(value, xml, sessionEngine)
+	sessionEngine.RegisterObj(value.Interface(), value.Type().Elem().Name())
 }
 
 //推荐默认使用单例传入
@@ -46,12 +47,12 @@ func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine SessionEn
 //func的基本类型的参数（例如string,int,time.Time,int64,float....）个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，返回值必须有error
 //func的结构体参数无需指定mapperParams的tag，框架会自动扫描它的属性，封装为map处理掉
 //使用WriteMapper函数设置代理后即可正常使用。
-func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory, templeteDecoder TempleteDecoder, decoder SqlResultDecoder, sqlBuilder SqlBuilder, callBackChain []*CallBack) {
+func WriteMapper(bean reflect.Value, xml []byte, sessionEngine SessionEngine) {
 	beanCheck(bean)
 	var mapperTree = LoadMapperXml(xml)
-	templeteDecoder.DecodeTree(mapperTree, bean.Type())
+	sessionEngine.TempleteDecoder().DecodeTree(mapperTree, bean.Type())
 	//构建期使用的map，无需考虑并发安全
-	var methodXmlMap = makeMethodXmlMap(bean, mapperTree, sqlBuilder)
+	var methodXmlMap = makeMethodXmlMap(bean, mapperTree, sessionEngine.SqlBuilder())
 	var resultMaps = makeResultMaps(mapperTree)
 	var returnTypeMap = makeReturnTypeMap(bean.Elem().Type())
 	var beanName = bean.Type().PkgPath() + bean.Type().String()
@@ -90,7 +91,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 					}
 					returnValue = &returnV
 				}
-				var session = sessionFactory.NewSession(beanName, SessionType_Default)
+				var session = sessionEngine.SessionFactory().NewSession(beanName, SessionType_Default)
 				var err error
 				returnValue.Elem().Set(reflect.ValueOf(session).Elem().Addr().Convert(*returnType.ReturnOutType))
 				return buildReturnValues(returnType, returnValue, err)
@@ -111,7 +112,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionFactory *SessionFactory,
 					returnValue = &returnV
 				}
 				//exe sql
-				var e = exeMethodByXml(mapper.xml.Tag, beanName, sessionFactory, arg, mapper.nodes, resultMap, returnValue, decoder, sqlBuilder, callBackChain)
+				var e = exeMethodByXml(mapper.xml.Tag, beanName, sessionEngine, arg, mapper.nodes, resultMap, returnValue)
 				return buildReturnValues(returnType, returnValue, e)
 			}
 			return proxyFunc
@@ -315,66 +316,42 @@ func findMapperXml(mapperTree map[string]etree.Token, methodName string) *etree.
 	return nil
 }
 
-func exeMethodByXml(elementType ElementType, beanName string, sessionFactory *SessionFactory, proxyArg ProxyArg, nodes []ast.Node, resultMap map[string]*ResultProperty, returnValue *reflect.Value, decoder SqlResultDecoder, sqlBuilder SqlBuilder, callBackChain []*CallBack) error {
+func exeMethodByXml(elementType ElementType, beanName string, sessionEngine SessionEngine, proxyArg ProxyArg, nodes []ast.Node, resultMap map[string]*ResultProperty, returnValue *reflect.Value) error {
 	//TODO　CallBack and Session must Location in build step!
 	var session Session
 	var sql string
 	var err error
-	session, sql, err = buildSql(proxyArg, nodes, sqlBuilder)
+	session, sql, err = buildSql(proxyArg, nodes, sessionEngine.SqlBuilder())
 	if err != nil {
 		return err
 	}
-	if sessionFactory == nil && session == nil {
+	if sessionEngine.SessionFactory() == nil && session == nil {
 		panic("[GoMybatis] exe sql need a SessionFactory or Session!")
 	}
 	//session
 	if session == nil {
-		session = sessionFactory.NewSession(beanName, SessionType_Default)
+		var goroutineID = utils.GoroutineID() //协程id
+		session = sessionEngine.GoroutineSessionMap().Get(goroutineID)
+	}
+	if session == nil {
+		session = sessionEngine.SessionFactory().NewSession(beanName, SessionType_Default)
 		//not arg session,just close!
-		defer closeSession(sessionFactory, session)
+		defer closeSession(sessionEngine.SessionFactory(), session)
 	}
 	var haveLastReturnValue = returnValue != nil && (*returnValue).IsNil() == false
 	//do CRUD
 	if elementType == Element_Select && haveLastReturnValue {
 		//is select and have return value
-		if callBackChain != nil {
-			for _, item := range callBackChain {
-				if item != nil && item.BeforeQuery != nil {
-					item.BeforeQuery(proxyArg.Args, &sql)
-				}
-			}
-		}
 		results, err := session.Query(sql)
-		if callBackChain != nil {
-			for _, item := range callBackChain {
-				if item != nil && item.AfterQuery != nil {
-					item.AfterQuery(proxyArg.Args, sql, &results, &err)
-				}
-			}
-		}
 		if err != nil {
 			return err
 		}
-		err = decoder.Decode(resultMap, results, returnValue.Interface())
+		err = sessionEngine.SqlResultDecoder().Decode(resultMap, results, returnValue.Interface())
 		if err != nil {
 			return err
 		}
 	} else {
-		if callBackChain != nil {
-			for _, item := range callBackChain {
-				if item != nil && item.BeforeExec != nil {
-					item.BeforeExec(proxyArg.Args, &sql)
-				}
-			}
-		}
 		var res, err = session.Exec(sql)
-		if callBackChain != nil {
-			for _, item := range callBackChain {
-				if item != nil && item.AfterExec != nil {
-					item.AfterExec(proxyArg.Args, sql, res, &err)
-				}
-			}
-		}
 		if err != nil {
 			return err
 		}

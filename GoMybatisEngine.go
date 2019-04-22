@@ -5,12 +5,16 @@ import (
 	"github.com/zhuxiujia/GoMybatis/ast"
 	"github.com/zhuxiujia/GoMybatis/engines"
 	"github.com/zhuxiujia/GoMybatis/utils"
+	"reflect"
 	"sync"
 )
 
 type GoMybatisEngine struct {
 	mutex             sync.RWMutex          //读写锁
 	isInit            bool                  //是否初始化
+
+	objMap            map[string]interface{}
+
 	dataSourceRouter  DataSourceRouter      //动态数据源路由器
 	log               Log                   //日志实现
 	logEnable         bool                  //是否允许日志输出（默认开启）
@@ -63,6 +67,7 @@ func (it GoMybatisEngine) New() GoMybatisEngine {
 		var gr=GoroutineSessionMap{}.New()
 		it.goroutineSessionMap=&gr
 	}
+	it.objMap= map[string]interface{}{}
 	return it
 }
 
@@ -221,4 +226,16 @@ func (it *GoMybatisEngine) CallBackChan() []*CallBack {
 
 func (it *GoMybatisEngine) GoroutineSessionMap() *GoroutineSessionMap{
 	return it.goroutineSessionMap
+}
+
+func (it *GoMybatisEngine) RegisterObj(ptr interface{},name string){
+	var v=reflect.ValueOf(ptr)
+	if v.Kind()!=reflect.Ptr{
+		panic("GoMybatis Engine Register obj not a ptr value!")
+	}
+	it.objMap[name]=ptr
+}
+
+func (it *GoMybatisEngine) GetObj(name string) interface{}{
+	return it.objMap[name]
 }

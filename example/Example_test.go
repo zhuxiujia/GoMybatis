@@ -416,7 +416,7 @@ func TestTestService(t *testing.T) {
 	}
 	GoMybatis.AopProxyService(reflect.ValueOf(&testService), &engine)
 
-	go testService.UpdateName("167", "updated name1")
+	//go testService.UpdateName("167", "updated name1")
 	testService.UpdateName("167", "updated name2")
 
 	time.Sleep(5 * time.Second)
