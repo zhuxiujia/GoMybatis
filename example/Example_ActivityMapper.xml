@@ -28,7 +28,7 @@
     <!--查询模板:默认id="selectTemplete,where自动设置逻辑删除字段-->
     <selectTemplete wheres="name?name = #{name}"/>
     <!--更新模板:默认id="updateTemplete,set自动设置乐观锁版本号-->
-    <updateTemplete sets="name?name = #{name}" wheres="id?id = #{id}"/>
+    <updateTemplete sets="name?name = #{name},remark?remark=#{remark}" wheres="id?id = #{id}"/>
     <!--删除模板:默认id="deleteTemplete,where自动设置逻辑删除字段-->
     <deleteTemplete wheres="name?name = #{name}"/>
 

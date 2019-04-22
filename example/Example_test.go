@@ -2,6 +2,7 @@ package example
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/zhuxiujia/GoMybatis"
@@ -46,8 +47,8 @@ var exampleActivityMapper = ExampleActivityMapper{}
 
 type TestService struct {
 	exampleActivityMapper *ExampleActivityMapper
-	UpdateName            func(id string, name string) error `tx:"REQUIRED",rollback:"error"` //事务注解,`tx:"" 开启事务，`tx:"REQUIRED,error"` 指定传播行为为REQUIRED，回滚操作为error类型
-	UpdateRemark          func(id string, remark string) error
+	UpdateName            func(id string, name string) error `tx:"REQUIRED"rollback:"error"` //事务注解,`tx:"" 开启事务，`tx:"REQUIRED,error"` 指定传播行为为REQUIRED，回滚操作为error类型
+	UpdateRemark          func(id string, remark string) error  `tx:"REQUIRED"rollback:"error"`
 }
 
 func init() {
@@ -402,11 +403,20 @@ func initTestService() TestService {
 	testService = TestService{
 		exampleActivityMapper: &exampleActivityMapper,
 		UpdateRemark: func(id string, remark string) error {
-			println("UpdateRemark start")
-			return nil
+			var activitys, err = testService.exampleActivityMapper.SelectByIds([]string{id})
+			if err != nil {
+				panic(err)
+			}
+			var activity = activitys[0]
+			activity.Remark = remark
+			updateNum, err := testService.exampleActivityMapper.UpdateTemplete(activity)
+			if err != nil {
+				panic(err)
+			}
+			println("UpdateRemark:",updateNum)
+			return errors.New("e")
 		},
 		UpdateName: func(id string, name string) error {
-			println("UpdateName start")
 			var activitys, err = testService.exampleActivityMapper.SelectByIds([]string{id})
 			if err != nil {
 				panic(err)
@@ -417,7 +427,7 @@ func initTestService() TestService {
 			if err != nil {
 				panic(err)
 			}
-			println("success updateNum:", updateNum)
+			println("UpdateName:",updateNum)
 			testService.UpdateRemark(id, "updated remark")
 			return nil
 		},

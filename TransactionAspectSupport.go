@@ -4,6 +4,7 @@ import (
 	"github.com/zhuxiujia/GoMybatis/tx"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
+	"strings"
 )
 
 //使用AOP切面 代理目标服务，如果服务painc()它的事务会回滚
@@ -11,7 +12,7 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 	//调用方法栈
 	var beanType = service.Type().Elem()
 	var beanName = beanType.PkgPath() + beanType.Name()
-	var methodStackMap = tx.GoroutineMethodStackMap{}.New()
+	//var methodStackMap = tx.GoroutineMethodStackMap{}.New()
 	ProxyValue(service, func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
 		//init data
 		var propagation = tx.PROPAGATION_NEVER
@@ -22,13 +23,13 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 			propagation = tx.NewPropagation(txTag)
 		}
 		var fn = func(arg ProxyArg) []reflect.Value {
-			var goroutineID = utils.GoroutineID()             //协程id
-			var methodStack = methodStackMap.Get(goroutineID) //方法栈
-			if methodStack == nil {
-				var sf = tx.StructField{}.New()
-				methodStack = &sf
-			}
-			methodStack.Push(funcField)
+			var goroutineID = utils.GoroutineID() //协程id
+			//var methodStack = methodStackMap.Get(goroutineID) //方法栈
+			//if methodStack == nil {
+			//	var sf = tx.StructField{}.New()
+			//	methodStack = &sf
+			//}
+			//methodStack.Push(funcField)
 
 			var session = engine.GoroutineSessionMap().Get(goroutineID)
 			if session == nil {
@@ -41,30 +42,30 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 				//压入map
 				engine.GoroutineSessionMap().Put(goroutineID, session)
 			}
-			if methodStack.Len() == 1 {
-				var err = session.Begin()
+			//if methodStack.Len() == 1 {
+			var err = session.Begin()
+			if err != nil {
+				panic(err)
+			}
+			println("Begin in session:", session.Id())
+			//}
+			var nativeImplResult = doNativeMethod(arg, nativeImplFunc, session)
+			//methodStack.Pop()
+			//if methodStack.Len() == 0 && session != nil {
+			if !haveRollBackType(nativeImplResult, rollbackTag) {
+				var err = session.Commit()
 				if err != nil {
 					panic(err)
 				}
-				println("Begin in session:", session.Id())
-			}
-			var nativeImplResult = doNativeMethod(arg, nativeImplFunc, session)
-			methodStack.Pop()
-			if methodStack.Len() == 0 && session != nil {
-				if !haveRollBackType(nativeImplResult, rollbackTag) {
-					var err = session.Commit()
-					if err != nil {
-						panic(err)
-					}
-					println("Commit in session:", session.Id())
-				} else {
-					var err = session.Rollback()
-					if err != nil {
-						panic(err)
-					}
-					println("Rollback in session:", session.Id())
+				println("Commit in session:", session.Id())
+			} else {
+				var err = session.Rollback()
+				if err != nil {
+					panic(err)
 				}
+				println("Rollback in session:", session.Id())
 			}
+			//}
 			return nativeImplResult
 		}
 		return fn
@@ -86,12 +87,14 @@ func doNativeMethod(arg ProxyArg, nativeImplFunc reflect.Value, session Session)
 }
 
 func haveRollBackType(v []reflect.Value, typeString string) bool {
+	//println(typeString)
 	if v == nil || len(v) == 0 || typeString == "" {
 		return false
 	}
 	for _, item := range v {
 		if item.Kind() == reflect.Interface {
-			if item.String() == typeString {
+			//println(typeString+" == " + item.String())
+			if strings.Contains(item.String(),typeString) {
 				if !item.IsNil() {
 					return true
 				}
