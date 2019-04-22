@@ -10,6 +10,7 @@ import (
 //本地直连session
 type LocalSession struct {
 	SessionId   string
+	url         string
 	db          *sql.DB
 	stmt        *sql.Stmt
 	txStack     tx.TxStack
@@ -19,11 +20,12 @@ type LocalSession struct {
 	newLocalSession *LocalSession
 }
 
-func (it LocalSession) New(db *sql.DB, propagation *tx.Propagation) LocalSession {
+func (it LocalSession) New(url string, db *sql.DB, propagation *tx.Propagation) LocalSession {
 	return LocalSession{
 		SessionId:   utils.CreateUUID(),
 		db:          db,
 		txStack:     tx.TxStack{}.New(),
+		url:         url,
 		propagation: propagation,
 	}
 }
@@ -67,7 +69,7 @@ func (it *LocalSession) Begin() error {
 
 	if it.propagation != nil {
 		switch *it.propagation {
-		case tx.PROPAGATION_REQUIRED://end
+		case tx.PROPAGATION_REQUIRED: //end
 			if it.txStack.Len() > 0 {
 				return nil
 			} else {
@@ -78,7 +80,7 @@ func (it *LocalSession) Begin() error {
 				return err
 			}
 			break
-		case tx.PROPAGATION_SUPPORTS://end
+		case tx.PROPAGATION_SUPPORTS: //end
 			if it.txStack.Len() > 0 {
 				return nil
 			} else {
@@ -86,26 +88,38 @@ func (it *LocalSession) Begin() error {
 				return nil
 			}
 			break
-		case tx.PROPAGATION_MANDATORY://end
+		case tx.PROPAGATION_MANDATORY: //end
 			if it.txStack.Len() > 0 {
 				return nil
 			} else {
 				return errors.New("[GoMybatis] PROPAGATION_MANDATORY Nested transaction exception! current not have a transaction!")
 			}
 			break
-		case tx.PROPAGATION_REQUIRES_NEW://TODO
+		case tx.PROPAGATION_REQUIRES_NEW: //TODO
 			if it.txStack.Len() > 0 {
 				//TODO stop old tx
 			}
 			//TODO new session(tx)
+			var db, e = sql.Open("mysql", it.url)
+			if e != nil {
+				return e
+			}
+			var sess = LocalSession{}.New(it.url, db, it.propagation)
+			it.newLocalSession = &sess
 			break
-		case tx.PROPAGATION_NOT_SUPPORTED://TODO
+		case tx.PROPAGATION_NOT_SUPPORTED: //TODO
 			if it.txStack.Len() > 0 {
 				//TODO stop old tx
 			}
 			//TODO new session( no tx)
+			var db, e = sql.Open("mysql", it.url)
+			if e != nil {
+				return e
+			}
+			var sess = LocalSession{}.New(it.url, db, nil)
+			it.newLocalSession = &sess
 			break
-		case tx.PROPAGATION_NEVER://END
+		case tx.PROPAGATION_NEVER: //END
 			if it.txStack.Len() > 0 {
 				return errors.New("[GoMybatis] PROPAGATION_NEVER  Nested transaction exception! current Already have a transaction!")
 			}
@@ -121,7 +135,7 @@ func (it *LocalSession) Begin() error {
 				return err
 			}
 			break
-		case tx.PROPAGATION_NOT_REQUIRED://end
+		case tx.PROPAGATION_NOT_REQUIRED: //end
 			if it.txStack.Len() > 0 {
 				return errors.New("[GoMybatis] PROPAGATION_NOT_REQUIRED Nested transaction exception! current Already have a transaction!")
 			} else {
