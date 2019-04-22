@@ -88,7 +88,7 @@ func (it *LocalSession) Begin() error {
 			if it.txStack.Len() > 0 {
 				return nil
 			} else {
-				return errors.New("[GoMybatis] Nested transaction exception! current not have a transaction!")
+				return errors.New("[GoMybatis] PROPAGATION_MANDATORY Nested transaction exception! current not have a transaction!")
 			}
 			break
 		case tx.PROPAGATION_REQUIRES_NEW://TODO
@@ -105,7 +105,7 @@ func (it *LocalSession) Begin() error {
 			break
 		case tx.PROPAGATION_NEVER://END
 			if it.txStack.Len() > 0 {
-				return errors.New("[GoMybatis] Nested transaction exception! current must have not a transaction!")
+				return errors.New("[GoMybatis] PROPAGATION_NEVER  Nested transaction exception! current Already have a transaction!")
 			}
 			break
 		case tx.PROPAGATION_NESTED: //TODO REQUIRED 类似，增加 save point
@@ -121,7 +121,7 @@ func (it *LocalSession) Begin() error {
 			break
 		case tx.PROPAGATION_NOT_REQUIRED://end
 			if it.txStack.Len() > 0 {
-				return errors.New("[GoMybatis] Nested transaction exception! current Already have a transaction!")
+				return errors.New("[GoMybatis] PROPAGATION_NOT_REQUIRED Nested transaction exception! current Already have a transaction!")
 			} else {
 				var tx, err = it.db.Begin()
 				if err == nil {
