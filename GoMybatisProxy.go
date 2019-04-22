@@ -106,6 +106,6 @@ func buildRemoteMethod(source reflect.Value, f reflect.Value, ft reflect.Type, s
 	} else {
 		f.Set(reflect.MakeFunc(ft, fn))
 	}
-	println("[GoMybatis] write method success:" + source.Type().Name() + " > " + sf.Name + " " + f.Type().String())
+	//println("[GoMybatis] write method success:" + source.Type().Name() + " > " + sf.Name + " " + f.Type().String())
 	tagParams = nil
 }
