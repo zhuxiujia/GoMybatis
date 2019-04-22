@@ -15,6 +15,8 @@ type LocalSession struct {
 	txStack     tx.TxStack
 	isClosed    bool
 	propagation *tx.Propagation
+
+	newLocalSession *LocalSession
 }
 
 func (it LocalSession) New(db *sql.DB, propagation *tx.Propagation) LocalSession {
