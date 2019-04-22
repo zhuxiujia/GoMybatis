@@ -16,8 +16,8 @@ import (
 //自定义结构体参数（属性必须大写）
 //方法 return 必须包含有error ,为了返回错误信息
 type ExampleActivityMapper struct {
-	GoMybatis.SessionSupport                     //session事务操作 写法1.  ExampleActivityMapper.SessionSupport.NewSession()
-	NewSession func() (GoMybatis.Session, error) //session事务操作.写法2   ExampleActivityMapper.NewSession()
+	GoMybatis.SessionSupport                                   //session事务操作 写法1.  ExampleActivityMapper.SessionSupport.NewSession()
+	NewSession               func() (GoMybatis.Session, error) //session事务操作.写法2   ExampleActivityMapper.NewSession()
 	//模板示例
 	SelectTemplete      func(name string) ([]Activity, error) `mapperParams:"name"`
 	SelectCountTemplete func(name string) (int64, error)      `mapperParams:"name"`
@@ -79,30 +79,30 @@ func init() {
 
 	//自定义日志实现(可选)
 	/**
-	engine.SetLogEnable(true)
-	engine.SetLog(&GoMybatis.LogStandard{
-		PrintlnFunc: func(messages []byte) {
-		},
-	})
-    **/
+		engine.SetLogEnable(true)
+		engine.SetLog(&GoMybatis.LogStandard{
+			PrintlnFunc: func(messages []byte) {
+			},
+		})
+	    **/
 
 	//注册回调(可选)
 	/**
-	engine.RegisterCallBack(&GoMybatis.CallBack{
-		BeforeExec: func(args []reflect.Value, sqlString *string) {
-         //do something
-		},
-		BeforeQuery: func(args []reflect.Value, sqlString *string) {
-			//do something
-		},
-		AfterExec: func(args []reflect.Value, sqlString string, result *GoMybatis.Result, err *error) {
-			//do something
-		},
-		AfterQuery: func(args []reflect.Value, sqlString string, result *[]map[string][]byte, err *error) {
-			//do something
-		},
-	})
-	**/
+		engine.RegisterCallBack(&GoMybatis.CallBack{
+			BeforeExec: func(args []reflect.Value, sqlString *string) {
+	         //do something
+			},
+			BeforeQuery: func(args []reflect.Value, sqlString *string) {
+				//do something
+			},
+			AfterExec: func(args []reflect.Value, sqlString string, result *GoMybatis.Result, err *error) {
+				//do something
+			},
+			AfterQuery: func(args []reflect.Value, sqlString string, result *[]map[string][]byte, err *error) {
+				//do something
+			},
+		})
+		**/
 	//读取mapper xml文件
 	bytes, _ := ioutil.ReadFile("Example_ActivityMapper.xml")
 	//设置对应的mapper xml文件
@@ -383,9 +383,12 @@ func TestDeleteTemplete(t *testing.T) {
 	fmt.Println("result=", result)
 }
 
-
 //嵌套事务/带有传播行为的事务
 func TestTestService(t *testing.T) {
+	if MysqlUri == "" || MysqlUri == "*" {
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		return
+	}
 	var testService TestService
 	testService = TestService{
 		exampleActivityMapper: &exampleActivityMapper,
@@ -401,17 +404,20 @@ func TestTestService(t *testing.T) {
 				panic(err)
 			}
 			var activity = activitys[0]
-			activity.Name=name
-			updateNum,err:=testService.exampleActivityMapper.UpdateTemplete(activity)
+			activity.Name = name
+			updateNum, err := testService.exampleActivityMapper.UpdateTemplete(activity)
 			if err != nil {
 				panic(err)
 			}
-			println("success updateNum:",updateNum)
+			println("success updateNum:", updateNum)
 			testService.UpdateRemark(id, "updated remark")
 			return nil
 		},
 	}
 	GoMybatis.AopProxyService(reflect.ValueOf(&testService), &engine)
 
-	testService.UpdateName("167", "updated name")
+	go testService.UpdateName("167", "updated name1")
+	testService.UpdateName("167", "updated name2")
+
+	time.Sleep(5 * time.Second)
 }

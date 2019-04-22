@@ -2,6 +2,7 @@ package GoMybatis
 
 import (
 	"github.com/zhuxiujia/GoMybatis/tx"
+	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
 )
 
@@ -10,8 +11,8 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 	//调用方法栈
 	var beanType = service.Type().Elem()
 	var beanName = beanType.PkgPath() + beanType.Name()
-	var session Session
-	var structStack = tx.StructField{}.New()
+	var sessionMap = GoroutineSessionMap{}.New()
+	var methodStackMap = tx.GoroutineMethodStackMap{}.New()
 	ProxyValue(service, func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
 		//init data
 		var propagation = tx.PROPAGATION_NEVER
@@ -22,9 +23,17 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 			propagation = tx.NewPropagation(txTag)
 		}
 		var fn = func(arg ProxyArg) []reflect.Value {
-			structStack.Push(funcField)
-			if structStack.Len() == 1 {
-				if propagation == tx.PROPAGATION_NEVER{
+			var goroutineID = utils.GoroutineID()             //协程id
+			var methodStack = methodStackMap.Get(goroutineID) //方法栈
+			if methodStack == nil {
+				var sf = tx.StructField{}.New()
+				methodStack = &sf
+			}
+			methodStack.Push(funcField)
+
+			var session = sessionMap.Get(goroutineID)
+			if methodStack.Len() == 1 {
+				if propagation == tx.PROPAGATION_NEVER {
 
 				} else if propagation == tx.PROPAGATION_REQUIRED {
 					//PROPAGATION_REQUIRED
@@ -39,25 +48,27 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 						if err != nil {
 							panic(err)
 						}
-						println("Begin in session:",session.Id())
+						println("Begin in session:", session.Id())
 					}
 				}
+				//压入map
+				sessionMap.Put(goroutineID, session)
 			}
 			var nativeImplResult = doNativeMethod(arg, nativeImplFunc, session)
-			structStack.Pop()
-			if structStack.Len() == 0 && session != nil {
+			methodStack.Pop()
+			if methodStack.Len() == 0 && session != nil {
 				if !haveRollBackType(nativeImplResult, rollbackTag) {
 					var err = session.Commit()
 					if err != nil {
 						panic(err)
 					}
-					println("Commit in session:",session.Id())
+					println("Commit in session:", session.Id())
 				} else {
 					var err = session.Rollback()
 					if err != nil {
 						panic(err)
 					}
-					println("Rollback in session:",session.Id())
+					println("Rollback in session:", session.Id())
 				}
 			}
 			return nativeImplResult
@@ -81,7 +92,7 @@ func doNativeMethod(arg ProxyArg, nativeImplFunc reflect.Value, session Session)
 }
 
 func haveRollBackType(v []reflect.Value, typeString string) bool {
-	if v == nil || len(v) == 0 || typeString == ""{
+	if v == nil || len(v) == 0 || typeString == "" {
 		return false
 	}
 	for _, item := range v {

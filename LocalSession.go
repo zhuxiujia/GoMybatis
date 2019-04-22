@@ -1,18 +1,17 @@
 package GoMybatis
 
 import (
-	"github.com/zhuxiujia/GoMybatis/utils"
 	"database/sql"
+	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
 //本地直连session
 type LocalSession struct {
-	SessionId              string
-	db                     *sql.DB
-	stmt                   *sql.Stmt
-	tx                     *sql.Tx
-	isCommitedOrRollbacked bool
-	isClosed               bool
+	SessionId string
+	db        *sql.DB
+	stmt      *sql.Stmt
+	tx        *sql.Tx
+	isClosed  bool
 }
 
 func (it *LocalSession) Id() string {
@@ -26,8 +25,9 @@ func (it *LocalSession) Rollback() error {
 	if it.tx != nil {
 		var err = it.tx.Rollback()
 		if err == nil {
-			it.isCommitedOrRollbacked = true
+			it.tx = nil
 		} else {
+			it.tx = nil
 			return err
 		}
 	}
@@ -41,7 +41,7 @@ func (it *LocalSession) Commit() error {
 	if it.tx != nil {
 		var err = it.tx.Commit()
 		if err == nil {
-			it.isCommitedOrRollbacked = true
+			it.tx = nil
 		}
 	}
 	return nil
@@ -69,7 +69,7 @@ func (it *LocalSession) Close() {
 		}
 		// When Close be called, if session is a transaction and do not call
 		// Commit or Rollback, then call Rollback.
-		if it.tx != nil && !it.isCommitedOrRollbacked {
+		if it.tx != nil {
 			it.tx.Rollback()
 		}
 		it.tx = nil
@@ -106,9 +106,6 @@ func (it *LocalSession) Exec(sqlorArgs string) (*Result, error) {
 	var result sql.Result
 	var err error
 	if it.tx != nil {
-		if it.isCommitedOrRollbacked {
-			return nil, utils.NewError("LocalSession", " Exec() sql fail!, session isCommitedOrRollbacked!")
-		}
 		result, err = it.tx.Exec(sqlorArgs)
 	} else {
 		result, err = it.db.Exec(sqlorArgs)
