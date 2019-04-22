@@ -31,33 +31,28 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 			methodStack.Push(funcField)
 
 			var session = engine.GoroutineSessionMap().Get(goroutineID)
-			if methodStack.Len() == 1 {
-				if propagation == tx.PROPAGATION_NEVER {
-
-				} else if propagation == tx.PROPAGATION_REQUIRED {
-					//PROPAGATION_REQUIRED
-					if session == nil {
-						//todo newSession is use service bean name?
-						var err error
-						session, err = engine.NewSession(beanName)
-						if err != nil {
-							panic(err)
-						}
-						err = session.Begin()
-						if err != nil {
-							panic(err)
-						}
-						println("Begin in session:", session.Id())
-					}
+			if session == nil {
+				//todo newSession is use service bean name?
+				var err error
+				session, err = engine.NewSession(beanName, &propagation)
+				if err != nil {
+					panic(err)
 				}
 				//压入map
 				engine.GoroutineSessionMap().Put(goroutineID, session)
+			}
+			if methodStack.Len() == 1 {
+				var err = session.Begin()
+				if err != nil {
+					panic(err)
+				}
+				println("Begin in session:", session.Id())
 			}
 			var nativeImplResult = doNativeMethod(arg, nativeImplFunc, session)
 			methodStack.Pop()
 			if methodStack.Len() == 0 && session != nil {
 				if !haveRollBackType(nativeImplResult, rollbackTag) {
-					var err = session.Rollback()
+					var err = session.Commit()
 					if err != nil {
 						panic(err)
 					}

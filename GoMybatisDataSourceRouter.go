@@ -1,6 +1,7 @@
 package GoMybatis
 
 import (
+	"github.com/zhuxiujia/GoMybatis/tx"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"database/sql"
 )
@@ -27,7 +28,7 @@ func (it *GoMybatisDataSourceRouter) SetDB(url string, db *sql.DB) {
 	it.dbMap[url] = db
 }
 
-func (it *GoMybatisDataSourceRouter) Router(mapperName string) (Session, error) {
+func (it *GoMybatisDataSourceRouter) Router(mapperName string,Propagation *tx.Propagation) (Session, error) {
 	var key *string
 	var db *sql.DB
 
@@ -48,10 +49,8 @@ func (it *GoMybatisDataSourceRouter) Router(mapperName string) (Session, error) 
 	if db == nil {
 		return nil, utils.NewError("GoMybatisDataSourceRouter", "router not find datasource opened ! do you forget invoke GoMybatis.GoMybatisEngine{}.New().Open(\"driverName\", Uri)?")
 	}
-	var session = Session(&LocalSession{
-		SessionId: utils.CreateUUID(),
-		db:        db,
-	})
+	var local=LocalSession{}.New(db,Propagation)
+	var session = Session(&local)
 	return session, nil
 }
 

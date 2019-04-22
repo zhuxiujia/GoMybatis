@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/zhuxiujia/GoMybatis/ast"
 	"github.com/zhuxiujia/GoMybatis/engines"
+	"github.com/zhuxiujia/GoMybatis/tx"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
 	"sync"
@@ -95,9 +96,9 @@ func (it *GoMybatisEngine) SetDataSourceRouter(router DataSourceRouter) {
 	it.dataSourceRouter = router
 }
 
-func (it *GoMybatisEngine) NewSession(mapperName string) (Session, error) {
+func (it *GoMybatisEngine) NewSession(mapperName string,proppagation *tx.Propagation) (Session, error) {
 	it.initCheck()
-	var session, err = it.DataSourceRouter().Router(mapperName)
+	var session, err = it.DataSourceRouter().Router(mapperName,proppagation)
 	return session, err
 }
 

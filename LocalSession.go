@@ -2,6 +2,7 @@ package GoMybatis
 
 import (
 	"database/sql"
+	"github.com/zhuxiujia/GoMybatis/tx"
 	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
@@ -12,6 +13,15 @@ type LocalSession struct {
 	stmt      *sql.Stmt
 	tx        *sql.Tx
 	isClosed  bool
+	propagation *tx.Propagation
+}
+
+func (it LocalSession)New(db *sql.DB,propagation *tx.Propagation) LocalSession  {
+	return LocalSession{
+		SessionId: utils.CreateUUID(),
+		db:        db,
+		propagation:propagation ,
+	}
 }
 
 func (it *LocalSession) Id() string {

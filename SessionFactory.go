@@ -19,7 +19,7 @@ func (it *SessionFactory) NewSession(mapperName string, sessionType SessionType)
 	var err error
 	switch sessionType {
 	case SessionType_Default:
-		var session, err = it.Engine.NewSession(mapperName)
+		var session, err = it.Engine.NewSession(mapperName,nil)
 		if err != nil {
 			panic(err)
 		}
@@ -30,7 +30,7 @@ func (it *SessionFactory) NewSession(mapperName string, sessionType SessionType)
 		newSession = Session(&factorySession)
 		break
 	case SessionType_Local:
-		newSession, err = it.Engine.NewSession(mapperName)
+		newSession, err = it.Engine.NewSession(mapperName,nil)
 		if err != nil {
 			panic(err)
 		}

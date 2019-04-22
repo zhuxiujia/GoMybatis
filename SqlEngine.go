@@ -1,6 +1,9 @@
 package GoMybatis
 
-import "github.com/zhuxiujia/GoMybatis/ast"
+import (
+	"github.com/zhuxiujia/GoMybatis/ast"
+	"github.com/zhuxiujia/GoMybatis/tx"
+)
 
 type Result struct {
 	LastInsertId int64
@@ -26,7 +29,7 @@ type SessionEngine interface {
 	//引擎名称
 	Name() string
 	//创建session
-	NewSession(mapperName string) (Session, error)
+	NewSession(mapperName string,proppagation *tx.Propagation) (Session, error)
 	//获取数据源路由
 	DataSourceRouter() DataSourceRouter
 	//设置数据源路由
