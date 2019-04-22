@@ -21,6 +21,7 @@ type GoMybatisEngine struct {
 	sqlResultDecoder  SqlResultDecoder      //sql查询结果解析引擎
 	templeteDecoder   TempleteDecoder       //模板解析引擎
 	callBackChain     []*CallBack           //回调链
+	goroutineSessionMap *GoroutineSessionMap //map[协程id]Session
 }
 
 func (it GoMybatisEngine) New() GoMybatisEngine {
@@ -57,6 +58,10 @@ func (it GoMybatisEngine) New() GoMybatisEngine {
 	if it.sessionFactory == nil {
 		var factory = SessionFactory{}.New(&it)
 		it.sessionFactory = &factory
+	}
+	if it.goroutineSessionMap==nil{
+		var gr=GoroutineSessionMap{}.New()
+		it.goroutineSessionMap=&gr
 	}
 	return it
 }
@@ -212,4 +217,8 @@ func (it *GoMybatisEngine) RegisterCallBack(arg *CallBack) {
 
 func (it *GoMybatisEngine) CallBackChan() []*CallBack {
 	return it.callBackChain
+}
+
+func (it *GoMybatisEngine) GoroutineSessionMap() *GoroutineSessionMap{
+	return it.goroutineSessionMap
 }

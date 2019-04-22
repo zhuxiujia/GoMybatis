@@ -11,7 +11,6 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 	//调用方法栈
 	var beanType = service.Type().Elem()
 	var beanName = beanType.PkgPath() + beanType.Name()
-	var sessionMap = GoroutineSessionMap{}.New()
 	var methodStackMap = tx.GoroutineMethodStackMap{}.New()
 	ProxyValue(service, func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
 		//init data
@@ -31,7 +30,7 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 			}
 			methodStack.Push(funcField)
 
-			var session = sessionMap.Get(goroutineID)
+			var session = engine.GoroutineSessionMap().Get(goroutineID)
 			if methodStack.Len() == 1 {
 				if propagation == tx.PROPAGATION_NEVER {
 
@@ -52,13 +51,13 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 					}
 				}
 				//压入map
-				sessionMap.Put(goroutineID, session)
+				engine.GoroutineSessionMap().Put(goroutineID, session)
 			}
 			var nativeImplResult = doNativeMethod(arg, nativeImplFunc, session)
 			methodStack.Pop()
 			if methodStack.Len() == 0 && session != nil {
 				if !haveRollBackType(nativeImplResult, rollbackTag) {
-					var err = session.Commit()
+					var err = session.Rollback()
 					if err != nil {
 						panic(err)
 					}
