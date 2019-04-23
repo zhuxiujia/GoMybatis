@@ -10,25 +10,27 @@ import (
 
 //本地直连session
 type LocalSession struct {
-	SessionId      string
-	driver         string
-	url            string
-	db             *sql.DB
-	stmt           *sql.Stmt
-	txStack        tx.TxStack
-	savePointStack *tx.SavePointStack
-	isClosed       bool
-
+	SessionId       string
+	driver          string
+	url             string
+	db              *sql.DB
+	stmt            *sql.Stmt
+	txStack         tx.TxStack
+	savePointStack  *tx.SavePointStack
+	isClosed        bool
 	newLocalSession *LocalSession
+
+	logSystem Log
 }
 
-func (it LocalSession) New(driver string, url string, db *sql.DB) LocalSession {
+func (it LocalSession) New(driver string, url string, db *sql.DB, logSystem Log) LocalSession {
 	return LocalSession{
 		SessionId: utils.CreateUUID(),
 		db:        db,
 		txStack:   tx.TxStack{}.New(),
 		driver:    driver,
 		url:       url,
+		logSystem: logSystem,
 	}
 }
 
@@ -53,15 +55,16 @@ func (it *LocalSession) Rollback() error {
 	var t, p = it.txStack.Pop()
 	if t != nil && p != nil {
 		if *p == tx.PROPAGATION_NESTED {
-			if it.savePointStack==nil{
-				var stack=tx.SavePointStack{}.New()
-				it.savePointStack=&stack
+			if it.savePointStack == nil {
+				var stack = tx.SavePointStack{}.New()
+				it.savePointStack = &stack
 			}
 			var point = it.savePointStack.Pop()
 			if point != nil {
-				println("[GoMybatis] exec ====================" + "rollback to " + *point)
-				r, e := t.Exec("rollback to " + *point)
-				println(r)
+				if it.logSystem != nil {
+					it.logSystem.Println([]byte("[GoMybatis] exec ====================" + "rollback to " + *point))
+				}
+				_, e := t.Exec("rollback to " + *point)
 				if e != nil {
 					return e
 				}
@@ -69,7 +72,9 @@ func (it *LocalSession) Rollback() error {
 		}
 
 		if it.txStack.Len() == 0 {
-			println("Rollback tx session:", it.Id())
+			if it.logSystem != nil {
+				it.logSystem.Println([]byte("Rollback tx session:" + it.Id()))
+			}
 			var err = t.Rollback()
 			if err != nil {
 				return err
@@ -97,20 +102,24 @@ func (it *LocalSession) Commit() error {
 	if t != nil && p != nil {
 
 		if *p == tx.PROPAGATION_NESTED {
-			if it.savePointStack==nil{
-				var stack=tx.SavePointStack{}.New()
-				it.savePointStack=&stack
+			if it.savePointStack == nil {
+				var stack = tx.SavePointStack{}.New()
+				it.savePointStack = &stack
 			}
 			var pId = "p" + strconv.Itoa(it.txStack.Len()+1)
 			it.savePointStack.Push(pId)
-			println("[GoMybatis]==================== exec " + "savepoint " + pId)
+			if it.logSystem != nil {
+				it.logSystem.Println([]byte("exec " + "savepoint " + pId))
+			}
 			_, e := t.Exec("savepoint " + pId)
 			if e != nil {
 				return e
 			}
 		}
 		if it.txStack.Len() == 0 {
-			println("Commit tx session:", it.Id())
+			if it.logSystem!=nil{
+				it.logSystem.Println([]byte("Commit tx session:"+it.Id()))
+			}
 			var err = t.Commit()
 			if err != nil {
 				return err
@@ -125,7 +134,9 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 	if p != nil {
 		prog = tx.ToString(*p)
 	}
-	println("Begin session:", it.Id(), ",prog:", prog)
+	if it.logSystem != nil {
+		it.logSystem.Println([]byte("Begin session:"+ it.Id()+ ",prog:"+ prog))
+	}
 	if it.isClosed == true {
 		return utils.NewError("LocalSession", " can not Begin() a Closed Session!")
 	}
@@ -168,7 +179,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 			if e != nil {
 				return e
 			}
-			var sess = LocalSession{}.New(it.driver, it.url, db) //same PROPAGATION_REQUIRES_NEW
+			var sess = LocalSession{}.New(it.driver, it.url, db, it.logSystem) //same PROPAGATION_REQUIRES_NEW
 			it.newLocalSession = &sess
 			break
 		case tx.PROPAGATION_NOT_SUPPORTED:
@@ -180,7 +191,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 			if e != nil {
 				return e
 			}
-			var sess = LocalSession{}.New(it.driver, it.url, db)
+			var sess = LocalSession{}.New(it.driver, it.url, db, it.logSystem)
 			it.newLocalSession = &sess
 			break
 		case tx.PROPAGATION_NEVER: //END
@@ -225,7 +236,9 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 }
 
 func (it *LocalSession) Close() {
-	println("Close session:", it.Id())
+	if it.logSystem != nil {
+		it.logSystem.Println([]byte("Close session:" + it.Id()))
+	}
 	if it.newLocalSession != nil {
 		it.newLocalSession.Close()
 		it.newLocalSession = nil
