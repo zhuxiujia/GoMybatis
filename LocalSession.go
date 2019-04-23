@@ -53,6 +53,10 @@ func (it *LocalSession) Rollback() error {
 	var t, p = it.txStack.Pop()
 	if t != nil && p != nil {
 		if *p == tx.PROPAGATION_NESTED {
+			if it.savePointStack==nil{
+				var stack=tx.SavePointStack{}.New()
+				it.savePointStack=&stack
+			}
 			var point = it.savePointStack.Pop()
 			if point != nil {
 				println("[GoMybatis] exec ====================" + "rollback to " + *point)
@@ -93,6 +97,10 @@ func (it *LocalSession) Commit() error {
 	if t != nil && p != nil {
 
 		if *p == tx.PROPAGATION_NESTED {
+			if it.savePointStack==nil{
+				var stack=tx.SavePointStack{}.New()
+				it.savePointStack=&stack
+			}
 			var pId = "p" + strconv.Itoa(it.txStack.Len()+1)
 			it.savePointStack.Push(pId)
 			println("[GoMybatis]==================== exec " + "savepoint " + pId)
