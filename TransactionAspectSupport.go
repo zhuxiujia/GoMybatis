@@ -35,7 +35,7 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 			if session == nil {
 				//todo newSession is use service bean name?
 				var err error
-				session, err = engine.NewSession(beanName, &propagation)
+				session, err = engine.NewSession(beanName)
 				if err != nil {
 					panic(err)
 				}

@@ -2,7 +2,6 @@ package GoMybatis
 
 import (
 	"database/sql"
-	"github.com/zhuxiujia/GoMybatis/tx"
 	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
@@ -31,7 +30,7 @@ func (it *GoMybatisDataSourceRouter) SetDB(driver string, url string, db *sql.DB
 	it.driverMap[url] = driver
 }
 
-func (it *GoMybatisDataSourceRouter) Router(mapperName string, Propagation *tx.Propagation) (Session, error) {
+func (it *GoMybatisDataSourceRouter) Router(mapperName string) (Session, error) {
 	var key *string
 	var db *sql.DB
 

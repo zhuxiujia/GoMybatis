@@ -30,7 +30,7 @@ type SessionEngine interface {
 	//引擎名称
 	Name() string
 	//创建session
-	NewSession(mapperName string, proppagation *tx.Propagation) (Session, error)
+	NewSession(mapperName string) (Session, error)
 	//获取数据源路由
 	DataSourceRouter() DataSourceRouter
 	//设置数据源路由
