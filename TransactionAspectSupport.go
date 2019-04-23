@@ -36,6 +36,10 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 				//todo newSession is use service bean name?
 				var err error
 				session, err = engine.NewSession(beanName)
+				defer func() {
+					session.Close()
+					engine.GoroutineSessionMap().Put(goroutineID,nil)
+				}()
 				if err != nil {
 					panic(err)
 				}
