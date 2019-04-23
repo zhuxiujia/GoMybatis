@@ -429,7 +429,7 @@ func initTestService() TestService {
 				panic(err)
 			}
 			println("UpdateName:", updateNum)
-			testService.UpdateRemark(id, "updated remark")
+			testService.UpdateRemark("172", "updated remark")
 			return errors.New("e")
 		},
 	}
