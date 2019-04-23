@@ -130,12 +130,12 @@ func (it *LocalSession) Commit() error {
 }
 
 func (it *LocalSession) Begin(p *tx.Propagation) error {
-	var prog = ""
+	var propagation = ""
 	if p != nil {
-		prog = tx.ToString(*p)
+		propagation = tx.ToString(*p)
 	}
 	if it.logSystem != nil {
-		it.logSystem.Println([]byte("Begin session:"+ it.Id()+ ",prog:"+ prog))
+		it.logSystem.Println([]byte("Begin session:"+ it.Id()+ ",Propagation:"+ propagation))
 	}
 	if it.isClosed == true {
 		return utils.NewError("LocalSession", " can not Begin() a Closed Session!")
