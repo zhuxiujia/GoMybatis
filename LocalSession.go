@@ -9,24 +9,24 @@ import (
 
 //本地直连session
 type LocalSession struct {
-	SessionId   string
-	url         string
-	db          *sql.DB
-	stmt        *sql.Stmt
-	txStack     tx.TxStack
-	isClosed    bool
-	propagation *tx.Propagation
+	SessionId string
+	driver    string
+	url       string
+	db        *sql.DB
+	stmt      *sql.Stmt
+	txStack   tx.TxStack
+	isClosed  bool
 
 	newLocalSession *LocalSession
 }
 
-func (it LocalSession) New(url string, db *sql.DB, propagation *tx.Propagation) LocalSession {
+func (it LocalSession) New(driver string, url string, db *sql.DB) LocalSession {
 	return LocalSession{
-		SessionId:   utils.CreateUUID(),
-		db:          db,
-		txStack:     tx.TxStack{}.New(),
-		url:         url,
-		propagation: propagation,
+		SessionId: utils.CreateUUID(),
+		db:        db,
+		txStack:   tx.TxStack{}.New(),
+		driver:    driver,
+		url:       url,
 	}
 }
 
@@ -38,8 +38,24 @@ func (it *LocalSession) Rollback() error {
 	if it.isClosed == true {
 		return utils.NewError("LocalSession", " can not Rollback() a Closed Session!")
 	}
-	var tx = it.txStack.Pop()
-	if tx != nil {
+
+	if it.txStack.Len() != 1 {
+		it.txStack.Pop()
+		return nil
+	}
+
+	if it.newLocalSession != nil {
+		var e = it.newLocalSession.Rollback()
+		it.newLocalSession.Close()
+		it.newLocalSession = nil
+		if e != nil {
+			return e
+		}
+	}
+
+	var tx, p = it.txStack.Pop()
+	if tx != nil && p != nil {
+		println("Rollback tx session:", it.Id())
 		var err = tx.Rollback()
 		if err != nil {
 			return err
@@ -52,8 +68,24 @@ func (it *LocalSession) Commit() error {
 	if it.isClosed == true {
 		return utils.NewError("LocalSession", " can not Commit() a Closed Session!")
 	}
-	var tx = it.txStack.Pop()
-	if tx != nil {
+
+	if it.txStack.Len() != 1 {
+		it.txStack.Pop()
+		return nil
+	}
+
+	if it.newLocalSession != nil {
+		var e = it.newLocalSession.Commit()
+		it.newLocalSession.Close()
+		it.newLocalSession = nil
+		if e != nil {
+			return e
+		}
+	}
+
+	var tx, p = it.txStack.Pop()
+	if tx != nil && p != nil {
+		println("Commit tx session:", it.Id())
 		var err = tx.Commit()
 		if err != nil {
 			return err
@@ -62,20 +94,26 @@ func (it *LocalSession) Commit() error {
 	return nil
 }
 
-func (it *LocalSession) Begin() error {
+func (it *LocalSession) Begin(p *tx.Propagation) error {
+	var prog = ""
+	if p != nil {
+		prog = tx.ToString(*p)
+	}
+	println("Begin session:", it.Id(), ",prog:", prog)
 	if it.isClosed == true {
 		return utils.NewError("LocalSession", " can not Begin() a Closed Session!")
 	}
 
-	if it.propagation != nil {
-		switch *it.propagation {
+	if p != nil {
+		switch *p {
 		case tx.PROPAGATION_REQUIRED: //end
 			if it.txStack.Len() > 0 {
+				it.txStack.Push(it.txStack.Last())
 				return nil
 			} else {
-				var tx, err = it.db.Begin()
+				var t, err = it.db.Begin()
 				if err == nil {
-					it.txStack.Push(tx)
+					it.txStack.Push(t, p)
 				}
 				return err
 			}
@@ -95,28 +133,28 @@ func (it *LocalSession) Begin() error {
 				return errors.New("[GoMybatis] PROPAGATION_MANDATORY Nested transaction exception! current not have a transaction!")
 			}
 			break
-		case tx.PROPAGATION_REQUIRES_NEW: //TODO
+		case tx.PROPAGATION_REQUIRES_NEW:
 			if it.txStack.Len() > 0 {
 				//TODO stop old tx
 			}
 			//TODO new session(tx)
-			var db, e = sql.Open("mysql", it.url)
+			var db, e = sql.Open(it.driver, it.url)
 			if e != nil {
 				return e
 			}
-			var sess = LocalSession{}.New(it.url, db, it.propagation)
+			var sess = LocalSession{}.New(it.driver, it.url, db) //same PROPAGATION_REQUIRES_NEW
 			it.newLocalSession = &sess
 			break
-		case tx.PROPAGATION_NOT_SUPPORTED: //TODO
+		case tx.PROPAGATION_NOT_SUPPORTED:
 			if it.txStack.Len() > 0 {
 				//TODO stop old tx
 			}
 			//TODO new session( no tx)
-			var db, e = sql.Open("mysql", it.url)
+			var db, e = sql.Open(it.driver, it.url)
 			if e != nil {
 				return e
 			}
-			var sess = LocalSession{}.New(it.url, db, nil)
+			var sess = LocalSession{}.New(it.driver, it.url, db)
 			it.newLocalSession = &sess
 			break
 		case tx.PROPAGATION_NEVER: //END
@@ -126,11 +164,12 @@ func (it *LocalSession) Begin() error {
 			break
 		case tx.PROPAGATION_NESTED: //TODO REQUIRED 类似，增加 save point
 			if it.txStack.Len() > 0 {
+				it.txStack.Push(it.txStack.Last())
 				return nil
 			} else {
 				var tx, err = it.db.Begin()
 				if err == nil {
-					it.txStack.Push(tx)
+					it.txStack.Push(tx, p)
 				}
 				return err
 			}
@@ -141,7 +180,7 @@ func (it *LocalSession) Begin() error {
 			} else {
 				var tx, err = it.db.Begin()
 				if err == nil {
-					it.txStack.Push(tx)
+					it.txStack.Push(tx, p)
 				}
 				return err
 			}
@@ -156,18 +195,20 @@ func (it *LocalSession) Begin() error {
 }
 
 func (it *LocalSession) Close() {
+	println("Close session:", it.Id())
+	if it.newLocalSession != nil {
+		it.newLocalSession.Close()
+		it.newLocalSession = nil
+	}
 	if it.db != nil {
 		if it.stmt != nil {
 			it.stmt.Close()
 		}
-		// When Close be called, if session is a transaction and do not call
-		// Commit or Rollback, then call Rollback.
 
 		for {
-			var tx = it.txStack.Pop()
-			tx.Rollback()
-			if tx == nil {
-				break
+			var tx, _ = it.txStack.Pop()
+			if tx != nil {
+				tx.Rollback()
 			}
 		}
 
@@ -181,10 +222,15 @@ func (it *LocalSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	if it.isClosed == true {
 		return nil, utils.NewError("LocalSession", " can not Query() a Closed Session!")
 	}
+	if it.newLocalSession != nil {
+		return it.newLocalSession.Query(sqlorArgs)
+	}
+
 	var rows *sql.Rows
 	var err error
-	if it.txStack.Last() != nil {
-		rows, err = it.txStack.Last().Query(sqlorArgs)
+	var t, _ = it.txStack.Last()
+	if t != nil {
+		rows, err = t.Query(sqlorArgs)
 	} else {
 		rows, err = it.db.Query(sqlorArgs)
 	}
@@ -201,10 +247,15 @@ func (it *LocalSession) Exec(sqlorArgs string) (*Result, error) {
 	if it.isClosed == true {
 		return nil, utils.NewError("LocalSession", " can not Exec() a Closed Session!")
 	}
+	if it.newLocalSession != nil {
+		return it.newLocalSession.Exec(sqlorArgs)
+	}
+
 	var result sql.Result
 	var err error
-	if it.txStack.Last() != nil {
-		result, err = it.txStack.Last().Exec(sqlorArgs)
+	var t, _ = it.txStack.Last()
+	if t != nil {
+		result, err = t.Exec(sqlorArgs)
 	} else {
 		result, err = it.db.Exec(sqlorArgs)
 	}

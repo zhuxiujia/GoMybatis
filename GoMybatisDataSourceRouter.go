@@ -9,6 +9,7 @@ import (
 //动态数据源路由
 type GoMybatisDataSourceRouter struct {
 	dbMap      map[string]*sql.DB
+	driverMap  map[string]string
 	routerFunc func(mapperName string) *string
 }
 
@@ -20,12 +21,14 @@ func (it GoMybatisDataSourceRouter) New(routerFunc func(mapperName string) *stri
 		}
 	}
 	it.dbMap = make(map[string]*sql.DB)
+	it.driverMap = make(map[string]string)
 	it.routerFunc = routerFunc
 	return it
 }
 
-func (it *GoMybatisDataSourceRouter) SetDB(url string, db *sql.DB) {
+func (it *GoMybatisDataSourceRouter) SetDB(driver string, url string, db *sql.DB) {
 	it.dbMap[url] = db
+	it.driverMap[url] = driver
 }
 
 func (it *GoMybatisDataSourceRouter) Router(mapperName string, Propagation *tx.Propagation) (Session, error) {
@@ -54,7 +57,7 @@ func (it *GoMybatisDataSourceRouter) Router(mapperName string, Propagation *tx.P
 	if key != nil {
 		url = *key
 	}
-	var local = LocalSession{}.New(url, db, Propagation)
+	var local = LocalSession{}.New(it.driverMap[url], url, db)
 	var session = Session(&local)
 	return session, nil
 }

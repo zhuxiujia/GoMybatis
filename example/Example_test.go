@@ -47,8 +47,8 @@ var exampleActivityMapper = ExampleActivityMapper{}
 
 type TestService struct {
 	exampleActivityMapper *ExampleActivityMapper
-	UpdateName            func(id string, name string) error `tx:"REQUIRED"rollback:"error"` //事务注解,`tx:"" 开启事务，`tx:"REQUIRED,error"` 指定传播行为为REQUIRED，回滚操作为error类型
-	UpdateRemark          func(id string, remark string) error  `tx:"REQUIRED"rollback:"error"`
+	UpdateName            func(id string, name string) error   `tx:"REQUIRED" rollback:"error"` //事务注解,`tx:"" 开启事务，`tx:"REQUIRED,error"` 指定传播行为为REQUIRED，回滚操作为error类型
+	UpdateRemark          func(id string, remark string) error `tx:"REQUIRES_NEW" rollback:"error"`
 }
 
 func init() {
@@ -58,7 +58,7 @@ func init() {
 	}
 	engine = GoMybatis.GoMybatisEngine{}.New()
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
-	_,err := engine.Open("mysql", MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
+	_, err := engine.Open("mysql", MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
 	if err != nil {
 		panic(err.Error())
 	}
@@ -242,7 +242,7 @@ func Test_local_Transation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	session.Begin() //开启事务
+	session.Begin(nil) //开启事务
 	var activityBean = Activity{
 		Id:   "170",
 		Name: "rs168-8",
@@ -395,11 +395,11 @@ func TestTestService(t *testing.T) {
 	//go testService.UpdateName("167", "updated name1")
 	testService.UpdateName("167", "updated name2")
 
-	time.Sleep(5 * time.Second)
+	time.Sleep(3 * time.Second)
 }
 
 func initTestService() TestService {
-	var testService  TestService
+	var testService TestService
 	testService = TestService{
 		exampleActivityMapper: &exampleActivityMapper,
 		UpdateRemark: func(id string, remark string) error {
@@ -413,8 +413,9 @@ func initTestService() TestService {
 			if err != nil {
 				panic(err)
 			}
-			println("UpdateRemark:",updateNum)
-			return errors.New("e")
+			println("UpdateRemark:", updateNum)
+			//return errors.New("e")
+			return nil
 		},
 		UpdateName: func(id string, name string) error {
 			var activitys, err = testService.exampleActivityMapper.SelectByIds([]string{id})
@@ -427,9 +428,9 @@ func initTestService() TestService {
 			if err != nil {
 				panic(err)
 			}
-			println("UpdateName:",updateNum)
+			println("UpdateName:", updateNum)
 			testService.UpdateRemark(id, "updated remark")
-			return nil
+			return errors.New("e")
 		},
 	}
 	GoMybatis.AopProxyService(reflect.ValueOf(&testService), &engine)

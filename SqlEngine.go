@@ -17,20 +17,20 @@ type Session interface {
 	Exec(sqlorArgs string) (*Result, error)
 	Rollback() error
 	Commit() error
-	Begin() error
+	Begin(p *tx.Propagation) error
 	Close()
 }
 
 //产生session的引擎
 type SessionEngine interface {
 	//打开数据库
-	Open(driverName, dataSourceName string) (*sql.DB,error)
+	Open(driverName, dataSourceName string) (*sql.DB, error)
 	//写方法到mapper
 	WriteMapperPtr(ptr interface{}, xml []byte)
 	//引擎名称
 	Name() string
 	//创建session
-	NewSession(mapperName string,proppagation *tx.Propagation) (Session, error)
+	NewSession(mapperName string, proppagation *tx.Propagation) (Session, error)
 	//获取数据源路由
 	DataSourceRouter() DataSourceRouter
 	//设置数据源路由
@@ -84,7 +84,7 @@ type SessionEngine interface {
 	//设置模板解析器
 	SetTempleteDecoder(decoder TempleteDecoder)
 
-	RegisterObj(ptr interface{},name string)
+	RegisterObj(ptr interface{}, name string)
 
 	GetObj(name string) interface{}
 

@@ -43,11 +43,10 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 				engine.GoroutineSessionMap().Put(goroutineID, session)
 			}
 			//if methodStack.Len() == 1 {
-			var err = session.Begin()
+			var err = session.Begin(&propagation)
 			if err != nil {
 				panic(err)
 			}
-			println("Begin in session:", session.Id())
 			//}
 			var nativeImplResult = doNativeMethod(arg, nativeImplFunc, session)
 			//methodStack.Pop()
@@ -57,13 +56,11 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 				if err != nil {
 					panic(err)
 				}
-				println("Commit in session:", session.Id())
 			} else {
 				var err = session.Rollback()
 				if err != nil {
 					panic(err)
 				}
-				println("Rollback in session:", session.Id())
 			}
 			//}
 			return nativeImplResult
@@ -94,7 +91,7 @@ func haveRollBackType(v []reflect.Value, typeString string) bool {
 	for _, item := range v {
 		if item.Kind() == reflect.Interface {
 			//println(typeString+" == " + item.String())
-			if strings.Contains(item.String(),typeString) {
+			if strings.Contains(item.String(), typeString) {
 				if !item.IsNil() {
 					return true
 				}

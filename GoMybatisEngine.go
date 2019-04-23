@@ -11,22 +11,22 @@ import (
 )
 
 type GoMybatisEngine struct {
-	mutex             sync.RWMutex          //读写锁
-	isInit            bool                  //是否初始化
+	mutex  sync.RWMutex //读写锁
+	isInit bool         //是否初始化
 
-	objMap            map[string]interface{}
+	objMap map[string]interface{}
 
-	dataSourceRouter  DataSourceRouter      //动态数据源路由器
-	log               Log                   //日志实现
-	logEnable         bool                  //是否允许日志输出（默认开启）
-	sessionFactory    *SessionFactory       //session 工厂
-	sqlArgTypeConvert ast.SqlArgTypeConvert //sql参数转换
-	expressionEngine  ast.ExpressionEngine  //表达式解析引擎
-	sqlBuilder        SqlBuilder            //sql 构建
-	sqlResultDecoder  SqlResultDecoder      //sql查询结果解析引擎
-	templeteDecoder   TempleteDecoder       //模板解析引擎
-	callBackChain     []*CallBack           //回调链
-	goroutineSessionMap *GoroutineSessionMap //map[协程id]Session
+	dataSourceRouter    DataSourceRouter      //动态数据源路由器
+	log                 Log                   //日志实现
+	logEnable           bool                  //是否允许日志输出（默认开启）
+	sessionFactory      *SessionFactory       //session 工厂
+	sqlArgTypeConvert   ast.SqlArgTypeConvert //sql参数转换
+	expressionEngine    ast.ExpressionEngine  //表达式解析引擎
+	sqlBuilder          SqlBuilder            //sql 构建
+	sqlResultDecoder    SqlResultDecoder      //sql查询结果解析引擎
+	templeteDecoder     TempleteDecoder       //模板解析引擎
+	callBackChain       []*CallBack           //回调链
+	goroutineSessionMap *GoroutineSessionMap  //map[协程id]Session
 }
 
 func (it GoMybatisEngine) New() GoMybatisEngine {
@@ -64,11 +64,11 @@ func (it GoMybatisEngine) New() GoMybatisEngine {
 		var factory = SessionFactory{}.New(&it)
 		it.sessionFactory = &factory
 	}
-	if it.goroutineSessionMap==nil{
-		var gr=GoroutineSessionMap{}.New()
-		it.goroutineSessionMap=&gr
+	if it.goroutineSessionMap == nil {
+		var gr = GoroutineSessionMap{}.New()
+		it.goroutineSessionMap = &gr
 	}
-	it.objMap= map[string]interface{}{}
+	it.objMap = map[string]interface{}{}
 	return it
 }
 
@@ -96,9 +96,9 @@ func (it *GoMybatisEngine) SetDataSourceRouter(router DataSourceRouter) {
 	it.dataSourceRouter = router
 }
 
-func (it *GoMybatisEngine) NewSession(mapperName string,proppagation *tx.Propagation) (Session, error) {
+func (it *GoMybatisEngine) NewSession(mapperName string, proppagation *tx.Propagation) (Session, error) {
 	it.initCheck()
-	var session, err = it.DataSourceRouter().Router(mapperName,proppagation)
+	var session, err = it.DataSourceRouter().Router(mapperName, proppagation)
 	return session, err
 }
 
@@ -191,14 +191,14 @@ func (it *GoMybatisEngine) SetSqlResultDecoder(decoder SqlResultDecoder) {
 
 //打开数据库
 //driverName: 驱动名称例如"mysql", dataSourceName: string 数据库url
-func (it *GoMybatisEngine) Open(driverName, dataSourceName string) (*sql.DB,error) {
+func (it *GoMybatisEngine) Open(driverName, dataSourceName string) (*sql.DB, error) {
 	it.initCheck()
 	db, err := sql.Open(driverName, dataSourceName)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
-	it.dataSourceRouter.SetDB(dataSourceName, db)
-	return db,nil
+	it.dataSourceRouter.SetDB(driverName, dataSourceName, db)
+	return db, nil
 }
 
 //模板解析器
@@ -225,18 +225,18 @@ func (it *GoMybatisEngine) CallBackChan() []*CallBack {
 	return it.callBackChain
 }
 
-func (it *GoMybatisEngine) GoroutineSessionMap() *GoroutineSessionMap{
+func (it *GoMybatisEngine) GoroutineSessionMap() *GoroutineSessionMap {
 	return it.goroutineSessionMap
 }
 
-func (it *GoMybatisEngine) RegisterObj(ptr interface{},name string){
-	var v=reflect.ValueOf(ptr)
-	if v.Kind()!=reflect.Ptr{
+func (it *GoMybatisEngine) RegisterObj(ptr interface{}, name string) {
+	var v = reflect.ValueOf(ptr)
+	if v.Kind() != reflect.Ptr {
 		panic("GoMybatis Engine Register obj not a ptr value!")
 	}
-	it.objMap[name]=ptr
+	it.objMap[name] = ptr
 }
 
-func (it *GoMybatisEngine) GetObj(name string) interface{}{
+func (it *GoMybatisEngine) GetObj(name string) interface{} {
 	return it.objMap[name]
 }
