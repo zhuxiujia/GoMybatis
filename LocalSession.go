@@ -209,6 +209,8 @@ func (it *LocalSession) Close() {
 			var tx, _ = it.txStack.Pop()
 			if tx != nil {
 				tx.Rollback()
+			}else{
+				break
 			}
 		}
 
