@@ -5,17 +5,19 @@ import (
 	"errors"
 	"github.com/zhuxiujia/GoMybatis/tx"
 	"github.com/zhuxiujia/GoMybatis/utils"
+	"strconv"
 )
 
 //本地直连session
 type LocalSession struct {
-	SessionId string
-	driver    string
-	url       string
-	db        *sql.DB
-	stmt      *sql.Stmt
-	txStack   tx.TxStack
-	isClosed  bool
+	SessionId      string
+	driver         string
+	url            string
+	db             *sql.DB
+	stmt           *sql.Stmt
+	txStack        tx.TxStack
+	savePointStack *tx.SavePointStack
+	isClosed       bool
 
 	newLocalSession *LocalSession
 }
@@ -39,11 +41,6 @@ func (it *LocalSession) Rollback() error {
 		return utils.NewError("LocalSession", " can not Rollback() a Closed Session!")
 	}
 
-	if it.txStack.Len() != 1 {
-		it.txStack.Pop()
-		return nil
-	}
-
 	if it.newLocalSession != nil {
 		var e = it.newLocalSession.Rollback()
 		it.newLocalSession.Close()
@@ -53,12 +50,26 @@ func (it *LocalSession) Rollback() error {
 		}
 	}
 
-	var tx, p = it.txStack.Pop()
-	if tx != nil && p != nil {
-		println("Rollback tx session:", it.Id())
-		var err = tx.Rollback()
-		if err != nil {
-			return err
+	var t, p = it.txStack.Pop()
+	if t != nil && p != nil {
+		if *p == tx.PROPAGATION_NESTED {
+			var point = it.savePointStack.Pop()
+			if point != nil {
+				println("[GoMybatis] exec ====================" + "rollback to " + *point)
+				r, e := t.Exec("rollback to " + *point)
+				println(r)
+				if e != nil {
+					return e
+				}
+			}
+		}
+
+		if it.txStack.Len() == 0 {
+			println("Rollback tx session:", it.Id())
+			var err = t.Rollback()
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -67,11 +78,6 @@ func (it *LocalSession) Rollback() error {
 func (it *LocalSession) Commit() error {
 	if it.isClosed == true {
 		return utils.NewError("LocalSession", " can not Commit() a Closed Session!")
-	}
-
-	if it.txStack.Len() != 1 {
-		it.txStack.Pop()
-		return nil
 	}
 
 	if it.newLocalSession != nil {
@@ -83,12 +89,24 @@ func (it *LocalSession) Commit() error {
 		}
 	}
 
-	var tx, p = it.txStack.Pop()
-	if tx != nil && p != nil {
-		println("Commit tx session:", it.Id())
-		var err = tx.Commit()
-		if err != nil {
-			return err
+	var t, p = it.txStack.Pop()
+	if t != nil && p != nil {
+
+		if *p == tx.PROPAGATION_NESTED {
+			var pId = "p" + strconv.Itoa(it.txStack.Len()+1)
+			it.savePointStack.Push(pId)
+			println("[GoMybatis]==================== exec " + "savepoint " + pId)
+			_, e := t.Exec("savepoint " + pId)
+			if e != nil {
+				return e
+			}
+		}
+		if it.txStack.Len() == 0 {
+			println("Commit tx session:", it.Id())
+			var err = t.Commit()
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -163,6 +181,10 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 			}
 			break
 		case tx.PROPAGATION_NESTED: //TODO REQUIRED 类似，增加 save point
+			if it.savePointStack == nil {
+				var savePointStack = tx.SavePointStack{}.New()
+				it.savePointStack = &savePointStack
+			}
 			if it.txStack.Len() > 0 {
 				it.txStack.Push(it.txStack.Last())
 				return nil
@@ -209,7 +231,7 @@ func (it *LocalSession) Close() {
 			var tx, _ = it.txStack.Pop()
 			if tx != nil {
 				tx.Rollback()
-			}else{
+			} else {
 				break
 			}
 		}

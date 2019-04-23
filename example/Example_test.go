@@ -47,8 +47,8 @@ var exampleActivityMapper = ExampleActivityMapper{}
 
 type TestService struct {
 	exampleActivityMapper *ExampleActivityMapper
-	UpdateName            func(id string, name string) error   `tx:"REQUIRED" rollback:"error"` //事务注解,`tx:"" 开启事务，`tx:"REQUIRED,error"` 指定传播行为为REQUIRED，回滚操作为error类型
-	UpdateRemark          func(id string, remark string) error `tx:"REQUIRES_NEW" rollback:"error"`
+	UpdateName            func(id string, name string) error   `tx:"NESTED" rollback:"error"` //事务注解,`tx:"" 开启事务，`tx:"REQUIRED,error"` 指定传播行为为REQUIRED，回滚操作为error类型
+	UpdateRemark          func(id string, remark string) error `tx:"NESTED" rollback:"error"`
 }
 
 func init() {
@@ -414,7 +414,9 @@ func initTestService() TestService {
 				panic(err)
 			}
 			println("UpdateRemark:", updateNum)
-			//return errors.New("e")
+			if id=="167"{
+				return errors.New("e")
+			}
 			return nil
 		},
 		UpdateName: func(id string, name string) error {
@@ -429,8 +431,9 @@ func initTestService() TestService {
 				panic(err)
 			}
 			println("UpdateName:", updateNum)
-			testService.UpdateRemark("172", "updated remark")
-			return errors.New("e")
+			testService.UpdateRemark("172", "p2")
+			testService.UpdateRemark("167", "p1")
+			return nil
 		},
 	}
 	GoMybatis.AopProxyService(reflect.ValueOf(&testService), &engine)
