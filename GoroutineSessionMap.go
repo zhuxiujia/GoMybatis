@@ -24,3 +24,7 @@ func (it *GoroutineSessionMap) Get(k int64) Session {
 		return nil
 	}
 }
+
+func (it *GoroutineSessionMap) Delete(k int64) {
+	it.m.Delete(k)
+}
