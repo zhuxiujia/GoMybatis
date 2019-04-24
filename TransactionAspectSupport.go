@@ -32,7 +32,9 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 				var err error
 				session, err = engine.NewSession(beanName)
 				defer func() {
-					session.Close()
+					if session != nil {
+						session.Close()
+					}
 					engine.GoroutineSessionMap().Delete(goroutineID)
 				}()
 				if err != nil {
