@@ -1,13 +1,14 @@
 package GoMybatis
 
 import (
-	"github.com/zhuxiujia/GoMybatis/example"
-	"github.com/zhuxiujia/GoMybatis/utils"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/zhuxiujia/GoMybatis/example"
+	"github.com/zhuxiujia/GoMybatis/tx"
+	"github.com/zhuxiujia/GoMybatis/utils"
 	"sync"
 	"testing"
 	"time"
-	_ "github.com/go-sql-driver/mysql"
 )
 
 //假设Mysql 数据库查询时间为0，框架单协程的Benchmark性能
@@ -170,7 +171,7 @@ func (it *TestSession) Rollback() error {
 func (it *TestSession) Commit() error {
 	return nil
 }
-func (it *TestSession) Begin() error {
+func (it *TestSession) Begin(*tx.Propagation) error {
 	return nil
 }
 func (it *TestSession) Close() {
@@ -190,7 +191,7 @@ type ExampleActivityMapperImpl struct {
 func InitMapperByLocalSession() ExampleActivityMapperImpl {
 	var engine = GoMybatisEngine{}.New()
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
-	err := engine.Open("mysql", "") //此处请按格式填写你的mysql链接，这里用*号代替
+	_, err := engine.Open("mysql", "") //此处请按格式填写你的mysql链接，这里用*号代替
 	if err != nil {
 		panic(err.Error())
 	}

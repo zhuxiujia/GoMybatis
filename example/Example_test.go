@@ -47,8 +47,8 @@ var exampleActivityMapper = ExampleActivityMapper{}
 
 type TestService struct {
 	exampleActivityMapper *ExampleActivityMapper
-	UpdateName            func(id string, name string) error   `tx:"NESTED" rollback:"error"` //事务注解,`tx:"" 开启事务，`tx:"REQUIRED,error"` 指定传播行为为REQUIRED，回滚操作为error类型
-	UpdateRemark          func(id string, remark string) error `tx:"NESTED" rollback:"error"`
+	UpdateName            func(id string, name string) error   `tx:"" rollback:"error"` //事务注解,`tx:"" 开启事务，`tx:"PROPAGATION_REQUIRED,error"` 指定传播行为为REQUIRED(默认REQUIRED)，回滚操作为error类型
+	UpdateRemark          func(id string, remark string) error `tx:"" rollback:"error"`
 }
 
 func init() {

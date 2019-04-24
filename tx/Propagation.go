@@ -50,29 +50,28 @@ func NewPropagation(arg string) Propagation {
 	case "":
 		return PROPAGATION_REQUIRED
 		break
-	case "REQUIRED":
+	case "PROPAGATION_REQUIRED":
 		return PROPAGATION_REQUIRED
 		break
-	case "SUPPORTS":
+	case "PROPAGATION_SUPPORTS":
 		return PROPAGATION_SUPPORTS
 		break
-
-	case "MANDATORY":
+	case "PROPAGATION_MANDATORY":
 		return PROPAGATION_MANDATORY
 		break
-	case "REQUIRES_NEW":
+	case "PROPAGATION_REQUIRES_NEW":
 		return PROPAGATION_REQUIRES_NEW
 		break
-	case "NOT_SUPPORTED":
+	case "PROPAGATION_NOT_SUPPORTED":
 		return PROPAGATION_NOT_SUPPORTED
 		break
-	case "NEVER":
+	case "PROPAGATION_NEVER":
 		return PROPAGATION_NEVER
 		break
-	case "NESTED":
+	case "PROPAGATION_NESTED":
 		return PROPAGATION_NESTED
 		break
-	case "NOT_REQUIRED":
+	case "PROPAGATION_NOT_REQUIRED":
 		return PROPAGATION_NOT_REQUIRED
 		break
 	default:
