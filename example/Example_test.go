@@ -7,7 +7,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/zhuxiujia/GoMybatis"
 	"io/ioutil"
-	"reflect"
 	"testing"
 	"time"
 )
@@ -445,6 +444,6 @@ func initTestService() TestService {
 			return nil
 		},
 	}
-	GoMybatis.AopProxyService(reflect.ValueOf(&testService), &engine)
+	GoMybatis.AopProxyService(&testService, &engine)
 	return testService
 }

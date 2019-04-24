@@ -9,7 +9,16 @@ import (
 )
 
 //使用AOP切面 代理目标服务，如果服务painc()它的事务会回滚
-func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
+func AopProxyService(service interface{}, engine *GoMybatisEngine) {
+	var v = reflect.ValueOf(service)
+	if v.Kind() != reflect.Ptr {
+		panic("[GoMybatis] AopProxy service  must use ptr arg!")
+	}
+	AopProxyServiceValue(v, engine)
+}
+
+//使用AOP切面 代理目标服务，如果服务painc()它的事务会回滚
+func AopProxyServiceValue(service reflect.Value, engine *GoMybatisEngine) {
 	if engine.PropagationEnable() == false {
 		panic("[GoMybatis] if need AopProxyService(),you must set engine.SetPropagationEnable(true)!")
 	}
