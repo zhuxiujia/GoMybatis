@@ -117,8 +117,8 @@ func (it *LocalSession) Commit() error {
 			}
 		}
 		if it.txStack.Len() == 0 {
-			if it.logSystem!=nil{
-				it.logSystem.Println([]byte("Commit tx session:"+it.Id()))
+			if it.logSystem != nil {
+				it.logSystem.Println([]byte("Commit tx session:" + it.Id()))
 			}
 			var err = t.Commit()
 			if err != nil {
@@ -135,7 +135,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 		propagation = tx.ToString(*p)
 	}
 	if it.logSystem != nil {
-		it.logSystem.Println([]byte("Begin session:"+ it.Id()+ ",Propagation:"+ propagation))
+		it.logSystem.Println([]byte("Begin session:" + it.Id() + ",Propagation:" + propagation))
 	}
 	if it.isClosed == true {
 		return utils.NewError("LocalSession", " can not Begin() a Closed Session!")
@@ -248,12 +248,10 @@ func (it *LocalSession) Close() {
 			it.stmt.Close()
 		}
 
-		for {
+		for i := 0; i < it.txStack.Len(); i++ {
 			var tx, _ = it.txStack.Pop()
 			if tx != nil {
 				tx.Rollback()
-			} else {
-				break
 			}
 		}
 
