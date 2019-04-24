@@ -5,20 +5,22 @@ import (
 )
 
 type GoroutineSessionMap struct {
-	m    map[int64]Session
-	lock sync.RWMutex
+	m sync.Map
 }
 
 func (it GoroutineSessionMap) New() GoroutineSessionMap {
 	return GoroutineSessionMap{
-		m: make(map[int64]Session),
+		m: sync.Map{},
 	}
 }
 func (it *GoroutineSessionMap) Put(k int64, session Session) {
-	it.lock.Lock()
-	defer it.lock.Unlock()
-	it.m[k] = session
+	it.m.Store(k, session)
 }
 func (it *GoroutineSessionMap) Get(k int64) Session {
-	return it.m[k]
+	var v, ok = it.m.Load(k)
+	if ok {
+		return v.(Session)
+	} else {
+		return nil
+	}
 }
