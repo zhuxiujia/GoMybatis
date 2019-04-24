@@ -20,6 +20,8 @@
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-Expression and XML object-oriented design</a>If foo. Bar is a pointer, then calling foo. Bar in XML will take the actual value and completely avoid using & and * symbolic pointer operations.<br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-Dynamic multiple data sources</a>You can customize multiple data source rules using routing engine. SetDataSourceRouter<br>
 <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-Template element</a>High development efficiency template, one line of code to achieve additions, deletions, modifications, logical deletions, optimistic lock version number<br>
+<a href="https://zhuxiujia.github.io/gomybatis.io/info.html">-Eight Transaction Communication Behaviors</a><br>
+
 #### Asynchronous Message Queue Logging System
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/log_system.png)
 Database Driven List
