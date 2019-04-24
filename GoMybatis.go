@@ -329,7 +329,7 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 		panic("[GoMybatis] exe sql need a SessionFactory or Session!")
 	}
 	//session
-	if session == nil {
+	if sessionEngine.PropagationEnable() && session == nil {
 		var goroutineID = utils.GoroutineID() //协程id
 		session = sessionEngine.GoroutineSessionMap().Get(goroutineID)
 	}

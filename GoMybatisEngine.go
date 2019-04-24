@@ -26,6 +26,7 @@ type GoMybatisEngine struct {
 	templeteDecoder     TempleteDecoder       //模板解析引擎
 	callBackChain       []*CallBack           //回调链
 	goroutineSessionMap *GoroutineSessionMap  //map[协程id]Session
+	propagationEnable   bool                  //是否启用传播行为（启用会从栈获取协程id，有一定性能消耗，换取最大的事务定义便捷）
 }
 
 func (it GoMybatisEngine) New() GoMybatisEngine {
@@ -97,7 +98,7 @@ func (it *GoMybatisEngine) SetDataSourceRouter(router DataSourceRouter) {
 
 func (it *GoMybatisEngine) NewSession(mapperName string) (Session, error) {
 	it.initCheck()
-	var session, err = it.DataSourceRouter().Router(mapperName,it.Log())
+	var session, err = it.DataSourceRouter().Router(mapperName, it.Log())
 	return session, err
 }
 
@@ -238,4 +239,12 @@ func (it *GoMybatisEngine) RegisterObj(ptr interface{}, name string) {
 
 func (it *GoMybatisEngine) GetObj(name string) interface{} {
 	return it.objMap[name]
+}
+
+func (it *GoMybatisEngine) SetPropagationEnable(enable bool) {
+	it.propagationEnable = enable
+}
+
+func (it *GoMybatisEngine) PropagationEnable() bool {
+	return it.propagationEnable
 }

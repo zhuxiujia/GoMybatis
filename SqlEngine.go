@@ -90,7 +90,7 @@ type SessionEngine interface {
 
 	GoroutineSessionMap() *GoroutineSessionMap
 
-	//TODO　RegisterBean(bean interface{}) // bean必须为struct的指针，且包含首字母大写的func属性，才能真正被GoMybatis AOP代理
+	SetPropagationEnable(enable bool)
 
-	//TODO　RegisterAOPFunc(funcChan []func..) //注册AOP方法到引擎Aop方法链
+	PropagationEnable() bool
 }
