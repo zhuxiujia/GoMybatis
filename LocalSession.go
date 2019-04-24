@@ -254,7 +254,7 @@ func (it *LocalSession) Close() {
 				tx.Rollback()
 			}
 		}
-
+		it.db.Close()
 		it.db = nil
 		it.stmt = nil
 		it.isClosed = true
