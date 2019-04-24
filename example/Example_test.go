@@ -407,6 +407,7 @@ func initTestService() TestService {
 			if err != nil {
 				panic(err)
 			}
+			//TODO 此处可能会因为activitys长度为0 导致数组越界 painc,painc 为运行时异常 框架自动回滚事务
 			var activity = activitys[0]
 			activity.Remark = remark
 			updateNum, err := testService.exampleActivityMapper.UpdateTemplete(activity)
@@ -414,7 +415,7 @@ func initTestService() TestService {
 				panic(err)
 			}
 			println("UpdateRemark:", updateNum)
-			if id=="167"{
+			if id == "167" {
 				return errors.New("e")
 			}
 			return nil
