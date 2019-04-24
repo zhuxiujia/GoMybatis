@@ -119,6 +119,9 @@ func main() {
  Oracle: github.com/mattn/go-oci8
  CockroachDB(Postgres): github.com/lib/pq
  ```
+ 
+ #### 嵌套事务-事务传播行为
+ <table><thead><tr><th>事务类型</th><th>说明</th></tr></thead><tbody><tr><td>PROPAGATION_REQUIRED</td><td>表示如果当前事务存在，则支持当前事务。否则，会启动一个新的事务。默认事务类型。</td></tr><tr><td>PROPAGATION_SUPPORTS</td><td>表示如果当前事务存在，则支持当前事务，如果当前没有事务，就以非事务方式执行。</td></tr><tr><td>PROPAGATION_MANDATORY</td><td>表示如果当前事务存在，则支持当前事务，如果当前没有事务，则返回事务嵌套错误。</td></tr><tr><td>PROPAGATION_REQUIRES_NEW</td><td>表示新建一个全新Session开启一个全新事务，如果当前存在事务，则把当前事务挂起。</td></tr><tr><td>PROPAGATION_NOT_SUPPORTED</td><td>表示以非事务方式执行操作，如果当前存在事务，则新建一个Session以非事务方式执行操作，把当前事务挂起。</td></tr><tr><td>PROPAGATION_NEVER</td><td>表示以非事务方式执行操作，如果当前存在事务，则返回事务嵌套错误。</td></tr><tr><td>PROPAGATION_NESTED</td><td>表示如果当前事务存在，则在嵌套事务内执行，如嵌套事务回滚，则只会在嵌套事务内回滚，不会影响当前事务。如果当前没有事务，则进行与PROPAGATION_REQUIRED类似的操作。</td></tr><tr><td>PROPAGATION_NOT_REQUIRED</td><td>表示如果当前没有事务，就新建一个事务,否则返回错误。</td></tr></tbody></table>
 
 
 #### 多种表达式引擎可选（表达式引擎接口ExpressionEngine.go 负责表达式("foo != nil"...)的判断和取值）
