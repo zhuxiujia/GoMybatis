@@ -45,10 +45,15 @@ var engine GoMybatis.GoMybatisEngine
 //初始化mapper文件和结构体
 var exampleActivityMapper = ExampleActivityMapper{}
 
+//测试服务
 type TestService struct {
-	exampleActivityMapper *ExampleActivityMapper
-	UpdateName            func(id string, name string) error   `tx:"" rollback:"error"` //事务注解,`tx:"" 开启事务，`tx:"PROPAGATION_REQUIRED,error"` 指定传播行为为REQUIRED(默认REQUIRED)，回滚操作为error类型
-	UpdateRemark          func(id string, remark string) error `tx:"" rollback:"error"`
+	exampleActivityMapper *ExampleActivityMapper //服务包含一个mapper操作数据库，类似java spring mvc
+
+	//类似拷贝spring MVC的声明式事务注解
+	//rollback:回滚操作为error类型(你也可以自定义实现了builtin.error接口的自定义struct，框架会把自定义的error类型转换为string，检查是否包含，是则回滚
+	//tx:"" 开启事务，`tx:"PROPAGATION_REQUIRED,error"` 指定传播行为为REQUIRED(默认REQUIRED))
+	UpdateName   func(id string, name string) error   `tx:"" rollback:"error"`
+	UpdateRemark func(id string, remark string) error `tx:"" rollback:"error"`
 }
 
 func init() {
