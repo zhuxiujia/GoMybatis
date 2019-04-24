@@ -1,6 +1,7 @@
 package GoMybatis
 
 import (
+	"fmt"
 	"github.com/zhuxiujia/GoMybatis/tx"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
@@ -38,7 +39,7 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 				session, err = engine.NewSession(beanName)
 				defer func() {
 					session.Close()
-					engine.GoroutineSessionMap().Put(goroutineID,nil)
+					engine.GoroutineSessionMap().Put(goroutineID, nil)
 				}()
 				if err != nil {
 					panic(err)
@@ -52,7 +53,7 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 				panic(err)
 			}
 			//}
-			var nativeImplResult = doNativeMethod(arg, nativeImplFunc, session)
+			var nativeImplResult = doNativeMethod(funcField, arg, nativeImplFunc, session, engine.Log())
 			//methodStack.Pop()
 			//if methodStack.Len() == 0 && session != nil {
 			if !haveRollBackType(nativeImplResult, rollbackTag) {
@@ -73,14 +74,18 @@ func AopProxyService(service reflect.Value, engine *GoMybatisEngine) {
 	})
 }
 
-func doNativeMethod(arg ProxyArg, nativeImplFunc reflect.Value, session Session) []reflect.Value {
+func doNativeMethod(funcField reflect.StructField, arg ProxyArg, nativeImplFunc reflect.Value, session Session, log Log) []reflect.Value {
 	defer func() {
 		err := recover()
 		if err != nil {
-			var err = session.Rollback()
-			if err != nil {
-				panic(err)
+			var rollbackErr = session.Rollback()
+			if rollbackErr != nil {
+				panic(fmt.Sprint(err) + rollbackErr.Error())
 			}
+			if log != nil {
+				log.Println([]byte(fmt.Sprint(err) + " Throw out from >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + funcField.Name + "()"))
+			}
+			panic(err)
 		}
 	}()
 	return nativeImplFunc.Call(arg.Args)
