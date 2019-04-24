@@ -157,3 +157,4 @@
         from biz_activity where delete_flag = 1
     </select>
 </mapper>
+
