@@ -9,7 +9,8 @@ import (
 )
 
 //使用AOP切面 代理目标服务，如果服务painc()它的事务会回滚
-func AopProxyService(service interface{}, engine *GoMybatisEngine) {
+//默认为单协程模型，如果是多协程调用的情况请开启engine.SetGoroutineIDEnable(true)
+func AopProxyService(service interface{}, engine SessionEngine) {
 	var v = reflect.ValueOf(service)
 	if v.Kind() != reflect.Ptr {
 		panic("[GoMybatis] AopProxy service  must use ptr arg!")
@@ -18,7 +19,7 @@ func AopProxyService(service interface{}, engine *GoMybatisEngine) {
 }
 
 //使用AOP切面 代理目标服务，如果服务painc()它的事务会回滚
-func AopProxyServiceValue(service reflect.Value, engine *GoMybatisEngine) {
+func AopProxyServiceValue(service reflect.Value, engine SessionEngine) {
 	var beanType = service.Type().Elem()
 	var beanName = beanType.PkgPath() + beanType.Name()
 	ProxyValue(service, func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
@@ -32,7 +33,7 @@ func AopProxyServiceValue(service reflect.Value, engine *GoMybatisEngine) {
 		}
 		var fn = func(arg ProxyArg) []reflect.Value {
 			var goroutineID int64 //协程id
-			if engine.goroutineIDEnable {
+			if engine.GoroutineIDEnable() {
 				goroutineID = utils.GoroutineID()
 			} else {
 				goroutineID = 0
