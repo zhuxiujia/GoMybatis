@@ -24,7 +24,6 @@ type GoMybatisEngine struct {
 	sqlBuilder          SqlBuilder            //sql 构建
 	sqlResultDecoder    SqlResultDecoder      //sql查询结果解析引擎
 	templeteDecoder     TempleteDecoder       //模板解析引擎
-	callBackChain       []*CallBack           //回调链
 	goroutineSessionMap *GoroutineSessionMap  //map[协程id]Session
 	goroutineIDEnable   bool                  //是否启用goroutineIDEnable（注意（该方法需要在多协程环境下调用）启用会从栈获取协程id，有一定性能消耗，换取最大的事务定义便捷）
 }
@@ -209,20 +208,6 @@ func (it *GoMybatisEngine) TempleteDecoder() TempleteDecoder {
 //设置模板解析器
 func (it *GoMybatisEngine) SetTempleteDecoder(decoder TempleteDecoder) {
 	it.templeteDecoder = decoder
-}
-
-//注册回调函数
-func (it *GoMybatisEngine) RegisterCallBack(arg *CallBack) {
-	it.mutex.Lock()
-	if it.callBackChain == nil {
-		it.callBackChain = make([]*CallBack, 0)
-	}
-	it.callBackChain = append(it.callBackChain, arg)
-	it.mutex.Unlock()
-}
-
-func (it *GoMybatisEngine) CallBackChan() []*CallBack {
-	return it.callBackChain
 }
 
 func (it *GoMybatisEngine) GoroutineSessionMap() *GoroutineSessionMap {
