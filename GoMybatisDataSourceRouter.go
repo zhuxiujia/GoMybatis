@@ -30,7 +30,7 @@ func (it *GoMybatisDataSourceRouter) SetDB(driver string, url string, db *sql.DB
 	it.driverMap[url] = driver
 }
 
-func (it *GoMybatisDataSourceRouter) Router(mapperName string,log Log) (Session, error) {
+func (it *GoMybatisDataSourceRouter) Router(mapperName string, engine SessionEngine) (Session, error) {
 	var key *string
 	var db *sql.DB
 
@@ -56,7 +56,7 @@ func (it *GoMybatisDataSourceRouter) Router(mapperName string,log Log) (Session,
 	if key != nil {
 		url = *key
 	}
-	var local = LocalSession{}.New(it.driverMap[url], url, db,log)
+	var local = LocalSession{}.New(it.driverMap[url], url, db, engine.Log())
 	var session = Session(&local)
 	return session, nil
 }

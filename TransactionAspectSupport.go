@@ -19,9 +19,6 @@ func AopProxyService(service interface{}, engine *GoMybatisEngine) {
 
 //使用AOP切面 代理目标服务，如果服务painc()它的事务会回滚
 func AopProxyServiceValue(service reflect.Value, engine *GoMybatisEngine) {
-	if engine.PropagationEnable() == false {
-		panic("[GoMybatis] if need AopProxyService(),you must set engine.SetPropagationEnable(true)!")
-	}
 	var beanType = service.Type().Elem()
 	var beanName = beanType.PkgPath() + beanType.Name()
 	ProxyValue(service, func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
@@ -34,7 +31,12 @@ func AopProxyServiceValue(service reflect.Value, engine *GoMybatisEngine) {
 			propagation = tx.NewPropagation(txTag)
 		}
 		var fn = func(arg ProxyArg) []reflect.Value {
-			var goroutineID = utils.GoroutineID() //协程id
+			var goroutineID int64 //协程id
+			if engine.goroutineIDEnable {
+				goroutineID = utils.GoroutineID()
+			} else {
+				goroutineID = 0
+			}
 			var session = engine.GoroutineSessionMap().Get(goroutineID)
 			if session == nil {
 				//todo newSession is use service bean name?

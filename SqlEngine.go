@@ -88,9 +88,12 @@ type SessionEngine interface {
 
 	GetObj(name string) interface{}
 
+	//（注意（该方法需要在多协程环境下调用）启用会从栈获取协程id，有一定性能消耗，换取最大的事务定义便捷）
 	GoroutineSessionMap() *GoroutineSessionMap
 
-	SetPropagationEnable(enable bool)
+	//是否启用goroutineIDEnable（注意（该方法需要在多协程环境下调用）启用会从栈获取协程id，有一定性能消耗，换取最大的事务定义便捷）
+	SetGoroutineIDEnable(enable bool)
 
-	PropagationEnable() bool
+	//是否启用goroutineIDEnable（注意（该方法需要在多协程环境下调用）启用会从栈获取协程id，有一定性能消耗，换取最大的事务定义便捷）
+	GoroutineIDEnable() bool
 }
