@@ -338,6 +338,14 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 		}
 		session = sessionEngine.GoroutineSessionMap().Get(goroutineID)
 	}
+	if session == nil {
+		var s, err = sessionEngine.NewSession(beanName)
+		if err != nil {
+			return err
+		}
+		session = s
+		defer session.Close()
+	}
 	var haveLastReturnValue = returnValue != nil && (*returnValue).IsNil() == false
 	//do CRUD
 	if elementType == Element_Select && haveLastReturnValue {
