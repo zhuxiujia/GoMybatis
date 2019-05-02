@@ -138,49 +138,17 @@ func main() {
  </table>
 
 
-## 多种表达式引擎可选（表达式引擎接口ExpressionEngine.go 负责表达式("foo != nil"...)的判断和取值）
-<table border="1">
-     <tr>
-        <td>表达式引擎</td>
-        <td>是否支持指针参数/null/nil</td>
-        <td>执行效率</td>
-	<td>and or 命令性能损耗</td>
-        <td>表达式功能</td>
-    </tr>
-     <tr>
-             <td>GoFastExpress</td>
-             <td>支持null和nil和指针</td>
-             <td>快-实测比expr快</td>
-    	     <td>还行</td>
-             <td>少</td>
-        </tr>
-    <tr>
-         <td>expr</td>
-         <td>支持null和nil和指针</td>
-         <td>快-实测比govaluate快</td>
-	     <td>还行</td>
-         <td>一般</td>
-    </tr>
-    <tr>
-          <td>gojee</td>
-          <td>支持null和指针</td>
-          <td>慢-每次检查表达式都有json序列化和反序列化操作</td>
-	  <td>大</td>
-          <td>多</td>
-    </tr>
-    <tr>
-           <td>govaluate</td>
-           <td>不支持null和nil和指针</td>
-           <td>中等</td>
-	   <td>一般</td>
-           <td>一般</td>
-    </tr>
-</table>
-为了执行效率 框架默认使用 github.com/zhuxiujia/GoFastExpress 表达式引擎作为默认选项，你也可以自定义调用GoMybatis.WriteMapper()参数中SqlBuilder的参数自行选择加入ExpressionEngine
-
 ## 配套生态-搭配GoMybatis
 * https://github.com/zhuxiujia/easyrpc  //easyrpc（基于标准库的RPC）吸收GoMybatis的概念，类似标准库的api，定义服务没有标准库的要求那么严格（可选不传参数，或者只有一个参数，只有一个返回值）
 * https://github.com/zhuxiujia/easyrpc_discovery  //基于easyrpc定制微服务发现，支持动态代理，支持GoMybatis事务，AOP代理，事务嵌套，tag定义事务，自带负载均衡算法（随机，加权轮询，源地址哈希法）
+
+
+
+
+
+
+
+
 
 
 
