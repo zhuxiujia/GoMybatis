@@ -178,6 +178,13 @@ func main() {
 </table>
 为了执行效率 框架默认使用 github.com/zhuxiujia/GoFastExpress 表达式引擎作为默认选项，你也可以自定义调用GoMybatis.WriteMapper()参数中SqlBuilder的参数自行选择加入ExpressionEngine
 
+## 生态系统-搭配GoMybatis使用的框架
+* https://github.com/zhuxiujia/easyrpc  //easyrpc（基于标准库的RPC）吸收GoMybatis的概念，类似标准库的api，定义服务没有标准库的要求那么严格（可选不传参数，或者只有一个参数，只有一个返回值）
+* https://github.com/zhuxiujia/easyrpc_discovery  //基于easyrpc，支持动态代理，支持GoMybatis事务，AOP代理，事务嵌套，tag定义事务，自带负载均衡算法 随机 加权轮询 源地址哈希法
+
+
+
+
 ## 请及时关注版本，及时升级版本(新的功能，bug修复)
 ## TODO 未来新特性（可能会更改）
 * 模板标签,一行代码crud（已完成）
