@@ -141,8 +141,7 @@ func main() {
 ## 配套生态-搭配GoMybatis
 * https://github.com/zhuxiujia/easyrpc  //easyrpc（基于标准库的RPC）吸收GoMybatis的概念，类似标准库的api，定义服务没有标准库的要求那么严格（可选不传参数，或者只有一个参数，只有一个返回值）
 * https://github.com/zhuxiujia/easyrpc_discovery  //基于easyrpc定制微服务发现，支持动态代理，支持GoMybatis事务，AOP代理，事务嵌套，tag定义事务，自带负载均衡算法（随机，加权轮询，源地址哈希法）
-
-
+![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/easy_consul.png)
 
 
 
