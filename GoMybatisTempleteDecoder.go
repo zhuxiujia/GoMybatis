@@ -87,11 +87,11 @@ func printElement(element *etree.Element, v *string) {
 				printElement(item.(*etree.Element), &nStr)
 				*v += nStr
 			} else if typeString == "*etree.CharData" {
-				*v += "\n" + item.(*etree.CharData).Data
+				*v += "" + item.(*etree.CharData).Data
 			}
 		}
 	}
-	*v += "\n</" + element.Tag + ">\n"
+	*v += "</" + element.Tag + ">\n"
 }
 
 func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *etree.Element, tree map[string]etree.Token) (bool, error) {
