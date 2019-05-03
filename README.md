@@ -1,4 +1,4 @@
-# Go语言sql数据库orm框架
+# 高性能 高开发效率 功能全面 的数据库orm框架
 * 中文
 * [English](README-en.md) 
 
