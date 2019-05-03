@@ -55,7 +55,12 @@ func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]etree.Token, bean
 					}
 				}
 			}
-			it.Decode(method, v, tree)
+			var oldChilds=v.Child
+			v.Child=[]etree.Token{}
+			var newTree=v
+			it.Decode(method, newTree, tree)
+			newTree.Child= append(newTree.Child, oldChilds...)
+			*v=*newTree
 		}
 	}
 	return nil
