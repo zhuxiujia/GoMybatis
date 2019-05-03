@@ -16,8 +16,9 @@ type GoMybatisEngine struct {
 	objMap map[string]interface{}
 
 	dataSourceRouter    DataSourceRouter      //动态数据源路由器
-	log                 Log                   //日志实现
+	log                 Log                   //日志实现类
 	logEnable           bool                  //是否允许日志输出（默认开启）
+	logSystem           *LogSystem            //日志发送系统
 	sessionFactory      *SessionFactory       //session 工厂
 	sqlArgTypeConvert   ast.SqlArgTypeConvert //sql参数转换
 	expressionEngine    ast.ExpressionEngine  //表达式解析引擎
@@ -31,14 +32,19 @@ type GoMybatisEngine struct {
 func (it GoMybatisEngine) New() GoMybatisEngine {
 	it.logEnable = true
 	it.isInit = true
-
+	if it.logEnable == true && it.log == nil {
+		it.log = &LogStandard{}
+	}
+	if it.logEnable {
+		var logSystem, err = LogSystem{}.New(it.log, it.log.QueueLen())
+		if err != nil {
+			panic(err)
+		}
+		it.logSystem = &logSystem
+	}
 	if it.dataSourceRouter == nil {
 		var newRouter = GoMybatisDataSourceRouter{}.New(nil)
 		it.SetDataSourceRouter(&newRouter)
-	}
-
-	if it.logEnable == true && it.log == nil {
-		it.log = &LogStandard{}
 	}
 	if it.sqlArgTypeConvert == nil {
 		it.sqlArgTypeConvert = GoMybatisSqlArgTypeConvert{}
@@ -233,4 +239,8 @@ func (it *GoMybatisEngine) SetGoroutineIDEnable(enable bool) {
 
 func (it *GoMybatisEngine) GoroutineIDEnable() bool {
 	return it.goroutineIDEnable
+}
+
+func (it *GoMybatisEngine) LogSystem() *LogSystem {
+	return it.logSystem
 }

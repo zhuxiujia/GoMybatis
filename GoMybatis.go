@@ -6,6 +6,7 @@ import (
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -350,16 +351,41 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 	//do CRUD
 	if elementType == Element_Select && haveLastReturnValue {
 		//is select and have return value
-		results, err := session.Query(sql)
+		if sessionEngine.LogEnable() {
+			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Query ==> "+sql)
+		}
+		res, err := session.Query(sql)
+		defer func() {
+			if sessionEngine.LogEnable() {
+				var RowsAffected = "0"
+				if err == nil && res != nil {
+					RowsAffected = strconv.Itoa(len(res))
+				}
+				sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] ReturnRows <== "+RowsAffected)
+			}
+		}()
 		if err != nil {
 			return err
 		}
-		err = sessionEngine.SqlResultDecoder().Decode(resultMap, results, returnValue.Interface())
+		err = sessionEngine.SqlResultDecoder().Decode(resultMap, res, returnValue.Interface())
 		if err != nil {
 			return err
 		}
 	} else {
+		if sessionEngine.LogEnable() {
+			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Exec ==> "+sql)
+		}
 		var res, err = session.Exec(sql)
+		defer func() {
+			if sessionEngine.LogEnable() {
+				var RowsAffected = "0"
+				if err == nil && res != nil {
+					RowsAffected = strconv.FormatInt(res.RowsAffected, 10)
+				}
+				sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] RowsAffected <== "+RowsAffected)
+			}
+		}()
+
 		if err != nil {
 			return err
 		}
