@@ -401,7 +401,7 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Eleme
 			//TODO have ?
 			var newWheres bytes.Buffer
 			if index > 0 {
-				newWheres.WriteString(" and ")
+				//newWheres.WriteString(" and ")
 			}
 			newWheres.WriteString(expressions[1])
 			var item = &etree.Element{
@@ -413,7 +413,7 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Eleme
 		} else {
 			var newWheres bytes.Buffer
 			if index > 0 {
-				newWheres.WriteString(" and ")
+				//newWheres.WriteString(" and ")
 			}
 			newWheres.WriteString(v)
 			var item = &etree.CharData{
