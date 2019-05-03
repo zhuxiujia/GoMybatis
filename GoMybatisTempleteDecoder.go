@@ -139,7 +139,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			it.DecodeWheres(wheres, mapper, logic, nil)
 		}
 		break
-	case "insertTemplete":
+	case "insertTemplete"://已支持批量
 		mapper.Tag = Element_Insert
 
 		var id = mapper.SelectAttrValue("id", "")
@@ -166,19 +166,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 
 		var logic = it.decodeLogicDelete(resultMapData)
 
-		var collection string
-		//check method arg type
-		if method != nil {
-			method.Type.NumIn()
-			for i := 0; i < method.Type.NumIn(); i++ {
-				var itemType = method.Type.In(i)
-				if itemType.Kind() == reflect.Slice {
-					var mapperParams = method.Tag.Get("mapperParams")
-					var args = strings.Split(mapperParams, ",")
-					collection = args[i]
-				}
-			}
-		}
+		var collectionName = it.DecodeCollectionName(method)
 
 		//start builder
 		var sql bytes.Buffer
@@ -201,7 +189,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 		}
 
 		//cloumns
-		if collection != "" {
+		if collectionName != "" {
 			for _, v := range resultMapData.ChildElements() {
 				if inserts == "*" || inserts == "*?*" {
 					trimColumn.Child = append(trimColumn.Child, &etree.CharData{
@@ -211,7 +199,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			}
 		} else {
 			for _, v := range resultMapData.ChildElements() {
-				if collection == "" && inserts == "*?*" {
+				if collectionName == "" && inserts == "*?*" {
 					trimColumn.Child = append(trimColumn.Child, &etree.Element{
 						Tag: Element_If,
 						Attr: []etree.Attr{
@@ -240,7 +228,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			Child: []etree.Token{},
 		}
 
-		if collection == "" {
+		if collectionName == "" {
 			for _, v := range resultMapData.ChildElements() {
 				if logic.Enable && v.SelectAttrValue("property", "") == logic.Property {
 					trimArg.Child = append(trimArg.Child, &etree.CharData{
@@ -271,7 +259,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 
 			var forEach = &etree.Element{
 				Tag:   Element_Foreach,
-				Attr:  []etree.Attr{{Key: "open", Value: ""}, {Key: "close", Value: ""}, {Key: "separator", Value: ","}, {Key: "collection", Value: collection}},
+				Attr:  []etree.Attr{{Key: "open", Value: ""}, {Key: "close", Value: ""}, {Key: "separator", Value: ","}, {Key: "collection", Value: collectionName}},
 				Child: []etree.Token{},
 			}
 
@@ -588,4 +576,22 @@ func (it *GoMybatisTempleteDecoder) decodeVersionData(xml *etree.Element) *Versi
 		}
 	}
 	return nil
+}
+
+//反射解码得到 集合名词
+func (it *GoMybatisTempleteDecoder) DecodeCollectionName(method *reflect.StructField) string {
+	var collection string
+	//check method arg type
+	if method != nil {
+		method.Type.NumIn()
+		for i := 0; i < method.Type.NumIn(); i++ {
+			var itemType = method.Type.In(i)
+			if itemType.Kind() == reflect.Slice {
+				var mapperParams = method.Tag.Get("mapperParams")
+				var args = strings.Split(mapperParams, ",")
+				collection = args[i]
+			}
+		}
+	}
+	return  collection
 }
