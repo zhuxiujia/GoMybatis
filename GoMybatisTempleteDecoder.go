@@ -58,12 +58,12 @@ func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]etree.Token, bean
 			var oldChilds = v.Child
 			v.Child = []etree.Token{}
 			var newTree = v
-			var success,_=it.Decode(method, newTree, tree)
+			var success, _ = it.Decode(method, newTree, tree)
 			newTree.Child = append(newTree.Child, oldChilds...)
 			*v = *newTree
 
 			//println
-			if success{
+			if success {
 				var s = "================DecoderTemplete============\n"
 				printElement(v, &s)
 				println(s)
@@ -335,7 +335,14 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			})
 			sql.Reset()
 			for _, v := range resultMapData.ChildElements() {
-				columns += v.SelectAttrValue("property", "") + "?" + v.SelectAttrValue("column", "") + ","
+				if v.Tag == "id" {
+
+				} else {
+					if v.SelectAttrValue("version_enable", "") == "true" {
+                      continue
+					}
+					columns += v.SelectAttrValue("property", "") + "?" + v.SelectAttrValue("column", "") + " = #{" + v.SelectAttrValue("property", "") + "},"
+				}
 			}
 			columns = strings.Trim(columns, ",")
 			it.DecodeSets(columns, mapper, LogicDeleteData{}, versionData)
