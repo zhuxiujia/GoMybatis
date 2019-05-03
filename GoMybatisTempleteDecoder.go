@@ -1,9 +1,9 @@
 package GoMybatis
 
 import (
+	"bytes"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 	"github.com/zhuxiujia/GoMybatis/utils"
-	"bytes"
 	"reflect"
 	"strings"
 )
@@ -55,18 +55,46 @@ func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]etree.Token, bean
 					}
 				}
 			}
-			var oldChilds=v.Child
-			v.Child=[]etree.Token{}
-			var newTree=v
-			it.Decode(method, newTree, tree)
-			newTree.Child= append(newTree.Child, oldChilds...)
-			*v=*newTree
+			var oldChilds = v.Child
+			v.Child = []etree.Token{}
+			var newTree = v
+			var success,_=it.Decode(method, newTree, tree)
+			newTree.Child = append(newTree.Child, oldChilds...)
+			*v = *newTree
+
+			//println
+			if success{
+				var s = "================DecoderTemplete============\n"
+				printElement(v, &s)
+				println(s)
+			}
 		}
 	}
 	return nil
 }
 
-func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *etree.Element, tree map[string]etree.Token) error {
+func printElement(element *etree.Element, v *string) {
+	*v = "<" + *v + element.Tag + " "
+	for _, item := range element.Attr {
+		*v += item.Key + "=\"" + item.Value + "\""
+	}
+	*v += " >"
+	if element.Child != nil && len(element.Child) != 0 {
+		for _, item := range element.Child {
+			var typeString = reflect.TypeOf(item).String()
+			if typeString == "*etree.Element" {
+				var nStr = ""
+				printElement(item.(*etree.Element), &nStr)
+				*v += nStr
+			} else if typeString == "*etree.CharData" {
+				*v += "\n" + item.(*etree.CharData).Data
+			}
+		}
+	}
+	*v += "\n</" + element.Tag + ">\n"
+}
+
+func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *etree.Element, tree map[string]etree.Token) (bool, error) {
 
 	switch mapper.Tag {
 
@@ -383,9 +411,11 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 				it.DecodeWheres(wheres, mapper, LogicDeleteData{}, nil)
 			}
 		}
-	}
 
-	return nil
+	default:
+		return false, nil
+	}
+	return true, nil
 }
 
 func checkTablesValue(mapper *etree.Element, tables *string, resultMapData *etree.Element) {
