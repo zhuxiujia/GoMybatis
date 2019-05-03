@@ -74,7 +74,7 @@ func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]etree.Token, bean
 }
 
 func printElement(element *etree.Element, v *string) {
-	*v = "<" + *v + element.Tag + " "
+	*v += "<" + element.Tag + " "
 	for _, item := range element.Attr {
 		*v += item.Key + "=\"" + item.Value + "\""
 	}
