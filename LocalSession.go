@@ -73,7 +73,7 @@ func (it *LocalSession) Rollback() error {
 
 		if it.txStack.Len() == 0 {
 			if it.logSystem != nil {
-				it.logSystem.Println([]byte("Rollback tx session:" + it.Id()))
+				it.logSystem.Println([]byte("[GoMybatis] Rollback tx session:" + it.Id()))
 			}
 			var err = t.Rollback()
 			if err != nil {
@@ -109,7 +109,7 @@ func (it *LocalSession) Commit() error {
 			var pId = "p" + strconv.Itoa(it.txStack.Len()+1)
 			it.savePointStack.Push(pId)
 			if it.logSystem != nil {
-				it.logSystem.Println([]byte("exec " + "savepoint " + pId))
+				it.logSystem.Println([]byte("[GoMybatis] exec " + "savepoint " + pId))
 			}
 			_, e := t.Exec("savepoint " + pId)
 			if e != nil {
@@ -118,7 +118,7 @@ func (it *LocalSession) Commit() error {
 		}
 		if it.txStack.Len() == 0 {
 			if it.logSystem != nil {
-				it.logSystem.Println([]byte("Commit tx session:" + it.Id()))
+				it.logSystem.Println([]byte("[GoMybatis] Commit tx session:" + it.Id()))
 			}
 			var err = t.Commit()
 			if err != nil {
@@ -135,7 +135,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 		propagation = tx.ToString(*p)
 	}
 	if it.logSystem != nil {
-		it.logSystem.Println([]byte("Begin session:" + it.Id() + ",Propagation:" + propagation))
+		it.logSystem.Println([]byte("[GoMybatis] Begin session:" + it.Id() + ",Propagation:" + propagation))
 	}
 	if it.isClosed == true {
 		return utils.NewError("LocalSession", " can not Begin() a Closed Session!")
@@ -237,7 +237,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 
 func (it *LocalSession) Close() {
 	if it.logSystem != nil {
-		it.logSystem.Println([]byte("Close session:" + it.Id()))
+		it.logSystem.Println([]byte("[GoMybatis] Close session:" + it.Id()))
 	}
 	if it.newLocalSession != nil {
 		it.newLocalSession.Close()
