@@ -139,7 +139,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			it.DecodeWheres(wheres, mapper, logic, nil)
 		}
 		break
-	case "insertTemplete"://已支持批量
+	case "insertTemplete": //已支持批量
 		mapper.Tag = Element_Insert
 
 		var id = mapper.SelectAttrValue("id", "")
@@ -327,7 +327,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 
 				} else {
 					if v.SelectAttrValue("version_enable", "") == "true" {
-                      continue
+						continue
 					}
 					columns += v.SelectAttrValue("property", "") + "?" + v.SelectAttrValue("column", "") + " = #{" + v.SelectAttrValue("property", "") + "},"
 				}
@@ -589,9 +589,13 @@ func (it *GoMybatisTempleteDecoder) DecodeCollectionName(method *reflect.StructF
 			if itemType.Kind() == reflect.Slice {
 				var mapperParams = method.Tag.Get("mapperParams")
 				var args = strings.Split(mapperParams, ",")
-				collection = args[i]
+				if args == nil || len(args) == 0 {
+					collection = DefaultOneArg
+				} else {
+					collection = args[i]
+				}
 			}
 		}
 	}
-	return  collection
+	return collection
 }
