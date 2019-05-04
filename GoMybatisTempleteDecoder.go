@@ -449,10 +449,16 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Eleme
 			//TODO have ?
 			var newWheres bytes.Buffer
 			newWheres.WriteString(expressions[1])
+
+			var appendAdd = ""
+			if len(mapper.Child) >= 1 && arg != "" {
+				appendAdd = " and "
+			}
+
 			var item = &etree.Element{
 				Tag:   Element_If,
 				Attr:  []etree.Attr{{Key: "test", Value: it.makeIfNotNull(expressions[0])}},
-				Child: []etree.Token{&etree.CharData{Data: newWheres.String()}},
+				Child: []etree.Token{&etree.CharData{Data: appendAdd+newWheres.String()}},
 			}
 			mapper.Child = append(mapper.Child, item)
 		} else {
