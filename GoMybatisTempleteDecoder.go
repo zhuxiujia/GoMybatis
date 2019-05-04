@@ -424,6 +424,13 @@ func checkTablesValue(mapper *etree.Element, tables *string, resultMapData *etre
 
 //解码逗号分隔的where
 func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Element, logic LogicDeleteData, versionData *VersionData) {
+	if logic.Enable == true {
+		var appendAdd = ""
+		var item = &etree.CharData{
+			Data: appendAdd + logic.Column + " = " + logic.Undelete_value,
+		}
+		mapper.Child = append(mapper.Child, item)
+	}
 	var wheres = strings.Split(arg, ",")
 	for _, v := range wheres {
 		var expressions = strings.Split(v, "?")
@@ -445,16 +452,6 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Eleme
 			}
 			mapper.Child = append(mapper.Child, item)
 		}
-	}
-	if logic.Enable == true {
-		var appendAdd = ""
-		if len(wheres) >= 1 && arg != "" {
-			appendAdd = " and "
-		}
-		var item = &etree.CharData{
-			Data: appendAdd + logic.Column + " = " + logic.Undelete_value,
-		}
-		mapper.Child = append(mapper.Child, item)
 	}
 	if versionData != nil {
 		var appendAdd = ""
