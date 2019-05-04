@@ -431,6 +431,17 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Eleme
 		}
 		mapper.Child = append(mapper.Child, item)
 	}
+	if versionData != nil {
+		var appendAdd = ""
+		if len(mapper.Child) >= 1 && arg != "" {
+			appendAdd = " and "
+		}
+		var item = &etree.CharData{
+			Data: appendAdd + versionData.Column + " = #{" + versionData.Property + "}",
+		}
+		mapper.Child = append(mapper.Child, item)
+	}
+
 	var wheres = strings.Split(arg, ",")
 	for _, v := range wheres {
 		var expressions = strings.Split(v, "?")
@@ -452,16 +463,6 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Eleme
 			}
 			mapper.Child = append(mapper.Child, item)
 		}
-	}
-	if versionData != nil {
-		var appendAdd = ""
-		if len(wheres) >= 1 && arg != "" {
-			appendAdd = " and "
-		}
-		var item = &etree.CharData{
-			Data: appendAdd + versionData.Column + " = #{" + versionData.Property + "}",
-		}
-		mapper.Child = append(mapper.Child, item)
 	}
 }
 
