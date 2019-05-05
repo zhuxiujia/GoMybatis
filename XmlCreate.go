@@ -30,7 +30,7 @@ var ResultItem = `<result column="#{property}" property="#{property}" langType="
 
 func TestUserAddres(t *testing.T)  {
 	var s=utils.CreateDefaultXml("biz_user_address",example.Activity{})//创建xml内容
-	utils.WriteXml("D:/GOPATH/src/dao/ActivityMapper.xml",[]byte(s))//写入磁盘
+	utils.OutPutXml("D:/GOPATH/src/dao/ActivityMapper.xml",[]byte(s))//写入磁盘
 }
  */
 //根据结构体 创建xml文件
@@ -83,8 +83,8 @@ func CreateXml(tableName string, bean interface{}) []byte {
 	return []byte(res)
 }
 
-//写文件到当前路径
-func WriteXml(fileName string, body []byte) {
+//输出文件
+func OutPutXml(fileName string, body []byte) {
 	f, err := os.Create(fileName)
 	if err != nil {
 		fmt.Println(err)
