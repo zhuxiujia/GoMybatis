@@ -86,13 +86,17 @@ func CreateXml(tableName string, bean interface{}) []byte {
 //写文件到当前路径
 func WriteXml(fileName string, body []byte) {
 	f, err := os.Create(fileName)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	defer f.Close()
 	if err != nil {
 		fmt.Println(err.Error())
 	} else {
 		_, err = f.Write(body)
 		if err != nil {
-			println(err)
+			println("写入文件失败：" + err.Error())
 		} else {
 			println("写入文件成功：" + fileName)
 		}
