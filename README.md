@@ -239,7 +239,7 @@ go run XmlCreateTool.go
 
 ## 请及时关注版本，及时升级版本(新的功能，bug修复)
 ## TODO 未来新特性（可能会更改）
-* <a href="https://github.com/zhuxiujia/RustMybatis">Rust语言版本的 RustMybatis</a>基于Rust语言和LLVM编译器`不输于C++性能``无运行时``无GC``无`,预期会在 -并发数,-内存消耗, 都将远超go语言版 (开发中) 敬请期待~
+
 ## 喜欢的老铁欢迎在右上角点下 star 关注和支持我们哈
 
 
