@@ -63,8 +63,10 @@ func CreateDefaultXml(tableName string, bean interface{}) string {
 			itemStr = strings.Replace(itemStr, "#{version}", "", -1)
 			itemStr = strings.Replace(itemStr, "#{logic}", "", -1)
 
-			content += "\t"+itemStr
-			content += "\n"
+			content += "\t" + itemStr
+			if i+1 < tv.NumField() {
+				content += "\n"
+			}
 		}
 	}
 	var res = strings.Replace(XmlData, "#{resultMapBody}", content, -1)
@@ -73,7 +75,7 @@ func CreateDefaultXml(tableName string, bean interface{}) string {
 }
 
 func WriteXml(fileName string, body []byte) {
-	f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_TRUNC, 0600)
+	f, err := os.Create(fileName)
 	defer f.Close()
 	if err != nil {
 		fmt.Println(err.Error())
