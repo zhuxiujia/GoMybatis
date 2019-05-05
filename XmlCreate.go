@@ -28,8 +28,23 @@ var ResultItem = `<result column="#{property}" property="#{property}" langType="
 /**
 //例子
 
+//GoMybatis当前是以xml内容为主gm:""注解只是生成xml的时候使用
+//定义数据库模型, gm:"id"表示输出id的xml,gm:"version"表示为输出版本号的xml，gm:"logic"表示输出逻辑删除xml
+type TestActivity struct {
+	Id         string    `json:"id" gm:"id"`
+	Uuid       string    `json:"uuid"`
+	Name       string    `json:"name"`
+	PcLink     string    `json:"pcLink"`
+	H5Link     string    `json:"h5Link"`
+	Remark     string    `json:"remark"`
+	Version    int       `json:"version" gm:"version"`
+	CreateTime time.Time `json:"createTime"`
+	DeleteFlag int       `json:"deleteFlag" gm:"logic"`
+}
+
+
 func TestUserAddres(t *testing.T)  {
-	var s=utils.CreateDefaultXml("biz_user_address",example.Activity{})//创建xml内容
+	var s=utils.CreateDefaultXml("biz_user_address",TestActivity{})//创建xml内容
 	utils.OutPutXml("D:/GOPATH/src/dao/ActivityMapper.xml",[]byte(s))//写入磁盘
 }
  */
