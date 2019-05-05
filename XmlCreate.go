@@ -29,8 +29,8 @@ var ResultItem = `<result column="#{property}" property="#{property}" langType="
 //例子
 
 func TestUserAddres(t *testing.T)  {
-	var s=utils.CreateDefaultXml("biz_user_address",model.UserAddress{})//创建xml内容
-	utils.WriteXml("D:/GOPATH/src/gitee.com/gascard/gas_server/core/com/gas/dao/UserAddressMapper.xml",[]byte(s))//写入磁盘
+	var s=utils.CreateDefaultXml("biz_user_address",example.Activity{})//创建xml内容
+	utils.WriteXml("D:/GOPATH/src/dao/ActivityMapper.xml",[]byte(s))//写入磁盘
 }
  */
 //根据结构体 创建xml文件
