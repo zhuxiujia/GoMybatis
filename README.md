@@ -153,7 +153,7 @@ func main()  {
 		UpdateRemark: func(id string, remark string) error {
 			testService.exampleActivityMapper.SelectByIds([]string{id})
 			panic(errors.New("业务异常")) // panic 触发事务回滚策略
-			return nil
+			return nil                   // rollback:"error"指定了返回error类型 且不为nil 就会触发事务回滚策略
 		},
 		UpdateName: func(id string, name string) error {
 			testService.exampleActivityMapper.SelectByIds([]string{id})
