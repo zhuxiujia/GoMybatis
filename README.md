@@ -109,7 +109,7 @@ func main() {
 ```
 ## 异步日志-基于消息队列日志
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/log_system.png)
-数据库驱动列表
+## 多数据库支持-驱动列表
 ```
  Mysql: github.com/go-sql-driver/mysql
  MyMysql: github.com/ziutek/mymysql/godrv
@@ -138,9 +138,92 @@ func main() {
  <tr><td>PROPAGATION_NESTED</td><td>表示如果当前事务存在，则在嵌套事务内执行，如嵌套事务回滚，则只会在嵌套事务内回滚，不会影响当前事务。如果当前没有事务，则进行与PROPAGATION_REQUIRED类似的操作。</td></tr>
  <tr><td>PROPAGATION_NOT_REQUIRED</td><td>表示如果当前没有事务，就新建一个事务,否则返回错误。</td></tr></tbody>
  </table>
+ 
+ ```
+ //嵌套事务的服务
+type TestService struct {
+	exampleActivityMapper *ExampleActivityMapper //服务包含一个mapper操作数据库，类似java spring mvc
+	UpdateName   func(id string, name string) error   `tx:"" rollback:"error"`
+	UpdateRemark func(id string, remark string) error `tx:"" rollback:"error"`
+}
+func main()  {
+	var testService TestService
+	testService = TestService{
+		exampleActivityMapper: &exampleActivityMapper,
+		UpdateRemark: func(id string, remark string) error {
+			testService.exampleActivityMapper.SelectByIds([]string{id})
+			panic(errors.New("业务异常")) // panic 触发事务回滚策略
+			return nil                   // rollback:"error"指定了返回error类型 且不为nil 就会触发事务回滚策略
+		},
+		UpdateName: func(id string, name string) error {
+			testService.exampleActivityMapper.SelectByIds([]string{id})
+			return nil
+		},
+	}
+	GoMybatis.AopProxyService(&testService, &engine)//必须使用AOP代理服务的func
+	testService.UpdateRemark("1","remark")
+}
+```
+ 
+ 
+ 
+ 
+ 
+  ## 内置xml生成工具- 根据用户定义的struct结构体生成对应的 mapper.xml
+```
+  //step1 定义你的数据库模型,必须包含 json注解（默认为数据库字段）, gm:""注解指定 值是否为 id,version乐观锁,logic逻辑软删除
+  type UserAddress struct {
+	Id            string `json:"id" gm:"id"`
+	UserId        string `json:"user_id"`
+	RealName      string `json:"real_name"`
+	Phone         string `json:"phone"`
+	AddressDetail string `json:"address_detail"`
+
+	Version    int       `json:"version" gm:"version"`
+	CreateTime time.Time `json:"create_time"`
+	DeleteFlag int       `json:"delete_flag" gm:"logic"`
+}
+
+//第二步，在你项目main 目录下建立一个 XmlCreateTool.go 内容如下
+func main() {
+	var bean = UserAddress{} //此处只是举例，应该替换为你自己的数据库模型
+	GoMybatis.OutPutXml(reflect.TypeOf(bean).Name()+"Mapper.xml", GoMybatis.CreateXml("biz_"+GoMybatis.StructToSnakeString(bean), bean))
+}
+
+//第三步，执行命令，在当前目录下得到 UserAddressMapper.xml文件
+go run XmlCreateTool.go
+
+//以下是自动生成的xml文件内容
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://raw.githubusercontent.com/zhuxiujia/GoMybatis/master/mybatis-3-mapper.dtd">
+<mapper>
+    <!--logic_enable 逻辑删除字段-->
+    <!--logic_deleted 逻辑删除已删除字段-->
+    <!--logic_undelete 逻辑删除 未删除字段-->
+    <!--version_enable 乐观锁版本字段,支持int,int8,int16,int32,int64-->
+    <resultMap id="BaseResultMap" tables="biz_user_address">
+    <id column="id" property="id"/>
+	<result column="id" property="id" langType="string"   />
+	<result column="user_id" property="user_id" langType="string"   />
+	<result column="real_name" property="real_name" langType="string"   />
+	<result column="phone" property="phone" langType="string"   />
+	<result column="address_detail" property="address_detail" langType="string"   />
+	<result column="version" property="version" langType="int" version_enable="true"  />
+	<result column="create_time" property="create_time" langType="Time"   />
+	<result column="delete_flag" property="delete_flag" langType="int"  logic_enable="true" logic_undelete="1" logic_deleted="0" />
+    </resultMap>
+</mapper>
+```
+ 
+ 
+ 
+ 
+ 
+ 
 
 
-## 配套生态-搭配GoMybatis
+## 配套生态(RPC,JSONRPC,Consul)-搭配GoMybatis
 * https://github.com/zhuxiujia/easyrpc  //easyrpc（基于标准库的RPC）吸收GoMybatis的概念，类似标准库的api，定义服务没有标准库的要求那么严格（可选不传参数，或者只有一个参数，只有一个返回值）
 * https://github.com/zhuxiujia/easyrpc_discovery  //基于easyrpc定制微服务发现，支持动态代理，支持GoMybatis事务，AOP代理，事务嵌套，tag定义事务，自带负载均衡算法（随机，加权轮询，源地址哈希法）
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/easy_consul.png)
@@ -156,11 +239,7 @@ func main() {
 
 ## 请及时关注版本，及时升级版本(新的功能，bug修复)
 ## TODO 未来新特性（可能会更改）
-* 模板标签,一行代码crud（已完成）
-* 逻辑删除(已完成)
-* 乐观锁（已完成）
-* 重构SqlBuilder，使用抽象语法树代替递归，获得更好的维护性可读性(已完成)
-* <a href="https://github.com/zhuxiujia/RustMybatis">Rust语言版本的 RustMybatis</a>基于Rust语言和LLVM编译器`不输于C++性能``无运行时``无GC``无`,预期会在 -并发数,-内存消耗, 都将远超go语言版 (开发中) 敬请期待~
+
 ## 喜欢的老铁欢迎在右上角点下 star 关注和支持我们哈
 
 
