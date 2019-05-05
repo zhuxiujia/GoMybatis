@@ -117,3 +117,33 @@ func OutPutXml(fileName string, body []byte) {
 		}
 	}
 }
+
+//转蛇形命名snake string, XxYy to xx_yy , XxYY to xx_yy
+func SnakeString(s string) string {
+	data := make([]byte, 0, len(s)*2)
+	j := false
+	num := len(s)
+	for i := 0; i < num; i++ {
+		d := s[i]
+		if i > 0 && d >= 'A' && d <= 'Z' && j {
+			data = append(data, '_')
+		}
+		if d != '_' {
+			j = true
+		}
+		data = append(data, d)
+	}
+	return strings.ToLower(string(data[:]))
+}
+
+//结构体名称转蛇形名称 例如 pcLink = pc_link
+func StructToSnakeString(arg interface{}) string {
+	if arg == nil {
+		panic("[GoMybatis] BeanToSnakeString arg can not be nil!")
+	}
+	var t = reflect.TypeOf(arg)
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+	return SnakeString(t.Name())
+}

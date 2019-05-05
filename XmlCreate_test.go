@@ -21,3 +21,7 @@ func TestCreateDefaultXml(t *testing.T) {
 	var xml = CreateXml("biz_activity", TestActivity{})
 	println(string(xml))
 }
+
+func TestSnakeString(t *testing.T) {
+	println(SnakeString("pcLink"))
+}
