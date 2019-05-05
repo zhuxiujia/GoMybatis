@@ -57,40 +57,32 @@ func CreateXml(tableName string, bean interface{}) []byte {
 	}
 	for i := 0; i < tv.NumField(); i++ {
 		var item = tv.Field(i)
-		if item.Name == "id" {
+		var itemName = item.Name
+		var itemJson = item.Tag.Get("json")
+		if itemJson != "" {
+			itemName = itemJson
+		}
+		var itemStr = strings.Replace(_ResultItem, "#{property}", itemName, -1)
+		itemStr = strings.Replace(itemStr, "#{langType}", item.Type.Name(), -1)
+		var gm = item.Tag.Get("gm")
+		if gm == "id" || itemName == "id" {
 			content += _XmlIdItem
 			content += "\n"
-		} else {
-			var itemName = item.Name
-			var itemJson = item.Tag.Get("json")
-			if itemJson != "" {
-				itemName = itemJson
-			}
+			continue
+		}
+		if gm == "version" {
+			itemStr = strings.Replace(itemStr, "#{version}", _XmlVersionEnable, -1)
+		}
+		if gm == "logic" {
+			itemStr = strings.Replace(itemStr, "#{logic}", _XmlLogicEnable, -1)
+		}
+		//clean
+		itemStr = strings.Replace(itemStr, "#{version}", "", -1)
+		itemStr = strings.Replace(itemStr, "#{logic}", "", -1)
 
-			var itemStr = strings.Replace(_ResultItem, "#{property}", itemName, -1)
-			itemStr = strings.Replace(itemStr, "#{langType}", item.Type.Name(), -1)
-
-			var gm = item.Tag.Get("gm")
-			if gm != "" {
-				if gm == "id" {
-					content += _XmlIdItem
-					content += "\n"
-				}
-				if gm == "version" {
-					itemStr = strings.Replace(itemStr, "#{version}", _XmlVersionEnable, -1)
-				}
-				if gm == "logic" {
-					itemStr = strings.Replace(itemStr, "#{logic}", _XmlLogicEnable, -1)
-				}
-			}
-			//clean
-			itemStr = strings.Replace(itemStr, "#{version}", "", -1)
-			itemStr = strings.Replace(itemStr, "#{logic}", "", -1)
-
-			content += "\t" + itemStr
-			if i+1 < tv.NumField() {
-				content += "\n"
-			}
+		content += "\t" + itemStr
+		if i+1 < tv.NumField() {
+			content += "\n"
 		}
 	}
 	var res = strings.Replace(_XmlData, "#{resultMapBody}", content, -1)
