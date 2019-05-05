@@ -165,9 +165,8 @@ func main() {
 
 //第三步，执行命令，在当前目录下得到 UserAddressMapper.xml文件
 go run XmlCreateTool.go
-```
-### 得到生成 且 初始化好的xml文件
-```
+
+//以下是自动生成的xml文件内容
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://raw.githubusercontent.com/zhuxiujia/GoMybatis/master/mybatis-3-mapper.dtd">
