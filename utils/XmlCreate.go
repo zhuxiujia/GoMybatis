@@ -25,7 +25,8 @@ var XmlVersionEnable = `version_enable="true"`
 var XmlIdItem = `<id column="id" property="id"/>`
 var ResultItem = `<result column="#{property}" property="#{property}" langType="#{langType}" #{version} #{logic} />`
 
-func CreateDefaultXml(tableName string, bean interface{}) string {
+//根据结构体 创建xml文件
+func CreateXml(tableName string, bean interface{}) []byte {
 	var content = ""
 	var tv = reflect.TypeOf(bean)
 	if tv.Kind() == reflect.Ptr {
@@ -71,9 +72,10 @@ func CreateDefaultXml(tableName string, bean interface{}) string {
 	}
 	var res = strings.Replace(XmlData, "#{resultMapBody}", content, -1)
 	res = strings.Replace(res, "#{table}", tableName, -1)
-	return res
+	return []byte(res)
 }
 
+//写文件到当前路径
 func WriteXml(fileName string, body []byte) {
 	f, err := os.Create(fileName)
 	defer f.Close()

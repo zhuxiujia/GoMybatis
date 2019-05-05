@@ -18,6 +18,6 @@ type TestActivity struct {
 }
 
 func TestCreateDefaultXml(t *testing.T) {
-	var xml = CreateDefaultXml("biz_activity", TestActivity{})
-	println(xml)
+	var xml = CreateXml("biz_activity", TestActivity{})
+	println(string(xml))
 }
