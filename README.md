@@ -138,6 +138,63 @@ func main() {
  <tr><td>PROPAGATION_NESTED</td><td>表示如果当前事务存在，则在嵌套事务内执行，如嵌套事务回滚，则只会在嵌套事务内回滚，不会影响当前事务。如果当前没有事务，则进行与PROPAGATION_REQUIRED类似的操作。</td></tr>
  <tr><td>PROPAGATION_NOT_REQUIRED</td><td>表示如果当前没有事务，就新建一个事务,否则返回错误。</td></tr></tbody>
  </table>
+ 
+ 
+ 
+ 
+  ## 内置xml生成工具- 根据用户定义的struct结构体生成对应的 mapper.xml
+```
+  //step1 定义你的数据库模型,必须包含 json注解（默认为数据库字段）, gm:""注解指定 值是否为 id,version乐观锁,logic逻辑软删除
+  type UserAddress struct {
+	Id            string `json:"id" gm:"id"`
+	UserId        string `json:"user_id"`
+	RealName      string `json:"real_name"`
+	Phone         string `json:"phone"`
+	AddressDetail string `json:"address_detail"`
+
+	Version    int       `json:"version" gm:"version"`
+	CreateTime time.Time `json:"create_time"`
+	DeleteFlag int       `json:"delete_flag" gm:"logic"`
+}
+
+//第二步，在你项目main 目录下建立一个 XmlCreateTool.go 内容如下
+func main() {
+	var bean = UserAddress{} //此处只是举例，应该替换为你自己的数据库模型
+	GoMybatis.OutPutXml(reflect.TypeOf(bean).Name()+"Mapper.xml", GoMybatis.CreateXml("biz_"+GoMybatis.StructToSnakeString(bean), bean))
+}
+
+//第三步，执行命令，在当前目录下得到 UserAddressMapper.xml文件
+go run XmlCreateTool.go
+```
+### 得到生成 且 初始化好的xml文件
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://raw.githubusercontent.com/zhuxiujia/GoMybatis/master/mybatis-3-mapper.dtd">
+<mapper>
+    <!--logic_enable 逻辑删除字段-->
+    <!--logic_deleted 逻辑删除已删除字段-->
+    <!--logic_undelete 逻辑删除 未删除字段-->
+    <!--version_enable 乐观锁版本字段,支持int,int8,int16,int32,int64-->
+    <resultMap id="BaseResultMap" tables="biz_user_address">
+    <id column="id" property="id"/>
+	<result column="id" property="id" langType="string"   />
+	<result column="user_id" property="user_id" langType="string"   />
+	<result column="real_name" property="real_name" langType="string"   />
+	<result column="phone" property="phone" langType="string"   />
+	<result column="address_detail" property="address_detail" langType="string"   />
+	<result column="version" property="version" langType="int" version_enable="true"  />
+	<result column="create_time" property="create_time" langType="Time"   />
+	<result column="delete_flag" property="delete_flag" langType="int"  logic_enable="true" logic_undelete="1" logic_deleted="0" />
+    </resultMap>
+</mapper>
+```
+ 
+ 
+ 
+ 
+ 
+ 
 
 
 ## 配套生态-搭配GoMybatis
