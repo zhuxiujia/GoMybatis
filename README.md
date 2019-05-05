@@ -138,6 +138,7 @@ func main() {
  <tr><td>PROPAGATION_NESTED</td><td>表示如果当前事务存在，则在嵌套事务内执行，如嵌套事务回滚，则只会在嵌套事务内回滚，不会影响当前事务。如果当前没有事务，则进行与PROPAGATION_REQUIRED类似的操作。</td></tr>
  <tr><td>PROPAGATION_NOT_REQUIRED</td><td>表示如果当前没有事务，就新建一个事务,否则返回错误。</td></tr></tbody>
  </table>
+ 
  ```
  //嵌套事务的服务
 type TestService struct {
@@ -162,8 +163,7 @@ func main()  {
 	GoMybatis.AopProxyService(&testService, &engine)
 	testService.UpdateRemark("1","remark")
 }
-
- ```
+```
  
  
  
