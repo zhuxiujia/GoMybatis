@@ -138,6 +138,33 @@ func main() {
  <tr><td>PROPAGATION_NESTED</td><td>表示如果当前事务存在，则在嵌套事务内执行，如嵌套事务回滚，则只会在嵌套事务内回滚，不会影响当前事务。如果当前没有事务，则进行与PROPAGATION_REQUIRED类似的操作。</td></tr>
  <tr><td>PROPAGATION_NOT_REQUIRED</td><td>表示如果当前没有事务，就新建一个事务,否则返回错误。</td></tr></tbody>
  </table>
+ ```
+ //嵌套事务的服务
+type TestService struct {
+	exampleActivityMapper *ExampleActivityMapper //服务包含一个mapper操作数据库，类似java spring mvc
+	UpdateName   func(id string, name string) error   `tx:"" rollback:"error"`
+	UpdateRemark func(id string, remark string) error `tx:"" rollback:"error"`
+}
+func main()  {
+	var testService TestService
+	testService = TestService{
+		exampleActivityMapper: &exampleActivityMapper,
+		UpdateRemark: func(id string, remark string) error {
+			testService.exampleActivityMapper.SelectByIds([]string{id})
+			panic(errors.New("业务异常")) // panic 触发事务回滚策略
+			return nil
+		},
+		UpdateName: func(id string, name string) error {
+			testService.exampleActivityMapper.SelectByIds([]string{id})
+			return nil
+		},
+	}
+	GoMybatis.AopProxyService(&testService, &engine)
+	testService.UpdateRemark("1","remark")
+}
+
+ ```
+ 
  
  
  
