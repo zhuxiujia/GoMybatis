@@ -160,7 +160,7 @@ func main()  {
 			return nil
 		},
 	}
-	GoMybatis.AopProxyService(&testService, &engine)
+	GoMybatis.AopProxyService(&testService, &engine)//必须使用AOP代理服务的func
 	testService.UpdateRemark("1","remark")
 }
 ```
