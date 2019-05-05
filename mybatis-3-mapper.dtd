@@ -20,7 +20,7 @@
         <!ATTLIST mapper
                 >
 
-        <!ELEMENT resultMap (constructor?,id*,result*,association*,collection*, discriminator?)>
+        <!ELEMENT resultMap (constructor?,id*,result*,collection* )>
         <!ATTLIST resultMap
                 id CDATA #REQUIRED
                 tables  #REQUIRED
@@ -75,7 +75,7 @@
                 name CDATA #IMPLIED
                 >
 
-        <!ELEMENT collection (constructor?,id*,result*,association*,collection*, discriminator?)>
+        <!ELEMENT collection (constructor?,id*,result*,collection* )>
         <!ATTLIST collection
                 property CDATA #REQUIRED
                 column CDATA #IMPLIED
