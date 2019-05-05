@@ -25,6 +25,14 @@ var XmlVersionEnable = `version_enable="true"`
 var XmlIdItem = `<id column="id" property="id"/>`
 var ResultItem = `<result column="#{property}" property="#{property}" langType="#{langType}" #{version} #{logic} />`
 
+/**
+//例子
+
+func TestUserAddres(t *testing.T)  {
+	var s=utils.CreateDefaultXml("biz_user_address",model.UserAddress{})//创建xml内容
+	utils.WriteXml("D:/GOPATH/src/gitee.com/gascard/gas_server/core/com/gas/dao/UserAddressMapper.xml",[]byte(s))//写入磁盘
+}
+ */
 //根据结构体 创建xml文件
 func CreateXml(tableName string, bean interface{}) []byte {
 	var content = ""
