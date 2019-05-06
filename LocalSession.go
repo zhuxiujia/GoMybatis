@@ -65,6 +65,7 @@ func (it *LocalSession) Rollback() error {
 					it.logSystem.Println([]byte("[GoMybatis] exec ====================" + "rollback to " + *point))
 				}
 				_, e := t.Exec("rollback to " + *point)
+				e = it.dbErrorPack(e)
 				if e != nil {
 					return e
 				}
@@ -112,6 +113,7 @@ func (it *LocalSession) Commit() error {
 				it.logSystem.Println([]byte("[GoMybatis] exec " + "savepoint " + pId))
 			}
 			_, e := t.Exec("savepoint " + pId)
+			e = it.dbErrorPack(e)
 			if e != nil {
 				return e
 			}
@@ -281,10 +283,12 @@ func (it *LocalSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 		rows, err = it.db.Query(sqlorArgs)
 		err = it.dbErrorPack(err)
 	}
+	if rows != nil {
+		defer rows.Close()
+	}
 	if err != nil {
 		return nil, err
 	} else {
-		defer rows.Close()
 		return rows2maps(rows)
 	}
 	return nil, nil
