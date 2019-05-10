@@ -5,6 +5,7 @@ import (
 	"github.com/zhuxiujia/GoMybatis/ast"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 	"github.com/zhuxiujia/GoMybatis/utils"
+	"log"
 	"reflect"
 	"strconv"
 	"strings"
@@ -300,6 +301,11 @@ func methodFieldCheck(beanType *reflect.Type, methodType *reflect.StructField) {
 		buffer.WriteString(methodType.Name)
 		buffer.WriteString("() must be return a 'error' type!")
 		panic(buffer.String())
+	}
+
+	var mapperParams = methodType.Tag.Get("mapperParams")
+	if methodType.Type.NumOut() > 1 && mapperParams == "" {
+		log.Println("[GoMybatis] warning ======================== " + methodType.Name + "() have not define tag mapperParams:\"\",maybe can not get param value!")
 	}
 }
 
