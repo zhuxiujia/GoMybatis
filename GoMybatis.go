@@ -305,7 +305,7 @@ func methodFieldCheck(beanType *reflect.Type, methodType *reflect.StructField) {
 
 	var mapperParams = methodType.Tag.Get("mapperParams")
 	if methodType.Type.NumOut() > 1 && mapperParams == "" {
-		log.Println("[GoMybatis] warning ======================== " +(*beanType).Name()+"."+ methodType.Name + "() have not define tag mapperParams:\"\",maybe can not get param value!")
+		log.Println("[GoMybatis] warning ======================== " + (*beanType).Name() + "." + methodType.Name + "() have not define tag mapperParams:\"\",maybe can not get param value!")
 	}
 }
 
@@ -368,6 +368,9 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 					RowsAffected = strconv.Itoa(len(res))
 				}
 				sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] ReturnRows <== "+RowsAffected)
+				if err != nil {
+					sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] error == "+err.Error())
+				}
 			}
 		}()
 		if err != nil {
@@ -389,6 +392,9 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 					RowsAffected = strconv.FormatInt(res.RowsAffected, 10)
 				}
 				sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] RowsAffected <== "+RowsAffected)
+				if err != nil {
+					sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] error == "+err.Error())
+				}
 			}
 		}()
 
