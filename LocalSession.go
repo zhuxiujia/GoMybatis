@@ -65,6 +65,7 @@ func (it *LocalSession) Rollback() error {
 					it.logSystem.Println([]byte("[GoMybatis] exec ====================" + "rollback to " + *point))
 				}
 				_, e := t.Exec("rollback to " + *point)
+				e = it.dbErrorPack(e)
 				if e != nil {
 					return e
 				}
@@ -112,6 +113,7 @@ func (it *LocalSession) Commit() error {
 				it.logSystem.Println([]byte("[GoMybatis] exec " + "savepoint " + pId))
 			}
 			_, e := t.Exec("savepoint " + pId)
+			e = it.dbErrorPack(e)
 			if e != nil {
 				return e
 			}
@@ -149,6 +151,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 				return nil
 			} else {
 				var t, err = it.db.Begin()
+				err = it.dbErrorPack(err)
 				if err == nil {
 					it.txStack.Push(t, p)
 				}
@@ -209,6 +212,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 				return nil
 			} else {
 				var tx, err = it.db.Begin()
+				err = it.dbErrorPack(err)
 				if err == nil {
 					it.txStack.Push(tx, p)
 				}
@@ -220,6 +224,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 				return errors.New("[GoMybatis] PROPAGATION_NOT_REQUIRED Nested transaction exception! current Already have a transaction!")
 			} else {
 				var tx, err = it.db.Begin()
+				err = it.dbErrorPack(err)
 				if err == nil {
 					it.txStack.Push(tx, p)
 				}
@@ -273,13 +278,17 @@ func (it *LocalSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	var t, _ = it.txStack.Last()
 	if t != nil {
 		rows, err = t.Query(sqlorArgs)
+		err = it.dbErrorPack(err)
 	} else {
 		rows, err = it.db.Query(sqlorArgs)
+		err = it.dbErrorPack(err)
+	}
+	if rows != nil {
+		defer rows.Close()
 	}
 	if err != nil {
 		return nil, err
 	} else {
-		defer rows.Close()
 		return rows2maps(rows)
 	}
 	return nil, nil
@@ -298,8 +307,10 @@ func (it *LocalSession) Exec(sqlorArgs string) (*Result, error) {
 	var t, _ = it.txStack.Last()
 	if t != nil {
 		result, err = t.Exec(sqlorArgs)
+		err = it.dbErrorPack(err)
 	} else {
 		result, err = it.db.Exec(sqlorArgs)
+		err = it.dbErrorPack(err)
 	}
 	if err != nil {
 		return nil, err
@@ -311,4 +322,12 @@ func (it *LocalSession) Exec(sqlorArgs string) (*Result, error) {
 			RowsAffected: RowsAffected,
 		}, nil
 	}
+}
+
+func (it *LocalSession) dbErrorPack(e error) error {
+	if e != nil {
+		var sqlError = errors.New("[GoMybatis][LocalSession]" + e.Error())
+		return sqlError
+	}
+	return nil
 }

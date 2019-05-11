@@ -9,23 +9,24 @@ import (
 
 func Test_SqlArgTypeConvert(t *testing.T) {
 	var a = true
-	var convertResult = GoMybatisSqlArgTypeConvert{}.Convert( a,reflect.TypeOf(a))
-	if convertResult == "" {
+	var convertResult = GoMybatisSqlArgTypeConvert{}.Convert(a, reflect.TypeOf(a))
+	if convertResult != "true" {
 		t.Fatal(`Test_Adapter fail convertResult != true`)
 	}
 	fmt.Println(convertResult)
-	convertResult = GoMybatisSqlArgTypeConvert{}.Convert( 1, reflect.TypeOf(1))
-	if convertResult == "" {
+	convertResult = GoMybatisSqlArgTypeConvert{}.Convert(1, reflect.TypeOf(1))
+	if convertResult != "1" {
 		t.Fatal(`Test_Adapter fail convertResult != 1`)
 	}
 	fmt.Println(convertResult)
-	convertResult = GoMybatisSqlArgTypeConvert{}.Convert(time.Now(),reflect.TypeOf(time.Now()))
-	if convertResult == "" {
-		t.Fatal(`Test_Adapter fail convertResult != time.Time`)
+	var now = time.Now()
+	convertResult = GoMybatisSqlArgTypeConvert{}.Convert(now, nil)
+	if convertResult != "'"+now.Format(Adapter_FormateDate)+"'" {
+		t.Fatal(`Test_Adapter fail convertResult != 2019-05-10 11:09:01`)
 	}
 	fmt.Println(convertResult)
 	convertResult = GoMybatisSqlArgTypeConvert{}.Convert("string", reflect.TypeOf("string"))
-	if convertResult == "" {
+	if convertResult != "'string'" {
 		t.Fatal(`Test_Adapter fail convertResult != string`)
 	}
 	fmt.Println(convertResult)
@@ -33,17 +34,17 @@ func Test_SqlArgTypeConvert(t *testing.T) {
 
 func Test_SqlArgTypeConvert_NoType(t *testing.T) {
 	var a = true
-	var convertResult = GoMybatisSqlArgTypeConvert{}.Convert( a,nil)
+	var convertResult = GoMybatisSqlArgTypeConvert{}.Convert(a, nil)
 	if convertResult == "" {
 		t.Fatal(`Test_Adapter fail convertResult != true`)
 	}
 	fmt.Println(convertResult)
-	convertResult = GoMybatisSqlArgTypeConvert{}.Convert( 1, nil)
+	convertResult = GoMybatisSqlArgTypeConvert{}.Convert(1, nil)
 	if convertResult == "" {
 		t.Fatal(`Test_Adapter fail convertResult != 1`)
 	}
 	fmt.Println(convertResult)
-	convertResult = GoMybatisSqlArgTypeConvert{}.Convert(time.Now(),nil)
+	convertResult = GoMybatisSqlArgTypeConvert{}.Convert(time.Now(), nil)
 	if convertResult == "" {
 		t.Fatal(`Test_Adapter fail convertResult != time.Time`)
 	}
