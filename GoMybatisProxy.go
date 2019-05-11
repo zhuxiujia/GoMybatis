@@ -25,8 +25,12 @@ func ProxyValue(mapperValue reflect.Value, buildFunc func(funcField reflect.Stru
 }
 
 func buildProxy(v reflect.Value, buildFunc func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value) {
-	if v.Kind() == reflect.Ptr {
-		v = v.Elem()
+	for{
+		if v.Kind() == reflect.Ptr {
+			v = v.Elem()
+		}else{
+			break
+		}
 	}
 	t := v.Type()
 	et := t
