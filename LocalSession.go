@@ -62,7 +62,7 @@ func (it *LocalSession) Rollback() error {
 			var point = it.savePointStack.Pop()
 			if point != nil {
 				if it.logSystem != nil {
-					it.logSystem.Println([]byte("[GoMybatis] exec ====================" + "rollback to " + *point))
+					it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] exec ====================" + "rollback to " + *point))
 				}
 				_, e := t.Exec("rollback to " + *point)
 				e = it.dbErrorPack(e)
@@ -74,7 +74,7 @@ func (it *LocalSession) Rollback() error {
 
 		if it.txStack.Len() == 0 {
 			if it.logSystem != nil {
-				it.logSystem.Println([]byte("[GoMybatis] Rollback tx session:" + it.Id()))
+				it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] Rollback Session"))
 			}
 			var err = t.Rollback()
 			if err != nil {
@@ -110,7 +110,7 @@ func (it *LocalSession) Commit() error {
 			var pId = "p" + strconv.Itoa(it.txStack.Len()+1)
 			it.savePointStack.Push(pId)
 			if it.logSystem != nil {
-				it.logSystem.Println([]byte("[GoMybatis] exec " + "savepoint " + pId))
+				it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] exec " + "savepoint " + pId))
 			}
 			_, e := t.Exec("savepoint " + pId)
 			e = it.dbErrorPack(e)
@@ -120,7 +120,7 @@ func (it *LocalSession) Commit() error {
 		}
 		if it.txStack.Len() == 0 {
 			if it.logSystem != nil {
-				it.logSystem.Println([]byte("[GoMybatis] Commit tx session:" + it.Id()))
+				it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] Commit tx session:" + it.Id()))
 			}
 			var err = t.Commit()
 			if err != nil {
