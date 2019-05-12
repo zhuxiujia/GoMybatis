@@ -66,6 +66,9 @@ func AopProxyServiceValue(service reflect.Value, engine SessionEngine) {
 					panic(err)
 				}
 			} else {
+				if engine.LogEnable() {
+					engine.LogSystem().SendLog("[GoMybatis] Session rollback! id=" + session.Id())
+				}
 				var err = session.Rollback()
 				if err != nil {
 					panic(err)
