@@ -19,6 +19,7 @@ type Session interface {
 	Commit() error
 	Begin(p *tx.Propagation) error
 	Close()
+	LastPROPAGATION () *tx.Propagation
 }
 
 //产生session的引擎

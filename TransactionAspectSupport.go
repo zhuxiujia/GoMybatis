@@ -55,10 +55,18 @@ func AopProxyServiceValue(service reflect.Value, engine SessionEngine) {
 				//压入map
 				engine.GoroutineSessionMap().Put(goroutineID, session)
 			}
-			var err = session.Begin(&propagation)
-			if err != nil {
-				panic(err)
+			if !haveTx {
+				var err = session.Begin(session.LastPROPAGATION())
+				if err != nil {
+					panic(err)
+				}
+			}else{
+				var err = session.Begin(&propagation)
+				if err != nil {
+					panic(err)
+				}
 			}
+
 			var nativeImplResult = doNativeMethod(funcField, arg, nativeImplFunc, session, engine.Log())
 			if !haveRollBackType(nativeImplResult, rollbackTag) {
 				var err = session.Commit()

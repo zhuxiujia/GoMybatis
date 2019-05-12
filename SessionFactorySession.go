@@ -56,3 +56,7 @@ func (it *SessionFactorySession) Close() {
 		it.Factory.SessionMap.Delete(id)
 	}
 }
+
+func (it *SessionFactorySession) LastPROPAGATION () *tx.Propagation{
+	return it.Session.LastPROPAGATION()
+}

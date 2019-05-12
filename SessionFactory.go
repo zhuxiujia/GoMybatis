@@ -1,6 +1,8 @@
 package GoMybatis
 
-import "sync"
+import (
+	"sync"
+)
 
 type SessionFactory struct {
 	Engine     SessionEngine

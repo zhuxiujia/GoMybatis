@@ -240,6 +240,14 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 	return nil
 }
 
+func (it *LocalSession)LastPROPAGATION () *tx.Propagation{
+	if it.txStack.Len()!=0{
+		var _,pr=it.txStack.Last()
+		return pr
+	}
+	return nil
+}
+
 func (it *LocalSession) Close() {
 	if it.logSystem != nil {
 		it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] Close session"))
