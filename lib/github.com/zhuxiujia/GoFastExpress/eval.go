@@ -52,7 +52,7 @@ func getObjV(operator Operator, av reflect.Value) (reflect.Value, error) {
 		if av.IsValid() && av.CanInterface() {
 			return av, nil
 		} else {
-			return av, errors.New("not valid value!")
+			return av, errors.New("express get value not valid value!:"+av.String()+",value key:"+operator)
 		}
 	}
 	av = av.FieldByName(operator)
@@ -62,7 +62,7 @@ func getObjV(operator Operator, av reflect.Value) (reflect.Value, error) {
 	if av.IsValid() && av.CanInterface() {
 		return av, nil
 	} else {
-		return av, errors.New("not valid value!")
+		return av, errors.New("express get value not valid value!:"+av.String()+",value key:"+operator)
 	}
 }
 
