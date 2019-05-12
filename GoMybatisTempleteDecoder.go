@@ -275,11 +275,33 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 				if index == 0 {
 					prefix = "("
 				}
-				var value = prefix + "#{" + "item." + utils.UpperFieldFirstName(v.SelectAttrValue("property", "")) + "}"
+				//TODO serch property
+				var defProperty = v.SelectAttrValue("property", "")
+				if method != nil {
+					for i := 0; i < method.Type.NumIn(); i++ {
+						var argItem = method.Type.In(i)
+						if argItem.Kind() == reflect.Ptr {
+							argItem = argItem.Elem()
+						}
+						if argItem.Kind() == reflect.Slice || argItem.Kind() == reflect.Array {
+							argItem = argItem.Elem()
+						}
+						if argItem.Kind() == reflect.Struct {
+							for k := 0; k < argItem.NumField(); k++ {
+								var argStructField = argItem.Field(k)
+								var js = argStructField.Tag.Get("json") //扫描json tag
+								if js == defProperty {
+									defProperty = argStructField.Name
+								}
+							}
+						}
+					}
+				}
+				var value = prefix + "#{" + "item." + defProperty + "}"
 				if logic.Enable && v.SelectAttrValue("property", "") == logic.Property {
 					value = `'` + logic.Undelete_value + "'"
 				}
-				if index+1 == len(resultMapData.Child) {
+				if index+1 == len(resultMapData.ChildElements()) {
 					value += ")"
 				} else {
 					value += ","

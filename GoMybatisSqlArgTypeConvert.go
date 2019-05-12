@@ -1,8 +1,8 @@
 package GoMybatis
 
 import (
-	"github.com/zhuxiujia/GoMybatis/utils"
 	"bytes"
+	"fmt"
 	"reflect"
 	"strings"
 	"time"
@@ -52,5 +52,5 @@ func (it GoMybatisSqlArgTypeConvert) toString(value interface{}, argType reflect
 	if value == nil {
 		return ""
 	}
-	return utils.GetValue(value, argType)
+	return fmt.Sprint(value)
 }

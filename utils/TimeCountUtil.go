@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"bytes"
 	"fmt"
 	"reflect"
 	"time"
@@ -39,13 +38,4 @@ func DurationToString(duration time.Duration) string {
 func CountMethodTps(total float64, now time.Time, info string) {
 	var end = time.Now()
 	fmt.Println(info+` tps =`, total/end.Sub(now).Seconds())
-}
-
-func PrintTimeString(info string, start time.Time, end time.Time, duration time.Duration) string {
-	var durationName = DurationToString(duration)
-	var str bytes.Buffer
-	str.WriteString(info)
-	str.WriteString(GetValue(end.Sub(start).Nanoseconds()/int64(duration), Float64Type))
-	str.WriteString(durationName)
-	return str.String()
 }

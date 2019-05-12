@@ -24,7 +24,6 @@ func (it GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultProperty,
 		panic("[GoMybatis] Decode only support ptr value!")
 	}
 	var sqlResultLen = len(sqlResult)
-	var renameMapArray = it.getRenameMapArray(sqlResult)
 	if it.isGoBasicType(resultV.Type()) {
 		//single basic type
 		if sqlResultLen > 1 {
@@ -32,20 +31,20 @@ func (it GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultProperty,
 		} else if sqlResultLen == 1 && len(sqlResult[0]) > 1 {
 			return utils.NewError("SqlResultDecoder", " Decode one result,but find database result size find > 1 !")
 		}
-		it.convertToBasicTypeCollection(sqlResult[0], &resultV, resultMap, renameMapArray[0])
+		it.convertToBasicTypeCollection(sqlResult[0], &resultV, resultMap)
 	} else {
 		if resultV.Kind() == reflect.Struct && sqlResultLen > 1 {
 			return utils.NewError("SqlResultDecoder", " Decode one result,but find database result size find > 1 !")
 		}
-		for index, sItemMap := range sqlResult {
-			it.convertToBasicTypeCollection(sItemMap, &resultV, resultMap, renameMapArray[index])
+		for _, sItemMap := range sqlResult {
+			it.convertToBasicTypeCollection(sItemMap, &resultV, resultMap)
 		}
 	}
 	resultValue.Elem().Set(resultV)
 	return nil
 }
 
-func (it GoMybatisSqlResultDecoder) sqlStructConvert(resultMap map[string]*ResultProperty, resultTItemType reflect.Type, sItemMap map[string][]byte, renamedSItemMap map[string][]byte) reflect.Value {
+func (it GoMybatisSqlResultDecoder) sqlStructConvert(resultMap map[string]*ResultProperty, resultTItemType reflect.Type, sItemMap map[string][]byte) reflect.Value {
 	if resultTItemType.Kind() == reflect.Struct {
 		var tItemTypeFieldTypeValue = reflect.New(resultTItemType)
 		for i := 0; i < resultTItemType.NumField(); i++ {
@@ -60,8 +59,11 @@ func (it GoMybatisSqlResultDecoder) sqlStructConvert(resultMap map[string]*Resul
 			var value = sItemMap[repleaceName]
 			if value == nil || len(value) == 0 {
 				//renamed
-				repleaceName = strings.ToLower(strings.Replace(tItemTypeFieldType.Name, "_", "", -1))
-				value = renamedSItemMap[repleaceName]
+				repleaceName = tItemTypeFieldType.Tag.Get("json")
+				if repleaceName == "" {
+					continue
+				}
+				value = sItemMap[repleaceName]
 				if value == nil || len(value) == 0 {
 					continue
 				}
@@ -191,7 +193,7 @@ func (it GoMybatisSqlResultDecoder) isGoBasicType(tItemTypeFieldType reflect.Typ
 }
 
 //resultV:  struct,int,float,map[string]string,[]string,[]struct
-func (it GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceMap map[string][]byte, resultV *reflect.Value, resultMap map[string]*ResultProperty, renameMap map[string][]byte) {
+func (it GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceMap map[string][]byte, resultV *reflect.Value, resultMap map[string]*ResultProperty) {
 
 	var isSlice = resultV.Type().Kind() == reflect.Slice
 	var isMap = resultV.Type().Kind() == reflect.Map
@@ -239,7 +241,7 @@ func (it GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceMap map[s
 			}
 		}
 	} else if isStruct {
-		var value = it.sqlStructConvert(resultMap, itemType, sourceMap, renameMap)
+		var value = it.sqlStructConvert(resultMap, itemType, sourceMap)
 		resultV.Set(value)
 	} else if isMap {
 		itemType = resultV.Type().Elem()
@@ -275,7 +277,7 @@ func (it GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceMap map[s
 				}
 			}
 		} else if isChildStruct {
-			var value = it.sqlStructConvert(resultMap, itemType, sourceMap, renameMap)
+			var value = it.sqlStructConvert(resultMap, itemType, sourceMap)
 			*resultV = reflect.Append(*resultV, value)
 		} else if isChildMap {
 			var mapItem = reflect.MakeMap(itemType) //todo support map[string]string -> map[string]interface{}
@@ -295,17 +297,4 @@ func (it GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceMap map[s
 			panic("[GoMybatis] not supprot type []" + itemType.String())
 		}
 	}
-}
-
-func (it GoMybatisSqlResultDecoder) getRenameMapArray(sourceArray []map[string][]byte) []map[string][]byte {
-	var renameMapArray = make([]map[string][]byte, len(sourceArray))
-	for index, v := range sourceArray {
-		var m = make(map[string][]byte)
-		for indexKey, indexValue := range v {
-			var repleaceName = strings.ToLower(strings.Replace(indexKey, "_", "", -1))
-			m[repleaceName] = indexValue
-		}
-		renameMapArray[index] = m
-	}
-	return renameMapArray
 }
