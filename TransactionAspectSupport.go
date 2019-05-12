@@ -65,13 +65,16 @@ func AopProxyServiceValue(service reflect.Value, engine SessionEngine) {
 				if err != nil {
 					panic(err)
 				}
-			} else {
 				if engine.LogEnable() {
-					engine.LogSystem().SendLog("[GoMybatis] Session rollback! id=" + session.Id())
+					engine.LogSystem().SendLog("[GoMybatis] Session Commit! id=" + session.Id())
 				}
+			} else {
 				var err = session.Rollback()
 				if err != nil {
 					panic(err)
+				}
+				if engine.LogEnable() {
+					engine.LogSystem().SendLog("[GoMybatis] Session Rollback! id=" + session.Id())
 				}
 			}
 			return nativeImplResult
