@@ -137,7 +137,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 		propagation = tx.ToString(*p)
 	}
 	if it.logSystem != nil {
-		it.logSystem.Println([]byte("[GoMybatis] Begin session:" + it.Id() + ",Propagation:" + propagation))
+		it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] Begin session,Propagation:" + propagation))
 	}
 	if it.isClosed == true {
 		return utils.NewError("LocalSession", " can not Begin() a Closed Session!")
@@ -242,7 +242,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 
 func (it *LocalSession) Close() {
 	if it.logSystem != nil {
-		it.logSystem.Println([]byte("[GoMybatis] Close session:" + it.Id()))
+		it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] Close session"))
 	}
 	if it.newLocalSession != nil {
 		it.newLocalSession.Close()

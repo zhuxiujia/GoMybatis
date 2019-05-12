@@ -59,6 +59,9 @@ func AopProxyServiceValue(service reflect.Value, engine SessionEngine) {
 			if err != nil {
 				panic(err)
 			}
+			if engine.LogEnable() {
+				engine.LogSystem().SendLog("[GoMybatis] ["+session.Id()+"] Session Begin!")
+			}
 			var nativeImplResult = doNativeMethod(funcField, arg, nativeImplFunc, session, engine.Log())
 			if !haveRollBackType(nativeImplResult, rollbackTag) {
 				var err = session.Commit()
@@ -66,7 +69,7 @@ func AopProxyServiceValue(service reflect.Value, engine SessionEngine) {
 					panic(err)
 				}
 				if engine.LogEnable() {
-					engine.LogSystem().SendLog("[GoMybatis] Session Commit! id=" + session.Id())
+					engine.LogSystem().SendLog("[GoMybatis] ["+session.Id()+"] Session Commit!")
 				}
 			} else {
 				var err = session.Rollback()
@@ -74,7 +77,7 @@ func AopProxyServiceValue(service reflect.Value, engine SessionEngine) {
 					panic(err)
 				}
 				if engine.LogEnable() {
-					engine.LogSystem().SendLog("[GoMybatis] Session Rollback! id=" + session.Id())
+					engine.LogSystem().SendLog("[GoMybatis] ["+session.Id()+"] Session Rollback!" )
 				}
 			}
 			return nativeImplResult
