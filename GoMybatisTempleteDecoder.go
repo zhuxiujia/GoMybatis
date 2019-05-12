@@ -68,7 +68,7 @@ func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]etree.Token, bean
 				if beanType!=nil{
 					beanName=beanType.String()
 				}
-				var s = "================DecoderTemplete "+beanName+"============\n"
+				var s = "================DecoderTemplete "+beanName+"."+v.SelectAttrValue("id", "")+"============\n"
 				printElement(v, &s)
 				println(s)
 			}
@@ -596,10 +596,9 @@ func (it *GoMybatisTempleteDecoder) DecodeCollectionName(method *reflect.StructF
 	var collection string
 	//check method arg type
 	if method != nil {
-		method.Type.NumIn()
 		for i := 0; i < method.Type.NumIn(); i++ {
 			var itemType = method.Type.In(i)
-			if itemType.Kind() == reflect.Slice {
+			if itemType.Kind() == reflect.Slice || itemType.Kind() == reflect.Array{
 				var mapperParams = method.Tag.Get("mapperParams")
 				var args = strings.Split(mapperParams, ",")
 				if args == nil || len(args) == 0 {
