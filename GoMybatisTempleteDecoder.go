@@ -229,7 +229,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 		mapper.Child = append(mapper.Child, &trimColumn)
 
 		//args
-		var trimArg = etree.Element{
+		var tempElement = etree.Element{
 			Tag:   Element_Trim,
 			Attr:  []etree.Attr{{Key: "prefix", Value: "values ("}, {Key: "suffix", Value: ")"}, {Key: "suffixOverrides", Value: ","}},
 			Child: []etree.Token{},
@@ -238,13 +238,13 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 		if collectionName == "" {
 			for _, v := range resultMapData.ChildElements() {
 				if logic.Enable && v.SelectAttrValue("property", "") == logic.Property {
-					trimArg.Child = append(trimArg.Child, &etree.CharData{
+					tempElement.Child = append(tempElement.Child, &etree.CharData{
 						Data: logic.Undelete_value + ",",
 					})
 					continue
 				}
 				if inserts == "*?*" {
-					trimArg.Child = append(trimArg.Child, &etree.Element{
+					tempElement.Child = append(tempElement.Child, &etree.Element{
 						Tag:  Element_If,
 						Attr: []etree.Attr{{Key: "test", Value: it.makeIfNotNull(v.SelectAttrValue("property", ""))}},
 						Child: []etree.Token{
@@ -254,19 +254,16 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 						},
 					})
 				} else if inserts == "*" {
-					trimArg.Child = append(trimArg.Child, &etree.CharData{
+					tempElement.Child = append(tempElement.Child, &etree.CharData{
 						Data: "#{" + v.SelectAttrValue("property", "") + "},",
 					})
 				}
 			}
 		} else {
-			trimArg.Attr = append(trimArg.Attr, []etree.Attr{{Key: "prefix", Value: "values "}, {Key: "suffix", Value: ""}, {Key: "suffixOverrides", Value: ","}}...)
-			var forEach = &etree.Element{
-				Tag:   Element_Foreach,
-				Attr:  []etree.Attr{{Key: "open", Value: ""}, {Key: "close", Value: ""}, {Key: "separator", Value: ","}, {Key: "collection", Value: collectionName}},
-				Child: []etree.Token{},
-			}
-
+			tempElement.Attr = []etree.Attr{}
+			tempElement.Tag=Element_Foreach
+			tempElement.Attr=[]etree.Attr{{Key: "open", Value: "values "}, {Key: "close", Value: ""}, {Key: "separator", Value: ","}, {Key: "collection", Value: collectionName}}
+			tempElement.Child = []etree.Token{}
 			for index, v := range resultMapData.ChildElements() {
 				var prefix = ""
 				if index == 0 {
@@ -303,13 +300,12 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 				} else {
 					value += ","
 				}
-				forEach.Child = append(forEach.Child, &etree.CharData{
+				tempElement.Child = append(tempElement.Child, &etree.CharData{
 					Data: value,
 				})
 			}
-			trimArg.Child = append(trimArg.Child, forEach)
 		}
-		mapper.Child = append(mapper.Child, &trimArg)
+		mapper.Child = append(mapper.Child, &tempElement)
 
 		break
 	case "updateTemplete":
