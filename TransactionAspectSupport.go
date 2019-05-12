@@ -24,7 +24,7 @@ func AopProxyServiceValue(service reflect.Value, engine SessionEngine) {
 	var beanName = beanType.PkgPath() + beanType.Name()
 	ProxyValue(service, func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value {
 		//init data
-		var propagation = tx.PROPAGATION_REQUIRED
+		var propagation = tx.PROPAGATION_NEVER
 		var nativeImplFunc = reflect.ValueOf(field.Interface())
 		var txTag, haveTx = funcField.Tag.Lookup("tx")
 		var rollbackTag = funcField.Tag.Get("rollback")
