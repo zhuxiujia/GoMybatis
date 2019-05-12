@@ -49,6 +49,9 @@ func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]etree.Token, bean
 			if beanType != nil {
 				if isMethodElement(v.Tag) {
 					var upperId = utils.UpperFieldFirstName(v.SelectAttrValue("id", ""))
+					if upperId == "" {
+						upperId = utils.UpperFieldFirstName(v.Tag)
+					}
 					m, haveMethod := beanType.FieldByName(upperId)
 					if haveMethod {
 						method = &m
@@ -65,10 +68,10 @@ func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]etree.Token, bean
 			//println
 			if success {
 				var beanName string
-				if beanType!=nil{
-					beanName=beanType.String()
+				if beanType != nil {
+					beanName = beanType.String()
 				}
-				var s = "================DecoderTemplete "+beanName+"."+v.SelectAttrValue("id", "")+"============\n"
+				var s = "================DecoderTemplete " + beanName + "." + v.SelectAttrValue("id", "") + "============\n"
 				printElement(v, &s)
 				println(s)
 			}
@@ -462,7 +465,7 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Eleme
 			var item = &etree.Element{
 				Tag:   Element_If,
 				Attr:  []etree.Attr{{Key: "test", Value: it.makeIfNotNull(expressions[0])}},
-				Child: []etree.Token{&etree.CharData{Data: appendAdd+newWheres.String()}},
+				Child: []etree.Token{&etree.CharData{Data: appendAdd + newWheres.String()}},
 			}
 			mapper.Child = append(mapper.Child, item)
 		} else {
@@ -598,10 +601,10 @@ func (it *GoMybatisTempleteDecoder) DecodeCollectionName(method *reflect.StructF
 	if method != nil {
 		for i := 0; i < method.Type.NumIn(); i++ {
 			var itemType = method.Type.In(i)
-			if itemType.Kind() == reflect.Slice || itemType.Kind() == reflect.Array{
+			if itemType.Kind() == reflect.Slice || itemType.Kind() == reflect.Array {
 				var mapperParams = method.Tag.Get("mapperParams")
 				var args = strings.Split(mapperParams, ",")
-				if args == nil || len(args) == 0 {
+				if mapperParams == "" || args == nil || len(args) == 0 || (len(args) == 1 && args[0] == "") {
 					collection = DefaultOneArg
 				} else {
 					collection = args[i]
