@@ -59,9 +59,6 @@ func AopProxyServiceValue(service reflect.Value, engine SessionEngine) {
 			if err != nil {
 				panic(err)
 			}
-			if engine.LogEnable() {
-				engine.LogSystem().SendLog("[GoMybatis] ["+session.Id()+"] Session Begin!")
-			}
 			var nativeImplResult = doNativeMethod(funcField, arg, nativeImplFunc, session, engine.Log())
 			if !haveRollBackType(nativeImplResult, rollbackTag) {
 				var err = session.Commit()
