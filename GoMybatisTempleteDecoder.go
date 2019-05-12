@@ -260,10 +260,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 				}
 			}
 		} else {
-			trimArg.Attr[0] = etree.Attr{Key: "prefix", Value: "values "}
-			trimArg.Attr[1] = etree.Attr{Key: "suffix", Value: ""}
-			trimArg.Attr[2] = etree.Attr{Key: "suffixOverrides", Value: ","}
-
+			trimArg.Attr = append(trimArg.Attr, []etree.Attr{{Key: "prefix", Value: "values "}, {Key: "suffix", Value: ""}, {Key: "suffixOverrides", Value: ","}}...)
 			var forEach = &etree.Element{
 				Tag:   Element_Foreach,
 				Attr:  []etree.Attr{{Key: "open", Value: ""}, {Key: "close", Value: ""}, {Key: "separator", Value: ","}, {Key: "collection", Value: collectionName}},
