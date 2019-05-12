@@ -64,7 +64,11 @@ func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]etree.Token, bean
 
 			//println
 			if success {
-				var s = "================DecoderTemplete============\n"
+				var beanName string
+				if beanType!=nil{
+					beanName=beanType.String()
+				}
+				var s = "================DecoderTemplete "+beanName+"============\n"
 				printElement(v, &s)
 				println(s)
 			}
