@@ -261,8 +261,8 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			}
 		} else {
 			tempElement.Attr = []etree.Attr{}
-			tempElement.Tag=Element_Foreach
-			tempElement.Attr=[]etree.Attr{{Key: "open", Value: "values "}, {Key: "close", Value: ""}, {Key: "separator", Value: ","}, {Key: "collection", Value: collectionName}}
+			tempElement.Tag = Element_Foreach
+			tempElement.Attr = []etree.Attr{{Key: "open", Value: "values "}, {Key: "close", Value: ""}, {Key: "separator", Value: ","}, {Key: "collection", Value: collectionName}}
 			tempElement.Child = []etree.Token{}
 			for index, v := range resultMapData.ChildElements() {
 				var prefix = ""
@@ -469,7 +469,7 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Eleme
 		var expressions = strings.Split(v, "?")
 
 		var appendAdd = ""
-		if index >= 1{
+		if index >= 1 || len(mapper.Child) > 0 {
 			appendAdd = " and "
 		}
 
