@@ -467,15 +467,16 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Eleme
 	var wheres = strings.Split(arg, ",")
 	for index, v := range wheres {
 		var expressions = strings.Split(v, "?")
+
+		var appendAdd = ""
+		if index >= 1{
+			appendAdd = " and "
+		}
+
 		if len(expressions) > 1 {
 			//TODO have ?
 			var newWheres bytes.Buffer
 			newWheres.WriteString(expressions[1])
-
-			var appendAdd = ""
-			if index >= 1{
-				appendAdd = " and "
-			}
 
 			var item = &etree.Element{
 				Tag:   Element_If,
@@ -489,7 +490,7 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Eleme
 			//if len(mapper.Child) >= 1 && arg != "" {
 			//	appendAdd = " and "
 			//}
-			//newWheres.WriteString(appendAdd)
+			newWheres.WriteString(appendAdd)
 			newWheres.WriteString(v)
 			var item = &etree.CharData{
 				Data: newWheres.String(),
