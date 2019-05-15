@@ -406,7 +406,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			sql.Reset()
 			it.DecodeSets("", mapper, logic, nil)
 			if len(wheres) > 0 {
-				sql.WriteString(" where ")
+				//sql.WriteString(" where ")
 				mapper.Child = append(mapper.Child, &etree.CharData{
 					Data: sql.String(),
 				})
@@ -464,36 +464,42 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Eleme
 		mapper.Child = append(mapper.Child, item)
 	}
 
+	var whereRoot=&etree.Element{
+		Tag:   Element_where,
+		Attr:  []etree.Attr{},
+		Child: []etree.Token{
+
+		},
+	}
 	var wheres = strings.Split(arg, ",")
 	for index, v := range wheres {
 		var expressions = strings.Split(v, "?")
-
 		var appendAdd = ""
 		if index >= 1 || len(mapper.Child) > 0 {
 			appendAdd = " and "
 		}
-
+		var item etree.Token
 		if len(expressions) > 1 {
 			//TODO have ?
 			var newWheres bytes.Buffer
 			newWheres.WriteString(expressions[1])
 
-			var item = &etree.Element{
+			item = &etree.Element{
 				Tag:   Element_If,
 				Attr:  []etree.Attr{{Key: "test", Value: it.makeIfNotNull(expressions[0])}},
 				Child: []etree.Token{&etree.CharData{Data: appendAdd + newWheres.String()}},
 			}
-			mapper.Child = append(mapper.Child, item)
 		} else {
 			var newWheres bytes.Buffer
 			newWheres.WriteString(appendAdd)
 			newWheres.WriteString(v)
-			var item = &etree.CharData{
+			item = &etree.CharData{
 				Data: newWheres.String(),
 			}
-			mapper.Child = append(mapper.Child, item)
 		}
+		whereRoot.Child= append(whereRoot.Child, item)
 	}
+	mapper.Child= append(mapper.Child, whereRoot)
 }
 
 func (it *GoMybatisTempleteDecoder) DecodeSets(arg string, mapper *etree.Element, logic LogicDeleteData, versionData *VersionData) {
