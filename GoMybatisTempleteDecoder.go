@@ -138,7 +138,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 		sql.WriteString(" from ")
 		sql.WriteString(tables)
 		if len(wheres) > 0 {
-			sql.WriteString(" where ")
+			//sql.WriteString(" where ")
 			mapper.Child = append(mapper.Child, &etree.CharData{
 				Data: sql.String(),
 			})
@@ -364,7 +364,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			it.DecodeSets(columns, mapper, LogicDeleteData{}, versionData)
 		}
 		if len(wheres) > 0 || logic.Enable {
-			sql.WriteString(" where ")
+			//sql.WriteString(" where ")
 			mapper.Child = append(mapper.Child, &etree.CharData{
 				Data: sql.String(),
 			})
@@ -420,7 +420,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			sql.WriteString("delete from ")
 			sql.WriteString(tables)
 			if len(wheres) > 0 {
-				sql.WriteString(" where ")
+				//sql.WriteString(" where ")
 				mapper.Child = append(mapper.Child, &etree.CharData{
 					Data: sql.String(),
 				})
