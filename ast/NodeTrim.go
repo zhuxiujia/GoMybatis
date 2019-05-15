@@ -25,7 +25,13 @@ func (it *NodeTrim) Eval(env map[string]interface{}) ([]byte, error) {
 	if sql == nil {
 		return nil, nil
 	}
-	sql = bytes.Trim(sql, " ")
+	for {
+		if bytes.HasPrefix(sql, []byte(" ")) {
+			sql = bytes.Trim(sql, " ")
+		} else {
+			break
+		}
+	}
 	if it.prefixOverrides != nil {
 		var prefixOverridesArray = bytes.Split(it.prefixOverrides, []byte("|"))
 		if len(prefixOverridesArray) > 0 {
@@ -50,7 +56,7 @@ func (it *NodeTrim) Eval(env map[string]interface{}) ([]byte, error) {
 	newBuffer.WriteString(` `)
 	newBuffer.Write(it.suffix)
 
-	var newBufferBytes=newBuffer.Bytes()
+	var newBufferBytes = newBuffer.Bytes()
 	newBuffer.Reset()
 	return newBufferBytes, nil
 }
