@@ -446,24 +446,6 @@ func checkTablesValue(mapper *etree.Element, tables *string, resultMapData *etre
 
 //解码逗号分隔的where
 func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Element, logic LogicDeleteData, versionData *VersionData) {
-	if logic.Enable == true {
-		var appendAdd = ""
-		var item = &etree.CharData{
-			Data: appendAdd + logic.Column + " = " + logic.Undelete_value,
-		}
-		mapper.Child = append(mapper.Child, item)
-	}
-	if versionData != nil {
-		var appendAdd = ""
-		if len(mapper.Child) >= 1 && arg != "" {
-			appendAdd = " and "
-		}
-		var item = &etree.CharData{
-			Data: appendAdd + versionData.Column + " = #{" + versionData.Property + "}",
-		}
-		mapper.Child = append(mapper.Child, item)
-	}
-
 	var whereRoot=&etree.Element{
 		Tag:   Element_where,
 		Attr:  []etree.Attr{},
@@ -471,11 +453,29 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Eleme
 
 		},
 	}
+	if logic.Enable == true {
+		var appendAdd = ""
+		var item = &etree.CharData{
+			Data: appendAdd + logic.Column + " = " + logic.Undelete_value,
+		}
+		whereRoot.Child = append(whereRoot.Child, item)
+	}
+	if versionData != nil {
+		var appendAdd = ""
+		if len(whereRoot.Child) >= 1 && arg != "" {
+			appendAdd = " and "
+		}
+		var item = &etree.CharData{
+			Data: appendAdd + versionData.Column + " = #{" + versionData.Property + "}",
+		}
+		whereRoot.Child = append(whereRoot.Child, item)
+	}
+
 	var wheres = strings.Split(arg, ",")
 	for index, v := range wheres {
 		var expressions = strings.Split(v, "?")
 		var appendAdd = ""
-		if index >= 1 || len(mapper.Child) > 0 {
+		if index >= 1 || len(whereRoot.Child) > 0 {
 			appendAdd = " and "
 		}
 		var item etree.Token
