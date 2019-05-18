@@ -40,7 +40,15 @@ func takeValue(arg reflect.Value, feilds []string) (interface{}, error) {
 			return nil, e
 		}
 	}
-	return arg.Interface(), nil
+	if !arg.IsValid() {
+		return nil, nil
+	}
+	if arg.CanInterface() {
+		var intf = arg.Interface()
+		return intf, nil
+	} else {
+		return nil, nil
+	}
 
 }
 
@@ -48,11 +56,16 @@ func getObjV(operator Operator, av reflect.Value) (reflect.Value, error) {
 	if av.Kind() == reflect.Ptr || av.Kind() == reflect.Interface {
 		av = GetDeepPtr(av)
 	}
+
+	if av.Kind() == reflect.Map {
+		return av.MapIndex(reflect.ValueOf(operator)), nil
+	}
+
 	if av.Kind() != reflect.Struct {
 		if av.IsValid() && av.CanInterface() {
 			return av, nil
 		} else {
-			return av, errors.New("express get value not valid value!:"+av.String()+",value key:"+operator)
+			return av, errors.New("express get value not valid value!:" + av.String() + ",value key:" + operator)
 		}
 	}
 	av = av.FieldByName(operator)
@@ -62,7 +75,7 @@ func getObjV(operator Operator, av reflect.Value) (reflect.Value, error) {
 	if av.IsValid() && av.CanInterface() {
 		return av, nil
 	} else {
-		return av, errors.New("express get value not valid value!:"+av.String()+",value key:"+operator)
+		return av, errors.New("express get value not valid value!:" + av.String() + ",value key:" + operator)
 	}
 }
 

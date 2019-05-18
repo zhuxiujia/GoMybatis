@@ -456,7 +456,11 @@ func buildSql(proxyArg ProxyArg, nodes []ast.Node, sqlBuilder SqlBuilder) (Sessi
 	}
 	if customLen == 1 && customIndex != -1 {
 		//只有一个结构体参数，需要展开它的成员变量 加入到map
-		paramMap = scanStructArgFields(proxyArg.Args[customIndex], nil)
+		var tag *TagArg
+		if proxyArg.TagArgsLen == 1 {
+			tag = &proxyArg.TagArgs[0]
+		}
+		paramMap = scanStructArgFields(proxyArg.Args[customIndex], tag)
 	}
 
 	result, err := sqlBuilder.BuildSql(paramMap, nodes)
@@ -464,7 +468,7 @@ func buildSql(proxyArg ProxyArg, nodes []ast.Node, sqlBuilder SqlBuilder) (Sessi
 }
 
 //scan params
-func scanStructArgFields(v reflect.Value, typeConvert func(arg interface{}) interface{}) map[string]interface{} {
+func scanStructArgFields(v reflect.Value, tag *TagArg) map[string]interface{} {
 	var t = v.Type()
 	parameters := make(map[string]interface{})
 	if v.Kind() == reflect.Ptr {
@@ -478,20 +482,33 @@ func scanStructArgFields(v reflect.Value, typeConvert func(arg interface{}) inte
 	if t.Kind() != reflect.Struct {
 		panic(`[GoMybatis] the scanParamterBean() arg is not a struct type!,type =` + t.String())
 	}
+	var structArg = make(map[string]interface{})
 	for i := 0; i < t.NumField(); i++ {
 		var typeValue = t.Field(i)
-		var obj = v.Field(i).Interface()
-		if typeConvert != nil {
-			obj = typeConvert(obj)
+		var field = v.Field(i)
+
+		var obj interface{}
+		if field.Kind() == reflect.Ptr {
+			if field.CanAddr(){
+				obj = field.Addr().Interface()
+			}
+		} else {
+			if field.CanInterface() {
+				obj = field.Interface()
+			}
 		}
 		var jsonKey = typeValue.Tag.Get(`json`)
 		if jsonKey != "" {
 			parameters[jsonKey] = obj
-			//parameters["type_"+jsonKey] = v.Field(i).Type()
+			structArg[jsonKey] = obj
+
 		} else {
 			parameters[typeValue.Name] = obj
-			//parameters["type_"+typeValue.Name] = v.Field(i).Type()
+			structArg[typeValue.Name] = obj
 		}
+	}
+	if tag != nil {
+		parameters[tag.Name] = structArg
 	}
 	return parameters
 }
