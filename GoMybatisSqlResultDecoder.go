@@ -127,12 +127,14 @@ func (it GoMybatisSqlResultDecoder) basicTypeConvert(tItemTypeFieldType reflect.
 func (it GoMybatisSqlResultDecoder) sqlBasicTypeConvert(clomnName string, resultMap map[string]*ResultProperty, tItemTypeFieldType reflect.Type, valueByte []byte, resultValue *reflect.Value) bool {
 	if tItemTypeFieldType.Kind() == reflect.Ptr && valueByte != nil && len(valueByte) != 0 {
 		tItemTypeFieldType = tItemTypeFieldType.Elem()
+		//
 		var el = resultValue.Elem()
 		if el.IsValid() == false {
 			resultValue.Set(reflect.New(tItemTypeFieldType))
 			el = resultValue.Elem()
 		}
 		resultValue = &el
+		return it.sqlBasicTypeConvert(clomnName,resultMap,tItemTypeFieldType,valueByte,resultValue)
 	}
 	if tItemTypeFieldType.Kind() == reflect.String {
 		return it.basicTypeConvert(tItemTypeFieldType, valueByte, resultValue)
