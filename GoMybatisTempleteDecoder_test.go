@@ -1,6 +1,7 @@
 package GoMybatis
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/zhuxiujia/GoMybatis/example"
 	"github.com/zhuxiujia/GoMybatis/tx"
@@ -84,17 +85,18 @@ type TempleteSession struct {
 func (it *TempleteSession) Id() string {
 	return "sadf"
 }
-func (it *TempleteSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
-	resultsSlice := make([]map[string][]byte, 0)
+func (it *TempleteSession) Query(sqlorArgs string) (string, error) {
+	resultsSlice := make([]map[string]interface{}, 0)
 
-	result := make(map[string][]byte)
-	result["name"] = []byte("活动1")
-	result["id"] = []byte("125")
-	result["pc_link"] = []byte("http://www.baidu.com")
-	result["h5_link"] = []byte("http://www.baidu.com")
-	result["remark"] = []byte("活动1")
+	result := make(map[string]interface{})
+	result["name"] = "活动1"
+	result["id"] = "125"
+	result["pc_link"] = "http://www.baidu.com"
+	result["h5_link"] = "http://www.baidu.com"
+	result["remark"] = "活动1"
 	resultsSlice = append(resultsSlice, result)
-	return resultsSlice, nil
+	var b,_=json.Marshal(resultsSlice)
+	return string(b), nil
 }
 func (it *TempleteSession) Exec(sqlorArgs string) (*Result, error) {
 	var result = Result{

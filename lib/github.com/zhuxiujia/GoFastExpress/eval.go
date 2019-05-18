@@ -18,7 +18,8 @@ func EvalTakes(argNode ArgNode, arg interface{}) (interface{}, error) {
 	if av.Kind() == reflect.Map {
 		var m = arg.(map[string]interface{})
 		if argNode.valuesLen == 1 {
-			return m[argNode.value], nil
+			var v= m[argNode.value]
+			return v, nil
 		}
 		return takeValue(av.MapIndex(reflect.ValueOf(argNode.values[0])), argNode.values[1:])
 	} else {

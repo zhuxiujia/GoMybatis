@@ -15,12 +15,12 @@ CREATE TABLE `biz_activity` (
 -- ----------------------------
 -- Records of biz_activity
 -- ----------------------------
-INSERT INTO `biz_activity` VALUES ('165', '安利一波大表哥', null, 'http://www.baidu.com', 'http://www.taobao.com', 'ceshi', '2018-05-23 15:21:22', '1');
-INSERT INTO `biz_activity` VALUES ('166', '注册送好礼', null, '', 'www.baidu.com', '测试', '2018-05-24 10:36:31', '1');
-INSERT INTO `biz_activity` VALUES ('167', 'hello', null, 'www.baidu.com', 'www.baidu.com', 'ceshi', '2018-05-24 10:41:17', '1');
-INSERT INTO `biz_activity` VALUES ('168', 'rs168', null, null, null, null, '2018-05-23 15:21:22', '1');
-INSERT INTO `biz_activity` VALUES ('169', 'rs168', null, null, null, null, '2018-05-23 15:21:22', '1');
-INSERT INTO `biz_activity` VALUES ('170', 'rs168-10', null, null, null, null, '2018-05-23 15:21:22', '1');
+INSERT INTO `biz_activity` VALUES ('165', '安利一波大表哥', null, 'http://www.baidu.com', 'http://www.taobao.com', 'ceshi',1, '2018-05-23 15:21:22', '1');
+INSERT INTO `biz_activity` VALUES ('166', '注册送好礼', null, '', 'www.baidu.com', '测试',1, '2018-05-24 10:36:31', '1');
+INSERT INTO `biz_activity` VALUES ('167', 'hello', null, 'www.baidu.com', 'www.baidu.com', 'ceshi',1, '2018-05-24 10:41:17', '1');
+INSERT INTO `biz_activity` VALUES ('168', 'rs168', null, null, null, null,1, '2018-05-23 15:21:22', '1');
+INSERT INTO `biz_activity` VALUES ('169', 'rs168', null, null, null, null,1, '2018-05-23 15:21:22', '1');
+INSERT INTO `biz_activity` VALUES ('170', 'rs168-10', null, null, null, null,1, '2018-05-23 15:21:22', '1');
 
 
 

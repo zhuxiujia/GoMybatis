@@ -181,7 +181,7 @@ func Test_count(t *testing.T) {
 		return
 	}
 	//使用mapper
-	var result, err = exampleActivityMapper.CountByCondition("", time.Time{}, time.Time{})
+	var result, err = exampleActivityMapper.CountByCondition("", time.Now(), time.Now())
 	if err != nil {
 		panic(err)
 	}

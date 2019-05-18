@@ -1,6 +1,7 @@
 package GoMybatis
 
 import (
+	"encoding/json"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"fmt"
 	"testing"
@@ -24,10 +25,14 @@ type TestResult struct {
 
 //解码基本数据-int,string,time.Time...
 func Test_Convert_Basic_Type(t *testing.T) {
-	var resMap = make(map[string][]byte)
-	resMap["Amount1"] = []byte("1908")
-	var resMapArray = make([]map[string][]byte, 0)
-	resMapArray = append(resMapArray, resMap)
+	var resMap = make(map[string]interface{})
+	resMap["Amount1"] = "1908"
+	var resMapArrayData = make([]map[string]interface{}, 0)
+	resMapArrayData = append(resMapArrayData, resMap)
+
+	var b,_=json.Marshal(resMapArrayData)
+
+	var resMapArray=string(b)
 
 	var intResult int
 	var error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &intResult)
@@ -50,10 +55,14 @@ func Test_Convert_Basic_Type(t *testing.T) {
 	}
 	fmt.Println("Test_Convert_Basic_Type,float=", floatResult)
 
-	resMap = make(map[string][]byte)
-	resMap["Date"] = []byte(time.Now().Format(time.RFC3339))
-	resMapArray = make([]map[string][]byte, 0)
-	resMapArray = append(resMapArray, resMap)
+	resMap = make(map[string]interface{})
+	resMap["Date"] = time.Now().Format(time.RFC3339)
+	resMapArrayData = make([]map[string]interface{}, 0)
+	resMapArrayData = append(resMapArrayData, resMap)
+
+	b,_=json.Marshal(resMapArrayData)
+	resMapArray=string(b)
+
 	var timeResult time.Time
 	error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &timeResult)
 	if error != nil {
@@ -62,141 +71,145 @@ func Test_Convert_Basic_Type(t *testing.T) {
 	fmt.Println("Test_Convert_Basic_Type,time=", timeResult)
 }
 
-//解码数组
-func Test_Convert_Slice(t *testing.T) {
-	var resMap = make(map[string][]byte)
-	resMap["Amount1"] = []byte("1908")
-	resMap["Amount2"] = []byte("1901")
-	var resMapArray = make([]map[string][]byte, 0)
-	resMapArray = append(resMapArray, resMap)
-
-	var result []int
-	var error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &result)
-	if error != nil {
-		t.Fatal(error)
-	}
-	fmt.Println("Test_Convert_Slice", result)
-}
 
 //解码map
 func Test_Convert_Map(t *testing.T) {
-	var resMap = make(map[string][]byte)
-	resMap["Amount1"] = []byte("1908")
-	resMap["Amount2"] = []byte("1901")
-	var resMapArray = make([]map[string][]byte, 0)
-	resMapArray = append(resMapArray, resMap)
+	var resMap = make(map[string]interface{})
+	resMap["Amount1"] = "1908"
+	resMap["Amount2"] = "1901"
+	var resMapArrayData = make([]map[string]interface{}, 0)
 
-	var result map[string]string
+	resMapArrayData = append(resMapArrayData, resMap)
+	var b,_=json.Marshal(resMapArrayData)
+
+	var resMapArray=string(b)
+
+	var result =map[string]string{}
 	var error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &result)
 	if error != nil {
 		t.Fatal(error)
 	}
 	fmt.Println("Test_Convert_Map", result)
 
-	resMapArray = append(resMapArray, resMap)
+	resMapArrayData = append(resMapArrayData, resMap)
+	 b,_=json.Marshal(resMapArrayData)
+	 resMapArray=string(b)
+
 
 	var resultMapArray []map[string]string
 	error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &resultMapArray)
 	if error != nil {
 		t.Fatal(error)
 	}
-	fmt.Println("Test_Convert_Map", resultMapArray)
+	fmt.Println("Test_Convert_Map_Array", resultMapArray)
 }
 
 func Test_convert_struct(t *testing.T) {
 	var GoMybatisSqlResultDecoder = GoMybatisSqlResultDecoder{}
-	var res = make([]map[string][]byte, 0)
+	var res = make([]map[string]interface{}, 0)
 
-	var resMap = make(map[string][]byte)
-	resMap["Name"] = []byte("xiao ming")
-	resMap["Amount1"] = []byte("1908.1")
-	resMap["Amount2"] = []byte("1908.444")
-	resMap["Age1"] = []byte("1908")
-	resMap["Age2"] = []byte("1908")
-	resMap["Age3"] = []byte("1908")
-	resMap["Age4"] = []byte("1908")
-	resMap["Age5"] = []byte("1908")
-	resMap["Age6"] = []byte("1908")
-	resMap["Age7"] = []byte("1908")
-	resMap["Age8"] = []byte("1908")
-	resMap["Bool"] = []byte("true")
+	var resMap = make(map[string]interface{})
+	resMap["Name"] = "xiao ming"
+	resMap["Amount1"] = "1908.1"
+	resMap["Amount2"] = "1908.444"
+	resMap["Age1"] = "1908"
+	resMap["Age2"] = "1908"
+	resMap["Age3"] = "1908"
+	resMap["Age4"] = "1908"
+	resMap["Age5"] = "1908"
+	resMap["Age6"] = "1908"
+	resMap["Age7"] = "1908"
+	resMap["Age8"] = "1908"
+	resMap["Bool"] = "true"
 	res = append(res, resMap)
 
+	var b,_=json.Marshal(res)
+
+	var resMapArray=string(b)
+
 	var result TestResult
-	GoMybatisSqlResultDecoder.Decode(nil, res, &result)
+	GoMybatisSqlResultDecoder.Decode(nil, resMapArray, &result)
 
 	fmt.Println("Test_convert_struct", result)
 }
 
 func Test_Ignore_Case_Underscores(t *testing.T) {
 	var GoMybatisSqlResultDecoder = GoMybatisSqlResultDecoder{}
-	var res = make([]map[string][]byte, 0)
+	var res = make([]map[string]interface{}, 0)
 
-	var resMap = make(map[string][]byte)
-	resMap["name"] = []byte("xiao ming")
-	resMap["Amount_1"] = []byte("1908.1")
-	resMap["amount_2"] = []byte("1908.444")
-	resMap["age_1"] = []byte("1908")
-	resMap["age_2"] = []byte("1908")
-	resMap["age_3"] = []byte("1908")
-	resMap["age_4"] = []byte("1908")
-	resMap["age_5"] = []byte("1908")
-	resMap["age_6"] = []byte("1908")
-	resMap["age_7"] = []byte("1908")
-	resMap["age_8"] = []byte("1908")
-	resMap["Bool"] = []byte("1")
+	var resMap = make(map[string]interface{})
+	resMap["name"] = "xiao ming"
+	resMap["Amount_1"] = "1908.1"
+	resMap["amount_2"] = "1908.444"
+	resMap["age_1"] = "1908"
+	resMap["age_2"] = "1908"
+	resMap["age_3"] = "1908"
+	resMap["age_4"] = "1908"
+	resMap["age_5"] = "1908"
+	resMap["age_6"] = "1908"
+	resMap["age_7"] = "1908"
+	resMap["age_8"] = "1908"
+	resMap["Bool"] = "1"
 	res = append(res, resMap)
 
+	var b,_=json.Marshal(res)
+
+	var resMapArray=string(b)
+
 	var result TestResult
-	GoMybatisSqlResultDecoder.Decode(nil, res, &result)
+	GoMybatisSqlResultDecoder.Decode(nil, resMapArray, &result)
 
 	fmt.Println("Test_Ignore_Case_Underscores", result)
 }
 
 func Test_Ignore_Case_Underscores_Tps(t *testing.T) {
 	var GoMybatisSqlResultDecoder = GoMybatisSqlResultDecoder{}
-	var res = make([]map[string][]byte, 0)
+	var res = make([]map[string]interface{}, 0)
 
-	var resMap = make(map[string][]byte)
-	resMap["name"] = []byte("xiao ming")
-	resMap["Amount_1"] = []byte("1908.1")
-	resMap["amount_2"] = []byte("1908.444")
-	resMap["age_1"] = []byte("1908")
-	resMap["age_2"] = []byte("1908")
-	resMap["age_3"] = []byte("1908")
-	resMap["age_4"] = []byte("1908")
-	resMap["age_5"] = []byte("1908")
-	resMap["age_6"] = []byte("1908")
-	resMap["age_7"] = []byte("1908")
-	resMap["age_8"] = []byte("1908")
-	resMap["Bool"] = []byte("1")
+	var resMap = make(map[string]interface{})
+	resMap["name"] = "xiao ming"
+	resMap["Amount_1"] = "1908.1"
+	resMap["amount_2"] = "1908.444"
+	resMap["age_1"] = "1908"
+	resMap["age_2"] = "1908"
+	resMap["age_3"] = "1908"
+	resMap["age_4"] = "1908"
+	resMap["age_5"] = "1908"
+	resMap["age_6"] = "1908"
+	resMap["age_7"] = "1908"
+	resMap["age_8"] = "1908"
+	resMap["Bool"] = "1"
 	res = append(res, resMap)
+
+	var b,_=json.Marshal(res)
+
+	var resMapArray=string(b)
 
 	var result TestResult
 
 	defer utils.CountMethodTps(10000, time.Now(), "Test_Ignore_Case_Underscores_Tps")
 	for i := 0; i < 10000; i++ {
-		GoMybatisSqlResultDecoder.Decode(nil, res, &result)
+		GoMybatisSqlResultDecoder.Decode(nil, resMapArray, &result)
 	}
 
 }
 
 func Test_Decode_Interface(t *testing.T) {
 
-	var res = make([]map[string][]byte, 0)
-	var resMap = make(map[string][]byte)
-	resMap["name"] = []byte("xiao ming")
-	resMap["Amount_1"] = []byte("1908.1")
-	resMap["amount_2"] = []byte("1908.444")
-	resMap["age_1"] = []byte("1908")
-	resMap["age_2"] = []byte("1908")
-	resMap["age_3"] = []byte("1908")
-	resMap["age_4"] = []byte("1908")
-	resMap["age_5"] = []byte("1908")
-	resMap["age_6"] = []byte("1908")
-	resMap["age_7"] = []byte("1908")
-	resMap["age_8"] = []byte("1908")
-	resMap["Bool"] = []byte("1")
+	var res = make([]map[string]interface{}, 0)
+	var resMap = make(map[string]interface{})
+	resMap["name"] = "xiao ming"
+	resMap["Amount_1"] = "1908.1"
+	resMap["amount_2"] = "1908.444"
+	resMap["age_1"] = "1908"
+	resMap["age_2"] = "1908"
+	resMap["age_3"] = "1908"
+	resMap["age_4"] = "1908"
+	resMap["age_5"] = "1908"
+	resMap["age_6"] = "1908"
+	resMap["age_7"] = "1908"
+	resMap["age_8"] = "1908"
+	resMap["Bool"] = "1"
 	res = append(res, resMap)
 
 	var resultMap = make(map[string]*ResultProperty)
@@ -224,8 +237,13 @@ func Test_Decode_Interface(t *testing.T) {
 		Property: "amount_2",
 		GoType:   "string",
 	}
+
+	var b,_=json.Marshal(res)
+
+	var resMapArray=string(b)
+
 	var result map[string]string
-	GoMybatisSqlResultDecoder{}.Decode(resultMap, res, &result)
+	GoMybatisSqlResultDecoder{}.Decode(resultMap, resMapArray, &result)
 
 	fmt.Println("Test_Decode_Interface", result)
 }
@@ -233,67 +251,33 @@ func Test_Decode_Interface(t *testing.T) {
 func Benchmark_Ignore_Case_Underscores(b *testing.B) {
 	b.StopTimer()
 	var GoMybatisSqlResultDecoder = GoMybatisSqlResultDecoder{}
-	var res = make([]map[string][]byte, 0)
+	var res = make([]map[string]interface{}, 0)
 
-	var resMap = make(map[string][]byte)
-	resMap["name"] = []byte("xiao ming")
-	resMap["Amount_1"] = []byte("1908.1")
-	resMap["amount_2"] = []byte("1908.444")
-	resMap["age_1"] = []byte("1908")
-	resMap["age_2"] = []byte("1908")
-	resMap["age_3"] = []byte("1908")
-	resMap["age_4"] = []byte("1908")
-	resMap["age_5"] = []byte("1908")
-	resMap["age_6"] = []byte("1908")
-	resMap["age_7"] = []byte("1908")
-	resMap["age_8"] = []byte("1908")
-	resMap["Bool"] = []byte("1")
+	var resMap = make(map[string]interface{})
+	resMap["name"] = "xiao ming"
+	resMap["Amount_1"] = "1908.1"
+	resMap["amount_2"] = "1908.444"
+	resMap["age_1"] = "1908"
+	resMap["age_2"] = "1908"
+	resMap["age_3"] = "1908"
+	resMap["age_4"] = "1908"
+	resMap["age_5"] = "1908"
+	resMap["age_6"] = "1908"
+	resMap["age_7"] = "1908"
+	resMap["age_8"] = "1908"
+	resMap["Bool"] = "1"
 	res = append(res, resMap)
+
+
+	var bt,_=json.Marshal(res)
+
+	var resMapArray=string(bt)
 
 	var result TestResult
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		GoMybatisSqlResultDecoder.Decode(nil, res, &result)
+		GoMybatisSqlResultDecoder.Decode(nil, resMapArray, &result)
 	}
 
 }
-//
-//func TestGoMybatisSqlResultDecoder_Decode(t *testing.T) {
-//	var GoMybatisSqlResultDecoder = GoMybatisSqlResultDecoder{}
-//	var res = make([]map[string][]byte, 0)
-//	var resMap = make(map[string][]byte)
-//	resMap["name"] = []byte("xiao ming")
-//	resMap["Amount_1"] = []byte("1908.1")
-//	resMap["amount_2"] = []byte("1908.444")
-//	resMap["age_1"] = []byte("1908")
-//	resMap["age_2"] = []byte("1908")
-//	resMap["age_3"] = []byte("1908")
-//	resMap["age_4"] = []byte("1908")
-//	resMap["age_5"] = []byte("1908")
-//	resMap["age_6"] = []byte("1908")
-//	resMap["age_7"] = []byte("1908")
-//	resMap["age_8"] = []byte("1908")
-//	resMap["Bool"] = []byte("1")
-//	res = append(res, resMap)
-//	var result TestResult
-//	var err = GoMybatisSqlResultDecoder.Decode(nil, res, &result)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//	if result.Name == "" ||
-//		result.Amount1 == 0 ||
-//		result.Amount2 == 0 ||
-//		result.Age1 == 0 ||
-//		result.Age2 == 0 ||
-//		result.Age3 == 0 ||
-//		result.Age4 == 0 ||
-//		result.Age5 == 0 ||
-//		result.Age6 == 0 ||
-//		result.Age7 == 0 ||
-//		result.Age8 == 0 ||
-//		result.Bool == false {
-//		t.Fatal("TestGoMybatisSqlResultDecoder_Decode fail,result not decoded!")
-//	}
-//	fmt.Println(result)
-//}

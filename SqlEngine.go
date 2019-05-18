@@ -13,7 +13,7 @@ type Result struct {
 
 type Session interface {
 	Id() string
-	Query(sqlorArgs string) ([]map[string][]byte, error)
+	Query(sqlorArgs string) (string, error)
 	Exec(sqlorArgs string) (*Result, error)
 	Rollback() error
 	Commit() error
