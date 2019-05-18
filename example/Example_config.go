@@ -8,6 +8,7 @@ const MysqlUri = "*"
 //const MysqlUri = "root:root@(127.0.0.1:3306)/test?charset=utf8&parseTime=True&loc=Local"
 //定义数据库模型
 //例子：Activity 活动数据
+//字段可以为指针，即数据库可能返回null的字段
 type Activity struct {
 	Id         string    `json:"id"`
 	Uuid       string    `json:"uuid"`
