@@ -157,6 +157,7 @@ func Test_select(t *testing.T) {
 		panic(err)
 	}
 	fmt.Println("result=", result)
+	fmt.Println("PcLink Addr Vale=", result[0].PcLink)
 }
 
 //查询

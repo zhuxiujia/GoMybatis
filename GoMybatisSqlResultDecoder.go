@@ -49,17 +49,24 @@ func (it GoMybatisSqlResultDecoder) sqlStructConvert(resultMap map[string]*Resul
 		var tItemTypeFieldTypeValue = reflect.New(resultTItemType)
 		for i := 0; i < resultTItemType.NumField(); i++ {
 			var tItemTypeFieldType = resultTItemType.Field(i)
+			var jsonTag = tItemTypeFieldType.Tag.Get("json")
 			var repleaceName = tItemTypeFieldType.Name
 
-			if !it.isGoBasicType(tItemTypeFieldType.Type) {
-				//not basic type,continue
-				continue
+			if tItemTypeFieldType.Type.Kind() != reflect.Ptr {
+				if !it.isGoBasicType(tItemTypeFieldType.Type) {
+					//not basic type,continue
+					continue
+				}
+			} else {
+				if !it.isGoBasicType(tItemTypeFieldType.Type.Elem()) {
+					//not basic type,continue
+					continue
+				}
 			}
-
 			var value = sItemMap[repleaceName]
 			if value == nil || len(value) == 0 {
 				//renamed
-				repleaceName = tItemTypeFieldType.Tag.Get("json")
+				repleaceName = jsonTag
 				if repleaceName == "" {
 					continue
 				}
@@ -118,6 +125,15 @@ func (it GoMybatisSqlResultDecoder) basicTypeConvert(tItemTypeFieldType reflect.
 }
 
 func (it GoMybatisSqlResultDecoder) sqlBasicTypeConvert(clomnName string, resultMap map[string]*ResultProperty, tItemTypeFieldType reflect.Type, valueByte []byte, resultValue *reflect.Value) bool {
+	if tItemTypeFieldType.Kind() == reflect.Ptr && valueByte != nil && len(valueByte) != 0 {
+		tItemTypeFieldType = tItemTypeFieldType.Elem()
+		var el = resultValue.Elem()
+		if el.IsValid() == false {
+			resultValue.Set(reflect.New(tItemTypeFieldType))
+			el = resultValue.Elem()
+		}
+		resultValue = &el
+	}
 	if tItemTypeFieldType.Kind() == reflect.String {
 		return it.basicTypeConvert(tItemTypeFieldType, valueByte, resultValue)
 	} else if tItemTypeFieldType.Kind() == reflect.Bool {
