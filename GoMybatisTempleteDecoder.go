@@ -284,8 +284,10 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 							for k := 0; k < argItem.NumField(); k++ {
 								var argStructField = argItem.Field(k)
 								var js = argStructField.Tag.Get("json") //扫描json tag
-								if js != defProperty {
-									defProperty = js
+								if strings.ToLower(strings.Replace(defProperty, "_", "", -1)) ==
+									strings.ToLower(strings.Replace(argStructField.Name, "_", "", -1)) ||
+									js == defProperty{
+									defProperty = argStructField.Name
 								}
 							}
 						}
@@ -446,9 +448,9 @@ func checkTablesValue(mapper *etree.Element, tables *string, resultMapData *etre
 
 //解码逗号分隔的where
 func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Element, logic LogicDeleteData, versionData *VersionData) {
-	var whereRoot=&etree.Element{
-		Tag:   Element_where,
-		Attr:  []etree.Attr{},
+	var whereRoot = &etree.Element{
+		Tag:  Element_where,
+		Attr: []etree.Attr{},
 		Child: []etree.Token{
 
 		},
@@ -497,9 +499,9 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Eleme
 				Data: newWheres.String(),
 			}
 		}
-		whereRoot.Child= append(whereRoot.Child, item)
+		whereRoot.Child = append(whereRoot.Child, item)
 	}
-	mapper.Child= append(mapper.Child, whereRoot)
+	mapper.Child = append(mapper.Child, whereRoot)
 }
 
 func (it *GoMybatisTempleteDecoder) DecodeSets(arg string, mapper *etree.Element, logic LogicDeleteData, versionData *VersionData) {
