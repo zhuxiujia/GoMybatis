@@ -273,9 +273,9 @@ func (it *LocalSession) Close() {
 	}
 }
 
-func (it *LocalSession) Query(sqlorArgs string) (string, error) {
+func (it *LocalSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	if it.isClosed == true {
-		return "", utils.NewError("LocalSession", " can not Query() a Closed Session!")
+		return nil, utils.NewError("LocalSession", " can not Query() a Closed Session!")
 	}
 	if it.newLocalSession != nil {
 		return it.newLocalSession.Query(sqlorArgs)
@@ -295,11 +295,11 @@ func (it *LocalSession) Query(sqlorArgs string) (string, error) {
 		defer rows.Close()
 	}
 	if err != nil {
-		return "", err
+		return nil, err
 	} else {
 		return rows2maps(rows)
 	}
-	return "", nil
+	return nil, nil
 }
 
 func (it *LocalSession) Exec(sqlorArgs string) (*Result, error) {

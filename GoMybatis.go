@@ -2,7 +2,6 @@ package GoMybatis
 
 import (
 	"bytes"
-	"encoding/json"
 	"github.com/zhuxiujia/GoMybatis/ast"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 	"github.com/zhuxiujia/GoMybatis/utils"
@@ -365,7 +364,7 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 		defer func() {
 			if sessionEngine.LogEnable() {
 				var RowsAffected = "0"
-				if err == nil && res != "" {
+				if err == nil && res != nil {
 					RowsAffected = strconv.Itoa(len(res))
 				}
 				sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] ReturnRows <== "+RowsAffected)
@@ -419,7 +418,7 @@ func closeSession(factory *SessionFactory, session Session) {
 
 func buildSql(proxyArg ProxyArg, nodes []ast.Node, sqlBuilder SqlBuilder) (Session, string, error) {
 	var session Session
-	var argMap = make(map[string]interface{})
+	var paramMap = make(map[string]interface{})
 	var tagArgsLen = proxyArg.TagArgsLen
 	var argsLen = proxyArg.ArgsLen //参数长度，除session参数外。
 	var customLen = 0
@@ -449,17 +448,12 @@ func buildSql(proxyArg ProxyArg, nodes []ast.Node, sqlBuilder SqlBuilder) (Sessi
 			//插入2份参数，兼容大小写不敏感的参数
 			var lowerKey = utils.LowerFieldFirstName(proxyArg.TagArgs[argIndex].Name)
 			var upperKey = utils.UpperFieldFirstName(proxyArg.TagArgs[argIndex].Name)
-			argMap[lowerKey] = argInterface
-			argMap[upperKey] = argInterface
+			paramMap[lowerKey] = argInterface
+			paramMap[upperKey] = argInterface
 		} else {
-			argMap[DefaultOneArg] = argInterface
+			paramMap[DefaultOneArg] = argInterface
 		}
 	}
-
-	var paramMap = map[string]interface{}{}
-	var b,_=json.Marshal(argMap)
-	json.Unmarshal(b,&paramMap)
-
 	if customLen == 1 && customIndex != -1 {
 		//只有一个结构体参数，需要展开它的成员变量 加入到map
 		var tag *TagArg
@@ -488,10 +482,33 @@ func scanStructArgFields(v reflect.Value, tag *TagArg) map[string]interface{} {
 	if t.Kind() != reflect.Struct {
 		panic(`[GoMybatis] the scanParamterBean() arg is not a struct type!,type =` + t.String())
 	}
-	var b, _ = json.Marshal(v.Interface())
-	json.Unmarshal(b, &parameters)
+	var structArg = make(map[string]interface{})
+	for i := 0; i < t.NumField(); i++ {
+		var typeValue = t.Field(i)
+		var field = v.Field(i)
+
+		var obj interface{}
+		if field.Kind() == reflect.Ptr {
+			if field.CanAddr(){
+				obj = field.Addr().Interface()
+			}
+		} else {
+			if field.CanInterface() {
+				obj = field.Interface()
+			}
+		}
+		var jsonKey = typeValue.Tag.Get(`json`)
+		if jsonKey != "" {
+			parameters[jsonKey] = obj
+			structArg[jsonKey] = obj
+
+		} else {
+			parameters[typeValue.Name] = obj
+			structArg[typeValue.Name] = obj
+		}
+	}
 	if tag != nil {
-		parameters[tag.Name] = parameters
+		parameters[tag.Name] = structArg
 	}
 	return parameters
 }
