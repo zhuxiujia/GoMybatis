@@ -483,7 +483,6 @@ func scanStructArgFields(v reflect.Value, tag *TagArg) map[string]interface{} {
 		panic(`[GoMybatis] the scanParamterBean() arg is not a struct type!,type =` + t.String())
 	}
 	var structArg = make(map[string]interface{})
-	println(v.String())
 	for i := 0; i < t.NumField(); i++ {
 		var typeValue = t.Field(i)
 		var field = v.Field(i)
