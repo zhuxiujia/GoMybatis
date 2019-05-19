@@ -20,7 +20,7 @@
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">无依赖</a>基于反射动态代理,无需go generate生成*.go等中间代码，xml读取后可直接调用函数<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">智能表达式</a>`#{foo.Bar}``#{arg+1}``#{arg*1}``#{arg/1}``#{arg-1}`不但可以处理简单判断和计算任务，同时在取值时 假如foo.Bar 这个属性是指针,那么调用 foo.Bar 则取实际值,避免解引用操作,单个参数为结构体时默认展开它的属性，免去重复写a.b.c的深度取值<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">动态数据源</a>可以使用路由engine.SetDataSourceRouter自定义多数据源规则<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">模板标签（核心优势-兼顾开发效率/扩展性）</a>一行代码实现增删改查，逻辑删除，乐观锁（基于版本号更新）极大减轻CRUD操作的心智负担。除此之外，模板标签body体可以插入任意xml逻辑非常高的扩展性<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">模板标签（核心优势-兼顾开发效率/扩展性）</a>一行代码实现增删改查，逻辑删除，乐观锁（基于版本号更新）极大减轻CRUD操作的心智负担。除此之外，模板标签body体可以插入任意xml逻辑非常高的扩展性（和传统Orm框架最大区别,编写动态sql的同时代码行数骤减）<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">乐观锁</a>`<updateTemplete>`支持通过修改版本号实现的乐观锁<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">逻辑删除</a>`<insertTemplete>``<updateTemplete>``<deleteTemplete>``<selectTemplete>`均支持逻辑删除<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">8种事务传播行为</a>复刻Spring MVC的事务传播行为功能<br>
