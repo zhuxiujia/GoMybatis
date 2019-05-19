@@ -2,30 +2,29 @@ package GoMybatis
 
 import (
 	"fmt"
-	"reflect"
 	"testing"
 	"time"
 )
 
 func Test_SqlArgTypeConvert(t *testing.T) {
 	var a = true
-	var convertResult = GoMybatisSqlArgTypeConvert{}.Convert(a, reflect.TypeOf(a))
+	var convertResult = GoMybatisSqlArgTypeConvert{}.Convert(a)
 	if convertResult != "true" {
 		t.Fatal(`Test_Adapter fail convertResult != true`)
 	}
 	fmt.Println(convertResult)
-	convertResult = GoMybatisSqlArgTypeConvert{}.Convert(1, reflect.TypeOf(1))
+	convertResult = GoMybatisSqlArgTypeConvert{}.Convert(1)
 	if convertResult != "1" {
 		t.Fatal(`Test_Adapter fail convertResult != 1`)
 	}
 	fmt.Println(convertResult)
 	var now = time.Now()
-	convertResult = GoMybatisSqlArgTypeConvert{}.Convert(now, nil)
+	convertResult = GoMybatisSqlArgTypeConvert{}.Convert(now)
 	if convertResult != "'"+now.Format(Adapter_FormateDate)+"'" {
 		t.Fatal(`Test_Adapter fail convertResult != 2019-05-10 11:09:01`)
 	}
 	fmt.Println(convertResult)
-	convertResult = GoMybatisSqlArgTypeConvert{}.Convert("string", reflect.TypeOf("string"))
+	convertResult = GoMybatisSqlArgTypeConvert{}.Convert("string")
 	if convertResult != "'string'" {
 		t.Fatal(`Test_Adapter fail convertResult != string`)
 	}
@@ -34,22 +33,22 @@ func Test_SqlArgTypeConvert(t *testing.T) {
 
 func Test_SqlArgTypeConvert_NoType(t *testing.T) {
 	var a = true
-	var convertResult = GoMybatisSqlArgTypeConvert{}.Convert(a, nil)
+	var convertResult = GoMybatisSqlArgTypeConvert{}.Convert(a)
 	if convertResult == "" {
 		t.Fatal(`Test_Adapter fail convertResult != true`)
 	}
 	fmt.Println(convertResult)
-	convertResult = GoMybatisSqlArgTypeConvert{}.Convert(1, nil)
+	convertResult = GoMybatisSqlArgTypeConvert{}.Convert(1)
 	if convertResult == "" {
 		t.Fatal(`Test_Adapter fail convertResult != 1`)
 	}
 	fmt.Println(convertResult)
-	convertResult = GoMybatisSqlArgTypeConvert{}.Convert(time.Now(), nil)
+	convertResult = GoMybatisSqlArgTypeConvert{}.Convert(time.Now())
 	if convertResult == "" {
 		t.Fatal(`Test_Adapter fail convertResult != time.Time`)
 	}
 	fmt.Println(convertResult)
-	convertResult = GoMybatisSqlArgTypeConvert{}.Convert("string", nil)
+	convertResult = GoMybatisSqlArgTypeConvert{}.Convert("string")
 	if convertResult == "" {
 		t.Fatal(`Test_Adapter fail convertResult != string`)
 	}
@@ -58,10 +57,9 @@ func Test_SqlArgTypeConvert_NoType(t *testing.T) {
 
 func BenchmarkGoMybatisSqlArgTypeConvert_Convert(b *testing.B) {
 	b.StopTimer()
-	var convertType = reflect.TypeOf(1)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		var convertResult = GoMybatisSqlArgTypeConvert{}.Convert(1, convertType)
+		var convertResult = GoMybatisSqlArgTypeConvert{}.Convert(1)
 		if convertResult == "" {
 			b.Fatal("convert fail!")
 		}

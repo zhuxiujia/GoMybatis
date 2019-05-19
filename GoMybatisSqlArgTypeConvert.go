@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"reflect"
-	"strings"
 	"time"
 )
 
@@ -15,36 +14,69 @@ type GoMybatisSqlArgTypeConvert struct {
 }
 
 //Sql内容类型转换器
-func (it GoMybatisSqlArgTypeConvert) Convert(argValue interface{}, argType reflect.Type) string {
-	if argType == nil {
-		argType = reflect.TypeOf(argValue)
-	}
+func (it GoMybatisSqlArgTypeConvert) Convert(argValue interface{}) string {
+	//if argType == nil {
+	//	argType = reflect.TypeOf(argValue)
+	//}
+	var argValueV = reflect.ValueOf(argValue)
+	var argType = argValueV.Type()
+
 	if argValue == nil {
 		return "''"
 	}
-	switch argType.Kind() {
-	case reflect.Bool:
-		if argValue.(bool) {
-			return "true"
-		} else {
-			return "false"
-		}
-	case reflect.String:
+
+	switch argType.String() {
+	case "string":
 		var argStr bytes.Buffer
 		argStr.WriteString(`'`)
 		argStr.WriteString(argValue.(string))
 		argStr.WriteString(`'`)
 		return argStr.String()
-	case reflect.Struct:
-		if strings.Contains(argType.String(), "time.Time") {
-			var argStr bytes.Buffer
-			argStr.WriteString(`'`)
-			argStr.WriteString(argValue.(time.Time).Format(Adapter_FormateDate))
-			argStr.WriteString(`'`)
-			return argStr.String()
+	case "*string":
+		var v = argValue.(*string)
+		if v == nil {
+			return "''"
 		}
-		break
+		var argStr bytes.Buffer
+		argStr.WriteString(`'`)
+		argStr.WriteString(*v)
+		argStr.WriteString(`'`)
+		return argStr.String()
+	case "bool":
+		if argValue.(bool) {
+			return "true"
+		} else {
+			return "false"
+		}
+	case "*bool":
+		var v = argValue.(*bool)
+		if v == nil {
+			return "''"
+		}
+		if *v {
+			return "true"
+		} else {
+			return "false"
+		}
+	case "time.Time":
+		var argStr bytes.Buffer
+		argStr.WriteString(`'`)
+		argStr.WriteString(argValue.(time.Time).Format(Adapter_FormateDate))
+		argStr.WriteString(`'`)
+		return argStr.String()
+	case "*time.Time":
+		var timePtr = argValue.(*time.Time)
+		if timePtr == nil {
+			return "''"
+		}
+		var argStr bytes.Buffer
+		argStr.WriteString(`'`)
+		argStr.WriteString(timePtr.Format(Adapter_FormateDate))
+		argStr.WriteString(`'`)
+		return argStr.String()
+
 	}
+
 	return it.toString(argValue, argType)
 }
 

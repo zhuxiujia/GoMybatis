@@ -29,7 +29,7 @@ func Replace(startChar string, findStrs []string, data string, typeConvert SqlAr
 		}
 		var resultStr string
 		if typeConvert != nil {
-			resultStr = typeConvert.Convert(evalData, nil)
+			resultStr = typeConvert.Convert(evalData)
 		} else {
 			resultStr = fmt.Sprint(evalData)
 		}
