@@ -19,6 +19,9 @@ func (it GoMybatisSqlArgTypeConvert) Convert(argValue interface{}) string {
 	//	argType = reflect.TypeOf(argValue)
 	//}
 	var argValueV = reflect.ValueOf(argValue)
+	if !argValueV.IsValid() {
+		return "''"
+	}
 	var argType = argValueV.Type()
 
 	if argValue == nil {
