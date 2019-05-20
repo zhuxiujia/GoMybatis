@@ -18,24 +18,21 @@ func (it GoMybatisSqlArgTypeConvert) Convert(argValue interface{}) string {
 	//if argType == nil {
 	//	argType = reflect.TypeOf(argValue)
 	//}
+	if argValue == nil {
+		return "''"
+	}
 	var argValueV = reflect.ValueOf(argValue)
 	if !argValueV.IsValid() {
 		return "''"
 	}
-	var argType = argValueV.Type()
-
-	if argValue == nil {
-		return "''"
-	}
-
-	switch argType.String() {
-	case "string":
+	switch argValue.(type) {
+	case string:
 		var argStr bytes.Buffer
 		argStr.WriteString(`'`)
 		argStr.WriteString(argValue.(string))
 		argStr.WriteString(`'`)
 		return argStr.String()
-	case "*string":
+	case *string:
 		var v = argValue.(*string)
 		if v == nil {
 			return "''"
@@ -45,13 +42,13 @@ func (it GoMybatisSqlArgTypeConvert) Convert(argValue interface{}) string {
 		argStr.WriteString(*v)
 		argStr.WriteString(`'`)
 		return argStr.String()
-	case "bool":
+	case bool:
 		if argValue.(bool) {
 			return "true"
 		} else {
 			return "false"
 		}
-	case "*bool":
+	case *bool:
 		var v = argValue.(*bool)
 		if v == nil {
 			return "''"
@@ -61,13 +58,13 @@ func (it GoMybatisSqlArgTypeConvert) Convert(argValue interface{}) string {
 		} else {
 			return "false"
 		}
-	case "time.Time":
+	case time.Time:
 		var argStr bytes.Buffer
 		argStr.WriteString(`'`)
 		argStr.WriteString(argValue.(time.Time).Format(Adapter_FormateDate))
 		argStr.WriteString(`'`)
 		return argStr.String()
-	case "*time.Time":
+	case *time.Time:
 		var timePtr = argValue.(*time.Time)
 		if timePtr == nil {
 			return "''"
@@ -80,10 +77,10 @@ func (it GoMybatisSqlArgTypeConvert) Convert(argValue interface{}) string {
 
 	}
 
-	return it.toString(argValue, argType)
+	return it.toString(argValue)
 }
 
-func (it GoMybatisSqlArgTypeConvert) toString(value interface{}, argType reflect.Type) string {
+func (it GoMybatisSqlArgTypeConvert) toString(value interface{}) string {
 	if value == nil {
 		return ""
 	}
