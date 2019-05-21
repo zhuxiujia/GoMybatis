@@ -8,12 +8,12 @@ import (
 )
 
 func TestEval(t *testing.T) {
-	fmt.Println(Eval("", nil, "a"))
+	fmt.Println(Eval("a", "", nil, "a"))
 }
 
 func TestEvalNil(t *testing.T) {
 	var b *string
-	var result, e = Eval("!=", nil, b)
+	var result, e = Eval("nil!=b", "!=", nil, b)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -24,7 +24,7 @@ func TestEvalNil(t *testing.T) {
 
 func TestEval_number(t *testing.T) {
 	var aa = 2
-	fmt.Println(Eval(Add, &aa, 1))
+	fmt.Println(Eval("2+1", Add, &aa, 1))
 }
 
 func BenchmarkEval(b *testing.B) {
@@ -33,7 +33,7 @@ func BenchmarkEval(b *testing.B) {
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		// var b,_=
-		Eval(Ride, &aa, 1)
+		Eval("1/1", Ride, &aa, 1)
 		//fmt.Println(b)
 	}
 }

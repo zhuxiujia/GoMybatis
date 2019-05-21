@@ -154,35 +154,38 @@ func parserNode(express string, v Operator) (Node, error) {
 	i, e := strconv.ParseInt(v, 0, 64)
 	if e == nil {
 		var inode = IntNode{
-			value: int64(i),
-			t:     NInt,
+			express: v,
+			value:   int64(i),
+			t:       NInt,
 		}
 		return inode, nil
 	}
 	u, _ := strconv.ParseUint(v, 0, 64)
 	if e == nil {
 		var inode = UIntNode{
-			value: u,
-			t:     NUInt,
+			express: v,
+			value:   u,
+			t:       NUInt,
 		}
 		return inode, nil
 	}
 	f, e := strconv.ParseFloat(v, 64)
 	if e == nil {
 		var inode = FloatNode{
-			value: f,
-			t:     NFloat,
+			express: v,
+			value:   f,
+			t:       NFloat,
 		}
 		return inode, nil
 	}
 	e = nil
 
-	var values=strings.Split(v,".")
+	var values = strings.Split(v, ".")
 	var argNode = ArgNode{
-		value: v,
-		values:values,
+		value:     v,
+		values:    values,
 		valuesLen: len(values),
-		t:     NArg,
+		t:         NArg,
 	}
 	return argNode, nil
 }

@@ -42,6 +42,7 @@ func (it nodeType) ToString() string {
 type Node interface {
 	Type() nodeType
 	Eval(env interface{}) (interface{}, error)
+	Express() string
 }
 
 type OptNode struct {
@@ -61,7 +62,9 @@ func (it OptNode) IsCalculationOperator() bool {
 		return true
 	}
 	return false
-
+}
+func (it OptNode) Express() string {
+	return it.value
 }
 
 func (it OptNode) Eval(env interface{}) (interface{}, error) {
@@ -70,14 +73,17 @@ func (it OptNode) Eval(env interface{}) (interface{}, error) {
 
 //参数节点
 type ArgNode struct {
-	value string
-	values []string
+	value     string
+	values    []string
 	valuesLen int
-	t     nodeType
+	t         nodeType
 }
 
 func (it ArgNode) Type() nodeType {
 	return NArg
+}
+func (it ArgNode) Express() string {
+	return it.value
 }
 
 func (it ArgNode) Eval(env interface{}) (interface{}, error) {
@@ -93,6 +99,9 @@ type StringNode struct {
 func (it StringNode) Type() nodeType {
 	return NString
 }
+func (it StringNode) Express() string {
+	return it.value
+}
 
 func (it StringNode) Eval(env interface{}) (interface{}, error) {
 	return it.value, nil
@@ -100,8 +109,13 @@ func (it StringNode) Eval(env interface{}) (interface{}, error) {
 
 //值节点
 type FloatNode struct {
-	value float64
-	t     nodeType
+	express string
+	value   float64
+	t       nodeType
+}
+
+func (it FloatNode) Express() string {
+	return it.express
 }
 
 func (it FloatNode) Type() nodeType {
@@ -114,8 +128,13 @@ func (it FloatNode) Eval(env interface{}) (interface{}, error) {
 
 //值节点
 type IntNode struct {
-	value int64
-	t     nodeType
+	express string
+	value   int64
+	t       nodeType
+}
+
+func (it IntNode) Express() string {
+	return it.express
 }
 
 func (it IntNode) Type() nodeType {
@@ -127,12 +146,16 @@ func (it IntNode) Eval(env interface{}) (interface{}, error) {
 }
 
 type UIntNode struct {
-	value uint64
-	t     nodeType
+	express string
+	value   uint64
+	t       nodeType
 }
 
 func (it UIntNode) Type() nodeType {
 	return NUInt
+}
+func (it UIntNode) Express() string {
+	return it.express
 }
 
 func (it UIntNode) Eval(env interface{}) (interface{}, error) {
@@ -148,6 +171,13 @@ type BoolNode struct {
 func (it BoolNode) Type() nodeType {
 	return NBool
 }
+func (it BoolNode) Express() string {
+	if it.value {
+		return "true"
+	} else {
+		return "false"
+	}
+}
 
 func (it BoolNode) Eval(env interface{}) (interface{}, error) {
 	return it.value, nil
@@ -160,6 +190,9 @@ type NilNode struct {
 
 func (it NilNode) Type() nodeType {
 	return NNil
+}
+func (it NilNode) Express() string {
+	return "nil"
 }
 
 func (NilNode) Eval(env interface{}) (interface{}, error) {
@@ -176,6 +209,16 @@ type BinaryNode struct {
 
 func (it BinaryNode) Type() nodeType {
 	return NBinary
+}
+func (it BinaryNode) Express() string {
+	var s = ""
+	if it.left != nil {
+		s += it.left.Express()
+	}
+	if it.right != nil {
+		s += it.right.Express()
+	}
+	return s
 }
 
 func (it BinaryNode) Eval(env interface{}) (interface{}, error) {
@@ -194,5 +237,5 @@ func (it BinaryNode) Eval(env interface{}) (interface{}, error) {
 			return nil, e
 		}
 	}
-	return Eval(it.opt, left, right)
+	return Eval(it.Express(), it.opt, left, right)
 }

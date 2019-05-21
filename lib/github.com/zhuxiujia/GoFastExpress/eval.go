@@ -76,7 +76,7 @@ func getObjV(key string, operator Operator, av reflect.Value) (*reflect.Value, e
 	}
 }
 
-func Eval(operator Operator, a interface{}, b interface{}) (interface{}, error) {
+func Eval(express string, operator Operator, a interface{}, b interface{}) (interface{}, error) {
 	var av = reflect.ValueOf(a)
 	var bv = reflect.ValueOf(b)
 
@@ -84,7 +84,7 @@ func Eval(operator Operator, a interface{}, b interface{}) (interface{}, error) 
 	case And:
 		if a == nil || b == nil {
 			//equal nil
-			return nil, errors.New("eval fail,value can not be nil")
+			return nil, errors.New("express " + express + " eval fail,value can not be nil")
 		}
 		a, av = GetDeepValue(av, a)
 		b, bv = GetDeepValue(bv, b)
@@ -94,7 +94,7 @@ func Eval(operator Operator, a interface{}, b interface{}) (interface{}, error) 
 	case Or:
 		if a == nil || b == nil {
 			//equal nil
-			return nil, errors.New("eval fail,value can not be nil")
+			return nil, errors.New("express " + express + " eval fail,value can not be nil")
 		}
 		a, av = GetDeepValue(av, a)
 		b, bv = GetDeepValue(bv, b)
@@ -103,21 +103,21 @@ func Eval(operator Operator, a interface{}, b interface{}) (interface{}, error) 
 		return ab == true || bb == true, nil
 	case Equal, MoreEqual, More, Less, LessEqual:
 		//a kind == b kind
-		return DoEqualAction(operator, a, b, av, bv)
+		return DoEqualAction(express, operator, a, b, av, bv)
 	case UnEqual:
 		//a kind == b kind
-		var r, e = DoEqualAction(operator, a, b, av, bv)
+		var r, e = DoEqualAction(express, operator, a, b, av, bv)
 		if e != nil {
 			return nil, e
 		}
 		return !r, nil
 	case Add, Reduce, Ride, Divide:
-		return DoCalculationAction(operator, a, b, av, bv)
+		return DoCalculationAction(express, operator, a, b, av, bv)
 	}
-	return nil, errors.New("find not support operator :" + operator)
+	return nil, errors.New("express " + express + " find not support operator :" + operator)
 }
 
-func DoEqualAction(operator Operator, a interface{}, b interface{}, av reflect.Value, bv reflect.Value) (bool, error) {
+func DoEqualAction(express string, operator Operator, a interface{}, b interface{}, av reflect.Value, bv reflect.Value) (bool, error) {
 	switch operator {
 	case UnEqual:
 		fallthrough
@@ -181,7 +181,7 @@ func DoEqualAction(operator Operator, a interface{}, b interface{}, av reflect.V
 		return a.(float64) == b.(float64), nil
 	case Less:
 		if a == nil || b == nil {
-			return false, errors.New("can not parser '<' , arg have nil object!")
+			return false, errors.New("express " + express + "can not parser '<' , arg have nil object!")
 		}
 		a, av = GetDeepValue(av, a)
 		b, bv = GetDeepValue(bv, b)
@@ -190,7 +190,7 @@ func DoEqualAction(operator Operator, a interface{}, b interface{}, av reflect.V
 		return a.(float64) < b.(float64), nil
 	case More:
 		if a == nil || b == nil {
-			return false, errors.New("can not parser '>' , arg have nil object!")
+			return false, errors.New("express " + express + "can not parser '>' , arg have nil object!")
 		}
 		a, av = GetDeepValue(av, a)
 		b, bv = GetDeepValue(bv, b)
@@ -199,7 +199,7 @@ func DoEqualAction(operator Operator, a interface{}, b interface{}, av reflect.V
 		return a.(float64) > b.(float64), nil
 	case MoreEqual:
 		if a == nil || b == nil {
-			return false, errors.New("can not parser '>=' , arg have nil object!")
+			return false, errors.New("express " + express + "can not parser '>=' , arg have nil object!")
 		}
 		a, av = GetDeepValue(av, a)
 		b, bv = GetDeepValue(bv, b)
@@ -208,7 +208,7 @@ func DoEqualAction(operator Operator, a interface{}, b interface{}, av reflect.V
 		return a.(float64) >= b.(float64), nil
 	case LessEqual:
 		if a == nil || b == nil {
-			return false, errors.New("can not parser '<=' , arg have nil object!")
+			return false, errors.New("express " + express + "can not parser '<=' , arg have nil object!")
 		}
 		a, av = GetDeepValue(av, a)
 		b, bv = GetDeepValue(bv, b)
@@ -216,13 +216,13 @@ func DoEqualAction(operator Operator, a interface{}, b interface{}, av reflect.V
 		b = toNumberType(bv)
 		return a.(float64) <= b.(float64), nil
 	}
-	return false, errors.New("find not support equal operator :" + operator)
+	return false, errors.New("express " + express + " find not support equal operator :" + operator)
 }
 
-func DoCalculationAction(operator Operator, a interface{}, b interface{}, av reflect.Value, bv reflect.Value) (interface{}, error) {
+func DoCalculationAction(express string, operator Operator, a interface{}, b interface{}, av reflect.Value, bv reflect.Value) (interface{}, error) {
 	if a == nil || b == nil {
 		//equal nil
-		return false, errors.New("add operator value can not be nil!")
+		return false, errors.New("express " + express + " have not a action operator!")
 	}
 	//start equal
 	a, av = GetDeepValue(av, a)
@@ -247,9 +247,9 @@ func DoCalculationAction(operator Operator, a interface{}, b interface{}, av ref
 		a = toNumberType(av)
 		b = toNumberType(bv)
 		if b.(float64) == 0 {
-			return nil, errors.New("can not divide zero value!")
+			return nil, errors.New("express " + express + "can not divide zero value!")
 		}
 		return a.(float64) / b.(float64), nil
 	}
-	return "", errors.New("find not support operator :" + operator)
+	return "", errors.New("express " + express + "find not support operator :" + operator)
 }
