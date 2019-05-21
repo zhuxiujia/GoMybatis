@@ -20,25 +20,25 @@ func EvalTakes(argNode ArgNode, arg interface{}) (interface{}, error) {
 		if argNode.valuesLen == 1 {
 			return m[argNode.value], nil
 		}
-		return takeValue(av.MapIndex(reflect.ValueOf(argNode.values[0])), argNode.values[1:])
+		return takeValue(argNode.value, av.MapIndex(reflect.ValueOf(argNode.values[0])), argNode.values[1:])
 	} else {
 		if argNode.valuesLen == 1 {
 			return arg, nil
 		}
-		return takeValue(av, argNode.values[1:])
+		return takeValue(argNode.value, av, argNode.values[1:])
 	}
 }
 
-func takeValue(arg reflect.Value, feilds []string) (interface{}, error) {
+func takeValue(key string, arg reflect.Value, feilds []string) (interface{}, error) {
 	if arg.IsValid() == false {
 		return nil, nil
 	}
-	var e error
 	for _, v := range feilds {
-		arg, e = getObjV(v, arg)
-		if e != nil {
+		argItem, e := getObjV(key, v, arg)
+		if e != nil || argItem == nil {
 			return nil, e
 		}
+		arg = *argItem
 	}
 	if !arg.IsValid() {
 		return nil, nil
@@ -52,30 +52,27 @@ func takeValue(arg reflect.Value, feilds []string) (interface{}, error) {
 
 }
 
-func getObjV(operator Operator, av reflect.Value) (reflect.Value, error) {
+func getObjV(key string, operator Operator, av reflect.Value) (*reflect.Value, error) {
 	if av.Kind() == reflect.Ptr || av.Kind() == reflect.Interface {
 		av = GetDeepPtr(av)
 	}
 
 	if av.Kind() == reflect.Map {
-		return av.MapIndex(reflect.ValueOf(operator)), nil
+		var mapV = av.MapIndex(reflect.ValueOf(operator))
+		return &mapV, nil
 	}
 
 	if av.Kind() != reflect.Struct {
-		if av.IsValid() && av.CanInterface() {
-			return av, nil
-		} else {
-			return av, errors.New("express get value not valid value!:" + av.String() + ",value key:" + operator)
-		}
+		return nil, errors.New("express get value  " + key + "  fail :" + av.String() + ",value key:" + operator)
 	}
 	av = av.FieldByName(operator)
 	if av.Kind() == reflect.Ptr || av.Kind() == reflect.Interface {
 		av = GetDeepPtr(av)
 	}
 	if av.IsValid() && av.CanInterface() {
-		return av, nil
+		return &av, nil
 	} else {
-		return av, errors.New("express get value not valid value!:" + av.String() + ",value key:" + operator)
+		return nil, errors.New("express get value not valid value!:" + av.String() + ",value key:" + operator)
 	}
 }
 

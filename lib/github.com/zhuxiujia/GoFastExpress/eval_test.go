@@ -42,7 +42,6 @@ type S struct {
 	Name *string
 }
 
-
 func BenchmarkGetDeepValue(b *testing.B) {
 	b.StopTimer()
 	var a1 = int64(1)
@@ -56,90 +55,91 @@ func BenchmarkGetDeepValue(b *testing.B) {
 }
 
 func TestEvalTakes(t *testing.T) {
-	var strNode=ArgNode{
-		value:"a.B",
-		values:strings.Split("a.B","."),
-		valuesLen:2,
+	var strNode = ArgNode{
+		value:     "a.B",
+		values:    strings.Split("a.B", "."),
+		valuesLen: 2,
 	}
-	var m=map[string]interface{}{"a":"B"}
+	var m = map[string]interface{}{"a": "B"}
 
-	var r,_=EvalTakes(strNode,m)
+	var r, _ = EvalTakes(strNode, m)
 	fmt.Println(r)
 }
 
 type A struct {
-	B string
-	C C
+	B  string
+	C  C
 	PC *C
 }
 
 type C struct {
-	D string
+	D  string
 	PD *string
 }
 
-
-
 func TestEvalTakesStruct(t *testing.T) {
-	var strNode=ArgNode{
-		value:"a.B",
-		values:strings.Split("a.B","."),
-		valuesLen:2,
+	var strNode = ArgNode{
+		value:     "a.B",
+		values:    strings.Split("a.B", "."),
+		valuesLen: 2,
 	}
-	var m=A{B:"B",C:C{D:"D"}}
+	var m = A{B: "B", C: C{D: "D"}}
 
-	var r,_=EvalTakes(strNode,m)
+	var r, _ = EvalTakes(strNode, m)
 	fmt.Println(r)
 }
 
 func TestEvalTakesStructD(t *testing.T) {
-	var values=strings.Split("a.C.D",".")
-	var strNode=ArgNode{
-		value:"a.C.D",
-		values:values,
+	var values = strings.Split("a.C.D", ".")
+	var strNode = ArgNode{
+		value:     "a.C.D",
+		values:    values,
 		valuesLen: len(values),
 	}
-	var m=A{B:"B",C:C{D:"D"}}
+	var m = A{B: "B", C: C{D: "D"}}
 
-	var r,_=EvalTakes(strNode,m)
+	var r, _ = EvalTakes(strNode, m)
 	fmt.Println(r)
 }
 
 func TestEvalTakesStructPC(t *testing.T) {
-	var values=strings.Split("a.PC.PD",".")
-	var strNode=ArgNode{
-		value:"a.PC",
-		values:values,
+	var values = strings.Split("a.PC.PD", ".")
+	var strNode = ArgNode{
+		value:     "a.PC",
+		values:    values,
 		valuesLen: len(values),
 	}
-	var pds="pds"
-	var c=C{
-		D:"D",
-		PD:&pds,
+	var pds = "pds"
+	var c = C{
+		D:  "D",
+		PD: &pds,
 	}
-	var m=A{B:"B",C:C{D:"D"},PC:&c,}
+	var m = A{B: "B", C: C{D: "D"}, PC: &c}
 
-	var r,_=EvalTakes(strNode,m)
+	var r, e = EvalTakes(strNode, m)
+	if e != nil {
+		t.Fatal(e)
+	}
 	fmt.Println(r)
 }
 
 func BenchmarkEvalTakes(b *testing.B) {
 	b.StopTimer()
-	var values=strings.Split("a.PC.PD",".")
-	var strNode=ArgNode{
-		value:"a.PC.PD",
-		values:values,
+	var values = strings.Split("a.PC.PD", ".")
+	var strNode = ArgNode{
+		value:     "a.PC.PD",
+		values:    values,
 		valuesLen: len(values),
 	}
-	var pds="pds"
-	var c=C{
-		D:"D",
-		PD:&pds,
+	var pds = "pds"
+	var c = C{
+		D:  "D",
+		PD: &pds,
 	}
-	var m=A{B:"B",C:C{D:"D"},PC:&c,}
+	var m = A{B: "B", C: C{D: "D"}, PC: &c}
 
 	b.StartTimer()
-	for i:=0;i<b.N;i++{
-		EvalTakes(strNode,m)
+	for i := 0; i < b.N; i++ {
+		EvalTakes(strNode, m)
 	}
 }
