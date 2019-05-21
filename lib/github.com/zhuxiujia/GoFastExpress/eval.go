@@ -63,7 +63,7 @@ func getObjV(key string, operator Operator, av reflect.Value) (*reflect.Value, e
 	}
 
 	if av.Kind() != reflect.Struct {
-		return nil, errors.New("[express] get value  " + key + "  fail :" + av.String() + ",value key:" + operator)
+		return nil, errors.New("[express] " + key + " get value  " + key + "  fail :" + av.String() + ",value key:" + operator)
 	}
 	av = av.FieldByName(operator)
 	if av.Kind() == reflect.Ptr || av.Kind() == reflect.Interface {
@@ -72,7 +72,7 @@ func getObjV(key string, operator Operator, av reflect.Value) (*reflect.Value, e
 	if av.IsValid() && av.CanInterface() {
 		return &av, nil
 	} else {
-		return nil, errors.New("[express] get value not valid value!:" + av.String() + ",value key:" + operator)
+		return nil, nil
 	}
 }
 
