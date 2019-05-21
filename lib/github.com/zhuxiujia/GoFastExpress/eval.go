@@ -84,7 +84,7 @@ func Eval(express string, operator Operator, a interface{}, b interface{}) (inte
 	case And:
 		if a == nil || b == nil {
 			//equal nil
-			return nil, errors.New("express " + express + " eval fail,value can not be nil")
+			return nil, errors.New("[express] " + express + " eval fail,value can not be nil")
 		}
 		a, av = GetDeepValue(av, a)
 		b, bv = GetDeepValue(bv, b)
@@ -94,7 +94,7 @@ func Eval(express string, operator Operator, a interface{}, b interface{}) (inte
 	case Or:
 		if a == nil || b == nil {
 			//equal nil
-			return nil, errors.New("express " + express + " eval fail,value can not be nil")
+			return nil, errors.New("[express] " + express + " eval fail,value can not be nil")
 		}
 		a, av = GetDeepValue(av, a)
 		b, bv = GetDeepValue(bv, b)
@@ -114,7 +114,7 @@ func Eval(express string, operator Operator, a interface{}, b interface{}) (inte
 	case Add, Reduce, Ride, Divide:
 		return DoCalculationAction(express, operator, a, b, av, bv)
 	}
-	return nil, errors.New("express " + express + " find not support operator :" + operator)
+	return nil, errors.New("[express] " + express + " find not support operator :" + operator)
 }
 
 func DoEqualAction(express string, operator Operator, a interface{}, b interface{}, av reflect.Value, bv reflect.Value) (bool, error) {
@@ -181,7 +181,7 @@ func DoEqualAction(express string, operator Operator, a interface{}, b interface
 		return a.(float64) == b.(float64), nil
 	case Less:
 		if a == nil || b == nil {
-			return false, errors.New("express " + express + "can not parser '<' , arg have nil object!")
+			return false, errors.New("[express] " + express + "can not parser '<' , arg have nil object!")
 		}
 		a, av = GetDeepValue(av, a)
 		b, bv = GetDeepValue(bv, b)
@@ -190,7 +190,7 @@ func DoEqualAction(express string, operator Operator, a interface{}, b interface
 		return a.(float64) < b.(float64), nil
 	case More:
 		if a == nil || b == nil {
-			return false, errors.New("express " + express + "can not parser '>' , arg have nil object!")
+			return false, errors.New("[express] " + express + "can not parser '>' , arg have nil object!")
 		}
 		a, av = GetDeepValue(av, a)
 		b, bv = GetDeepValue(bv, b)
@@ -199,7 +199,7 @@ func DoEqualAction(express string, operator Operator, a interface{}, b interface
 		return a.(float64) > b.(float64), nil
 	case MoreEqual:
 		if a == nil || b == nil {
-			return false, errors.New("express " + express + "can not parser '>=' , arg have nil object!")
+			return false, errors.New("[express] " + express + "can not parser '>=' , arg have nil object!")
 		}
 		a, av = GetDeepValue(av, a)
 		b, bv = GetDeepValue(bv, b)
@@ -208,7 +208,7 @@ func DoEqualAction(express string, operator Operator, a interface{}, b interface
 		return a.(float64) >= b.(float64), nil
 	case LessEqual:
 		if a == nil || b == nil {
-			return false, errors.New("express " + express + "can not parser '<=' , arg have nil object!")
+			return false, errors.New("[express] " + express + "can not parser '<=' , arg have nil object!")
 		}
 		a, av = GetDeepValue(av, a)
 		b, bv = GetDeepValue(bv, b)
@@ -216,13 +216,13 @@ func DoEqualAction(express string, operator Operator, a interface{}, b interface
 		b = toNumberType(bv)
 		return a.(float64) <= b.(float64), nil
 	}
-	return false, errors.New("express " + express + " find not support equal operator :" + operator)
+	return false, errors.New("[express] " + express + " find not support equal operator :" + operator)
 }
 
 func DoCalculationAction(express string, operator Operator, a interface{}, b interface{}, av reflect.Value, bv reflect.Value) (interface{}, error) {
 	if a == nil || b == nil {
 		//equal nil
-		return false, errors.New("express " + express + " have not a action operator!")
+		return false, errors.New("[express] " + express + " have not a action operator!")
 	}
 	//start equal
 	a, av = GetDeepValue(av, a)
@@ -247,9 +247,9 @@ func DoCalculationAction(express string, operator Operator, a interface{}, b int
 		a = toNumberType(av)
 		b = toNumberType(bv)
 		if b.(float64) == 0 {
-			return nil, errors.New("express " + express + "can not divide zero value!")
+			return nil, errors.New("[express] " + express + "can not divide zero value!")
 		}
 		return a.(float64) / b.(float64), nil
 	}
-	return "", errors.New("express " + express + "find not support operator :" + operator)
+	return "", errors.New("[express] " + express + "find not support operator :" + operator)
 }
