@@ -488,20 +488,15 @@ func scanStructArgFields(v reflect.Value, tag *TagArg) map[string]interface{} {
 		var field = v.Field(i)
 
 		var obj interface{}
-		if field.Kind() == reflect.Ptr {
-			if field.CanAddr(){
-				obj = field.Addr().Interface()
-			}
-		} else {
-			if field.CanInterface() {
-				obj = field.Interface()
-			}
+		if field.CanInterface() {
+			obj = field.Interface()
 		}
 		var jsonKey = typeValue.Tag.Get(`json`)
 		if jsonKey != "" {
 			parameters[jsonKey] = obj
 			structArg[jsonKey] = obj
-
+			parameters[typeValue.Name] = obj
+			structArg[typeValue.Name] = obj
 		} else {
 			parameters[typeValue.Name] = obj
 			structArg[typeValue.Name] = obj
