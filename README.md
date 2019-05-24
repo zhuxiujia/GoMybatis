@@ -111,15 +111,17 @@ func main() {
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/log_system.png)
 ## 多数据库支持-驱动列表
 ```
+ //传统数据库
  Mysql: github.com/go-sql-driver/mysql
  MyMysql: github.com/ziutek/mymysql/godrv
  Postgres: github.com/lib/pq
- Tidb: github.com/pingcap/tidb
  SQLite: github.com/mattn/go-sqlite3
  MsSql: github.com/denisenkom/go-mssqldb
  MsSql: github.com/lunny/godbc
  Oracle: github.com/mattn/go-oci8
- CockroachDB(Postgres): github.com/lib/pq
+ //分布式NewSql数据库
+ Tidb: github.com/pingcap/tidb
+ CockroachDB(也是Postgres驱动): github.com/lib/pq
  ```
  
  ## 嵌套事务-事务传播行为
