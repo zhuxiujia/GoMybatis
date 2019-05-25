@@ -254,7 +254,6 @@ func ParserOperators(express string) []Operator {
 		}
 
 		if index >= 1 && isNumber(s) && newResult[index-1] == "-" {
-			println("eq:" + s)
 			if index == 1 {
 				newResult = []string{}
 				s = "-" + s
@@ -270,9 +269,6 @@ func ParserOperators(express string) []Operator {
 
 		newResult = append(newResult, s)
 		index += 1
-	}
-	for _, v := range newResult {
-		println(v)
 	}
 	return newResult
 }
