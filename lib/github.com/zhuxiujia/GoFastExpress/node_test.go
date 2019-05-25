@@ -25,6 +25,9 @@ func TestNode_Run(t *testing.T) {
 		true,
 		true,
 		true,
+		true,
+		true,
+		true,
 	}
 
 	var expressions = []string{
@@ -45,6 +48,9 @@ func TestNode_Run(t *testing.T) {
 		"1 != null",
 		"1 + 2 != nil && 1 > 0 ",
 		"1 + 2 != nil && 2 < b*8 ",
+		"-1 != -2",
+		"1 != -2",
+		"-1 > -2",
 	}
 	for index, expr := range expressions {
 		node, e := Parser(expr)

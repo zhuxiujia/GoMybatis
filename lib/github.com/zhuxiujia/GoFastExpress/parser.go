@@ -236,6 +236,7 @@ func ParserOperators(express string) []Operator {
 	file := fset.AddFile("", fset.Base(), len(src))
 	s.Init(file, src, nil, 0)
 	var lastToken token.Token
+	var index = 0
 	for {
 		_, tok, lit := s.Scan()
 		if tok == token.EOF || lit == "\n" {
@@ -251,9 +252,61 @@ func ParserOperators(express string) []Operator {
 			newResult[len(newResult)-1] = newResult[len(newResult)-1] + s
 			continue
 		}
+
+		if index >= 1 && isNumber(s) && newResult[index-1] == "-" {
+			println("eq:" + s)
+			if index == 1 {
+				newResult = []string{}
+				s = "-" + s
+				index -= 1
+			} else {
+				if index > 2 && isOperatorsAction(newResult[index-2]) {
+					newResult = newResult[:2]
+					s = "-" + s
+					index -= 1
+				}
+			}
+		}
+
 		newResult = append(newResult, s)
+		index += 1
+	}
+	for _, v := range newResult {
+		println(v)
 	}
 	return newResult
+}
+
+func isNumber(s string) bool {
+	var o0 = rune([]byte("0")[0])
+	var o1 = rune([]byte("1")[0])
+	var o2 = rune([]byte("2")[0])
+	var o3 = rune([]byte("3")[0])
+	var o4 = rune([]byte("4")[0])
+	var o5 = rune([]byte("5")[0])
+	var o6 = rune([]byte("6")[0])
+	var o7 = rune([]byte("7")[0])
+	var o8 = rune([]byte("8")[0])
+	var o9 = rune([]byte("9")[0])
+	var o10 = rune([]byte("9")[0])
+	var o11 = rune([]byte(".")[0])
+	for _, v := range s {
+		if o0 != v &&
+			o1 != v &&
+			o2 != v &&
+			o3 != v &&
+			o4 != v &&
+			o5 != v &&
+			o6 != v &&
+			o7 != v &&
+			o8 != v &&
+			o9 != v &&
+			o10 != v &&
+			o11 != v {
+			return false
+		}
+	}
+	return true
 }
 
 func toStr(lit string, tok token.Token) string {
@@ -270,7 +323,7 @@ func isOperatorsAction(arg string) bool {
 		arg == Reduce ||
 		arg == Ride ||
 		arg == Divide ||
-		//比较操作符
+	//比较操作符
 		arg == And ||
 		arg == Or ||
 		arg == Equal ||
