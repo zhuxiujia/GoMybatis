@@ -84,5 +84,45 @@ func (it GoMybatisSqlArgTypeConvert) toString(value interface{}) string {
 	if value == nil {
 		return ""
 	}
+	switch value.(type) {
+	case int, int16, int32, int64, float32, float64:
+		return fmt.Sprint(value)
+	case *int:
+		var v = value.(*int)
+		if v == nil {
+			return ""
+		}
+		return fmt.Sprint(*v)
+	case *int16:
+		var v = value.(*int16)
+		if v == nil {
+			return ""
+		}
+		return fmt.Sprint(*v)
+	case *int32:
+		var v = value.(*int32)
+		if v == nil {
+			return ""
+		}
+		return fmt.Sprint(*v)
+	case *int64:
+		var v = value.(*int64)
+		if v == nil {
+			return ""
+		}
+		return fmt.Sprint(*v)
+	case *float32:
+		var v = value.(*float32)
+		if v == nil {
+			return ""
+		}
+		return fmt.Sprint(*v)
+	case *float64:
+		var v = value.(*float64)
+		if v == nil {
+			return ""
+		}
+		return fmt.Sprint(*v)
+	}
 	return fmt.Sprint(value)
 }
