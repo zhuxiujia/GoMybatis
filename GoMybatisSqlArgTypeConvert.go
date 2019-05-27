@@ -3,7 +3,6 @@ package GoMybatis
 import (
 	"bytes"
 	"fmt"
-	"reflect"
 	"time"
 )
 
@@ -15,14 +14,7 @@ type GoMybatisSqlArgTypeConvert struct {
 
 //Sql内容类型转换器
 func (it GoMybatisSqlArgTypeConvert) Convert(argValue interface{}) string {
-	//if argType == nil {
-	//	argType = reflect.TypeOf(argValue)
-	//}
 	if argValue == nil {
-		return "''"
-	}
-	var argValueV = reflect.ValueOf(argValue)
-	if !argValueV.IsValid() {
 		return "''"
 	}
 	switch argValue.(type) {
@@ -75,54 +67,52 @@ func (it GoMybatisSqlArgTypeConvert) Convert(argValue interface{}) string {
 		argStr.WriteString(`'`)
 		return argStr.String()
 
-	}
-
-	return it.toString(argValue)
-}
-
-func (it GoMybatisSqlArgTypeConvert) toString(value interface{}) string {
-	if value == nil {
-		return ""
-	}
-	switch value.(type) {
 	case int, int16, int32, int64, float32, float64:
-		return fmt.Sprint(value)
+		return fmt.Sprint(argValue)
 	case *int:
-		var v = value.(*int)
+		var v = argValue.(*int)
 		if v == nil {
 			return ""
 		}
 		return fmt.Sprint(*v)
 	case *int16:
-		var v = value.(*int16)
+		var v = argValue.(*int16)
 		if v == nil {
 			return ""
 		}
 		return fmt.Sprint(*v)
 	case *int32:
-		var v = value.(*int32)
+		var v = argValue.(*int32)
 		if v == nil {
 			return ""
 		}
 		return fmt.Sprint(*v)
 	case *int64:
-		var v = value.(*int64)
+		var v = argValue.(*int64)
 		if v == nil {
 			return ""
 		}
 		return fmt.Sprint(*v)
 	case *float32:
-		var v = value.(*float32)
+		var v = argValue.(*float32)
 		if v == nil {
 			return ""
 		}
 		return fmt.Sprint(*v)
 	case *float64:
-		var v = value.(*float64)
+		var v = argValue.(*float64)
 		if v == nil {
 			return ""
 		}
 		return fmt.Sprint(*v)
 	}
-	return fmt.Sprint(value)
+
+	return it.toString(argValue)
+}
+
+func (it GoMybatisSqlArgTypeConvert) toString(argValue interface{}) string {
+	if argValue == nil {
+		return ""
+	}
+	return fmt.Sprint(argValue)
 }
