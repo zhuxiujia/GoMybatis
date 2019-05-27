@@ -276,9 +276,9 @@ func (it GoMybatisSqlResultDecoder) convertToBasicTypeCollection(sourceMap map[s
 				}
 			}
 		} else if isChildStruct {
-			panic("[GoMybatis] not supprot type struct:" + resultV.Elem().Type().String())
+			panic("[GoMybatis] not supprot type struct:" + resultV.Type().String())
 		} else {
-			panic("[GoMybatis] not supprot type map[*]" + resultV.Elem().Type().String())
+			panic("[GoMybatis] not supprot type map[*]" + resultV.Type().String())
 		}
 	} else if isSlice {
 		itemType = resultV.Type().Elem()
