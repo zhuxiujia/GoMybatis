@@ -1,7 +1,7 @@
 # 高性能 高开发效率 功能全面 的数据库orm框架
 * 中文
 * [English](README-en.md) 
-* [文档/官网](https://zhuxiujia.github.io/gomybatis.io/info.html)
+* [文档](https://zhuxiujia.github.io/gomybatis.io/#/getting-started)
 
 基于go语言的高效率，高并发，低IO消耗助力帮助企业和个人开发者完成大型,中型,和小型项目最重要的数据Dao层 
 
