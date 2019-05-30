@@ -2,7 +2,7 @@
 * 中文
 * [English](README-en.md) 
 
-基于go语言的高效率，高并发，低IO消耗助力帮助企业和个人开发者完成大型,中型,和小型项目最重要的数据Model层 
+基于go语言的高效率，高并发，低IO消耗助力帮助企业和个人开发者完成大型,中型,和小型项目最重要的数据Dao层 
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/zhuxiujia/GoMybatis)](https://goreportcard.com/report/github.com/zhuxiujia/GoMybatis)
 [![Build Status](https://travis-ci.com/zhuxiujia/GoMybatis.svg?branch=master)](https://travis-ci.com/zhuxiujia/GoMybatis)
