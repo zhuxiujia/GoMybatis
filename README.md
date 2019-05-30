@@ -2,6 +2,8 @@
 * 中文
 * [English](README-en.md) 
 
+基于go语言的高效率，高并发，低IO消耗助力帮助企业和个人开发者完成大型,中型,和小型项目最重要的数据Model层 
+
 [![Go Report Card](https://goreportcard.com/badge/github.com/zhuxiujia/GoMybatis)](https://goreportcard.com/report/github.com/zhuxiujia/GoMybatis)
 [![Build Status](https://travis-ci.com/zhuxiujia/GoMybatis.svg?branch=master)](https://travis-ci.com/zhuxiujia/GoMybatis)
 [![GoDoc](https://godoc.org/github.com/zhuxiujia/GoMybatis?status.svg)](https://godoc.org/github.com/zhuxiujia/GoMybatis)
@@ -237,11 +239,7 @@ go run XmlCreateTool.go
 
 
 
-
-
-
-## 请及时关注版本，及时升级版本(新的功能，bug修复)
-## TODO 未来新特性（可能会更改）
+## 请及时关注版本，及时升级版本(新的功能，bug修复) ，使用GoMybatis的项目请在Issues里留言您的项目名称+联系方式
 
 ## 喜欢的老铁欢迎在右上角点下 star 关注和支持我们哈
 
