@@ -41,7 +41,7 @@ go get github.com/zhuxiujia/GoMybatis
 go get github.com/go-sql-driver/mysql
 ```
 实际使用mapper
-```
+``` go
 import (
 	_ "github.com/go-sql-driver/mysql" //导入mysql驱动
 	"GoMybatis"
@@ -88,7 +88,7 @@ func main() {
 }
 ```
 ## 动态数据源
-```
+``` go
         //添加第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
 	GoMybatis.Open("mysql", MysqlUri)
 	//动态数据源路由
@@ -103,7 +103,7 @@ func main() {
 	})
 ```
 ## 自定义日志输出
-```
+``` go
 	engine.SetLogEnable(true)
 	engine.SetLog(&GoMybatis.LogStandard{
 		PrintlnFunc: func(messages []byte) {
@@ -144,7 +144,7 @@ func main() {
  <tr><td>PROPAGATION_NOT_REQUIRED</td><td>表示如果当前没有事务，就新建一个事务,否则返回错误。</td></tr></tbody>
  </table>
  
- ```
+ ``` go
  //嵌套事务的服务
 type TestService struct {
 	exampleActivityMapper *ExampleActivityMapper //服务包含一个mapper操作数据库，类似java spring mvc
@@ -175,7 +175,7 @@ func main()  {
  
  
   ## 内置xml生成工具- 根据用户定义的struct结构体生成对应的 mapper.xml
-```
+``` go
   //step1 定义你的数据库模型,必须包含 json注解（默认为数据库字段）, gm:""注解指定 值是否为 id,version乐观锁,logic逻辑软删除
   type UserAddress struct {
 	Id            string `json:"id" gm:"id"`
