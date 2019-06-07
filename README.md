@@ -131,6 +131,28 @@ func main() {
     <deleteTemplete wheres="name?name = #{name}"/>
 </mapper>    
 ```
+xml对应以下定义的Mapper结构体方法
+```go
+type Activity struct {
+	Id         string    `json:"id"`
+	Uuid       string    `json:"uuid"`
+	Name       string    `json:"name"`
+	PcLink     string    `json:"pcLink"`
+	H5Link     string    `json:"h5Link"`
+	Remark     string    `json:"remark"`
+	Version    int       `json:"version"`
+	CreateTime time.Time `json:"createTime"`
+	DeleteFlag int       `json:"deleteFlag"`
+}
+type ExampleActivityMapper struct {
+	SelectTemplete      func(name string) ([]Activity, error) `mapperParams:"name"`
+	InsertTemplete      func(arg Activity) (int64, error)
+	InsertTempleteBatch func(args []Activity) (int64, error) `mapperParams:"args"`
+	UpdateTemplete      func(arg Activity) (int64, error)    `mapperParams:"name"`
+	DeleteTemplete      func(name string) (int64, error)     `mapperParams:"name"`
+}
+```
+
 ## 动态数据源
 ``` go
         //添加第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
