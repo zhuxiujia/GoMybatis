@@ -96,7 +96,7 @@ func main() {
 	fmt.Println(result)
 }
 ```
-## 模板标签CRUD 简化（必须依赖一个resultMap 标签）
+## 功能：模板标签CRUD 简化（必须依赖一个resultMap 标签）
 ``` xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
@@ -153,7 +153,7 @@ type ExampleActivityMapper struct {
 }
 ```
 
-## 动态数据源
+## 功能：动态数据源
 ``` go
         //添加第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
 	GoMybatis.Open("mysql", MysqlUri)
@@ -168,7 +168,7 @@ type ExampleActivityMapper struct {
 		return nil
 	})
 ```
-## 自定义日志输出
+## 功能：自定义日志输出
 ``` go
 	engine.SetLogEnable(true)
 	engine.SetLog(&GoMybatis.LogStandard{
@@ -177,10 +177,10 @@ type ExampleActivityMapper struct {
 		},
 	})
 ```
-## 异步日志-基于消息队列日志
+## 功能：异步日志-基于消息队列日志
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/log_system.png)
 
- ## 嵌套事务-事务传播行为
+ ## 功能：嵌套事务-事务传播行为
  <table>
  <thead>
  <tr><th>事务类型</th>
@@ -227,7 +227,7 @@ func main()  {
  
  
  
-  ## 内置xml生成工具- 根据用户定义的struct结构体生成对应的 mapper.xml
+  ## 功能：内置xml生成工具- 根据用户定义的struct结构体生成对应的 mapper.xml
 ``` go
   //step1 定义你的数据库模型,必须包含 json注解（默认为数据库字段）, gm:""注解指定 值是否为 id,version乐观锁,logic逻辑软删除
   type UserAddress struct {
