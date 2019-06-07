@@ -40,16 +40,7 @@
 go get github.com/zhuxiujia/GoMybatis
 go get github.com/go-sql-driver/mysql
 ```
-实际使用mapper
-``` go
-import (
-	_ "github.com/go-sql-driver/mysql" //导入mysql驱动
-	"GoMybatis"
-	"fmt"
-	"time"
-)
-```
-定义xml内容，建议以*Mapper.xml文件存于项目目录中,在编辑xml时就可享受GoLand等IDE渲染和智能提示。生产环境可以使用statikFS把xml文件打包进程序里
+实际使用mapper 定义xml内容，建议以*Mapper.xml文件存于项目目录中,在编辑xml时就可享受GoLand等IDE渲染和智能提示。生产环境可以使用statikFS把xml文件打包进程序里
 ``` xml
 var xmlBytes = []byte(`
 <?xml version="1.0" encoding="UTF-8"?>
@@ -65,7 +56,7 @@ var xmlBytes = []byte(`
 ``` go
 import (
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql" //选择需要的数据库驱动导入
 	"github.com/zhuxiujia/GoMybatis"
 )
 type ExampleActivityMapperImpl struct {
