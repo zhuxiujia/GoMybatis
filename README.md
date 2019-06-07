@@ -16,7 +16,7 @@
 # 优势
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">安全稳定无坑</a>，已应用生产环境，功能稳定，适合各种复杂业务逻辑项目 帮助您做项目将数十万RMB收入囊中<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">高性能</a>，单机每秒事务数最高可达456621Tps/s,总耗时0.22s （测试环境 返回模拟的sql数据，并发1000，总数100000，6核16GB win10）<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">事务</a>，session灵活插拔，兼容过渡期微服务<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">事务</a>，session灵活插拔，同时一行注解  支持方便的AOP事务，事务传播行为<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">异步日志</a>异步消息队列日,框架内sql日志使用带缓存的channel实现 消息队列异步记录日志<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">动态SQL</a>，在xml中`<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<where>,<foreach>,<resultMap>,<bind>,<choose><when><otherwise>,<sql><include>`等等java框架Mybatis包含的15种实用功能<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">多数据库</a>Mysql,Postgres,Tidb,SQLite,Oracle....等等更多<br>
