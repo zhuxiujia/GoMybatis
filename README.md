@@ -98,6 +98,10 @@ func main() {
 ```
 ## 模板标签CRUD 简化（必须依赖一个resultMap 标签）
 ``` xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://raw.githubusercontent.com/zhuxiujia/GoMybatis/master/mybatis-3-mapper.dtd">
+<mapper>
     <!--logic_enable 逻辑删除字段-->
     <!--logic_deleted 逻辑删除已删除字段-->
     <!--logic_undelete 逻辑删除 未删除字段-->
@@ -125,6 +129,7 @@ func main() {
     <updateTemplete sets="name?name = #{name},remark?remark=#{remark}" wheres="id?id = #{id}"/>
     <!--删除模板:默认id="deleteTemplete,where自动设置逻辑删除字段-->
     <deleteTemplete wheres="name?name = #{name}"/>
+</mapper>    
 ```
 ## 动态数据源
 ``` go
