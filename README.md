@@ -96,6 +96,18 @@ func main() {
 	fmt.Println(result)
 }
 ```
+## 模板标签CRUD 简化
+``` xml
+    <!--模板标签: columns wheres sets 支持逗号,分隔表达式，*?* 为判空表达式-->
+    <!--插入模板:默认id="insertTemplete,test="field != null",where自动设置逻辑删除字段,支持批量插入" -->
+    <insertTemplete/>
+    <!--查询模板:默认id="selectTemplete,where自动设置逻辑删除字段-->
+    <selectTemplete wheres="name?name = #{name}"/>
+    <!--更新模板:默认id="updateTemplete,set自动设置乐观锁版本号-->
+    <updateTemplete sets="name?name = #{name},remark?remark=#{remark}" wheres="id?id = #{id}"/>
+    <!--删除模板:默认id="deleteTemplete,where自动设置逻辑删除字段-->
+    <deleteTemplete wheres="name?name = #{name}"/>
+```
 ## 动态数据源
 ``` go
         //添加第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
