@@ -36,7 +36,7 @@
 > 示例源码https://github.com/zhuxiujia/GoMybatis/tree/master/example
 
 设置好GoPath,用go get 命令下载GoMybatis和对应的数据库驱动
-```
+``` bash
 go get github.com/zhuxiujia/GoMybatis
 go get github.com/go-sql-driver/mysql
 ```
@@ -109,7 +109,7 @@ func main() {
 ## 异步日志-基于消息队列日志
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/log_system.png)
 ## 多数据库支持-驱动列表
-```
+``` bash
  //传统数据库
  Mysql: github.com/go-sql-driver/mysql
  MyMysql: github.com/ziutek/mymysql/godrv
