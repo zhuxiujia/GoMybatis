@@ -14,7 +14,7 @@
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/vuetify.png)
 ### 使用教程请仔细阅读文档网站 https://zhuxiujia.github.io/gomybatis.io/info.html
 # 优势
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">安全</a>，已应用于高并发生产环境，意味着功能稳定，最佳实践<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">安全稳定无坑</a>，已应用生产环境，功能稳定，适合各种复杂业务逻辑项目 帮助您做项目将数十万RMB收入囊中<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">高性能</a>，单机每秒事务数最高可达456621Tps/s,总耗时0.22s （测试环境 返回模拟的sql数据，并发1000，总数100000，6核16GB win10）<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">事务</a>，session灵活插拔，兼容过渡期微服务<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">异步日志</a>异步消息队列日,框架内sql日志使用带缓存的channel实现 消息队列异步记录日志<br>
