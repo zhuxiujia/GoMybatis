@@ -25,7 +25,7 @@
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">动态数据源</a>可以使用路由engine.SetDataSourceRouter自定义多数据源规则<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">模板标签（核心优势-兼顾开发效率/扩展性）</a>一行代码实现增删改查，逻辑删除，乐观锁（基于版本号更新）极大减轻CRUD操作的心智负担。除此之外，模板标签body体可以插入任意xml逻辑非常高的扩展性（和传统Orm框架最大区别,编写动态sql的同时代码行数骤减）<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">乐观锁</a>`<updateTemplete>`支持通过修改版本号实现的乐观锁<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">逻辑删除</a>`<insertTemplete>``<updateTemplete>``<deleteTemplete>``<selectTemplete>`均支持逻辑删除<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">逻辑删除</a>`<insertTemplete><updateTemplete><deleteTemplete><selectTemplete>`均支持逻辑删除<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">8种事务传播行为</a>复刻Spring MVC的事务传播行为功能<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">定制easyrpc 基于rpc/jsonrpc</a>让服务完美支持RPC（减少参数限制）,动态代理，事务订阅，易于微服务集成和扩展 详情请点击链接https://github.com/zhuxiujia/easyrpc<br>
 
