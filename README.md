@@ -1,4 +1,4 @@
-# 高性能 高开发效率 功能全面 的数据库orm框架
+# 高性能 高开发效率 高可读性 功能完备 的数据库orm框架
 * 中文
 * [English](README-en.md) 
 * [文档](https://zhuxiujia.github.io/gomybatis.io/#/getting-started)
