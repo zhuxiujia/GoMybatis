@@ -30,10 +30,23 @@
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">定制easyrpc 基于rpc/jsonrpc</a>让服务完美支持RPC（减少参数限制）,动态代理，事务订阅，易于微服务集成和扩展 详情请点击链接https://github.com/zhuxiujia/easyrpc<br>
 
 
-
+## 数据库驱动
+``` bash
+ //传统数据库
+ Mysql:                             github.com/go-sql-driver/mysql
+ MyMysql:                           github.com/ziutek/mymysql/godrv
+ Postgres:                          github.com/lib/pq
+ SQLite:                            github.com/mattn/go-sqlite3
+ MsSql:                             github.com/denisenkom/go-mssqldb
+ MsSql:                             github.com/lunny/godbc
+ Oracle:                            github.com/mattn/go-oci8
+ //分布式NewSql数据库
+ Tidb:                              github.com/pingcap/tidb
+ CockroachDB:                       github.com/lib/pq
+ ```
+ 
 ## 使用教程
-
-> 示例源码https://github.com/zhuxiujia/GoMybatis/tree/master/example
+> 教程源码  https://github.com/zhuxiujia/GoMybatis/tree/master/example
 
 设置好GoPath,用go get 命令下载GoMybatis和对应的数据库驱动
 ``` bash
@@ -109,21 +122,7 @@ func main() {
 ```
 ## 异步日志-基于消息队列日志
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/log_system.png)
-## 多数据库支持-驱动列表
-``` bash
- //传统数据库
- Mysql: github.com/go-sql-driver/mysql
- MyMysql: github.com/ziutek/mymysql/godrv
- Postgres: github.com/lib/pq
- SQLite: github.com/mattn/go-sqlite3
- MsSql: github.com/denisenkom/go-mssqldb
- MsSql: github.com/lunny/godbc
- Oracle: github.com/mattn/go-oci8
- //分布式NewSql数据库
- Tidb: github.com/pingcap/tidb
- CockroachDB(也是Postgres驱动): github.com/lib/pq
- ```
- 
+
  ## 嵌套事务-事务传播行为
  <table>
  <thead>
