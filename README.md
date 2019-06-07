@@ -21,7 +21,7 @@
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">动态SQL</a>，在xml中`<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<where>,<foreach>,<resultMap>,<bind>,<choose><when><otherwise>,<sql><include>`等等java框架Mybatis包含的15种实用功能<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">多数据库</a>Mysql,Postgres,Tidb,SQLite,Oracle....等等更多<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">无依赖</a>基于反射动态代理,无需go generate生成*.go等中间代码，xml读取后可直接调用函数<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">智能表达式</a>`#{foo.Bar}``#{arg+1}``#{arg*1}``#{arg/1}``#{arg-1}`不但可以处理简单判断和计算任务，支持自动解指针引用,支持简写模糊查询例如`select * from table where name like #{name+'%'}`(推荐后置百分号走索引)<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">智能表达式</a>`#{foo.Bar}``#{arg+1}``#{arg*1}``#{arg/1}``#{arg-1}`不但可以处理简单判断和计算任务，支持自动解指针引用,例如写一个模糊查询`select * from table where name like #{name+'%'}`(注意后置百分号走索引)<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">动态数据源</a>可以使用路由engine.SetDataSourceRouter自定义多数据源规则<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">模板标签（核心优势-兼顾开发效率/扩展性）</a>一行代码实现增删改查，逻辑删除，乐观锁，而且还保留完美的扩展性（标签体内可以继续插入各种逻辑） `<insertTemplete><updateTemplete><deleteTemplete><selectTemplete>` <br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">乐观锁</a>`<updateTemplete>`支持通过修改版本号实现的乐观锁<br>
