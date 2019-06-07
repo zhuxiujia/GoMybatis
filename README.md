@@ -63,6 +63,11 @@ var xmlBytes = []byte(`
 `)
 ```
 ``` go
+import (
+	"fmt"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/zhuxiujia/GoMybatis"
+)
 type ExampleActivityMapperImpl struct {
      SelectAll  func() ([]Activity, error)
 }
