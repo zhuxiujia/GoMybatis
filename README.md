@@ -48,7 +48,8 @@ import (
 	"fmt"
 	"time"
 )
-
+```
+``` xml
 //定义xml内容，建议以*Mapper.xml文件存于项目目录中,在编辑xml时就可享受GoLand等IDE渲染和智能提示。生产环境可以使用statikFS把xml文件打包进程序里
 
 var xmlBytes = []byte(`
@@ -62,7 +63,8 @@ var xmlBytes = []byte(`
     </select>
 </mapper>
 `)
-
+```
+``` go
 type ExampleActivityMapperImpl struct {
      SelectAll  func() ([]Activity, error)
 }
@@ -188,18 +190,20 @@ func main()  {
 	CreateTime time.Time `json:"create_time"`
 	DeleteFlag int       `json:"delete_flag" gm:"logic"`
 }
-
-//第二步，在你项目main 目录下建立一个 XmlCreateTool.go 内容如下
+```
+* 第二步，在你项目main 目录下建立一个 XmlCreateTool.go 内容如下
+```
 func main() {
 	var bean = UserAddress{} //此处只是举例，应该替换为你自己的数据库模型
 	GoMybatis.OutPutXml(reflect.TypeOf(bean).Name()+"Mapper.xml", GoMybatis.CreateXml("biz_"+GoMybatis.StructToSnakeString(bean), bean))
 }
-
-//第三步，执行命令，在当前目录下得到 UserAddressMapper.xml文件
+```
+* 第三步，执行命令，在当前目录下得到 UserAddressMapper.xml文件
+``` go
 go run XmlCreateTool.go
 ```
+* 以下是自动生成的xml文件内容
 ``` xml
-//以下是自动生成的xml文件内容
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://raw.githubusercontent.com/zhuxiujia/GoMybatis/master/mybatis-3-mapper.dtd">
