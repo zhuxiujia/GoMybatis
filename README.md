@@ -103,6 +103,7 @@ func main() {
 	engine.SetLogEnable(true)
 	engine.SetLog(&GoMybatis.LogStandard{
 		PrintlnFunc: func(messages []byte) {
+		  //do someting save messages
 		},
 	})
 ```
