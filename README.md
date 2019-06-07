@@ -14,7 +14,7 @@
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/vuetify.png)
 ### 使用教程请仔细阅读文档网站 https://zhuxiujia.github.io/gomybatis.io/info.html
 # 优势
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">安全稳定无坑</a>，已应用生产环境，功能稳定，适合各类 大小型项目以及复杂的金融项目,ERP项目 帮助您将数十万RMB轻松收入囊中<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">安全稳定无坑</a>，已应用生产环境（电商app平台,P2P金融app平台,卡充值app平台），功能稳定，适合各类 大小型项目以及复杂的金融项目,ERP项目 帮助您将数十万RMB轻松收入囊中<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">高性能</a>，单机每秒事务数最高可达456621Tps/s,总耗时0.22s （测试环境 返回模拟的sql数据，并发1000，总数100000，6核16GB win10）<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">事务</a>，session灵活插拔，同时一行注解  支持方便的AOP事务，事务传播行为<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">异步日志</a>异步消息队列日,框架内sql日志使用带缓存的channel实现 消息队列异步记录日志<br>
@@ -228,7 +228,7 @@ go run XmlCreateTool.go
  
 
 
-## 配套生态(RPC,JSONRPC,Consul)-搭配GoMybatis（已应用生成环境-已实践）
+## 配套生态(RPC,JSONRPC,Consul)-搭配GoMybatis
 * https://github.com/zhuxiujia/easy_mvc //mvc,极大简化开发流程
 * https://github.com/zhuxiujia/easyrpc  //easyrpc（基于标准库的RPC）吸收GoMybatis的概念，类似标准库的api，定义服务没有标准库的要求那么严格（可选不传参数，或者只有一个参数，只有一个返回值）
 * https://github.com/zhuxiujia/easyrpc_discovery  //基于easyrpc定制微服务发现，支持动态代理，支持GoMybatis事务，AOP代理，事务嵌套，tag定义事务，自带负载均衡算法（随机，加权轮询，源地址哈希法）
