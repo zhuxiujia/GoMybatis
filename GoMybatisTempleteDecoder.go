@@ -624,6 +624,9 @@ func (it *GoMybatisTempleteDecoder) DecodeCollectionName(method *reflect.StructF
 			if itemType.Kind() == reflect.Slice || itemType.Kind() == reflect.Array {
 				var mapperParams = method.Tag.Get("mapperParams")
 				var args = strings.Split(mapperParams, ",")
+				if collection != "" {
+					panic("[GoMybatis] collection arg number can not more than one!")
+				}
 				if mapperParams == "" || args == nil || len(args) == 0 {
 					collection = DefaultOneArg + strconv.Itoa(i)
 				} else {
