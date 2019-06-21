@@ -618,12 +618,13 @@ func (it *GoMybatisTempleteDecoder) DecodeCollectionName(method *reflect.StructF
 	var collection string
 	//check method arg type
 	if method != nil {
-		for i := 0; i < method.Type.NumIn(); i++ {
+		var numIn = method.Type.NumIn()
+		for i := 0; i < numIn; i++ {
 			var itemType = method.Type.In(i)
 			if itemType.Kind() == reflect.Slice || itemType.Kind() == reflect.Array {
 				var mapperParams = method.Tag.Get("mapperParams")
 				var args = strings.Split(mapperParams, ",")
-				if mapperParams == "" || args == nil || len(args) == 0 || (len(args) == 1 && args[0] == "") {
+				if mapperParams == "" || args == nil || len(args) == 0 || (numIn == 1 && args[0] == "") {
 					collection = DefaultOneArg + strconv.Itoa(i)
 				} else {
 					collection = args[i]
