@@ -451,7 +451,8 @@ func buildSql(proxyArg ProxyArg, nodes []ast.Node, sqlBuilder SqlBuilder) (Sessi
 			paramMap[lowerKey] = argInterface
 			paramMap[upperKey] = argInterface
 		} else {
-			paramMap[DefaultOneArg] = argInterface
+			//未命名参数，为arg加参数位置，例如 arg0,arg1,arg2....
+			paramMap[DefaultOneArg+strconv.Itoa(argIndex)] = argInterface
 		}
 	}
 	if customLen == 1 && customIndex != -1 {
@@ -502,7 +503,7 @@ func scanStructArgFields(v reflect.Value, tag *TagArg) map[string]interface{} {
 			structArg[typeValue.Name] = obj
 		}
 	}
-	if tag != nil && parameters[tag.Name]==nil{
+	if tag != nil && parameters[tag.Name] == nil {
 		parameters[tag.Name] = structArg
 	}
 	return parameters

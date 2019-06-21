@@ -5,6 +5,7 @@ import (
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -623,7 +624,7 @@ func (it *GoMybatisTempleteDecoder) DecodeCollectionName(method *reflect.StructF
 				var mapperParams = method.Tag.Get("mapperParams")
 				var args = strings.Split(mapperParams, ",")
 				if mapperParams == "" || args == nil || len(args) == 0 || (len(args) == 1 && args[0] == "") {
-					collection = DefaultOneArg
+					collection = DefaultOneArg + strconv.Itoa(i)
 				} else {
 					collection = args[i]
 				}
