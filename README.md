@@ -16,7 +16,7 @@
 # 优势
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">安全稳定无坑</a>，已应用生产环境（电商app平台,金融app平台,卡充值app平台），功能稳定，适合各类 大小型项目以及复杂的金融项目,ERP项目 帮助您将数十万RMB轻松收入囊中<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">高性能</a>，单机每秒事务数最高可达456621Tps/s,总耗时0.22s （测试环境 返回模拟的sql数据，并发1000，总数100000，6核16GB win10）<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">可移植</a>，兼容大部分Java Mybatis/Mybatis Plus框架的逻辑，无痛苦Java迁移至Go语言（仅修改resultMap的javaType为langType指定go语言类型）<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">可移植</a>，兼容大部分Java(Mybatis3,Mybatis Plus)框架逻辑，无痛苦Java迁移至Go语言（仅修改resultMap的javaType为langType指定go语言类型）<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">智能</a>，启动时检查用户配置/参数规范/提示警告，让配置问题bug阻断在调试前<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">事务</a>，session灵活插拔，同时一行注解  支持方便的AOP事务，事务传播行为<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">异步日志</a>异步消息队列日,框架内sql日志使用带缓存的channel实现 消息队列异步记录日志<br>
