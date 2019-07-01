@@ -2,6 +2,7 @@
 * 中文
 * [English](README-en.md) 
 * [文档](https://zhuxiujia.github.io/gomybatis.io/#/getting-started)
+* qq群 893963179
 
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/zhuxiujia/GoMybatis)](https://goreportcard.com/report/github.com/zhuxiujia/GoMybatis)
