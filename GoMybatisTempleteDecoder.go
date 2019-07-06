@@ -509,9 +509,11 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Eleme
 func (it *GoMybatisTempleteDecoder) DecodeSets(arg string, mapper *etree.Element, logic LogicDeleteData, versionData *VersionData) {
 	var sets = strings.Split(arg, ",")
 	for index, v := range sets {
+		if v == "" {
+			continue
+		}
 		var expressions = strings.Split(v, "?")
 		if len(expressions) > 1 {
-			//TODO have ?
 			var newWheres bytes.Buffer
 			if index > 0 {
 				newWheres.WriteString(",")
@@ -559,6 +561,9 @@ func (it *GoMybatisTempleteDecoder) DecodeSets(arg string, mapper *etree.Element
 
 func (it *GoMybatisTempleteDecoder) makeIfNotNull(arg string) string {
 	for _, v := range equalOperator {
+		if v == "" {
+			continue
+		}
 		if strings.Contains(arg, v) {
 			return arg
 		}
