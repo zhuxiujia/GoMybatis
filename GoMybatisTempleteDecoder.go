@@ -463,7 +463,7 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Eleme
 	}
 	if versionData != nil {
 		var appendAdd = ""
-		if len(whereRoot.Child) >= 1 && arg != "" {
+		if len(whereRoot.Child) >= 1 {
 			appendAdd = " and "
 		}
 		var item = &etree.CharData{
@@ -474,6 +474,9 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Eleme
 
 	var wheres = strings.Split(arg, ",")
 	for index, v := range wheres {
+		if v == "" || strings.Trim(v, " ") == "" {
+			continue
+		}
 		var expressions = strings.Split(v, "?")
 		var appendAdd = ""
 		if index >= 1 || len(whereRoot.Child) > 0 {
