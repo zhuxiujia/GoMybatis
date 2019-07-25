@@ -12,7 +12,7 @@
 
 
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/vuetify.png)
-### 使用教程请仔细阅读文档网站 https://zhuxiujia.github.io/gomybatis.io/info.html
+### 使用教程请仔细阅读文档网站 [文档](https://zhuxiujia.github.io/gomybatis.io/#/getting-started)
 # 优势
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">安全稳定无坑</a>，已应用生产环境App（电商/金融/卡充值类），功能稳定，适合各类 大小型项目以及复杂的金融项目,ERP项目 帮助您将数十万RMB轻松收入囊中<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">高性能</a>，单机每秒事务数最高可达456621Tps/s,总耗时0.22s （测试环境 返回模拟的sql数据，并发1000，总数100000，6核16GB win10）<br>
