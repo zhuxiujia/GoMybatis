@@ -20,7 +20,7 @@
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">干净/无依赖</a>集成第三方库无依赖。结构体+闭包+反射+代理实现 而不是使用go generate生成*.go等中间代码<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">智能</a>，启动时检查用户配置/参数规范/提示警告，让配置问题bug阻断在调试前<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">事务</a>，session灵活插拔，同时一行注解  支持方便的AOP事务，事务传播行为<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">异步日志</a>异步消息队列日,框架内sql日志使用带缓存的channel实现 消息队列异步记录日志<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">异步可扩展日志</a>异步消息队列日,框架内sql日志使用带缓存的channel实现 消息队列异步记录日志<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">动态SQL</a>，在xml中`<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<where>,<foreach>,<resultMap>,<bind>,<choose><when><otherwise>,<sql><include>`等等java框架Mybatis包含的15种实用功能<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">多数据库</a>Mysql,Postgres,Tidb,SQLite,Oracle....等等更多<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">智能表达式</a>`#{foo.Bar}#{arg+1}#{arg*1}#{arg/1}#{arg-1}`不但可以处理简单判断和计算任务，支持自动解指针引用,例如写一个模糊查询`select * from table where name like #{name+'%'}`(注意后置百分号走索引)<br>
