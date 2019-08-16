@@ -25,8 +25,7 @@
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">模板标签（新）</a>一行代码实现增删改查，逻辑删除，乐观锁，而且还保留完美的扩展性（标签体内可以继续插入各种逻辑） `<insertTemplete><updateTemplete><deleteTemplete><selectTemplete>` <br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">乐观锁（新）</a>`<updateTemplete>`乐观锁,尽可能防止并发竞争修改记录<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">逻辑删除（新）</a>`<insertTemplete><updateTemplete><deleteTemplete><selectTemplete>`逻辑删除,防止意外删除数据，数据恢复简单<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">事务传播行为（新）</a>复刻Spring MVC的8种事务传播行为功能<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">easyrpc/easymvc支持（新）</a>让服务完美支持RPC（减少参数限制）,动态代理，事务订阅，易于微服务集成和扩展 详情请点击链接https://github.com/zhuxiujia/easyrpc<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">RPC/MVC组件支持（新）</a>让服务完美支持RPC（减少参数限制）,动态代理，事务订阅，易于微服务集成和扩展 详情请点击链接https://github.com/zhuxiujia/easyrpc<br>
 
 
 ## 数据库驱动
