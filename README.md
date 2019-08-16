@@ -180,10 +180,10 @@ type ExampleActivityMapper struct {
 		},
 	})
 ```
-## 功能：异步日志-基于消息队列日志
+## 功能：异步日志接口（可自定义日志输出）
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/log_system.png)
 
- ## 功能：嵌套事务-事务传播行为
+ ## 功能：事务传播处理器（嵌套事务）
  <table>
  <thead>
  <tr><th>事务类型</th>
@@ -230,7 +230,7 @@ func main()  {
  
  
  
-  ## 功能：内置xml生成工具- 根据用户定义的struct结构体生成对应的 mapper.xml
+  ## 功能：XML/Mapper生成器- 根据struct结构体生成*mapper.xml
 ``` go
   //step1 定义你的数据库模型,必须包含 json注解（默认为数据库字段）, gm:""注解指定 值是否为 id,version乐观锁,logic逻辑软删除
   type UserAddress struct {
@@ -287,7 +287,7 @@ go run XmlCreateTool.go
  
 
 
-## 配套生态(RPC,JSONRPC,Consul)-搭配GoMybatis
+## 组件(RPC,JSONRPC,Consul)-搭配GoMybatis
 * https://github.com/zhuxiujia/easy_mvc //mvc,极大简化开发流程
 * https://github.com/zhuxiujia/easyrpc  //easyrpc（基于标准库的RPC）吸收GoMybatis的概念，类似标准库的api，定义服务没有标准库的要求那么严格（可选不传参数，或者只有一个参数，只有一个返回值）
 * https://github.com/zhuxiujia/easyrpc_discovery  //基于easyrpc定制微服务发现，支持动态代理，支持GoMybatis事务，AOP代理，事务嵌套，tag定义事务，自带负载均衡算法（随机，加权轮询，源地址哈希法）
