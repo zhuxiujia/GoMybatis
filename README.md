@@ -55,7 +55,8 @@
 go get github.com/zhuxiujia/GoMybatis
 go get github.com/go-sql-driver/mysql
 ```
-实际使用mapper 定义xml内容，建议以*Mapper.xml文件存于项目目录中,在编辑xml时就可享受GoLand等IDE渲染和智能提示。生产环境可以使用statikFS把xml文件打包进程序里
+实际使用mapper 定义xml内容，建议以*Mapper.xml文件存于项目目录中,在编辑xml时就可享受GoLand等IDE渲染和智能提示。生产环境可以使用statikFS把xml文件打包进程序里</br>
+* main.go
 ``` xml
 var xmlBytes = []byte(`
 <?xml version="1.0" encoding="UTF-8"?>
