@@ -301,5 +301,5 @@ go run XmlCreateTool.go
 
 ## 请及时关注版本，及时升级版本(新的功能，bug修复) ，使用GoMybatis的项目请在Issues里留言您的项目名称+联系方式
 
-## 喜欢的老铁欢迎在右上角点下 star 关注和赞助我们哈
+## 欢迎右上角点下 star 或者 微信支付赞助我们~
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/wx_account.jpg)
