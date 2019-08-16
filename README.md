@@ -20,7 +20,7 @@
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">声明式事务/AOP事务/传播行为</a>只需一行Tag定义AOP事务，以及事务传播行为<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">可扩展日志接口</a>异步消息队列日,框架内sql日志使用带缓存的channel实现 消息队列异步记录日志<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">动态SQL</a>，在xml中`<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<where>,<foreach>,<resultMap>,<bind>,<choose><when><otherwise>,<sql><include>`等等java框架Mybatis包含的15种实用功能<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">智能表达式</a>`#{foo.Bar}#{arg+1}#{arg*1}#{arg/1}#{arg-1}`不但可以处理简单判断和计算任务，支持自动解指针引用,例如写一个模糊查询`select * from table where name like #{name+'%'}`(注意后置百分号走索引)<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">智能表达式</a>可处理动态判断、计算任务（例如：`#{foo.Bar}#{arg+1}#{arg*1}#{arg/1}#{arg-1}`）,例如写模糊查询`select * from table where phone like #{phone+'%'}`(注意后置百分号走索引)<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">动态数据源</a>可自定义多数据源，动态切换多个数据库实例<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">模板标签（新）</a>一行代码实现增删改查，逻辑删除，乐观锁，而且还保留完美的扩展性（标签体内可以继续扩展sql逻辑）<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">乐观锁（新）</a>`<updateTemplete>`乐观锁,尽可能防止并发竞争修改记录<br>
