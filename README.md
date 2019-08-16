@@ -13,7 +13,6 @@
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/vuetify.png)
 ### Please read the documentation website carefully when using the tutorial. [DOC](https://zhuxiujia.github.io/gomybatis.io/#/getting-started)
 # Features
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">Safety and stability</a>，App (e-commerce/finance/card recharge class) has been applied. Features are stable and suitable for all kinds of large and small projects as well as complex financial projects. ERP projects help you to easily pocket hundreds of thousands of RMBs.<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">High Performance</a>，The maximum number of transactions per second of a single computer can reach 456621Tps/s, and the total time consumed is 0.22s (test environment returns simulated SQL data, concurrently 1000, total 100000, 6-core 16GB win10)<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">Painless migration from Java to go</a>，Compatible with most Java(Mybatis3,Mybatis Plus) ，Painless migration of XML SQL files from Java Spring Mybatis to Go language（Modify only the javaType of resultMap to specify go language type for langType）<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">Declarative transaction/AOP transaction/transaction Behavior</a>Only one line Tag is needed to define AOP transactions and transaction propagation behavior<br>
