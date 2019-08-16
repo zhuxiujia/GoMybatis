@@ -1,7 +1,6 @@
-# 高性能/高效率/可读性/功能齐备/优雅  的数据库sql orm mapper xml框架
-* 中文
-* [English](README-en.md) 
-* [文档](https://zhuxiujia.github.io/gomybatis.io/#/getting-started)
+# SQL mapper ORM framework for Golang
+* English
+* [中文](README-ch.md)   
 
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/zhuxiujia/GoMybatis)](https://goreportcard.com/report/github.com/zhuxiujia/GoMybatis)
@@ -12,25 +11,25 @@
 
 
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/vuetify.png)
-### 使用教程请仔细阅读文档网站 [文档](https://zhuxiujia.github.io/gomybatis.io/#/getting-started)
-# 优势
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">安全稳定无坑</a>，已应用生产环境App（电商/金融/卡充值类），功能稳定，适合各类 大小型项目以及复杂的金融项目,ERP项目 帮助您将数十万RMB轻松收入囊中<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">高性能</a>，单机每秒事务数最高可达456621Tps/s,总耗时0.22s （测试环境 返回模拟的sql数据，并发1000，总数100000，6核16GB win10）<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">Java到go无痛迁移</a>，兼容大部分Java(Mybatis3,Mybatis Plus)框架逻辑，无痛苦Java Spring Mybatis的xml sql文件迁移至Go语言（仅修改resultMap的javaType为langType指定go语言类型）<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">声明式事务/AOP事务/传播行为</a>只需一行Tag定义AOP事务，以及事务传播行为<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">可扩展日志接口</a>异步消息队列日,框架内sql日志使用带缓存的channel实现 消息队列异步记录日志<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">动态SQL</a>，在xml中`<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<where>,<foreach>,<resultMap>,<bind>,<choose><when><otherwise>,<sql><include>`等等java框架Mybatis包含的15种实用功能<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">智能表达式</a>可处理动态判断、计算任务（例如：`#{foo.Bar}#{arg+1}#{arg*1}#{arg/1}#{arg-1}`）,例如写模糊查询`select * from table where phone like #{phone+'%'}`(注意后置百分号走索引)<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">动态数据源</a>可自定义多数据源，动态切换多个数据库实例<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">模板标签（新）</a>一行代码实现增删改查，逻辑删除，乐观锁，而且还保留完美的扩展性（标签体内可以继续扩展sql逻辑）<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">乐观锁（新）</a>`<updateTemplete>`乐观锁,尽可能防止并发竞争修改记录<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">逻辑删除（新）</a>`<insertTemplete><updateTemplete><deleteTemplete><selectTemplete>`逻辑删除,防止意外删除数据，数据恢复简单<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">RPC/MVC组件支持（新）</a>让服务完美支持RPC（减少参数限制）,动态代理，事务订阅，易于微服务集成和扩展 详情请点击链接https://github.com/zhuxiujia/easyrpc<br>
+### Please read the documentation website carefully when using the tutorial. [DOC](https://zhuxiujia.github.io/gomybatis.io/#/getting-started)
+# advantage
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">Safety and stability</a>，App (e-commerce/finance/card recharge class) has been applied. Features are stable and suitable for all kinds of large and small projects as well as complex financial projects. ERP projects help you to easily pocket hundreds of thousands of RMBs.<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">High Performance</a>，The maximum number of transactions per second of a single computer can reach 456621Tps/s, and the total time consumed is 0.22s (test environment returns simulated SQL data, concurrently 1000, total 100000, 6-core 16GB win10)<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">Painless migration from Java to go</a>，Compatible with most Java(Mybatis3,Mybatis Plus) ，Painless migration of XML SQL files from Java Spring Mybatis to Go language（Modify only the javaType of resultMap to specify go language type for langType）<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">Declarative transaction/AOP transaction/transaction Behavior</a>Only one line Tag is needed to define AOP transactions and transaction propagation behavior<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">Extensible Log Interface</a>Asynchronous message queue day, SQL log in framework uses cached channel to realize asynchronous message queue logging<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">dynamic sql</a>，在xml中`<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<where>,<foreach>,<resultMap>,<bind>,<choose><when><otherwise>,<sql><include>`Mybatis, a Java framework, contains 15 utilities Features<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">Intelligent expression</a>Processing dynamic judgment and computation tasks（such as：`#{foo.Bar}#{arg+1}#{arg*1}#{arg/1}#{arg-1}`）,For example, write fuzzy queries `select * from table where phone like #{phone+'%'}`(Note the post-percentile query run in index)<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">Dynamic Data Source</a>Multiple data sources can be customized to dynamically switch multiple database instances<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">Template label（new）</a>One line of code to achieve add, delete, modify, delete logic, optimistic lock, but also retain perfect scalability (tag body can continue to expand SQL logic)<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">Optimistic Lock（new）</a>`<updateTemplete>`Optimistic locks to prevent concurrent competition to modify records as much as possible<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">Logical deletion（new）</a>`<insertTemplete><updateTemplete><deleteTemplete><selectTemplete>`Logical deletion, prevent accidental deletion of data, data recovery is simple<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/info.html">RPC/MVC Component Support（new）</a>To make the service perfect for RPC (reducing parameter restrictions), dynamic proxy, transaction subscription, easy integration and extension of micro services, click on the link https://github.com/zhuxiujia/easyrpc<br>
 
 
-## 数据库驱动
+## Database Driver support table
 ``` bash
- //传统数据库
+ //Traditional database
  Mysql:                             github.com/go-sql-driver/mysql
  MyMysql:                           github.com/ziutek/mymysql/godrv
  Postgres:                          github.com/lib/pq
@@ -38,20 +37,20 @@
  MsSql:                             github.com/denisenkom/go-mssqldb
  MsSql:                             github.com/lunny/godbc
  Oracle:                            github.com/mattn/go-oci8
- //分布式NewSql数据库
+ //Distributed NewSql database
  Tidb:                              github.com/pingcap/tidb
  CockroachDB:                       github.com/lib/pq
  ```
  
-## 使用教程
-> 教程源码  https://github.com/zhuxiujia/GoMybatis/tree/master/example
+## Use tutorials
+> Tutorial source code  https://github.com/zhuxiujia/GoMybatis/tree/master/example
 
-设置好GoPath,用go get 命令下载GoMybatis和对应的数据库驱动
+Set up GoPath and download GoMybatis and the corresponding database driver with the go get command
 ``` bash
 go get github.com/zhuxiujia/GoMybatis
 go get github.com/go-sql-driver/mysql
 ```
-实际使用mapper 定义xml内容，建议以*Mapper.xml文件存于项目目录中,在编辑xml时就可享受GoLand等IDE渲染和智能提示。生产环境可以使用statikFS把xml文件打包进程序里</br>
+In practice, we use mapper to define the content of xml. It is suggested that the * Mapper. XML file be stored in the project directory. When editing xml, we can enjoy IDE rendering and intelligent prompts such as GoLand. Production environments can use statikFS to package XML files in the process</br>
 * main.go
 ``` xml
 var xmlBytes = []byte(`
@@ -68,7 +67,7 @@ var xmlBytes = []byte(`
 ``` go
 import (
 	"fmt"
-	_ "github.com/go-sql-driver/mysql" //选择需要的数据库驱动导入
+	_ "github.com/go-sql-driver/mysql" //Select the required database-driven imports
 	"github.com/zhuxiujia/GoMybatis"
 )
 type ExampleActivityMapperImpl struct {
@@ -77,17 +76,17 @@ type ExampleActivityMapperImpl struct {
 
 func main() {
     var engine = GoMybatis.GoMybatisEngine{}.New()
-	//Mysql链接格式 用户名:密码@(数据库链接地址:端口)/数据库名称,如root:123456@(***.com:3306)/test
+	//Mysql link format user name: password @ (database link address: port)/database name, such as root: 123456 @(***.com: 3306)/test
 	err := engine.Open("mysql", "*?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 	   panic(err)
 	}
 	var exampleActivityMapperImpl ExampleActivityMapperImpl
 	
-	//加载xml实现逻辑到ExampleActivityMapperImpl
+	//Loading XML implementation logic to ExampleActivity Mapper Impl
 	engine.WriteMapperPtr(&exampleActivityMapperImpl, xmlBytes)
 
-	//使用mapper
+	//use mapper
 	result, err := exampleActivityMapperImpl.SelectAll(&result)
         if err != nil {
 	   panic(err)
@@ -95,16 +94,16 @@ func main() {
 	fmt.Println(result)
 }
 ```
-## 功能：模板标签CRUD 简化（必须依赖一个resultMap 标签）
+## Features: Template tag CRUD simplification (must rely on a resultMap tag)
 ``` xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://raw.githubusercontent.com/zhuxiujia/GoMybatis/master/mybatis-3-mapper.dtd">
 <mapper>
-    <!--logic_enable 逻辑删除字段-->
-    <!--logic_deleted 逻辑删除已删除字段-->
-    <!--logic_undelete 逻辑删除 未删除字段-->
-    <!--version_enable 乐观锁版本字段,支持int,int8,int16,int32,int64-->
+    <!--logic_enable Logical Delete Fields-->
+    <!--logic_deleted Logically delete deleted fields-->
+    <!--logic_undelete Logically Delete Undeleted Fields-->
+    <!--version_enable Optimistic lock version field, support int, int8, int16, int32, Int64-->
     <resultMap id="BaseResultMap" tables="biz_activity">
         <id column="id" property="id"/>
         <result column="name" property="name" langType="string"/>
@@ -119,18 +118,18 @@ func main() {
                 logic_undelete="1"
                 logic_deleted="0"/>
     </resultMap>
-    <!--模板标签: columns wheres sets 支持逗号,分隔表达式，*?* 为判空表达式-->
-    <!--插入模板:默认id="insertTemplete,test="field != null",where自动设置逻辑删除字段,支持批量插入" -->
+    <!--Template tags: columns wheres sets support commas, separating expressions, *?* as null expressions-->
+    <!--Insert Template: Default id="insertTemplete,test="field != null",where Automatically set logical deletion fields to support batch insertion" -->
     <insertTemplete/>
-    <!--查询模板:默认id="selectTemplete,where自动设置逻辑删除字段-->
+    <!--Query template: default id="selectTemplete,where Automatically Set Logical Delete Fields-->
     <selectTemplete wheres="name?name = #{name}"/>
-    <!--更新模板:默认id="updateTemplete,set自动设置乐观锁版本号-->
+    <!-- Update template: default id="updateTemplete,set Automatically Setting Optimistic Lock Version Number-->
     <updateTemplete sets="name?name = #{name},remark?remark=#{remark}" wheres="id?id = #{id}"/>
-    <!--删除模板:默认id="deleteTemplete,where自动设置逻辑删除字段-->
+    <!--Delete template: default id="deleteTemplete,where Automatically Set Logical Delete Fields-->
     <deleteTemplete wheres="name?name = #{name}"/>
 </mapper>    
 ```
-xml对应以下定义的Mapper结构体方法
+XML corresponds to the Mapper structure method defined below
 ```go
 type Activity struct {
 	Id         string    `json:"id"`
@@ -152,22 +151,22 @@ type ExampleActivityMapper struct {
 }
 ```
 
-## 功能：动态数据源
+## Features：Dynamic Data Source
 ``` go
-        //添加第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
+        //To add a second MySQL database, change Mysql Uri to your second data source link
 	GoMybatis.Open("mysql", MysqlUri)
-	//动态数据源路由
+	//Dynamic Data Source Routing
 	var router = GoMybatis.GoMybatisDataSourceRouter{}.New(func(mapperName string) *string {
-		//根据包名路由指向数据源
+		//Point to the data source according to the packet name routing
 		if strings.Contains(mapperName, "example.") {
-			var url = MysqlUri//第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
+			var url = MysqlUri//The second MySQL database, please change Mysql Uri to your second data source link
 			fmt.Println(url)
 			return &url
 		}
 		return nil
 	})
 ```
-## 功能：自定义日志输出
+## Features：Custom log output
 ``` go
 	engine.SetLogEnable(true)
 	engine.SetLog(&GoMybatis.LogStandard{
@@ -176,30 +175,30 @@ type ExampleActivityMapper struct {
 		},
 	})
 ```
-## 功能：异步日志接口（可自定义日志输出）
+## Features：Asynchronous log interface (customizable log output)
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/log_system.png)
 
- ## 功能：事务传播处理器（嵌套事务）
+ ## Features：Transaction Propagation Processor (Nested Transactions)
  <table>
  <thead>
- <tr><th>事务类型</th>
- <th>说明</th>
+ <tr><th>Transaction type</th>
+ <th>Explain</th>
  </tr>
  </thead>
- <tbody><tr><td>PROPAGATION_REQUIRED</td><td>表示如果当前事务存在，则支持当前事务。否则，会启动一个新的事务。默认事务类型。</td></tr>
- <tr><td>PROPAGATION_SUPPORTS</td><td>表示如果当前事务存在，则支持当前事务，如果当前没有事务，就以非事务方式执行。</td></tr>
- <tr><td>PROPAGATION_MANDATORY</td><td>表示如果当前事务存在，则支持当前事务，如果当前没有事务，则返回事务嵌套错误。</td></tr>
- <tr><td>PROPAGATION_REQUIRES_NEW</td><td>表示新建一个全新Session开启一个全新事务，如果当前存在事务，则把当前事务挂起。</td></tr>
- <tr><td>PROPAGATION_NOT_SUPPORTED</td><td>表示以非事务方式执行操作，如果当前存在事务，则新建一个Session以非事务方式执行操作，把当前事务挂起。</td></tr>
- <tr><td>PROPAGATION_NEVER</td><td>表示以非事务方式执行操作，如果当前存在事务，则返回事务嵌套错误。</td></tr>
- <tr><td>PROPAGATION_NESTED</td><td>表示如果当前事务存在，则在嵌套事务内执行，如嵌套事务回滚，则只会在嵌套事务内回滚，不会影响当前事务。如果当前没有事务，则进行与PROPAGATION_REQUIRED类似的操作。</td></tr>
- <tr><td>PROPAGATION_NOT_REQUIRED</td><td>表示如果当前没有事务，就新建一个事务,否则返回错误。</td></tr></tbody>
+ <tbody><tr><td>PROPAGATION_REQUIRED</td><td>Represents that if the current transaction exists, the current transaction is supported. Otherwise, a new transaction will be started. Default transaction type.</td></tr>
+ <tr><td>PROPAGATION_SUPPORTS</td><td>Represents that if the current transaction exists, the current transaction is supported, and if there is no transaction at present, it is executed in a non-transactional manner.</td></tr>
+ <tr><td>PROPAGATION_MANDATORY</td><td>Represents that if the current transaction exists, the current transaction is supported, and if no transaction exists, the transaction nesting error is returned.</td></tr>
+ <tr><td>PROPAGATION_REQUIRES_NEW</td><td>Represents that a new Session opens a new transaction and suspends the current transaction if it currently exists.</td></tr>
+ <tr><td>PROPAGATION_NOT_SUPPORTED</td><td>Represents that an operation is performed in a non-transactional manner. If a transaction exists, a new Session is created to perform the operation in a non-transactional manner, suspending the current transaction.</td></tr>
+ <tr><td>PROPAGATION_NEVER</td><td>Represents that an operation is executed in a non-transactional manner and returns a transaction nesting error if a transaction currently exists.</td></tr>
+ <tr><td>PROPAGATION_NESTED</td><td>Represents that if the current transaction exists, it will be executed within the nested transaction. If the nested transaction rolls back, it will only roll back within the nested transaction and will not affect the current transaction. If there is no transaction at the moment, do something similar to PROPAGATION_REQUIRED.</td></tr>
+ <tr><td>PROPAGATION_NOT_REQUIRED</td><td>Represents that if there is currently no transaction, a new transaction will be created, otherwise an error will be returned.</td></tr></tbody>
  </table>
  
  ``` go
- //嵌套事务的服务
+ //Nested transaction services
 type TestService struct {
-	exampleActivityMapper *ExampleActivityMapper //服务包含一个mapper操作数据库，类似java spring mvc
+	exampleActivityMapper *ExampleActivityMapper //The service contains a mapper operation database similar to Java spring MVC
 	UpdateName   func(id string, name string) error   `tx:"" rollback:"error"`
 	UpdateRemark func(id string, remark string) error `tx:"" rollback:"error"`
 }
@@ -209,15 +208,15 @@ func main()  {
 		exampleActivityMapper: &exampleActivityMapper,
 		UpdateRemark: func(id string, remark string) error {
 			testService.exampleActivityMapper.SelectByIds([]string{id})
-			panic(errors.New("业务异常")) // panic 触发事务回滚策略
-			return nil                   // rollback:"error"指定了返回error类型 且不为nil 就会触发事务回滚策略
+			panic(errors.New("Business exceptions")) // panic Triggered transaction rollback strategy
+			return nil                   // rollback:"error" A transaction rollback policy is triggered if the error type is returned and is not nil
 		},
 		UpdateName: func(id string, name string) error {
 			testService.exampleActivityMapper.SelectByIds([]string{id})
 			return nil
 		},
 	}
-	GoMybatis.AopProxyService(&testService, &engine)//必须使用AOP代理服务的func
+	GoMybatis.AopProxyService(&testService, &engine)//Func must use AOP proxy service
 	testService.UpdateRemark("1","remark")
 }
 ```
@@ -226,9 +225,9 @@ func main()  {
  
  
  
-  ## 功能：XML/Mapper生成器- 根据struct结构体生成*mapper.xml
+  ## Features：XML/Mapper Generator - Generate * mapper. XML from struct structure
 ``` go
-  //step1 定义你的数据库模型,必须包含 json注解（默认为数据库字段）, gm:""注解指定 值是否为 id,version乐观锁,logic逻辑软删除
+  //step1 To define your database model, you must include JSON annotations (default database fields), gm:"" annotations specifying whether the value is id, version optimistic locks, and logic logic soft deletion.
   type UserAddress struct {
 	Id            string `json:"id" gm:"id"`
 	UserId        string `json:"user_id"`
@@ -241,27 +240,27 @@ func main()  {
 	DeleteFlag int       `json:"delete_flag" gm:"logic"`
 }
 ```
-* 第二步，在你项目main 目录下建立一个 XmlCreateTool.go 内容如下
+* Step 2: Create an Xml CreateTool. go in the main directory of your project as follows
 ```
 func main() {
-	var bean = UserAddress{} //此处只是举例，应该替换为你自己的数据库模型
+	var bean = UserAddress{} //Here's just an example, which should be replaced by your own database model
 	GoMybatis.OutPutXml(reflect.TypeOf(bean).Name()+"Mapper.xml", GoMybatis.CreateXml("biz_"+GoMybatis.StructToSnakeString(bean), bean))
 }
 ```
-* 第三步，执行命令，在当前目录下得到 UserAddressMapper.xml文件
+* Third, execute the command to get the UserAddressMapper. XML file in the current directory
 ``` go
 go run XmlCreateTool.go
 ```
-* 以下是自动生成的xml文件内容
+* The following is the content of the automatically generated XML file
 ``` xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://raw.githubusercontent.com/zhuxiujia/GoMybatis/master/mybatis-3-mapper.dtd">
 <mapper>
-    <!--logic_enable 逻辑删除字段-->
-    <!--logic_deleted 逻辑删除已删除字段-->
-    <!--logic_undelete 逻辑删除 未删除字段-->
-    <!--version_enable 乐观锁版本字段,支持int,int8,int16,int32,int64-->
+    <!--logic_enable Logical Delete Fields-->
+    <!--logic_deleted Logically delete deleted fields-->
+    <!--logic_undelete Logically Delete Undeleted Fields-->
+    <!--version_enable Optimistic lock version field, support int, int8, int16, int32, Int64-->
     <resultMap id="BaseResultMap" tables="biz_user_address">
     <id column="id" property="id"/>
 	<result column="id" property="id" langType="string"   />
@@ -283,10 +282,10 @@ go run XmlCreateTool.go
  
 
 
-## 组件(RPC,JSONRPC,Consul)-搭配GoMybatis
-* https://github.com/zhuxiujia/easy_mvc //mvc,极大简化开发流程
-* https://github.com/zhuxiujia/easyrpc  //easyrpc（基于标准库的RPC）吸收GoMybatis的概念，类似标准库的api，定义服务没有标准库的要求那么严格（可选不传参数，或者只有一个参数，只有一个返回值）
-* https://github.com/zhuxiujia/easyrpc_discovery  //基于easyrpc定制微服务发现，支持动态代理，支持GoMybatis事务，AOP代理，事务嵌套，tag定义事务，自带负载均衡算法（随机，加权轮询，源地址哈希法）
+## Components (RPC, JSONRPC, Consul) - With GoMybatis
+* https://github.com/zhuxiujia/easy_mvc //mvc
+* https://github.com/zhuxiujia/easyrpc  //easyrpc
+* https://github.com/zhuxiujia/easyrpc_discovery  //easyrpc discovery
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/easy_consul.png)
 
 
@@ -295,7 +294,7 @@ go run XmlCreateTool.go
 
 
 
-## 请及时关注版本，及时升级版本(新的功能，bug修复) ，使用GoMybatis的项目请在Issues里留言您的项目名称+联系方式
+## Please pay attention to the version in time, upgrade the version in time (new features, bug fix). For projects using GoMybatis, please leave your project name + contact information in Issues.
 
-## 欢迎右上角点下 star 或者 微信支付赞助我们~
+## Welcome to Star or Wechat Payment Sponsorship at the top right corner~
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/wx_account.jpg)
