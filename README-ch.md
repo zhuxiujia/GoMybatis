@@ -95,7 +95,7 @@ func main() {
 	fmt.Println(result)
 }
 ```
-## 功能：模板标签CRUD 简化（必须依赖一个resultMap 标签）
+## 功能：模板标签CRUD 简化（依赖resultMap，同时带有 乐观锁.逻辑删除）
 ``` xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
