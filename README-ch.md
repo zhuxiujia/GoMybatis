@@ -130,7 +130,7 @@ func main() {
     <deleteTemplete wheres="name?name = #{name}"/>
 </mapper>    
 ```
-xml对应以下定义的Mapper结构体方法
+xml对应以下定义的Mapper结构体方法,然后将生成对应的SQL语句
 ```go
 type Activity struct {
 	Id         string    `json:"id"`
@@ -144,9 +144,11 @@ type Activity struct {
 	DeleteFlag int       `json:"deleteFlag"`
 }
 type ExampleActivityMapper struct {
+    //调用即可生成sql  select * from biz_activity where delete_flag = 1 and name = #{name}
 	SelectTemplete      func(name string) ([]Activity, error) `mapperParams:"name"`
 	InsertTemplete      func(arg Activity) (int64, error)
 	InsertTempleteBatch func(args []Activity) (int64, error) `mapperParams:"args"`
+    //调用即可生成sql  update biz_activity set name = #{name},remark=#{remark},version=#{version+1} where delete_flag = 1 and id = #{id} and version = #{version}
 	UpdateTemplete      func(arg Activity) (int64, error)    `mapperParams:"name"`
 	DeleteTemplete      func(name string) (int64, error)     `mapperParams:"name"`
 }
