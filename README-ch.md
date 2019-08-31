@@ -1,4 +1,4 @@
-# 大道至简 的数据库sql orm mapper xml框架
+# 大道至简 原生sql风格 全功能 数据库ORM 框架
 * 中文
 * [English](README-en.md) 
 * [文档](https://zhuxiujia.github.io/gomybatis.io/#/getting-started)
