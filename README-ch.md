@@ -17,7 +17,7 @@
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">稳定</a>，已应用生产环境App（电商/金融/卡充值类），功能稳定，适合各类 大小型项目以及复杂的金融项目,ERP项目 帮助您将数十万RMB轻松收入囊中<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">高性能</a>，单机每秒事务数最高可达456621Tps/s,总耗时0.22s （测试环境 返回模拟的sql数据，并发1000，总数100000，6核16GB win10）<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">无痛迁移</a>，兼容大部分Java(Mybatis3,Mybatis Plus)框架逻辑，无痛苦Java Spring Mybatis的xml sql文件迁移至Go语言（仅修改resultMap的javaType为langType指定go语言类型）<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/">声明式事务、AOP事务、事务传播行为</a>只需一行Tag定义AOP事务，以及事务传播行为<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/">声明式事务、AOP事务、事务传播行为</a>只需在函数上定义一行Tag即可使用声明式事务，以及事务传播行为<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">扩展日志接口</a>异步消息队列日,框架内sql日志使用带缓存的channel实现 消息队列异步记录日志<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">动态SQL</a>，在xml中`<select>,<update>,<insert>,<delete>,<trim>,<if>,<set>,<where>,<foreach>,<resultMap>,<bind>,<choose><when><otherwise>,<sql><include>`等等java框架Mybatis包含的15种实用功能<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">智能表达式</a>可处理动态判断、计算任务（例如：`#{foo.Bar}#{arg+1}#{arg*1}#{arg/1}#{arg-1}`）,例如写模糊查询`select * from table where phone like #{phone+'%'}`(注意后置百分号走索引)<br>
