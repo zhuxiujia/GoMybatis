@@ -1,4 +1,4 @@
-# 大道至简 原生sql风格 全功能 数据库ORM 框架
+# 更简单的xml/sql风格 功能丰富 值得一试的ORM库
 * 中文
 * [English](README-en.md) 
 * [文档](https://zhuxiujia.github.io/gomybatis.io/#/getting-started)
