@@ -44,7 +44,7 @@ var engine GoMybatis.GoMybatisEngine
 //初始化mapper文件和结构体
 var exampleActivityMapper = ExampleActivityMapper{}
 
-//测试服务
+//测试服务下，声明式事务
 type TestService struct {
 	exampleActivityMapper *ExampleActivityMapper //服务包含一个mapper操作数据库，类似java spring mvc
 
