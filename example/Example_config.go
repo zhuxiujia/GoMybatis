@@ -9,10 +9,10 @@ const MysqlUri = "*"
 //定义数据库模型
 //例子：Activity 活动数据
 type Activity struct {
-	Id         string    `json:"id"`
+	Id         string    `json:"id,omitempty"`
 	Uuid       string    `json:"uuid"`
 	Name       string    `json:"name"`
-	PcLink     string   `json:"pcLink"`
+	PcLink     string    `json:"pcLink"`
 	H5Link     string    `json:"h5Link"`
 	Remark     string    `json:"remark"`
 	Version    int       `json:"version"`

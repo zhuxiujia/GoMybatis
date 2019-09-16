@@ -483,7 +483,19 @@ func scanStructArgFields(v reflect.Value, tag *TagArg) map[string]interface{} {
 	if t.Kind() != reflect.Struct {
 		panic(`[GoMybatis] the scanParamterBean() arg is not a struct type!,type =` + t.String())
 	}
+
 	var structArg = make(map[string]interface{})
+
+	//json arg,性能较差
+	//var vptr=v.Interface()
+	//var js,_=json.Marshal(vptr)
+	//json.Unmarshal(js,&structArg)
+	//
+	//for key,value:=range structArg {
+	//	parameters[key]=value
+	//}
+
+	//reflect arg,性能较快
 	for i := 0; i < t.NumField(); i++ {
 		var typeValue = t.Field(i)
 		var field = v.Field(i)
@@ -493,6 +505,9 @@ func scanStructArgFields(v reflect.Value, tag *TagArg) map[string]interface{} {
 			obj = field.Interface()
 		}
 		var jsonKey = typeValue.Tag.Get(`json`)
+		if strings.Index(jsonKey, ",") != -1 {
+			jsonKey = strings.Split(jsonKey, ",")[0]
+		}
 		if jsonKey != "" {
 			parameters[jsonKey] = obj
 			structArg[jsonKey] = obj
