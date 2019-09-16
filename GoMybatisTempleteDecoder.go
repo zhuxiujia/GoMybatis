@@ -285,6 +285,9 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 							for k := 0; k < argItem.NumField(); k++ {
 								var argStructField = argItem.Field(k)
 								var js = argStructField.Tag.Get("json") //扫描json tag
+								if strings.Index(js, ",") != -1 {
+									js = strings.Split(js, ",")[0]
+								}
 								if strings.ToLower(strings.Replace(defProperty, "_", "", -1)) ==
 									strings.ToLower(strings.Replace(argStructField.Name, "_", "", -1)) ||
 									js == defProperty {
