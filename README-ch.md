@@ -1,7 +1,5 @@
 # 更简单的xml/sql风格 功能丰富 值得一试的ORM库
-* 中文
-* [English](README-en.md) 
-* [文档](https://zhuxiujia.github.io/gomybatis.io/#/getting-started)
+* [点我查看-文档](https://zhuxiujia.github.io/gomybatis.io/#/getting-started)
 
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/zhuxiujia/GoMybatis)](https://goreportcard.com/report/github.com/zhuxiujia/GoMybatis)
