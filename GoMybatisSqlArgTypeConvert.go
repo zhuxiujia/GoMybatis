@@ -21,7 +21,8 @@ func (it GoMybatisSqlArgTypeConvert) Convert(argValue interface{}) string {
 	case string:
 		var argStr bytes.Buffer
 		argStr.WriteString(`'`)
-		argStr.WriteString(argValue.(string))
+		//argStr.WriteString(argValue.(string))
+		argStr.WriteString(antiSqlInjectionExp(argValue.(string)))
 		argStr.WriteString(`'`)
 		return argStr.String()
 	case *string:
@@ -31,7 +32,8 @@ func (it GoMybatisSqlArgTypeConvert) Convert(argValue interface{}) string {
 		}
 		var argStr bytes.Buffer
 		argStr.WriteString(`'`)
-		argStr.WriteString(*v)
+		//argStr.WriteString(*v)
+		argStr.WriteString(antiSqlInjectionExp(*v))
 		argStr.WriteString(`'`)
 		return argStr.String()
 	case bool:
@@ -115,4 +117,11 @@ func (it GoMybatisSqlArgTypeConvert) toString(argValue interface{}) string {
 		return ""
 	}
 	return fmt.Sprint(argValue)
+}
+// 字符串防Sql注入[将字符'替换为`]
+// 不足之处：
+// １）破坏了原值；
+// ２）本框架与其它使用别的框架（如java的mybatis）等共用数据源时，可能有到导致处理结果不
+func antiSqlInjectionStringExp(str string) string{
+	return strings.ReplaceAll(str,"'","`")
 }

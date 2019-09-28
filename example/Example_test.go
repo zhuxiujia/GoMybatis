@@ -111,6 +111,20 @@ func Test_inset(t *testing.T) {
 	fmt.Println("result=", result)
 }
 
+//插入
+func Test_insetSqlInjection(t *testing.T) {
+	if MysqlUri == "" || MysqlUri == "*" {
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		return
+	}
+	//使用mapper
+	var result, err = exampleActivityMapper.Insert(Activity{Id: "171' #", Name: "test_insretSqlInjection", CreateTime: time.Now(), DeleteFlag: 1})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("result=", result)
+}
+
 //修改
 //本地事务使用例子
 func Test_update(t *testing.T) {
@@ -277,6 +291,19 @@ func TestSelectTemplete(t *testing.T) {
 	}
 	//使用mapper
 	var result, err = exampleActivityMapper.SelectTemplete("hello")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("result=", result)
+}
+
+func TestSelectTempleteSqlInjection(* testing.T){
+	if MysqlUri == "" || MysqlUri == "*" {
+		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		return
+	}
+	//使用mapper
+	var result, err = exampleActivityMapper.SelectTemplete("hello' OR 'A'!='")
 	if err != nil {
 		panic(err)
 	}
