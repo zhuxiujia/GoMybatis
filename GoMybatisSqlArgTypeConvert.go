@@ -118,10 +118,10 @@ func (it GoMybatisSqlArgTypeConvert) toString(argValue interface{}) string {
 	}
 	return fmt.Sprint(argValue)
 }
-// 字符串防Sql注入[将字符'替换为`]
+// 字符串防Sql注入[将字符'替换为\']
 // 不足之处：
 // １）破坏了原值；
 // ２）本框架与其它使用别的框架（如java的mybatis）等共用数据源时，可能有到导致处理结果不
 func antiSqlInjectionStringExp(str string) string{
-	return strings.ReplaceAll(str,"'","`")
+	return strings.ReplaceAll(str,"'","\'")
 }
