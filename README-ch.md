@@ -297,5 +297,5 @@ go run XmlCreateTool.go
 
 ## 请及时关注版本，及时升级版本(新的功能，bug修复) ，使用GoMybatis的项目请在Issues里留言您的项目名称+联系方式
 
-## 欢迎右上角点下 star 或者 微信支付赞助我们~
+## 欢迎右上角点下 star 或者 微信 捐赠 和 赞助~
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/wx_account.jpg)
