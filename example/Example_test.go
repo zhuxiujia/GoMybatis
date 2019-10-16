@@ -385,6 +385,7 @@ func TestTestService(t *testing.T) {
 	time.Sleep(3 * time.Second)
 }
 
+//嵌套事务服务TestService
 func initTestService() TestService {
 	var testService TestService
 	testService = TestService{
