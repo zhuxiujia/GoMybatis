@@ -1,25 +1,25 @@
 package GoMybatis
 
 import (
-	"github.com/zhuxiujia/GoMybatis/utils"
 	"fmt"
+	"github.com/zhuxiujia/GoMybatis/utils"
 	"testing"
 	"time"
 )
 
 type TestResult struct {
-	Name    string `json:"name"`
+	Name    string  `json:"name"`
 	Amount1 float32 `json:"amount_1"`
 	Amount2 float64 `json:"amount_2"`
-	Age1    int `json:"age_1"`
-	Age2    int32 `json:"age_2"`
-	Age3    int64 `json:"age_3"`
-	Age4    uint `json:"age_4"`
-	Age5    uint8 `json:"age_5"`
-	Age6    uint16 `json:"age_6"`
-	Age7    uint32 `json:"age_7"`
-	Age8    uint64 `json:"age_8"`
-	Bool    bool `json:"bool"`
+	Age1    int     `json:"age_1"`
+	Age2    int32   `json:"age_2"`
+	Age3    int64   `json:"age_3"`
+	Age4    uint    `json:"age_4"`
+	Age5    uint8   `json:"age_5"`
+	Age6    uint16  `json:"age_6"`
+	Age7    uint32  `json:"age_7"`
+	Age8    uint64  `json:"age_8"`
+	Bool    bool    `json:"bool"`
 }
 
 //解码基本数据-int,string,time.Time...
@@ -204,25 +204,25 @@ func Test_Decode_Interface(t *testing.T) {
 		XMLName:  "id",
 		Column:   "id",
 		Property: "id",
-		GoType:   "string",
+		LangType: "string",
 	}
 	resultMap["name"] = &ResultProperty{
 		XMLName:  "result",
 		Column:   "name",
 		Property: "Name",
-		GoType:   "string",
+		LangType: "string",
 	}
 	resultMap["Amount_1"] = &ResultProperty{
 		XMLName:  "result",
 		Column:   "Amount_1",
 		Property: "amount_1",
-		GoType:   "string",
+		LangType: "string",
 	}
 	resultMap["amount_2"] = &ResultProperty{
 		XMLName:  "result",
 		Column:   "Amount_2",
 		Property: "amount_2",
-		GoType:   "string",
+		LangType: "string",
 	}
 	var result map[string]string
 	GoMybatisSqlResultDecoder{}.Decode(resultMap, res, &result)
@@ -258,6 +258,7 @@ func Benchmark_Ignore_Case_Underscores(b *testing.B) {
 	}
 
 }
+
 //
 //func TestGoMybatisSqlResultDecoder_Decode(t *testing.T) {
 //	var GoMybatisSqlResultDecoder = GoMybatisSqlResultDecoder{}
