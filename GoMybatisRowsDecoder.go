@@ -8,22 +8,26 @@ import (
 	"time"
 )
 
-func rows2maps(rows *sql.Rows) (resultsSlice []map[string][]byte, err error) {
-	fields, err := rows.Columns()
+func rows2maps(rows *sql.Rows) (resultsSlice QueryResult, err error) {
+	fields, err := rows.ColumnTypes()
 	if err != nil {
-		return nil, err
+		return QueryResult{}, err
 	}
 	for rows.Next() {
 		result, err := row2map(rows, fields)
 		if err != nil {
-			return nil, err
+			return QueryResult{}, err
 		}
-		resultsSlice = append(resultsSlice, result)
+		resultsSlice.append(result)
+	}
+	resultsSlice.columnMap = make(map[string]SqlType, len(fields))
+	for _, v := range fields {
+		resultsSlice.columnMap[v.Name()] = SqlType(v.DatabaseTypeName())
 	}
 	return resultsSlice, nil
 }
 
-func row2map(rows *sql.Rows, fields []string) (resultsMap map[string][]byte, err error) {
+func row2map(rows *sql.Rows, fields []*sql.ColumnType) (resultsMap map[string][]byte, err error) {
 	result := make(map[string][]byte)
 	scanResultContainers := make([]interface{}, len(fields))
 	for i := 0; i < len(fields); i++ {
@@ -38,12 +42,12 @@ func row2map(rows *sql.Rows, fields []string) (resultsMap map[string][]byte, err
 		rawValue := reflect.Indirect(reflect.ValueOf(scanResultContainers[ii]))
 		//if row is null then ignore
 		if rawValue.Interface() == nil {
-			result[key] = []byte{}
+			result[key.Name()] = []byte{}
 			continue
 		}
 
 		if data, err := value2Bytes(&rawValue); err == nil {
-			result[key] = data
+			result[key.Name()] = data
 		} else {
 			return nil, err // !nashtsai! REVIEW, should return err or just error log?
 		}

@@ -16,9 +16,9 @@ func (it *SessionFactorySession) Id() string {
 	}
 	return it.Session.Id()
 }
-func (it *SessionFactorySession) Query(sqlorArgs string) ([]map[string][]byte, error) {
+func (it *SessionFactorySession) Query(sqlorArgs string) (QueryResult, error) {
 	if it.Session == nil {
-		return nil, utils.NewError("SessionFactorySession", " can not run Id(),it.Session == nil")
+		return QueryResult{}, utils.NewError("SessionFactorySession", " can not run Id(),it.Session == nil")
 	}
 	return it.Session.Query(sqlorArgs)
 }

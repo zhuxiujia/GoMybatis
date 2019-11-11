@@ -2,13 +2,14 @@ package GoMybatis
 
 import (
 	"bytes"
-	"github.com/zhuxiujia/GoMybatis/ast"
-	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
-	"github.com/zhuxiujia/GoMybatis/utils"
 	"log"
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/zhuxiujia/GoMybatis/ast"
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
+	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
 const NewSessionFunc = "NewSession" //NewSession method,auto write implement body code
@@ -364,8 +365,8 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 		defer func() {
 			if sessionEngine.LogEnable() {
 				var RowsAffected = "0"
-				if err == nil && res != nil {
-					RowsAffected = strconv.Itoa(len(res))
+				if err == nil && !res.IsBlank() {
+					RowsAffected = strconv.Itoa(res.Rows())
 				}
 				sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] ReturnRows <== "+RowsAffected)
 				if err != nil {

@@ -150,7 +150,7 @@ type TestSession struct {
 func (it *TestSession) Id() string {
 	return "sadf"
 }
-func (it *TestSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
+/*func (it *TestSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	resultsSlice := make([]map[string][]byte, 0)
 
 	result := make(map[string][]byte)
@@ -161,7 +161,7 @@ func (it *TestSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	result["remark"] = []byte("活动1")
 	resultsSlice = append(resultsSlice, result)
 	return resultsSlice, nil
-}
+}*/
 func (it *TestSession) Exec(sqlorArgs string) (*Result, error) {
 	return nil, nil
 }

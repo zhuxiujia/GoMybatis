@@ -2,24 +2,97 @@ package GoMybatis
 
 import (
 	"database/sql"
+	"time"
+
 	"github.com/zhuxiujia/GoMybatis/ast"
 	"github.com/zhuxiujia/GoMybatis/tx"
 )
+
 
 type Result struct {
 	LastInsertId int64
 	RowsAffected int64
 }
 
+type SqlType string
+
+func (s SqlType) newPoint() interface{} {
+	switch s {
+	//数值类型
+	case "TINYINT",       //8(bit)
+		"SMALLINT",       //16(bit)
+		"MEDIUMINT",      //34(bit)
+		"INT", "INTEGER": //32(bit)
+		var i int
+		return &i
+	case "BIGINT": //64(bit)
+		var i int
+		return &i
+	case "FLOAT": //32(bit)
+		var i float32
+		return &i
+	case "DOUBLE", "DECIMAL":
+		var i float64
+		return &i
+	//字符串类型
+	case "CHAR",      //0-255(byte)
+		"VARCHAR",    //0-65535(byte)
+		"TINYBLOB",   //0-255(byte)
+		"TINYTEXT",   //0-255(byte)
+		"BLOB",       //0-65535(byte)
+		"TEXT",       //0-65535(byte)
+		"MEDIUMBLOB", //0-16777215(byte)
+		"MEDIUMTEXT", //0-16777215(byte)
+		"LONGBLOB",   //0-4294967295(byte)
+		"LONGTEXT":   //0-4294967295(byte)
+		var i string
+		return &i
+	//日期和时间类型
+	case "DATE",     //YYYY-MM-DD
+		"TIME",      //HH:MM:SS
+		"YEAR",      //YYYY
+		"DATETIME",  //YYYY-MM-DD HH:MM:SS
+		"TIMESTAMP": //YYYY-MM-DD HH:MM:SS
+		var i time.Time
+		return &i
+	}
+	return nil
+}
+
+type QueryResult struct {
+	data      []map[string][]byte
+	columnMap map[string]SqlType
+}
+
+func (q QueryResult) Index(index int) map[string][]byte {
+	return q.data[index]
+}
+
+func (q QueryResult) Rows() int {
+	return len(q.data)
+}
+
+func (q QueryResult) IsBlank() bool {
+	return q.data == nil || len(q.data) == 0
+}
+
+func (q *QueryResult) append(cell map[string][]byte) {
+	q.data = append(q.data, cell)
+}
+
+func (q QueryResult) SqlType(field string) SqlType {
+	return q.columnMap[field]
+}
+
 type Session interface {
 	Id() string
-	Query(sqlorArgs string) ([]map[string][]byte, error)
+	Query(sqlorArgs string) (QueryResult, error)
 	Exec(sqlorArgs string) (*Result, error)
 	Rollback() error
 	Commit() error
 	Begin(p *tx.Propagation) error
 	Close()
-	LastPROPAGATION () *tx.Propagation
+	LastPROPAGATION() *tx.Propagation
 }
 
 //产生session的引擎
