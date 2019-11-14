@@ -84,7 +84,7 @@ type TempleteSession struct {
 func (it *TempleteSession) Id() string {
 	return "sadf"
 }
-/*func (it *TempleteSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
+func (it *TempleteSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	resultsSlice := make([]map[string][]byte, 0)
 
 	result := make(map[string][]byte)
@@ -95,7 +95,7 @@ func (it *TempleteSession) Id() string {
 	result["remark"] = []byte("活动1")
 	resultsSlice = append(resultsSlice, result)
 	return resultsSlice, nil
-}*/
+}
 func (it *TempleteSession) Exec(sqlorArgs string) (*Result, error) {
 	var result = Result{
 		LastInsertId: 1,

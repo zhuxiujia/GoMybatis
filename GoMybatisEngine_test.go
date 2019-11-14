@@ -2,13 +2,14 @@ package GoMybatis
 
 import (
 	"fmt"
+	"sync"
+	"testing"
+	"time"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/zhuxiujia/GoMybatis/example"
 	"github.com/zhuxiujia/GoMybatis/tx"
 	"github.com/zhuxiujia/GoMybatis/utils"
-	"sync"
-	"testing"
-	"time"
 )
 
 //假设Mysql 数据库查询时间为0，框架单协程的Benchmark性能
@@ -150,7 +151,7 @@ type TestSession struct {
 func (it *TestSession) Id() string {
 	return "sadf"
 }
-/*func (it *TestSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
+func (it *TestSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	resultsSlice := make([]map[string][]byte, 0)
 
 	result := make(map[string][]byte)
@@ -161,7 +162,7 @@ func (it *TestSession) Id() string {
 	result["remark"] = []byte("活动1")
 	resultsSlice = append(resultsSlice, result)
 	return resultsSlice, nil
-}*/
+}
 func (it *TestSession) Exec(sqlorArgs string) (*Result, error) {
 	return nil, nil
 }
