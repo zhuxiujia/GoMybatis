@@ -2,10 +2,11 @@ package GoMybatis
 
 import (
 	"fmt"
-	"github.com/zhuxiujia/GoMybatis/example"
-	"github.com/zhuxiujia/GoMybatis/tx"
 	"testing"
 	"time"
+
+	"github.com/zhuxiujia/GoMybatis/example"
+	"github.com/zhuxiujia/GoMybatis/tx"
 )
 
 type ExampleActivityMapper struct {
@@ -84,8 +85,8 @@ type TempleteSession struct {
 func (it *TempleteSession) Id() string {
 	return "sadf"
 }
-func (it *TempleteSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
-	resultsSlice := make([]map[string][]byte, 0)
+func (it *TempleteSession) Query(sqlorArgs string) (QueryResult, error) {
+	resultsSlice := QueryResult{}
 
 	result := make(map[string][]byte)
 	result["name"] = []byte("活动1")
@@ -93,7 +94,7 @@ func (it *TempleteSession) Query(sqlorArgs string) ([]map[string][]byte, error) 
 	result["pc_link"] = []byte("http://www.baidu.com")
 	result["h5_link"] = []byte("http://www.baidu.com")
 	result["remark"] = []byte("活动1")
-	resultsSlice = append(resultsSlice, result)
+	resultsSlice.append(result)
 	return resultsSlice, nil
 }
 func (it *TempleteSession) Exec(sqlorArgs string) (*Result, error) {
@@ -232,11 +233,9 @@ func TestGoMybatisTempleteDecoder_Delete(t *testing.T) {
 	time.Sleep(time.Second)
 }
 
-func TestInit(t *testing.T)  {
+func TestInit(t *testing.T) {
 	initMapperTest()
 }
-
-
 
 func initMapperTest() {
 	bytes := []byte(`<?xml version="1.0" encoding="UTF-8"?>

@@ -151,16 +151,15 @@ type TestSession struct {
 func (it *TestSession) Id() string {
 	return "sadf"
 }
-func (it *TestSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
-	resultsSlice := make([]map[string][]byte, 0)
-
+func (it *TestSession) Query(sqlorArgs string) (QueryResult, error) {
+	resultsSlice := QueryResult{}
 	result := make(map[string][]byte)
 	result["name"] = []byte("活动1")
 	result["id"] = []byte("125")
 	result["pc_link"] = []byte("http://www.baidu.com")
 	result["h5_link"] = []byte("http://www.baidu.com")
 	result["remark"] = []byte("活动1")
-	resultsSlice = append(resultsSlice, result)
+	resultsSlice.append(result)
 	return resultsSlice, nil
 }
 func (it *TestSession) Exec(sqlorArgs string) (*Result, error) {
