@@ -2,9 +2,10 @@ package GoMybatis
 
 import (
 	"fmt"
-	"github.com/zhuxiujia/GoMybatis/utils"
 	"testing"
 	"time"
+
+	"github.com/zhuxiujia/GoMybatis/utils"
 )
 
 type TestResult struct {
@@ -26,8 +27,8 @@ type TestResult struct {
 func Test_Convert_Basic_Type(t *testing.T) {
 	var resMap = make(map[string][]byte)
 	resMap["Amount1"] = []byte("1908")
-	var resMapArray = make([]map[string][]byte, 0)
-	resMapArray = append(resMapArray, resMap)
+	var resMapArray = QueryResult{}
+	resMapArray.append(resMap)
 
 	var intResult int
 	var error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &intResult)
@@ -52,8 +53,8 @@ func Test_Convert_Basic_Type(t *testing.T) {
 
 	resMap = make(map[string][]byte)
 	resMap["Date"] = []byte(time.Now().Format(time.RFC3339))
-	resMapArray = make([]map[string][]byte, 0)
-	resMapArray = append(resMapArray, resMap)
+	resMapArray = QueryResult{}
+	resMapArray.append(resMap)
 	var timeResult time.Time
 	error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &timeResult)
 	if error != nil {
@@ -67,8 +68,8 @@ func Test_Convert_Slice(t *testing.T) {
 	var resMap = make(map[string][]byte)
 	resMap["Amount1"] = []byte("1908")
 	resMap["Amount2"] = []byte("1901")
-	var resMapArray = make([]map[string][]byte, 0)
-	resMapArray = append(resMapArray, resMap)
+	var resMapArray = QueryResult{}
+	resMapArray.append(resMap)
 
 	var result []int
 	var error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &result)
@@ -83,8 +84,8 @@ func Test_Convert_Map(t *testing.T) {
 	var resMap = make(map[string][]byte)
 	resMap["Amount1"] = []byte("1908")
 	resMap["Amount2"] = []byte("1901")
-	var resMapArray = make([]map[string][]byte, 0)
-	resMapArray = append(resMapArray, resMap)
+	var resMapArray = QueryResult{}
+	resMapArray.append(resMap)
 
 	var result map[string]string
 	var error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &result)
@@ -93,7 +94,7 @@ func Test_Convert_Map(t *testing.T) {
 	}
 	fmt.Println("Test_Convert_Map", result)
 
-	resMapArray = append(resMapArray, resMap)
+	resMapArray.append(resMap)
 
 	var resultMapArray []map[string]string
 	error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &resultMapArray)
@@ -105,7 +106,7 @@ func Test_Convert_Map(t *testing.T) {
 
 func Test_convert_struct(t *testing.T) {
 	var GoMybatisSqlResultDecoder = GoMybatisSqlResultDecoder{}
-	var res = make([]map[string][]byte, 0)
+	var res = QueryResult{}
 
 	var resMap = make(map[string][]byte)
 	resMap["Name"] = []byte("xiao ming")
@@ -120,7 +121,7 @@ func Test_convert_struct(t *testing.T) {
 	resMap["Age7"] = []byte("1908")
 	resMap["Age8"] = []byte("1908")
 	resMap["Bool"] = []byte("true")
-	res = append(res, resMap)
+	res.append(resMap)
 
 	var result TestResult
 	GoMybatisSqlResultDecoder.Decode(nil, res, &result)
@@ -130,7 +131,7 @@ func Test_convert_struct(t *testing.T) {
 
 func Test_Ignore_Case_Underscores(t *testing.T) {
 	var GoMybatisSqlResultDecoder = GoMybatisSqlResultDecoder{}
-	var res = make([]map[string][]byte, 0)
+	var res = QueryResult{}
 
 	var resMap = make(map[string][]byte)
 	resMap["name"] = []byte("xiao ming")
@@ -145,7 +146,7 @@ func Test_Ignore_Case_Underscores(t *testing.T) {
 	resMap["age_7"] = []byte("1908")
 	resMap["age_8"] = []byte("1908")
 	resMap["Bool"] = []byte("1")
-	res = append(res, resMap)
+	res.append(resMap)
 
 	var result TestResult
 	GoMybatisSqlResultDecoder.Decode(nil, res, &result)
@@ -155,7 +156,7 @@ func Test_Ignore_Case_Underscores(t *testing.T) {
 
 func Test_Ignore_Case_Underscores_Tps(t *testing.T) {
 	var GoMybatisSqlResultDecoder = GoMybatisSqlResultDecoder{}
-	var res = make([]map[string][]byte, 0)
+	var res = QueryResult{}
 
 	var resMap = make(map[string][]byte)
 	resMap["name"] = []byte("xiao ming")
@@ -170,7 +171,7 @@ func Test_Ignore_Case_Underscores_Tps(t *testing.T) {
 	resMap["age_7"] = []byte("1908")
 	resMap["age_8"] = []byte("1908")
 	resMap["Bool"] = []byte("1")
-	res = append(res, resMap)
+	res.append(resMap)
 
 	var result TestResult
 
@@ -183,7 +184,7 @@ func Test_Ignore_Case_Underscores_Tps(t *testing.T) {
 
 func Test_Decode_Interface(t *testing.T) {
 
-	var res = make([]map[string][]byte, 0)
+	var res = QueryResult{}
 	var resMap = make(map[string][]byte)
 	resMap["name"] = []byte("xiao ming")
 	resMap["Amount_1"] = []byte("1908.1")
@@ -197,7 +198,7 @@ func Test_Decode_Interface(t *testing.T) {
 	resMap["age_7"] = []byte("1908")
 	resMap["age_8"] = []byte("1908")
 	resMap["Bool"] = []byte("1")
-	res = append(res, resMap)
+	res.append(resMap)
 
 	var resultMap = make(map[string]*ResultProperty)
 	resultMap["id"] = &ResultProperty{
@@ -233,7 +234,7 @@ func Test_Decode_Interface(t *testing.T) {
 func Benchmark_Ignore_Case_Underscores(b *testing.B) {
 	b.StopTimer()
 	var GoMybatisSqlResultDecoder = GoMybatisSqlResultDecoder{}
-	var res = make([]map[string][]byte, 0)
+	var res = QueryResult{}
 
 	var resMap = make(map[string][]byte)
 	resMap["name"] = []byte("xiao ming")
@@ -248,7 +249,7 @@ func Benchmark_Ignore_Case_Underscores(b *testing.B) {
 	resMap["age_7"] = []byte("1908")
 	resMap["age_8"] = []byte("1908")
 	resMap["Bool"] = []byte("1")
-	res = append(res, resMap)
+	res.append(resMap)
 
 	var result TestResult
 
