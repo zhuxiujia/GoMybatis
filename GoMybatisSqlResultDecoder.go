@@ -47,36 +47,56 @@ func (it GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultProperty,
 func (it GoMybatisSqlResultDecoder) sqlStructConvert(resultMap map[string]*ResultProperty, resultTItemType reflect.Type, sItemMap map[string][]byte) reflect.Value {
 	if resultTItemType.Kind() == reflect.Struct {
 		var tItemTypeFieldTypeValue = reflect.New(resultTItemType)
-		for i := 0; i < resultTItemType.NumField(); i++ {
-			var tItemTypeFieldType = resultTItemType.Field(i)
-			var jsonTag = tItemTypeFieldType.Tag.Get("json")
-			var repleaceName = tItemTypeFieldType.Name
+		//for i := 0; i < resultTItemType.NumField(); i++ {
+		//	var tItemTypeFieldType = resultTItemType.Field(i)
+		//	var jsonTag = tItemTypeFieldType.Tag.Get("json")
+		//	var repleaceName = tItemTypeFieldType.Name
+		//
+		//	if tItemTypeFieldType.Type.Kind() != reflect.Ptr {
+		//		if !it.isGoBasicType(tItemTypeFieldType.Type) {
+		//			//not basic type,continue
+		//			continue
+		//		}
+		//	} else {
+		//		if !it.isGoBasicType(tItemTypeFieldType.Type.Elem()) {
+		//			//not basic type,continue
+		//			continue
+		//		}
+		//	}
+		//	var value = sItemMap[repleaceName]
+		//	if value == nil || len(value) == 0 {
+		//		//renamed
+		//		repleaceName = jsonTag
+		//		if repleaceName == "" {
+		//			continue
+		//		}
+		//		value = sItemMap[repleaceName]
+		//		if value == nil || len(value) == 0 {
+		//			continue
+		//		}
+		//	}
+		//	var fieldValue = tItemTypeFieldTypeValue.Elem().Field(i)
+		//	it.sqlBasicTypeConvert(repleaceName, resultMap, tItemTypeFieldType.Type, value, &fieldValue)
+		//}
 
-			if tItemTypeFieldType.Type.Kind() != reflect.Ptr {
-				if !it.isGoBasicType(tItemTypeFieldType.Type) {
-					//not basic type,continue
-					continue
+		for cloumn, value := range sItemMap {
+			var conf = resultMap[cloumn]
+			if conf != nil {
+				tItemTypeFieldType, find := resultTItemType.FieldByName(conf.Property)
+				if find {
+					var fieldValue = tItemTypeFieldTypeValue.Elem().FieldByName(conf.Property)
+					it.sqlBasicTypeConvert(cloumn, resultMap, tItemTypeFieldType.Type, value, &fieldValue)
 				}
+				println("value:", string(value), find, conf.Property)
 			} else {
-				if !it.isGoBasicType(tItemTypeFieldType.Type.Elem()) {
-					//not basic type,continue
-					continue
+				tItemTypeFieldType, find := resultTItemType.FieldByName(cloumn)
+				if find {
+					var fieldValue = tItemTypeFieldTypeValue.Elem().FieldByName(cloumn)
+					it.sqlBasicTypeConvert(cloumn, resultMap, tItemTypeFieldType.Type, value, &fieldValue)
+				} else {
+					//TODO
 				}
 			}
-			var value = sItemMap[repleaceName]
-			if value == nil || len(value) == 0 {
-				//renamed
-				repleaceName = jsonTag
-				if repleaceName == "" {
-					continue
-				}
-				value = sItemMap[repleaceName]
-				if value == nil || len(value) == 0 {
-					continue
-				}
-			}
-			var fieldValue = tItemTypeFieldTypeValue.Elem().Field(i)
-			it.sqlBasicTypeConvert(repleaceName, resultMap, tItemTypeFieldType.Type, value, &fieldValue)
 		}
 		return tItemTypeFieldTypeValue.Elem()
 	} else {
