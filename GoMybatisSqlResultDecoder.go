@@ -175,19 +175,19 @@ func (it GoMybatisSqlResultDecoder) sqlBasicTypeConvert(clomnName string, result
 				return false
 			}
 			if strings.EqualFold(v.Column, clomnName) || strings.EqualFold(v.Property, clomnName) {
-				if v.GoType == "" {
+				if v.LangType == "" {
 					return false
-				} else if strings.Contains(v.GoType, "string") {
+				} else if strings.Contains(v.LangType, "string") {
 					tItemTypeFieldType = StringType
-				} else if strings.Contains(v.GoType, "int") {
+				} else if strings.Contains(v.LangType, "int") {
 					tItemTypeFieldType = Int64Type
-				} else if strings.Contains(v.GoType, "uint") {
+				} else if strings.Contains(v.LangType, "uint") {
 					tItemTypeFieldType = Uint64Type
-				} else if strings.Contains(v.GoType, "time.Time") {
+				} else if strings.Contains(v.LangType, "time.Time") {
 					tItemTypeFieldType = TimeType
-				} else if strings.Contains(v.GoType, "float") {
+				} else if strings.Contains(v.LangType, "float") {
 					tItemTypeFieldType = Float64Type
-				} else if strings.Contains(v.GoType, "bool") {
+				} else if strings.Contains(v.LangType, "bool") {
 					tItemTypeFieldType = BoolType
 				} else {
 					return false

@@ -9,6 +9,7 @@ import (
 func TestNode_Run(t *testing.T) {
 	var results = []interface{}{
 		true,
+		true,
 		"fs",
 		false,
 		true,
@@ -31,6 +32,7 @@ func TestNode_Run(t *testing.T) {
 	}
 
 	var expressions = []string{
+		"1 != -1",
 		"'2019-02-26' == '2019-02-26'",
 		"`f`+`s`",
 		"a +1 > b * 8",

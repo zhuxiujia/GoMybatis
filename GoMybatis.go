@@ -232,7 +232,7 @@ func makeResultMaps(xmls map[string]etree.Token) map[string]map[string]*ResultPr
 						XMLName:  elementItem.Tag,
 						Column:   elementItem.SelectAttrValue("column", ""),
 						Property: elementItem.SelectAttrValue("property", ""),
-						GoType:   elementItem.SelectAttrValue("goType", ""),
+						LangType: elementItem.SelectAttrValue("langType", ""),
 					}
 					resultPropertyMap[property.Column] = &property
 				}
