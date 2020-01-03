@@ -87,7 +87,6 @@ func (it GoMybatisSqlResultDecoder) sqlStructConvert(resultMap map[string]*Resul
 					var fieldValue = tItemTypeFieldTypeValue.Elem().FieldByName(conf.Property)
 					it.sqlBasicTypeConvert(cloumn, resultMap, tItemTypeFieldType.Type, value, &fieldValue)
 				}
-				println("value:", string(value), find, conf.Property)
 			} else {
 				tItemTypeFieldType, find := resultTItemType.FieldByName(cloumn)
 				if find {
