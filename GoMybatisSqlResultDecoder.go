@@ -79,18 +79,20 @@ func (it GoMybatisSqlResultDecoder) sqlStructConvert(resultMap map[string]*Resul
 		//	it.sqlBasicTypeConvert(repleaceName, resultMap, tItemTypeFieldType.Type, value, &fieldValue)
 		//}
 
+		var tItemTypeFieldTypeValueElem = tItemTypeFieldTypeValue.Elem()
+
 		for cloumn, value := range sItemMap {
 			var conf = resultMap[cloumn]
 			if conf != nil {
 				tItemTypeFieldType, find := resultTItemType.FieldByName(conf.Property)
 				if find {
-					var fieldValue = tItemTypeFieldTypeValue.Elem().FieldByName(conf.Property)
+					var fieldValue = tItemTypeFieldTypeValueElem.FieldByName(conf.Property)
 					it.sqlBasicTypeConvert(cloumn, resultMap, tItemTypeFieldType.Type, value, &fieldValue)
 				}
 			} else {
 				tItemTypeFieldType, find := resultTItemType.FieldByName(cloumn)
 				if find {
-					var fieldValue = tItemTypeFieldTypeValue.Elem().FieldByName(cloumn)
+					var fieldValue = tItemTypeFieldTypeValueElem.FieldByName(cloumn)
 					it.sqlBasicTypeConvert(cloumn, resultMap, tItemTypeFieldType.Type, value, &fieldValue)
 				} else {
 					//TODO
