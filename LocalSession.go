@@ -208,7 +208,8 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 				it.savePointStack = &savePointStack
 			}
 			if it.txStack.Len() > 0 {
-				return errors.New("[GoMybatis] Propagation::NESTED the stack have more than one tx!")
+				it.txStack.Push(it.txStack.Last())
+				return nil
 			} else {
 				var tx, err = it.db.Begin()
 				err = it.dbErrorPack(err)
