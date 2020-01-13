@@ -62,7 +62,7 @@ func (it *LocalSession) Rollback() error {
 			var point = it.savePointStack.Pop()
 			if point != nil {
 				if it.logSystem != nil {
-					it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] exec ====================" + "rollback to " + *point))
+					it.logSystem.Println([]byte("[GoMybatis] [" + it.Id() + "] exec ====================" + "rollback to " + *point))
 				}
 				_, e := t.Exec("rollback to " + *point)
 				e = it.dbErrorPack(e)
@@ -74,7 +74,7 @@ func (it *LocalSession) Rollback() error {
 
 		if it.txStack.Len() == 0 {
 			if it.logSystem != nil {
-				it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] Rollback Session"))
+				it.logSystem.Println([]byte("[GoMybatis] [" + it.Id() + "] Rollback Session"))
 			}
 			var err = t.Rollback()
 			if err != nil {
@@ -110,7 +110,7 @@ func (it *LocalSession) Commit() error {
 			var pId = "p" + strconv.Itoa(it.txStack.Len()+1)
 			it.savePointStack.Push(pId)
 			if it.logSystem != nil {
-				it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] exec " + "savepoint " + pId))
+				it.logSystem.Println([]byte("[GoMybatis] [" + it.Id() + "] exec " + "savepoint " + pId))
 			}
 			_, e := t.Exec("savepoint " + pId)
 			e = it.dbErrorPack(e)
@@ -120,7 +120,7 @@ func (it *LocalSession) Commit() error {
 		}
 		if it.txStack.Len() == 0 {
 			if it.logSystem != nil {
-				it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] Commit tx session:" + it.Id()))
+				it.logSystem.Println([]byte("[GoMybatis] [" + it.Id() + "] Commit tx session:" + it.Id()))
 			}
 			var err = t.Commit()
 			if err != nil {
@@ -137,7 +137,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 		propagation = tx.ToString(*p)
 	}
 	if it.logSystem != nil {
-		it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] Begin session(Propagation:" + propagation+")"))
+		it.logSystem.Println([]byte("[GoMybatis] [" + it.Id() + "] Begin session(Propagation:" + propagation + ")"))
 	}
 	if it.isClosed == true {
 		return utils.NewError("LocalSession", " can not Begin() a Closed Session!")
@@ -208,8 +208,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 				it.savePointStack = &savePointStack
 			}
 			if it.txStack.Len() > 0 {
-				it.txStack.Push(it.txStack.Last())
-				return nil
+				return errors.New("[GoMybatis] Propagation::NESTED the stack have more than one tx!")
 			} else {
 				var tx, err = it.db.Begin()
 				err = it.dbErrorPack(err)
@@ -240,9 +239,9 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 	return nil
 }
 
-func (it *LocalSession)LastPROPAGATION () *tx.Propagation{
-	if it.txStack.Len()!=0{
-		var _,pr=it.txStack.Last()
+func (it *LocalSession) LastPROPAGATION() *tx.Propagation {
+	if it.txStack.Len() != 0 {
+		var _, pr = it.txStack.Last()
 		return pr
 	}
 	return nil
@@ -250,7 +249,7 @@ func (it *LocalSession)LastPROPAGATION () *tx.Propagation{
 
 func (it *LocalSession) Close() {
 	if it.logSystem != nil {
-		it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] Close session"))
+		it.logSystem.Println([]byte("[GoMybatis] [" + it.Id() + "] Close session"))
 	}
 	if it.newLocalSession != nil {
 		it.newLocalSession.Close()
