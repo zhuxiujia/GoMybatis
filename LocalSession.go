@@ -211,12 +211,8 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 				it.txStack.Push(it.txStack.Last())
 				return nil
 			} else {
-				var tx, err = it.db.Begin()
-				err = it.dbErrorPack(err)
-				if err == nil {
-					it.txStack.Push(tx, p)
-				}
-				return err
+				var np = tx.PROPAGATION_REQUIRED
+				return it.Begin(&np)
 			}
 			break
 		case tx.PROPAGATION_NOT_REQUIRED: //end
