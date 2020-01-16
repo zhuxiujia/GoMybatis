@@ -42,7 +42,7 @@ func row2map(rows *sql.Rows, fields []string) (resultsMap map[string][]byte, err
 			continue
 		}
 
-		if data, err := value2Bytes(&rawValue); err == nil {
+		if data, err := value2Bytes(&rawValue, key); err == nil {
 			result[key] = data
 		} else {
 			return nil, err // !nashtsai! REVIEW, should return err or just error log?
@@ -50,7 +50,8 @@ func row2map(rows *sql.Rows, fields []string) (resultsMap map[string][]byte, err
 	}
 	return result, nil
 }
-func value2Bytes(rawValue *reflect.Value) ([]byte, error) {
+func value2Bytes(rawValue *reflect.Value, column string) ([]byte, error) {
+	//TODO convert type with column and column type
 	str, err := value2String(rawValue)
 	if err != nil {
 		return nil, err
