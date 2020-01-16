@@ -82,20 +82,28 @@ func (it GoMybatisSqlResultDecoder) sqlStructConvert(resultMap map[string]*Resul
 		var tItemTypeFieldTypeValueElem = tItemTypeFieldTypeValue.Elem()
 
 		for cloumn, value := range sItemMap {
-			var conf = resultMap[cloumn]
-			if conf != nil {
-				tItemTypeFieldType, find := resultTItemType.FieldByName(conf.Property)
-				if find {
-					var fieldValue = tItemTypeFieldTypeValueElem.FieldByName(conf.Property)
-					it.sqlBasicTypeConvert(cloumn, resultMap, tItemTypeFieldType.Type, value, &fieldValue)
+			if resultMap != nil {
+				var conf = resultMap[cloumn]
+				if conf != nil {
+					tItemTypeFieldType, find := resultTItemType.FieldByName(conf.Property)
+					if find {
+						var fieldValue = tItemTypeFieldTypeValueElem.FieldByName(conf.Property)
+						it.sqlBasicTypeConvert(cloumn, resultMap, tItemTypeFieldType.Type, value, &fieldValue)
+					}
 				}
 			} else {
-				tItemTypeFieldType, find := resultTItemType.FieldByName(cloumn)
+				var fieldName = utils.UpperFieldFirstName(cloumn)
+				tItemTypeFieldType, find := resultTItemType.FieldByName(fieldName)
 				if find {
-					var fieldValue = tItemTypeFieldTypeValueElem.FieldByName(cloumn)
+					var fieldValue = tItemTypeFieldTypeValueElem.FieldByName(fieldName)
 					it.sqlBasicTypeConvert(cloumn, resultMap, tItemTypeFieldType.Type, value, &fieldValue)
 				} else {
-					//TODO
+					fieldName = strings.ReplaceAll(fieldName, "_", "")
+					tItemTypeFieldType, find = resultTItemType.FieldByName(fieldName)
+					if find {
+						var fieldValue = tItemTypeFieldTypeValueElem.FieldByName(fieldName)
+						it.sqlBasicTypeConvert(cloumn, resultMap, tItemTypeFieldType.Type, value, &fieldValue)
+					}
 				}
 			}
 		}
