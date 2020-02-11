@@ -242,7 +242,7 @@ func main()  {
 }
 ```
 * 第二步，在你项目main 目录下建立一个 XmlCreateTool.go 内容如下
-```
+``` go
 func main() {
 	var bean = UserAddress{} //此处只是举例，应该替换为你自己的数据库模型
 	GoMybatis.OutPutXml(reflect.TypeOf(bean).Name()+"Mapper.xml", GoMybatis.CreateXml("biz_"+GoMybatis.StructToSnakeString(bean), bean))
