@@ -7,6 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/zhuxiujia/GoMybatis"
 	"io/ioutil"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -427,4 +428,9 @@ func initTestService() TestService {
 	}
 	GoMybatis.AopProxyService(&testService, &engine)
 	return testService
+}
+
+func TestCreateDefaultXmlWriteToFile(t *testing.T) {
+	var bean = Activity{} //此处只是举例，应该替换为你自己的数据库模型
+	GoMybatis.OutPutXml(reflect.TypeOf(bean).Name()+"Mapper.xml", GoMybatis.CreateXml("biz_"+GoMybatis.StructToSnakeString(bean), bean))
 }

@@ -23,7 +23,7 @@ var _XmlData = `<?xml version="1.0" encoding="UTF-8"?>
 var _XmlLogicEnable = `logic_enable="true" logic_undelete="1" logic_deleted="0"`
 var _XmlVersionEnable = `version_enable="true"`
 var _XmlIdItem = `<id column="id" property="id"/>`
-var _ResultItem = `<result column="#{property}" property="#{property}" langType="#{langType}" #{version} #{logic} />`
+var _ResultItem = `<result column="#{column}" property="#{property}" langType="#{langType}" #{version} #{logic} />`
 
 /**
 //例子
@@ -60,6 +60,7 @@ func CreateXml(tableName string, bean interface{}) []byte {
 		var property = item.Name
 		var jsonName = item.Tag.Get("json")
 		var itemStr = strings.Replace(_ResultItem, "#{property}", property, -1)
+		itemStr = strings.Replace(itemStr, "#{column}", jsonName, -1)
 		itemStr = strings.Replace(itemStr, "#{langType}", item.Type.Name(), -1)
 		var gm = item.Tag.Get("gm")
 		if gm == "id" || jsonName == "id" || strings.EqualFold(property, "id") {
