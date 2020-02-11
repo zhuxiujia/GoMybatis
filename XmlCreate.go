@@ -76,7 +76,6 @@ func CreateXml(tableName string, bean interface{}) []byte {
 		//clean
 		itemStr = strings.Replace(itemStr, "#{version}", "", -1)
 		itemStr = strings.Replace(itemStr, "#{logic}", "", -1)
-
 		content += "\t" + itemStr
 		if i+1 < tv.NumField() {
 			content += "\n"
