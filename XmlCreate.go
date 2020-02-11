@@ -47,7 +47,7 @@ func TestUserAddres(t *testing.T)  {
 	var s=utils.CreateDefaultXml("biz_user_address",TestActivity{})//创建xml内容
 	utils.OutPutXml("D:/GOPATH/src/dao/ActivityMapper.xml",[]byte(s))//写入磁盘
 }
- */
+*/
 //根据结构体 创建xml文件
 func CreateXml(tableName string, bean interface{}) []byte {
 	var content = ""
@@ -57,15 +57,12 @@ func CreateXml(tableName string, bean interface{}) []byte {
 	}
 	for i := 0; i < tv.NumField(); i++ {
 		var item = tv.Field(i)
-		var itemName = item.Name
-		var itemJson = item.Tag.Get("json")
-		if itemJson != "" {
-			itemName = itemJson
-		}
-		var itemStr = strings.Replace(_ResultItem, "#{property}", itemName, -1)
+		var property = item.Name
+		var jsonName = item.Tag.Get("json")
+		var itemStr = strings.Replace(_ResultItem, "#{property}", property, -1)
 		itemStr = strings.Replace(itemStr, "#{langType}", item.Type.Name(), -1)
 		var gm = item.Tag.Get("gm")
-		if gm == "id" || itemName == "id" {
+		if gm == "id" || jsonName == "id" || strings.EqualFold(property, "id") {
 			content += _XmlIdItem
 			content += "\n"
 			continue
