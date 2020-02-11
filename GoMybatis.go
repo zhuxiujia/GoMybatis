@@ -304,7 +304,7 @@ func methodFieldCheck(beanType *reflect.Type, methodType *reflect.StructField) {
 	}
 
 	var mapperParams = methodType.Tag.Get("mapperParams")
-	if methodType.Type.NumOut() > 1 && mapperParams == "" {
+	if methodType.Type.NumOut() > 1 && mapperParams == "" && !(methodType.Name == "NewSession") {
 		log.Println("[GoMybatis] warning ======================== " + (*beanType).Name() + "." + methodType.Name + "() have not define tag mapperParams:\"\",maybe can not get param value!")
 	}
 }
