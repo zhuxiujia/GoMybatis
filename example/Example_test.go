@@ -151,7 +151,7 @@ func Test_select(t *testing.T) {
 		return
 	}
 	//使用mapper
-	name := "注册"
+	name := ""
 
 	var result, err = exampleActivityMapper.SelectByCondition(&name, nil, nil, nil, nil)
 	if err != nil {

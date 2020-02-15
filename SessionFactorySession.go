@@ -33,13 +33,13 @@ func (it *SessionFactorySession) QueryPrepare(sqlorArgs string, args ...interfac
 	if it.Session == nil {
 		return nil, utils.NewError("SessionFactorySession", " can not run Id(),it.Session == nil")
 	}
-	return it.Session.QueryPrepare(sqlorArgs, args)
+	return it.Session.QueryPrepare(sqlorArgs, args...)
 }
 func (it *SessionFactorySession) ExecPrepare(sqlorArgs string, args ...interface{}) (*Result, error) {
 	if it.Session == nil {
 		return nil, utils.NewError("SessionFactorySession", " can not run Exec(),it.Session == nil")
 	}
-	return it.Session.ExecPrepare(sqlorArgs, args)
+	return it.Session.ExecPrepare(sqlorArgs, args...)
 }
 
 func (it *SessionFactorySession) Rollback() error {

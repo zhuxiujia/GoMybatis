@@ -1,7 +1,5 @@
 package ast
 
-
-
 type NodeBind struct {
 	t NodeType
 
@@ -15,7 +13,7 @@ func (it *NodeBind) Type() NodeType {
 	return NBind
 }
 
-func (it *NodeBind) Eval(env map[string]interface{}) ([]byte, error) {
+func (it *NodeBind) Eval(env map[string]interface{}, arg_array *[]interface{}) ([]byte, error) {
 	if it.name == "" {
 		panic(`[GoMybatis] element <bind name = ""> name can not be nil!`)
 	}

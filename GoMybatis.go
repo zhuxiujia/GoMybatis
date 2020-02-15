@@ -2,6 +2,7 @@ package GoMybatis
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/zhuxiujia/GoMybatis/ast"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 	"github.com/zhuxiujia/GoMybatis/utils"
@@ -328,7 +329,7 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 	var session Session
 	var sql string
 	var err error
-	session, sql, err = buildSql(proxyArg, nodes, sessionEngine.SqlBuilder())
+	session, sql, arg_array, err := buildSql(proxyArg, nodes, sessionEngine.SqlBuilder())
 	if err != nil {
 		return err
 	}
@@ -359,8 +360,9 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 		//is select and have return value
 		if sessionEngine.LogEnable() {
 			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Query ==> "+sql)
+			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Param ==> "+fmt.Sprint(arg_array))
 		}
-		res, err := session.Query(sql)
+		res, err := session.QueryPrepare(sql, arg_array...)
 		defer func() {
 			if sessionEngine.LogEnable() {
 				var RowsAffected = "0"
@@ -383,8 +385,9 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 	} else {
 		if sessionEngine.LogEnable() {
 			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Exec ==> "+sql)
+			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Param ==> "+fmt.Sprint(arg_array))
 		}
-		var res, err = session.Exec(sql)
+		var res, err = session.ExecPrepare(sql, arg_array...)
 		defer func() {
 			if sessionEngine.LogEnable() {
 				var RowsAffected = "0"
@@ -416,7 +419,8 @@ func closeSession(factory *SessionFactory, session Session) {
 	session.Close()
 }
 
-func buildSql(proxyArg ProxyArg, nodes []ast.Node, sqlBuilder SqlBuilder) (Session, string, error) {
+func buildSql(proxyArg ProxyArg, nodes []ast.Node, sqlBuilder SqlBuilder) (Session, string, []interface{}, error) {
+	var array_arg = []interface{}{}
 	var session Session
 	var paramMap = make(map[string]interface{})
 	var tagArgsLen = proxyArg.TagArgsLen
@@ -464,8 +468,8 @@ func buildSql(proxyArg ProxyArg, nodes []ast.Node, sqlBuilder SqlBuilder) (Sessi
 		paramMap = scanStructArgFields(proxyArg.Args[customIndex], tag)
 	}
 
-	result, err := sqlBuilder.BuildSql(paramMap, nodes)
-	return session, result, err
+	result, err := sqlBuilder.BuildSql(paramMap, nodes, &array_arg)
+	return session, result, array_arg, err
 }
 
 //scan params

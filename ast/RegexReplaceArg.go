@@ -12,7 +12,31 @@ var defaultArgRegex, _ = regexp.Compile("\\$\\{[^}]*\\}")
 var sqlArgRegex, _ = regexp.Compile("\\#\\{[^}]*\\}")
 
 //执行替换操作
-func Replace(startChar string, findStrs []string, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine ExpressionEngine) (string, error) {
+func Replace(findStrs []string, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine ExpressionEngine, arg_array *[]interface{}) (string, error) {
+	for _, findStr := range findStrs {
+
+		//find param arg
+		var argValue = arg[findStr]
+		if argValue != nil {
+			*arg_array = append(*arg_array, argValue)
+		} else {
+			//exec lexer
+			var err error
+			evalData, err := engine.LexerAndEval(findStr, arg)
+			if err != nil {
+				return "", errors.New(engine.Name() + ":" + err.Error())
+			}
+			*arg_array = append(*arg_array, evalData)
+		}
+		//replace to ' ? '
+		data = strings.Replace(data, "#{"+findStr+"}", " ? ", -1)
+	}
+
+	return data, nil
+}
+
+//执行替换操作
+func ReplaceRaw(findStrs []string, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine ExpressionEngine) (string, error) {
 	for _, findStr := range findStrs {
 		var evalData interface{}
 		//find param arg
@@ -33,7 +57,7 @@ func Replace(startChar string, findStrs []string, data string, typeConvert SqlAr
 		} else {
 			resultStr = fmt.Sprint(evalData)
 		}
-		data = strings.Replace(data, startChar+findStr+"}", resultStr, -1)
+		data = strings.Replace(data, "${"+findStr+"}", resultStr, -1)
 	}
 	arg = nil
 	typeConvert = nil

@@ -107,7 +107,11 @@ func (it *TempleteSession) QueryPrepare(sqlorArgs string, args ...interface{}) (
 	return nil, nil
 }
 func (it *TempleteSession) ExecPrepare(sqlorArgs string, args ...interface{}) (*Result, error) {
-	return nil, nil
+	var result = Result{
+		LastInsertId: 1,
+		RowsAffected: 1,
+	}
+	return &result, nil
 }
 
 func (it *TempleteSession) Rollback() error {

@@ -345,16 +345,23 @@ func (it *LocalSession) QueryPrepare(sqlPrepare string, args ...interface{}) ([]
 		if err != nil {
 			return nil, err
 		}
-		rows, err = stmt.Query(args)
+		rows, err = stmt.Query(args...)
 		err = it.dbErrorPack(err)
+		if err != nil {
+			return nil, err
+		}
 	} else {
 		stmt, err := it.db.Prepare(sqlPrepare)
 		err = it.dbErrorPack(err)
 		if err != nil {
 			return nil, err
 		}
-		rows, err = stmt.Query(args)
+
+		rows, err = stmt.Query(args...)
 		err = it.dbErrorPack(err)
+		if err != nil {
+			return nil, err
+		}
 	}
 	if rows != nil {
 		defer rows.Close()
@@ -384,16 +391,22 @@ func (it *LocalSession) ExecPrepare(sqlPrepare string, args ...interface{}) (*Re
 		if err != nil {
 			return nil, err
 		}
-		result, err = stmt.Exec(args)
+		result, err = stmt.Exec(args...)
 		err = it.dbErrorPack(err)
+		if err != nil {
+			return nil, err
+		}
 	} else {
 		stmt, err := it.db.Prepare(sqlPrepare)
 		err = it.dbErrorPack(err)
 		if err != nil {
 			return nil, err
 		}
-		result, err = stmt.Exec(args)
+		result, err = stmt.Exec(args...)
 		err = it.dbErrorPack(err)
+		if err != nil {
+			return nil, err
+		}
 	}
 	if err != nil {
 		return nil, err

@@ -1,6 +1,8 @@
 package utils
 
-import "strings"
+import (
+	"strings"
+)
 
 //首字母转大写
 func UpperFieldFirstName(fieldStr string) string {

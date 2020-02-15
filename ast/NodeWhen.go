@@ -14,7 +14,7 @@ func (it *NodeWhen) Type() NodeType {
 	return NWhen
 }
 
-func (it *NodeWhen) Eval(env map[string]interface{}) ([]byte, error) {
+func (it *NodeWhen) Eval(env map[string]interface{}, arg_array *[]interface{}) ([]byte, error) {
 	if it.holder == nil {
 		return nil, nil
 	}
@@ -23,7 +23,7 @@ func (it *NodeWhen) Eval(env map[string]interface{}) ([]byte, error) {
 		err = utils.NewError("GoMybatisSqlBuilder", "[GoMybatis] <test `", it.test, `> fail,`, err.Error())
 	}
 	if result.(bool) {
-		return DoChildNodes(it.childs, env)
+		return DoChildNodes(it.childs, env, arg_array)
 	}
 	return nil, nil
 }
