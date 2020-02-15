@@ -328,6 +328,85 @@ func (it *LocalSession) Exec(sqlorArgs string) (*Result, error) {
 	}
 }
 
+func (it *LocalSession) QueryPrepare(sqlPrepare string, args ...interface{}) ([]map[string][]byte, error) {
+	if it.isClosed == true {
+		return nil, utils.NewError("LocalSession", " can not Query() a Closed Session!")
+	}
+	if it.newLocalSession != nil {
+		return it.newLocalSession.Query(sqlPrepare)
+	}
+
+	var rows *sql.Rows
+	var err error
+	var t, _ = it.txStack.Last()
+	if t != nil {
+		stmt, err := t.Prepare(sqlPrepare)
+		err = it.dbErrorPack(err)
+		if err != nil {
+			return nil, err
+		}
+		rows, err = stmt.Query(args)
+		err = it.dbErrorPack(err)
+	} else {
+		stmt, err := it.db.Prepare(sqlPrepare)
+		err = it.dbErrorPack(err)
+		if err != nil {
+			return nil, err
+		}
+		rows, err = stmt.Query(args)
+		err = it.dbErrorPack(err)
+	}
+	if rows != nil {
+		defer rows.Close()
+	}
+	if err != nil {
+		return nil, err
+	} else {
+		return rows2maps(rows)
+	}
+	return nil, nil
+}
+
+func (it *LocalSession) ExecPrepare(sqlPrepare string, args ...interface{}) (*Result, error) {
+	if it.isClosed == true {
+		return nil, utils.NewError("LocalSession", " can not Exec() a Closed Session!")
+	}
+	if it.newLocalSession != nil {
+		return it.newLocalSession.Exec(sqlPrepare)
+	}
+
+	var result sql.Result
+	var err error
+	var t, _ = it.txStack.Last()
+	if t != nil {
+		stmt, err := t.Prepare(sqlPrepare)
+		err = it.dbErrorPack(err)
+		if err != nil {
+			return nil, err
+		}
+		result, err = stmt.Exec(args)
+		err = it.dbErrorPack(err)
+	} else {
+		stmt, err := it.db.Prepare(sqlPrepare)
+		err = it.dbErrorPack(err)
+		if err != nil {
+			return nil, err
+		}
+		result, err = stmt.Exec(args)
+		err = it.dbErrorPack(err)
+	}
+	if err != nil {
+		return nil, err
+	} else {
+		var LastInsertId, _ = result.LastInsertId()
+		var RowsAffected, _ = result.RowsAffected()
+		return &Result{
+			LastInsertId: LastInsertId,
+			RowsAffected: RowsAffected,
+		}, nil
+	}
+}
+
 func (it *LocalSession) dbErrorPack(e error) error {
 	if e != nil {
 		var sqlError = errors.New("[GoMybatis][LocalSession]" + e.Error())

@@ -103,6 +103,13 @@ func (it *TempleteSession) Exec(sqlorArgs string) (*Result, error) {
 	}
 	return &result, nil
 }
+func (it *TempleteSession) QueryPrepare(sqlorArgs string, args ...interface{}) ([]map[string][]byte, error) {
+	return nil, nil
+}
+func (it *TempleteSession) ExecPrepare(sqlorArgs string, args ...interface{}) (*Result, error) {
+	return nil, nil
+}
+
 func (it *TempleteSession) Rollback() error {
 	return nil
 }
@@ -232,11 +239,9 @@ func TestGoMybatisTempleteDecoder_Delete(t *testing.T) {
 	time.Sleep(time.Second)
 }
 
-func TestInit(t *testing.T)  {
+func TestInit(t *testing.T) {
 	initMapperTest()
 }
-
-
 
 func initMapperTest() {
 	bytes := []byte(`<?xml version="1.0" encoding="UTF-8"?>

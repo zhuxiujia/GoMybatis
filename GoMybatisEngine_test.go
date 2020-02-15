@@ -165,9 +165,18 @@ func (it *TestSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 func (it *TestSession) Exec(sqlorArgs string) (*Result, error) {
 	return nil, nil
 }
+
+func (it *TestSession) QueryPrepare(sqlorArgs string, args ...interface{}) ([]map[string][]byte, error) {
+	return nil, nil
+}
+func (it *TestSession) ExecPrepare(sqlorArgs string, args ...interface{}) (*Result, error) {
+	return nil, nil
+}
+
 func (it *TestSession) Rollback() error {
 	return nil
 }
+
 func (it *TestSession) Commit() error {
 	return nil
 }
