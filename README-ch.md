@@ -293,8 +293,7 @@ go run XmlCreateTool.go
 
 
 ## 规划
-* 推荐新项目 https://github.com/zhuxiujia/rbatis ，届时提供高于go语言版2倍以上性能，安全，通用，的orm框架。
-
+* 推荐新项目 https://github.com/rbatis/rbatis 提供高性能，无GC,无并发安全问题，内存安全的rust语言 orm框架
 
 ## 请及时关注版本，及时升级版本(新的功能，bug修复) ，使用GoMybatis的项目请在Issues里留言您的项目名称+联系方式
 
