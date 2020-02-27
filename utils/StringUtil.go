@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -24,4 +25,9 @@ func LowerFieldFirstName(fieldStr string) string {
 		fieldBytes = nil
 	}
 	return fieldStr
+}
+
+// format array [1,2,3,""] to '[1,2,3,]'
+func SprintArray(array_or_slice []interface{}) string {
+	return strings.Replace(strings.Trim(fmt.Sprint(array_or_slice), ""), " ", ",", -1)
 }
