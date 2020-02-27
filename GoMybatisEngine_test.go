@@ -81,7 +81,7 @@ func Test_One_Transcation_TPS(t *testing.T) {
 	var page = 1
 	//开始TPS测试
 	var total = 10000
-	defer utils.CountMethodTps(float64(total), time.Now(), "Test_One_Transcation_TPS")
+	defer utils.CountMethodTps(total, time.Now(), "Test_One_Transcation_TPS")
 	for i := 0; i < total; i++ {
 		var _, err = exampleActivityMapperImpl.SelectByCondition(&session, &name, &times, &times, &page, &page)
 		if err != nil {
@@ -108,7 +108,7 @@ func Test_One_Transcation_multiple_coroutine_TPS(t *testing.T) {
 	var waitGroup = sync.WaitGroup{}
 	waitGroup.Add(goruntine)
 
-	defer utils.CountMethodTps(float64(total), time.Now(), "Test_One_Transcation_multiple_coroutine_TPS")
+	defer utils.CountMethodTps(total, time.Now(), "Test_One_Transcation_multiple_coroutine_TPS")
 
 	for i := 0; i < goruntine; i++ {
 		go func() {
