@@ -13,7 +13,7 @@
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/vuetify.png)
 ### Please read the documentation website carefully when using the tutorial. [DOC](https://zhuxiujia.github.io/gomybatis.io/#/getting-started)
 # Powerful Features
-* <a href="https://zhuxiujia.github.io/gomybatis.io/">High Performance</a>，The maximum number of transactions per second of a single computer can reach 470741Tps/s, and the total time consumed is 0.21s (test environment returns simulated SQL data, concurrently 1000, total 100000, 6-core 16GB win10)<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/">High Performance</a>，The maximum number of transactions per second of a single computer can reach 751020 Tps/s, and the total time consumed is 0.14s (test environment returns simulated SQL data, concurrently 1000, total 100000, 6-core 16GB win10)<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">Painless migration from Java to go</a>，Compatible with most Java(Mybatis3,Mybatis Plus) ，Painless migration of XML SQL files from Java Spring Mybatis to Go language（Modify only the javaType of resultMap to specify go language type for langType）<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">Declarative transaction/AOP transaction/transaction Behavior</a>Only one line Tag is needed to define AOP transactions and transaction propagation behavior<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">Extensible Log Interface</a>Asynchronous message queue day, SQL log in framework uses cached channel to realize asynchronous message queue logging<br>
