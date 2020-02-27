@@ -29,5 +29,5 @@ func LowerFieldFirstName(fieldStr string) string {
 
 // format array [1,2,3,""] to '[1,2,3,]'
 func SprintArray(array_or_slice []interface{}) string {
-	return strings.Replace(strings.Trim(fmt.Sprint(array_or_slice), ""), " ", ",", -1)
+	return strings.Replace(fmt.Sprint(array_or_slice), " ", ",", -1)
 }
