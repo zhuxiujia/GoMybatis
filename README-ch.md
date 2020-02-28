@@ -34,7 +34,6 @@
  Postgres:                          github.com/lib/pq
  SQLite:                            github.com/mattn/go-sqlite3
  MsSql:                             github.com/denisenkom/go-mssqldb
- MsSql:                             github.com/lunny/godbc
  Oracle:                            github.com/mattn/go-oci8
  //分布式NewSql数据库
  Tidb:                              github.com/pingcap/tidb
