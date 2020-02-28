@@ -54,6 +54,8 @@ go get github.com/go-sql-driver/mysql
 * mod使用（环境变量加入GO111MODULE auto）:加入
 ``` bash
 go env -w GOSUMDB=off
+```
+``` bash
 github.com/zhuxiujia/GoMybatis v6.0.2
 ```
 ``` bash
