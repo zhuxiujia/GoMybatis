@@ -62,7 +62,7 @@ func (it *LocalSession) Rollback() error {
 			var point = it.savePointStack.Pop()
 			if point != nil {
 				if it.logSystem != nil {
-					it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] exec ====================" + "rollback to " + *point))
+					it.logSystem.Println([]byte("[GoMybatis] [" + it.Id() + "] exec ====================" + "rollback to " + *point))
 				}
 				_, e := t.Exec("rollback to " + *point)
 				e = it.dbErrorPack(e)
@@ -74,7 +74,7 @@ func (it *LocalSession) Rollback() error {
 
 		if it.txStack.Len() == 0 {
 			if it.logSystem != nil {
-				it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] Rollback Session"))
+				it.logSystem.Println([]byte("[GoMybatis] [" + it.Id() + "] Rollback Session"))
 			}
 			var err = t.Rollback()
 			if err != nil {
@@ -110,7 +110,7 @@ func (it *LocalSession) Commit() error {
 			var pId = "p" + strconv.Itoa(it.txStack.Len()+1)
 			it.savePointStack.Push(pId)
 			if it.logSystem != nil {
-				it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] exec " + "savepoint " + pId))
+				it.logSystem.Println([]byte("[GoMybatis] [" + it.Id() + "] exec " + "savepoint " + pId))
 			}
 			_, e := t.Exec("savepoint " + pId)
 			e = it.dbErrorPack(e)
@@ -120,7 +120,7 @@ func (it *LocalSession) Commit() error {
 		}
 		if it.txStack.Len() == 0 {
 			if it.logSystem != nil {
-				it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] Commit tx session:" + it.Id()))
+				it.logSystem.Println([]byte("[GoMybatis] [" + it.Id() + "] Commit tx session:" + it.Id()))
 			}
 			var err = t.Commit()
 			if err != nil {
@@ -137,7 +137,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 		propagation = tx.ToString(*p)
 	}
 	if it.logSystem != nil {
-		it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] Begin session(Propagation:" + propagation+")"))
+		it.logSystem.Println([]byte("[GoMybatis] [" + it.Id() + "] Begin session(Propagation:" + propagation + ")"))
 	}
 	if it.isClosed == true {
 		return utils.NewError("LocalSession", " can not Begin() a Closed Session!")
@@ -211,12 +211,8 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 				it.txStack.Push(it.txStack.Last())
 				return nil
 			} else {
-				var tx, err = it.db.Begin()
-				err = it.dbErrorPack(err)
-				if err == nil {
-					it.txStack.Push(tx, p)
-				}
-				return err
+				var np = tx.PROPAGATION_REQUIRED
+				return it.Begin(&np)
 			}
 			break
 		case tx.PROPAGATION_NOT_REQUIRED: //end
@@ -240,9 +236,9 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 	return nil
 }
 
-func (it *LocalSession)LastPROPAGATION () *tx.Propagation{
-	if it.txStack.Len()!=0{
-		var _,pr=it.txStack.Last()
+func (it *LocalSession) LastPROPAGATION() *tx.Propagation {
+	if it.txStack.Len() != 0 {
+		var _, pr = it.txStack.Last()
 		return pr
 	}
 	return nil
@@ -250,7 +246,7 @@ func (it *LocalSession)LastPROPAGATION () *tx.Propagation{
 
 func (it *LocalSession) Close() {
 	if it.logSystem != nil {
-		it.logSystem.Println([]byte("[GoMybatis] ["+it.Id()+"] Close session"))
+		it.logSystem.Println([]byte("[GoMybatis] [" + it.Id() + "] Close session"))
 	}
 	if it.newLocalSession != nil {
 		it.newLocalSession.Close()
@@ -319,6 +315,98 @@ func (it *LocalSession) Exec(sqlorArgs string) (*Result, error) {
 	} else {
 		result, err = it.db.Exec(sqlorArgs)
 		err = it.dbErrorPack(err)
+	}
+	if err != nil {
+		return nil, err
+	} else {
+		var LastInsertId, _ = result.LastInsertId()
+		var RowsAffected, _ = result.RowsAffected()
+		return &Result{
+			LastInsertId: LastInsertId,
+			RowsAffected: RowsAffected,
+		}, nil
+	}
+}
+
+func (it *LocalSession) QueryPrepare(sqlPrepare string, args ...interface{}) ([]map[string][]byte, error) {
+	if it.isClosed == true {
+		return nil, utils.NewError("LocalSession", " can not Query() a Closed Session!")
+	}
+	if it.newLocalSession != nil {
+		return it.newLocalSession.Query(sqlPrepare)
+	}
+
+	var rows *sql.Rows
+	var err error
+	var t, _ = it.txStack.Last()
+	if t != nil {
+		stmt, err := t.Prepare(sqlPrepare)
+		err = it.dbErrorPack(err)
+		if err != nil {
+			return nil, err
+		}
+		rows, err = stmt.Query(args...)
+		err = it.dbErrorPack(err)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		stmt, err := it.db.Prepare(sqlPrepare)
+		err = it.dbErrorPack(err)
+		if err != nil {
+			return nil, err
+		}
+
+		rows, err = stmt.Query(args...)
+		err = it.dbErrorPack(err)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if rows != nil {
+		defer rows.Close()
+	}
+	if err != nil {
+		return nil, err
+	} else {
+		return rows2maps(rows)
+	}
+	return nil, nil
+}
+
+func (it *LocalSession) ExecPrepare(sqlPrepare string, args ...interface{}) (*Result, error) {
+	if it.isClosed == true {
+		return nil, utils.NewError("LocalSession", " can not Exec() a Closed Session!")
+	}
+	if it.newLocalSession != nil {
+		return it.newLocalSession.Exec(sqlPrepare)
+	}
+
+	var result sql.Result
+	var err error
+	var t, _ = it.txStack.Last()
+	if t != nil {
+		stmt, err := t.Prepare(sqlPrepare)
+		err = it.dbErrorPack(err)
+		if err != nil {
+			return nil, err
+		}
+		result, err = stmt.Exec(args...)
+		err = it.dbErrorPack(err)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		stmt, err := it.db.Prepare(sqlPrepare)
+		err = it.dbErrorPack(err)
+		if err != nil {
+			return nil, err
+		}
+		result, err = stmt.Exec(args...)
+		err = it.dbErrorPack(err)
+		if err != nil {
+			return nil, err
+		}
 	}
 	if err != nil {
 		return nil, err

@@ -4,7 +4,7 @@ import "github.com/zhuxiujia/GoMybatis/ast"
 
 //sql文本构建
 type SqlBuilder interface {
-	BuildSql(paramMap map[string]interface{}, nodes []ast.Node) (string, error)
+	BuildSql(paramMap map[string]interface{}, nodes []ast.Node, arg_array *[]interface{}) (string, error)
 	ExpressionEngineProxy() *ExpressionEngineProxy
 	SqlArgTypeConvert() ast.SqlArgTypeConvert
 	SetEnableLog(enable bool)

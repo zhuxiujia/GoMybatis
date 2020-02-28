@@ -94,7 +94,7 @@ func (it GoMybatisSqlResultDecoder) basicTypeConvert(tItemTypeFieldType reflect.
 			return false
 		}
 		resultValue.SetBool(newValue)
-	} else if tItemTypeFieldType.Kind() == reflect.Int || tItemTypeFieldType.Kind() == reflect.Int32 || tItemTypeFieldType.Kind() == reflect.Int64 {
+	} else if tItemTypeFieldType.Kind() == reflect.Int || tItemTypeFieldType.Kind() == reflect.Int8 || tItemTypeFieldType.Kind() == reflect.Int16 || tItemTypeFieldType.Kind() == reflect.Int32 || tItemTypeFieldType.Kind() == reflect.Int64 {
 		newValue, e := strconv.ParseInt(value, 0, 64)
 		if e != nil {
 			return false
@@ -134,13 +134,13 @@ func (it GoMybatisSqlResultDecoder) sqlBasicTypeConvert(clomnName string, result
 			el = resultValue.Elem()
 		}
 		resultValue = &el
-		return it.sqlBasicTypeConvert(clomnName,resultMap,tItemTypeFieldType,valueByte,resultValue)
+		return it.sqlBasicTypeConvert(clomnName, resultMap, tItemTypeFieldType, valueByte, resultValue)
 	}
 	if tItemTypeFieldType.Kind() == reflect.String {
 		return it.basicTypeConvert(tItemTypeFieldType, valueByte, resultValue)
 	} else if tItemTypeFieldType.Kind() == reflect.Bool {
 		return it.basicTypeConvert(tItemTypeFieldType, valueByte, resultValue)
-	} else if tItemTypeFieldType.Kind() == reflect.Int || tItemTypeFieldType.Kind() == reflect.Int32 || tItemTypeFieldType.Kind() == reflect.Int64 {
+	} else if tItemTypeFieldType.Kind() == reflect.Int || tItemTypeFieldType.Kind() == reflect.Int8 || tItemTypeFieldType.Kind() == reflect.Int16 || tItemTypeFieldType.Kind() == reflect.Int32 || tItemTypeFieldType.Kind() == reflect.Int64 {
 		return it.basicTypeConvert(tItemTypeFieldType, valueByte, resultValue)
 	} else if tItemTypeFieldType.Kind() == reflect.Uint || tItemTypeFieldType.Kind() == reflect.Uint8 || tItemTypeFieldType.Kind() == reflect.Uint16 || tItemTypeFieldType.Kind() == reflect.Uint32 || tItemTypeFieldType.Kind() == reflect.Uint64 {
 		return it.basicTypeConvert(tItemTypeFieldType, valueByte, resultValue)
@@ -155,19 +155,19 @@ func (it GoMybatisSqlResultDecoder) sqlBasicTypeConvert(clomnName string, result
 				return false
 			}
 			if strings.EqualFold(v.Column, clomnName) || strings.EqualFold(v.Property, clomnName) {
-				if v.GoType == "" {
+				if v.LangType == "" {
 					return false
-				} else if strings.Contains(v.GoType, "string") {
+				} else if strings.Contains(v.LangType, "string") {
 					tItemTypeFieldType = StringType
-				} else if strings.Contains(v.GoType, "int") {
+				} else if strings.Contains(v.LangType, "int") {
 					tItemTypeFieldType = Int64Type
-				} else if strings.Contains(v.GoType, "uint") {
+				} else if strings.Contains(v.LangType, "uint") {
 					tItemTypeFieldType = Uint64Type
-				} else if strings.Contains(v.GoType, "time.Time") {
+				} else if strings.Contains(v.LangType, "time.Time") {
 					tItemTypeFieldType = TimeType
-				} else if strings.Contains(v.GoType, "float") {
+				} else if strings.Contains(v.LangType, "float") {
 					tItemTypeFieldType = Float64Type
-				} else if strings.Contains(v.GoType, "bool") {
+				} else if strings.Contains(v.LangType, "bool") {
 					tItemTypeFieldType = BoolType
 				} else {
 					return false

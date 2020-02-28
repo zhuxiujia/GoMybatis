@@ -13,8 +13,12 @@ func rows2maps(rows *sql.Rows) (resultsSlice []map[string][]byte, err error) {
 	if err != nil {
 		return nil, err
 	}
+	fieldTypes, err := rows.ColumnTypes()
+	if err != nil {
+		return nil, err
+	}
 	for rows.Next() {
-		result, err := row2map(rows, fields)
+		result, err := row2map(rows, fields, fieldTypes)
 		if err != nil {
 			return nil, err
 		}
@@ -23,7 +27,7 @@ func rows2maps(rows *sql.Rows) (resultsSlice []map[string][]byte, err error) {
 	return resultsSlice, nil
 }
 
-func row2map(rows *sql.Rows, fields []string) (resultsMap map[string][]byte, err error) {
+func row2map(rows *sql.Rows, fields []string, fieldTypes []*sql.ColumnType) (resultsMap map[string][]byte, err error) {
 	result := make(map[string][]byte)
 	scanResultContainers := make([]interface{}, len(fields))
 	for i := 0; i < len(fields); i++ {
@@ -42,7 +46,7 @@ func row2map(rows *sql.Rows, fields []string) (resultsMap map[string][]byte, err
 			continue
 		}
 
-		if data, err := value2Bytes(&rawValue); err == nil {
+		if data, err := value2Bytes(&rawValue, key, fieldTypes[ii]); err == nil {
 			result[key] = data
 		} else {
 			return nil, err // !nashtsai! REVIEW, should return err or just error log?
@@ -50,7 +54,9 @@ func row2map(rows *sql.Rows, fields []string) (resultsMap map[string][]byte, err
 	}
 	return result, nil
 }
-func value2Bytes(rawValue *reflect.Value) ([]byte, error) {
+
+func value2Bytes(rawValue *reflect.Value, column string, columnType *sql.ColumnType) ([]byte, error) {
+	//TODO convert type with column and column type
 	str, err := value2String(rawValue)
 	if err != nil {
 		return nil, err

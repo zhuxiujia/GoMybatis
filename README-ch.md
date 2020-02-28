@@ -13,7 +13,7 @@
 ### 使用教程请仔细阅读文档网站 [文档](https://zhuxiujia.github.io/gomybatis.io/#/getting-started)
 # 优势
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">稳定</a>，已应用生产环境App（电商/金融/卡充值类），功能稳定，适合各类 大小型项目以及复杂的金融项目,ERP项目 帮助您将数十万RMB轻松收入囊中<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/">高性能</a>，单机每秒事务数最高可达456621Tps/s,总耗时0.22s （测试环境 返回模拟的sql数据，并发1000，总数100000，6核16GB win10）<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/">高性能</a>，单机每秒事务数benchmark最高可达751020 Tps/s,总耗时0.14s （测试环境返回模拟sql数据，并发1000，总数100000，6核16GB win10）<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">无痛迁移</a>，xml对于语言无关/低耦合，兼容大部分Java(Mybatis3,Mybatis Plus)框架逻辑，无痛苦Java Spring Mybatis的xml sql文件迁移至Go语言（仅修改resultMap的javaType为langType指定go语言类型）<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">声明式事务、AOP事务、事务传播行为</a>只需在函数尾部 定义`tx:"" rollback:"error"`即可启用声明式事务，事务传播行为,回滚策略.轻松应对复杂的事务嵌套/回滚<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">扩展日志接口</a>异步消息队列日,框架内sql日志使用带缓存的channel实现 消息队列异步记录日志<br>
@@ -242,7 +242,7 @@ func main()  {
 }
 ```
 * 第二步，在你项目main 目录下建立一个 XmlCreateTool.go 内容如下
-```
+``` go
 func main() {
 	var bean = UserAddress{} //此处只是举例，应该替换为你自己的数据库模型
 	GoMybatis.OutPutXml(reflect.TypeOf(bean).Name()+"Mapper.xml", GoMybatis.CreateXml("biz_"+GoMybatis.StructToSnakeString(bean), bean))
@@ -284,18 +284,18 @@ go run XmlCreateTool.go
 
 
 ## 组件(RPC,JSONRPC,Consul)-搭配GoMybatis
-* https://github.com/zhuxiujia/easy_mvc //mvc,极大简化开发流程
-* https://github.com/zhuxiujia/easyrpc  //easyrpc（基于标准库的RPC）吸收GoMybatis的概念，类似标准库的api，定义服务没有标准库的要求那么严格（可选不传参数，或者只有一个参数，只有一个返回值）
-* https://github.com/zhuxiujia/easyrpc_discovery  //基于easyrpc定制微服务发现，支持动态代理，支持GoMybatis事务，AOP代理，事务嵌套，tag定义事务，自带负载均衡算法（随机，加权轮询，源地址哈希法）
+* [easy_mvc](https://github.com/zhuxiujia/easy_mvc)  （使用tag 类似spring boot风格定义接口，集成swagger ui动态接口文档（使用反射，不需要生成代码），拦截器，全局错误处理）
+* [easy_rpc](https://github.com/zhuxiujia/easyrpc)  （RPC框架，和GoMybatis配合更容易）吸收GoMybatis的概念，类似标准库的api，定义服务没有标准库的要求那么严格（可选不传参数，或者只有一个参数，只有一个返回值）
+* [easyrpc_discovery](https://github.com/zhuxiujia/easyrpc_discovery)  基于easyrpc定制的微 服务发现框架，支持动态代理，支持GoMybatis事务，AOP代理，事务嵌套，tag定义事务，自带负载均衡算法（随机，加权轮询，源地址哈希法）
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/easy_consul.png)
 
 
 
 
-
-
+## 规划
+* 推荐新项目 https://github.com/rbatis/rbatis 提供高性能，无GC,无并发安全问题，内存安全的rust语言 orm框架
 
 ## 请及时关注版本，及时升级版本(新的功能，bug修复) ，使用GoMybatis的项目请在Issues里留言您的项目名称+联系方式
 
-## 欢迎右上角点下 star 或者 微信支付赞助我们~
+## 欢迎右上角点下 star 或者 微信 捐赠 和 赞助~
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/wx_account.jpg)

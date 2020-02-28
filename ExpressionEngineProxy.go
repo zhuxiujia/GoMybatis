@@ -94,7 +94,6 @@ func (it *ExpressionEngineProxy) LexerCacheable() bool {
 
 //执行
 func (it *ExpressionEngineProxy) LexerAndEval(expression string, arg interface{}) (interface{}, error) {
-
 	var funcItem = arg.(map[string]interface{})["func_"+expression]
 	if funcItem != nil {
 		var f = funcItem.(func(arg map[string]interface{}) interface{})

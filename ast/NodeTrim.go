@@ -17,8 +17,8 @@ func (it *NodeTrim) Type() NodeType {
 	return NTrim
 }
 
-func (it *NodeTrim) Eval(env map[string]interface{}) ([]byte, error) {
-	var sql, err = DoChildNodes(it.childs, env)
+func (it *NodeTrim) Eval(env map[string]interface{}, arg_array *[]interface{}) ([]byte, error) {
+	var sql, err = DoChildNodes(it.childs, env, arg_array)
 	if err != nil {
 		return nil, err
 	}

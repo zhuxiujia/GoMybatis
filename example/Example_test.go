@@ -7,6 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/zhuxiujia/GoMybatis"
 	"io/ioutil"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -100,7 +101,7 @@ func init() {
 //插入
 func Test_inset(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	//使用mapper
@@ -129,7 +130,7 @@ func Test_insetSqlInjection(t *testing.T) {
 //本地事务使用例子
 func Test_update(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	var activityBean = Activity{
@@ -146,7 +147,7 @@ func Test_update(t *testing.T) {
 //删除
 func Test_delete(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	//使用mapper
@@ -160,11 +161,11 @@ func Test_delete(t *testing.T) {
 //查询
 func Test_select(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	//使用mapper
-	name := "注册"
+	name := ""
 
 	var result, err = exampleActivityMapper.SelectByCondition(&name, nil, nil, nil, nil)
 	if err != nil {
@@ -176,7 +177,7 @@ func Test_select(t *testing.T) {
 //查询
 func Test_select_all(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	//使用mapper
@@ -191,7 +192,7 @@ func Test_select_all(t *testing.T) {
 //查询
 func Test_count(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	//使用mapper
@@ -205,7 +206,7 @@ func Test_count(t *testing.T) {
 //本地GoMybatis使用例子
 func Test_ForEach(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	//使用mapper
@@ -220,7 +221,7 @@ func Test_ForEach(t *testing.T) {
 //本地GoMybatis使用例子
 func Test_ForEach_Map(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	//使用mapper
@@ -235,7 +236,7 @@ func Test_ForEach_Map(t *testing.T) {
 //本地事务使用例子
 func Test_local_Transation(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	//使用事务
@@ -259,7 +260,7 @@ func Test_local_Transation(t *testing.T) {
 
 func Test_choose(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	//使用mapper
@@ -273,7 +274,7 @@ func Test_choose(t *testing.T) {
 //查询
 func Test_include_sql(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	//使用mapper
@@ -286,7 +287,7 @@ func Test_include_sql(t *testing.T) {
 
 func TestSelectTemplete(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	//使用mapper
@@ -312,7 +313,7 @@ func TestSelectTempleteSqlInjection(* testing.T){
 
 func TestSelectCountTemplete(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	//使用mapper
@@ -325,7 +326,7 @@ func TestSelectCountTemplete(t *testing.T) {
 
 func TestInsertTemplete(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	//使用mapper
@@ -339,7 +340,7 @@ func TestInsertTemplete(t *testing.T) {
 //批量插入模板
 func TestInsertTempleteBatch(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	var args = []Activity{
@@ -367,7 +368,7 @@ func TestInsertTempleteBatch(t *testing.T) {
 //修改模板默认支持逻辑删除和乐观锁
 func TestUpdateTemplete(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	var activityBean = Activity{
@@ -387,7 +388,7 @@ func TestUpdateTemplete(t *testing.T) {
 //删除
 func TestDeleteTemplete(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	//模板默认支持逻辑删除
@@ -401,7 +402,7 @@ func TestDeleteTemplete(t *testing.T) {
 //嵌套事务/带有传播行为的事务
 func TestTestService(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
-		fmt.Println("no database url define in MysqlConfig.go , you must set the mysql link!")
+		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	var testService = initTestService()
@@ -412,6 +413,7 @@ func TestTestService(t *testing.T) {
 	time.Sleep(3 * time.Second)
 }
 
+//嵌套事务服务TestService
 func initTestService() TestService {
 	var testService TestService
 	testService = TestService{
@@ -453,4 +455,9 @@ func initTestService() TestService {
 	}
 	GoMybatis.AopProxyService(&testService, &engine)
 	return testService
+}
+
+func TestCreateDefaultXmlWriteToFile(t *testing.T) {
+	var bean = Activity{} //此处只是举例，应该替换为你自己的数据库模型
+	GoMybatis.OutPutXml(reflect.TypeOf(bean).Name()+"Mapper.xml", GoMybatis.CreateXml("biz_"+GoMybatis.StructToSnakeString(bean), bean))
 }

@@ -8,7 +8,7 @@ type GoMybatisSqlBuilder struct {
 	sqlArgTypeConvert     ast.SqlArgTypeConvert
 	expressionEngineProxy ExpressionEngineProxy
 	enableLog             bool
-	nodeParser ast.NodeParser
+	nodeParser            ast.NodeParser
 }
 
 func (it *GoMybatisSqlBuilder) ExpressionEngineProxy() *ExpressionEngineProxy {
@@ -31,9 +31,9 @@ func (it GoMybatisSqlBuilder) New(SqlArgTypeConvert ast.SqlArgTypeConvert, expre
 	return it
 }
 
-func (it *GoMybatisSqlBuilder) BuildSql(paramMap map[string]interface{}, nodes []ast.Node) (string, error) {
+func (it *GoMybatisSqlBuilder) BuildSql(paramMap map[string]interface{}, nodes []ast.Node, arg_array *[]interface{}) (string, error) {
 	//抽象语法树节点构建
-	var sql, err = ast.DoChildNodes(nodes, paramMap)
+	var sql, err = ast.DoChildNodes(nodes, paramMap, arg_array)
 	if err != nil {
 		return "", err
 	}
@@ -47,7 +47,6 @@ func (it *GoMybatisSqlBuilder) SetEnableLog(enable bool) {
 func (it *GoMybatisSqlBuilder) EnableLog() bool {
 	return it.enableLog
 }
-
 
 func (it *GoMybatisSqlBuilder) NodeParser() ast.NodeParser {
 	return it.nodeParser

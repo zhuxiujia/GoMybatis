@@ -35,7 +35,7 @@ func DurationToString(duration time.Duration) string {
 }
 
 //调用次方法 必须加上 defer 关键字！
-func CountMethodTps(total float64, now time.Time, info string) {
+func CountMethodTps(total int, now time.Time, info string) {
 	var end = time.Now()
-	fmt.Println(info+` tps =`, total/end.Sub(now).Seconds())
+	fmt.Println(info+` tps =`, int64(total*1000000000)/end.Sub(now).Nanoseconds())
 }

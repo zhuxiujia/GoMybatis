@@ -6,15 +6,15 @@ import (
 )
 
 type TestActivity struct {
-	Id         string    `json:"id" gm:"id"`
+	Id         string    `json:"id,omitempty"`
 	Uuid       string    `json:"uuid"`
 	Name       string    `json:"name"`
-	PcLink     string    `json:"pcLink"`
-	H5Link     string    `json:"h5Link"`
+	PcLink     string    `json:"pc_link"`
+	H5Link     string    `json:"h5_link"`
 	Remark     string    `json:"remark"`
-	Version    int       `json:"version" gm:"version"`
-	CreateTime time.Time `json:"createTime"`
-	DeleteFlag int       `json:"deleteFlag" gm:"logic"`
+	Version    int       `json:"version"`
+	CreateTime time.Time `json:"create_time"`
+	DeleteFlag int       `json:"delete_flag"`
 }
 
 func TestCreateDefaultXml(t *testing.T) {

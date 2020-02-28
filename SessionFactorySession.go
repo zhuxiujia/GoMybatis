@@ -28,6 +28,20 @@ func (it *SessionFactorySession) Exec(sqlorArgs string) (*Result, error) {
 	}
 	return it.Session.Exec(sqlorArgs)
 }
+
+func (it *SessionFactorySession) QueryPrepare(sqlorArgs string, args ...interface{}) ([]map[string][]byte, error) {
+	if it.Session == nil {
+		return nil, utils.NewError("SessionFactorySession", " can not run Id(),it.Session == nil")
+	}
+	return it.Session.QueryPrepare(sqlorArgs, args...)
+}
+func (it *SessionFactorySession) ExecPrepare(sqlorArgs string, args ...interface{}) (*Result, error) {
+	if it.Session == nil {
+		return nil, utils.NewError("SessionFactorySession", " can not run Exec(),it.Session == nil")
+	}
+	return it.Session.ExecPrepare(sqlorArgs, args...)
+}
+
 func (it *SessionFactorySession) Rollback() error {
 	if it.Session == nil {
 		return utils.NewError("SessionFactorySession", " can not run Rollback(),it.Session == nil")
@@ -48,7 +62,7 @@ func (it *SessionFactorySession) Begin(p *tx.Propagation) error {
 }
 func (it *SessionFactorySession) Close() {
 	var id = it.Id()
-	var s,_ = it.Factory.SessionMap.Load(id)
+	var s, _ = it.Factory.SessionMap.Load(id)
 	if s != nil {
 		if it.Session != nil {
 			it.Session.Close()
@@ -57,6 +71,6 @@ func (it *SessionFactorySession) Close() {
 	}
 }
 
-func (it *SessionFactorySession) LastPROPAGATION () *tx.Propagation{
+func (it *SessionFactorySession) LastPROPAGATION() *tx.Propagation {
 	return it.Session.LastPROPAGATION()
 }

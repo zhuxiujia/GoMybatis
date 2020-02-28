@@ -1,6 +1,9 @@
 package utils
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 //首字母转大写
 func UpperFieldFirstName(fieldStr string) string {
@@ -22,4 +25,9 @@ func LowerFieldFirstName(fieldStr string) string {
 		fieldBytes = nil
 	}
 	return fieldStr
+}
+
+// format array [1,2,3,""] to '[1,2,3,]'
+func SprintArray(array_or_slice []interface{}) string {
+	return strings.Replace(fmt.Sprint(array_or_slice), " ", ",", -1)
 }

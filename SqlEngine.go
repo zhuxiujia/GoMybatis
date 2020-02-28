@@ -15,11 +15,15 @@ type Session interface {
 	Id() string
 	Query(sqlorArgs string) ([]map[string][]byte, error)
 	Exec(sqlorArgs string) (*Result, error)
+	//Prepare sql, example sqlPrepare: select * from table where id = ?   ,   args：'1'
+	QueryPrepare(sqlPrepare string, args ...interface{}) ([]map[string][]byte, error)
+	//Prepare sql, example sqlPrepare: select * from table where id = ?   ,   args：'1'
+	ExecPrepare(sqlPrepare string, args ...interface{}) (*Result, error)
 	Rollback() error
 	Commit() error
 	Begin(p *tx.Propagation) error
 	Close()
-	LastPROPAGATION () *tx.Propagation
+	LastPROPAGATION() *tx.Propagation
 }
 
 //产生session的引擎
