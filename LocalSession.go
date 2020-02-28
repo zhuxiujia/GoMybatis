@@ -145,7 +145,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 
 	if p != nil {
 		switch *p {
-		case tx.PROPAGATION_REQUIRED: //end
+		case tx.PROPAGATION_REQUIRED:
 			if it.txStack.Len() > 0 {
 				it.txStack.Push(it.txStack.Last())
 				return nil
@@ -158,26 +158,36 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 				return err
 			}
 			break
-		case tx.PROPAGATION_SUPPORTS: //end
+		case tx.PROPAGATION_SUPPORTS:
 			if it.txStack.Len() > 0 {
-				return nil
+				var t, err = it.db.Begin()
+				err = it.dbErrorPack(err)
+				if err == nil {
+					it.txStack.Push(t, p)
+				}
+				return err
 			} else {
-				//非事务
+				//nothing to do
 				return nil
 			}
 			break
-		case tx.PROPAGATION_MANDATORY: //end
+		case tx.PROPAGATION_MANDATORY:
 			if it.txStack.Len() > 0 {
-				return nil
+				var t, err = it.db.Begin()
+				err = it.dbErrorPack(err)
+				if err == nil {
+					it.txStack.Push(t, p)
+				}
+				return err
 			} else {
 				return errors.New("[GoMybatis] PROPAGATION_MANDATORY Nested transaction exception! current not have a transaction!")
 			}
 			break
 		case tx.PROPAGATION_REQUIRES_NEW:
-			if it.txStack.Len() > 0 {
-				//TODO stop old tx
-			}
-			//TODO new session(tx)
+			//if it.txStack.Len() > 0 {
+			//stop old tx
+			//}
+			//new session(tx)
 			var db, e = sql.Open(it.driver, it.url)
 			if e != nil {
 				return e
@@ -186,10 +196,10 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 			it.newLocalSession = &sess
 			break
 		case tx.PROPAGATION_NOT_SUPPORTED:
-			if it.txStack.Len() > 0 {
-				//TODO stop old tx
-			}
-			//TODO new session( no tx)
+			//if it.txStack.Len() > 0 {
+			//stop old tx
+			//}
+			//new session( no tx)
 			var db, e = sql.Open(it.driver, it.url)
 			if e != nil {
 				return e
@@ -219,6 +229,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 			if it.txStack.Len() > 0 {
 				return errors.New("[GoMybatis] PROPAGATION_NOT_REQUIRED Nested transaction exception! current Already have a transaction!")
 			} else {
+				//new tx
 				var tx, err = it.db.Begin()
 				err = it.dbErrorPack(err)
 				if err == nil {
