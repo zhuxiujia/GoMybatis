@@ -43,11 +43,28 @@
 ## 使用教程
 > 教程源码  https://github.com/zhuxiujia/GoMybatis/tree/master/example
 
-设置好GoPath,用go get 命令下载GoMybatis和对应的数据库驱动
+* GoPath使用： go get 命令下载GoMybatis和对应的数据库驱动
 ``` bash
 go get github.com/zhuxiujia/GoMybatis
+```
+``` bash
+//驱动
 go get github.com/go-sql-driver/mysql
 ```
+* mod使用（环境变量加入GO111MODULE auto）:加入
+``` bash
+go env -w GOSUMDB=off
+```
+``` bash
+github.com/zhuxiujia/GoMybatis v6.0.2
+```
+``` bash
+//驱动
+github.com/go-sql-driver/mysql v1.5.0
+```
+
+
+
 实际使用mapper 定义xml内容，建议以*Mapper.xml文件存于项目目录中,在编辑xml时就可享受GoLand等IDE渲染和智能提示。生产环境可以使用statikFS把xml文件打包进程序里</br>
 * main.go
 ``` xml
