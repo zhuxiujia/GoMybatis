@@ -359,7 +359,7 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 		//is select and have return value
 		if sessionEngine.LogEnable() {
 			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Query ==> "+sql)
-			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Param ==> "+utils.SprintArray(arg_array))
+			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Args  ==> "+utils.SprintArray(arg_array))
 		}
 		res, err := session.QueryPrepare(sql, arg_array...)
 		defer func() {
@@ -384,7 +384,7 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 	} else {
 		if sessionEngine.LogEnable() {
 			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Exec ==> "+sql)
-			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Param ==> "+utils.SprintArray(arg_array))
+			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Args ==> "+utils.SprintArray(arg_array))
 		}
 		var res, err = session.ExecPrepare(sql, arg_array...)
 		defer func() {
