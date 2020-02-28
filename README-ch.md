@@ -51,8 +51,9 @@ go get github.com/zhuxiujia/GoMybatis
 //驱动
 go get github.com/go-sql-driver/mysql
 ```
-* mod使用（环境变量加入GO111MODULE auto,然后cmd/bash执行go env -w GOSUMDB=off）:加入
+* mod使用（环境变量加入GO111MODULE auto）:加入
 ``` bash
+go env -w GOSUMDB=off
 github.com/zhuxiujia/GoMybatis v6.0.2
 ```
 ``` bash
