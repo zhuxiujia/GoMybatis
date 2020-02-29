@@ -56,11 +56,10 @@ go get github.com/go-sql-driver/mysql
 go env -w GOSUMDB=off
 ```
 ``` bash
-github.com/zhuxiujia/GoMybatis v6.0.2
-```
-``` bash
-//驱动
-github.com/go-sql-driver/mysql v1.5.0
+require (
+	github.com/go-sql-driver/mysql v1.5.0
+	github.com/zhuxiujia/GoMybatis v6.1.1+incompatible
+)
 ```
 
 
