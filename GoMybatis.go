@@ -362,7 +362,7 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Query ==> "+sql)
 			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Args  ==> "+utils.SprintArray(array_arg))
 		}
-		res, err := session.QueryPrepare(sql, array_arg)
+		res, err := session.QueryPrepare(sql, array_arg...)
 		defer func() {
 			if sessionEngine.LogEnable() {
 				var RowsAffected = "0"
@@ -387,7 +387,7 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Exec ==> "+sql)
 			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Args ==> "+utils.SprintArray(array_arg))
 		}
-		var res, err = session.ExecPrepare(sql, array_arg)
+		var res, err = session.ExecPrepare(sql, array_arg...)
 		defer func() {
 			if sessionEngine.LogEnable() {
 				var RowsAffected = "0"
