@@ -51,11 +51,13 @@ go get github.com/zhuxiujia/GoMybatis
 //驱动
 go get github.com/go-sql-driver/mysql
 ```
-* mod使用（环境变量加入GO111MODULE auto）:加入
+* mod使用（环境变量加入GO111MODULE auto）:
 ``` bash
+//命令行执行 禁止gosumdb
 go env -w GOSUMDB=off
 ```
 ``` bash
+//go.mod加入依赖
 require (
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/zhuxiujia/GoMybatis v6.1.1+incompatible
