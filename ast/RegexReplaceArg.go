@@ -65,8 +65,8 @@ func ReplaceRaw(findStrs []string, data string, typeConvert SqlArgTypeConvert, a
 }
 
 //find like #{*} value *
-func FindAllExpressConvertString(str string) []string {
-	var finds = map[string]int{}
+func FindAllExpress(str string) []string {
+	var finds = []string{}
 	var item []byte
 	var lastIndex = -1
 	var startIndex = -1
@@ -85,8 +85,7 @@ func FindAllExpressConvertString(str string) []string {
 			if bytes.Contains(item, []byte(",")) {
 				item = bytes.Split(item, []byte(","))[0]
 			}
-
-			finds[string(item)] = 1
+			finds = append(finds, string(item))
 			item = nil
 			startIndex = -1
 			lastIndex = -1
@@ -96,7 +95,7 @@ func FindAllExpressConvertString(str string) []string {
 	strBytes = nil
 
 	var strs = []string{}
-	for k, _ := range finds {
+	for _, k := range finds {
 		strs = append(strs, k)
 	}
 	return strs
@@ -104,7 +103,7 @@ func FindAllExpressConvertString(str string) []string {
 
 //find like ${*} value *
 func FindAllExpressString(str string) []string {
-	var finds = map[string]int{}
+	var finds = []string{}
 	var item []byte
 	var lastIndex = -1
 	var startIndex = -1
@@ -118,13 +117,11 @@ func FindAllExpressString(str string) []string {
 		}
 		if v == 125 && startIndex != -1 {
 			item = strBytes[startIndex:index]
-
 			//去掉逗号之后的部分
 			if bytes.Contains(item, []byte(",")) {
 				item = bytes.Split(item, []byte(","))[0]
 			}
-
-			finds[string(item)] = 1
+			finds = append(finds, string(item))
 			item = nil
 			startIndex = -1
 			lastIndex = -1
@@ -134,7 +131,7 @@ func FindAllExpressString(str string) []string {
 	strBytes = nil
 
 	var strs = []string{}
-	for k, _ := range finds {
+	for _, k := range finds {
 		strs = append(strs, k)
 	}
 	return strs
