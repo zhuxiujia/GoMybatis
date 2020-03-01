@@ -35,7 +35,7 @@ func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
 			n := NodeString{
 				value:               str,
 				t:                   NString,
-				expressMap:          FindAllExpressConvertString(charData.Data), //表达式需要替换的string
+				expressMap:          FindAllExpress(charData.Data), //表达式需要替换的string
 				noConvertExpressMap: FindAllExpressString(charData.Data),
 				holder:              &it.Holder,
 			}
