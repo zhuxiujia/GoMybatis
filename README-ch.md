@@ -60,7 +60,7 @@ go env -w GOSUMDB=off
 //go.mod加入依赖
 require (
 	github.com/go-sql-driver/mysql v1.5.0
-	github.com/zhuxiujia/GoMybatis v6.1.1+incompatible
+	github.com/zhuxiujia/GoMybatis v6.1.5+incompatible
 )
 ```
 
@@ -294,16 +294,28 @@ go run XmlCreateTool.go
 ```
  
  
- 
- 
- 
- 
-
-
-## 组件(RPC,JSONRPC,Consul)-搭配GoMybatis
-* [easy_mvc](https://github.com/zhuxiujia/easy_mvc)  （使用tag 类似spring boot风格定义接口，集成swagger ui动态接口文档（使用反射，不需要生成代码），拦截器，全局错误处理）
-* [easy_rpc](https://github.com/zhuxiujia/easyrpc)  （RPC框架，和GoMybatis配合更容易）吸收GoMybatis的概念，类似标准库的api，定义服务没有标准库的要求那么严格（可选不传参数，或者只有一个参数，只有一个返回值）
-* [easyrpc_discovery](https://github.com/zhuxiujia/easyrpc_discovery)  基于easyrpc定制的微 服务发现框架，支持动态代理，支持GoMybatis事务，AOP代理，事务嵌套，tag定义事务，自带负载均衡算法（随机，加权轮询，源地址哈希法）
+## 建议使用的框架（已应用在生产环境）配合GoMybatis
+#### [easy_mvc](https://github.com/zhuxiujia/easy_mvc) 
+* 整体基于反射tag，所有配置（包括http方法，路径，参数，swagger文档参数）都集中于你定义的函数之后
+* 轻量 完全兼容标准库的http，意味着和标准库一般稳定，可以混合搭配使用，扩展性极高
+* 拦截器 支持（例如非常方便的检查用户登录，提取用户登录数据，支持JWT token，Oath2Token更加方便的接入）
+* 过滤器 支持
+* 全局错误处理器链 支持
+* 使用tag 定义 http请求参数，包含 *int,*string,*float 同时支持标准库的 writer http.ResponseWriter, request *http.Request
+* Json参数支持（app端上传时需要Header，Content-Type设置为application/json）
+* 支持参数默认值 只需在tag中 定义，例如 func(phone string, pwd string, age *int) interface{} arg:"phone,pwd,age:1"  其中 arg没有传参则默认为1
+* 指针参数可为空（nil）非指针参数 如果没有值框架会拦截
+* root path支持，类似spring controller定义一个基础的path加控制器具体方法的http path
+* 支持swagger ui 动态文档，免生成任何中间go文件 基于Tag和反射实现的swagger动态文档
+#### [easy_rpc](https://github.com/zhuxiujia/easyrpc)  （RPC框架，和GoMybatis配合更容易）
+* 基于标准库rpc库修改而来,稳定,高性能,扩展性好
+* 标准库默认使用func (* Type)Method(arg,*result) error 的模式,EasyRpc 则把方法移动到结构体里（方便动态代理和Aop以及各种扩展和定制）
+* easyrpc同时支持 无参数，无返回值，或只有参数，只有返回值
+* 支持注册defer函数  easyrpc.RegisterDefer(v,deferFunc) ，防止服务因为不可预知 painc 问题导致程序退出。defer函数可处理问题然后把错误发送还给客户端
+#### [easyrpc_discovery](https://github.com/zhuxiujia/easyrpc_discovery)  服务发现
+* 自带负载均衡算法 随机 加权轮询 源地址哈希法
+* 基于easyrpc,类似标准库的api，定义服务没有标准库的要求那么严格（可选不传参数，或者只有一个参数，只有一个返回值） https://github.com/zhuxiujia/easyrpc
+* 基于easyrpc，负载均衡算法，失败重试，支持动态代理，支持GoMybatis事务，AOP代理，事务嵌套，tag定义事务
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/easy_consul.png)
 
 
