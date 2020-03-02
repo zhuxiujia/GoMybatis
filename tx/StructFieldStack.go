@@ -2,6 +2,8 @@ package tx
 
 import "reflect"
 
+//session map是协程安全的
+//此处无需处理并发，因为都是单协程访问
 type StructField struct {
 	i    int
 	data []reflect.StructField //方法队列

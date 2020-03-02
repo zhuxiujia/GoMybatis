@@ -2,6 +2,8 @@ package tx
 
 import "database/sql"
 
+//session map是协程安全的
+//session对应TxStack是1:1关系，此处无需处理并发，因为都是单协程访问
 type TxStack struct {
 	i            int
 	data         []*sql.Tx      //队列

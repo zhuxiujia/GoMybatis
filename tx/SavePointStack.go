@@ -1,4 +1,7 @@
 package tx
+
+//session map是协程安全的
+//session对应SavePointStack是1:1关系，此处无需处理并发，因为都是单协程访问
 type SavePointStack struct {
 	i    int
 	data []string //方法队列
