@@ -43,11 +43,20 @@
 ## Use tutorials
 > Tutorial source code  https://github.com/zhuxiujia/GoMybatis/tree/master/example
 
-Set up GoPath and download GoMybatis and the corresponding database driver with the go get command
+* GoPath use, download GoMybatis and the corresponding database driver with the go get command
 ``` bash
 go get github.com/zhuxiujia/GoMybatis
 go get github.com/go-sql-driver/mysql
 ```
+* Go mod use
+```bash
+//go.mod加入依赖
+require (
+	github.com/go-sql-driver/mysql v1.5.0
+	github.com/zhuxiujia/GoMybatis v6.1.6+incompatible
+)
+```
+
 In practice, we use mapper to define the content of xml. It is suggested that the * Mapper. XML file be stored in the project directory. When editing xml, we can enjoy IDE rendering and intelligent prompts such as GoLand. Production environments can use statikFS to package XML files in the process</br>
 * main.go
 ``` xml
