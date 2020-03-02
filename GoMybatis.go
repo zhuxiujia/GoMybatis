@@ -261,7 +261,7 @@ func makeMethodXmlMap(bean reflect.Value, mapperTree map[string]etree.Token, sql
 			if mapperXml != nil {
 				methodXmlMap[fieldItem.Name] = &Mapper{
 					xml:   mapperXml,
-					nodes: sqlBuilder.NodeParser().ParserNodes(mapperXml.Child),
+					nodes: sqlBuilder.NodeParser().Parser(mapperXml.Child),
 				}
 			} else {
 				if fieldItem.Name == NewSessionFunc {

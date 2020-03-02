@@ -15,8 +15,8 @@ type NodeParser struct {
 	Holder NodeConfigHolder
 }
 
-//界面为node
-func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
+//解析为node
+func (it NodeParser) Parser(mapperXml []etree.Token) []Node {
 	if it.Holder.Proxy == nil {
 		panic("NodeParser need a *ExpressionEngineProxy{}!")
 	}
@@ -55,7 +55,7 @@ func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
 					holder: &it.Holder,
 				}
 				if childItems != nil {
-					var childNodes = it.ParserNodes(childItems)
+					var childNodes = it.Parser(childItems)
 					n.childs = append(n.childs, childNodes...)
 				}
 				node = &n
@@ -70,7 +70,7 @@ func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
 					childs:          []Node{},
 				}
 				if childItems != nil {
-					var childNodes = it.ParserNodes(childItems)
+					var childNodes = it.Parser(childItems)
 					n.childs = append(n.childs, childNodes...)
 				}
 				node = &n
@@ -86,7 +86,7 @@ func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
 					suffixOverrides: []byte(","),
 				}
 				if childItems != nil {
-					var childNodes = it.ParserNodes(childItems)
+					var childNodes = it.Parser(childItems)
 					n.childs = append(n.childs, childNodes...)
 				}
 				node = &n
@@ -103,7 +103,7 @@ func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
 					separator:  v.SelectAttrValue("separator", ""),
 				}
 				if childItems != nil {
-					var childNodes = it.ParserNodes(childItems)
+					var childNodes = it.Parser(childItems)
 					n.childs = append(n.childs, childNodes...)
 				}
 				node = &n
@@ -114,7 +114,7 @@ func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
 					whenNodes: []Node{},
 				}
 				if childItems != nil {
-					var childNodes = it.ParserNodes(childItems)
+					var childNodes = it.Parser(childItems)
 					for _, v := range childNodes {
 						if v.Type() == NWhen {
 							n.whenNodes = append(n.whenNodes, childNodes...)
@@ -144,7 +144,7 @@ func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
 					holder: &it.Holder,
 				}
 				if childItems != nil {
-					var childNodes = it.ParserNodes(childItems)
+					var childNodes = it.Parser(childItems)
 					n.childs = append(n.childs, childNodes...)
 				}
 				node = &n
@@ -155,7 +155,7 @@ func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
 					childs: []Node{},
 				}
 				if childItems != nil {
-					var childNodes = it.ParserNodes(childItems)
+					var childNodes = it.Parser(childItems)
 					n.childs = append(n.childs, childNodes...)
 				}
 				node = &n
@@ -170,7 +170,7 @@ func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
 					childs:          []Node{},
 				}
 				if childItems != nil {
-					var childNodes = it.ParserNodes(childItems)
+					var childNodes = it.Parser(childItems)
 					n.childs = append(n.childs, childNodes...)
 				}
 				node = &n
@@ -188,7 +188,7 @@ func (it NodeParser) ParserNodes(mapperXml []etree.Token) []Node {
 					t: NInclude,
 				}
 				if childItems != nil {
-					var childNodes = it.ParserNodes(childItems)
+					var childNodes = it.Parser(childItems)
 					n.childs = append(n.childs, childNodes...)
 				}
 				node = &n
