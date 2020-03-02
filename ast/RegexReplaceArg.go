@@ -4,12 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"regexp"
 	"strings"
 )
-
-var defaultArgRegex, _ = regexp.Compile("\\$\\{[^}]*\\}")
-var sqlArgRegex, _ = regexp.Compile("\\#\\{[^}]*\\}")
 
 //执行替换操作
 func Replace(findStrs []string, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine ExpressionEngine, arg_array *[]interface{}) (string, error) {
@@ -65,7 +61,7 @@ func ReplaceRaw(findStrs []string, data string, typeConvert SqlArgTypeConvert, a
 }
 
 //find like #{*} value *
-func FindAllExpress(str string) []string {
+func FindExpress(str string) []string {
 	var finds = []string{}
 	var item []byte
 	var lastIndex = -1
@@ -102,7 +98,7 @@ func FindAllExpress(str string) []string {
 }
 
 //find like ${*} value *
-func FindAllExpressString(str string) []string {
+func FindRawExpressString(str string) []string {
 	var finds = []string{}
 	var item []byte
 	var lastIndex = -1
