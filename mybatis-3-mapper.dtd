@@ -24,10 +24,7 @@
         <!ATTLIST resultMap
                 id CDATA #REQUIRED
                 tables  #REQUIRED
-                extends CDATA #IMPLIED
                 >
-
-
 
         <!ELEMENT id EMPTY>
         <!ATTLIST id
