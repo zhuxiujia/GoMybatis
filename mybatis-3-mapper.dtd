@@ -20,23 +20,20 @@
         <!ATTLIST mapper
                 >
 
-        <!ELEMENT resultMap (constructor?,id*,result*,collection* )>
+        <!ELEMENT resultMap (id*,result*)>
         <!ATTLIST resultMap
                 id CDATA #REQUIRED
                 tables  #REQUIRED
                 extends CDATA #IMPLIED
-                autoMapping (true|false) #IMPLIED
                 >
 
-        <!ELEMENT constructor (idArg*,arg*)>
+
 
         <!ELEMENT id EMPTY>
         <!ATTLIST id
                 property CDATA #IMPLIED
                 langType CDATA #IMPLIED
                 column CDATA #IMPLIED
-                <!--jdbcType CDATA #IMPLIED-->
-                typeHandler CDATA #IMPLIED
                 >
 
         <!ELEMENT result EMPTY>
@@ -49,55 +46,15 @@
                 logic_enable CDATA #IMPLIED
                 logic_deleted CDATA #IMPLIED
                 logic_undelete CDATA #IMPLIED
-                <!--jdbcType CDATA #IMPLIED-->
-                typeHandler CDATA #IMPLIED
-                >
-
-        <!ELEMENT idArg EMPTY>
-        <!ATTLIST idArg
-                langType CDATA #IMPLIED
-                column CDATA #IMPLIED
-                <!--jdbcType CDATA #IMPLIED-->
-                typeHandler CDATA #IMPLIED
-                select CDATA #IMPLIED
-                resultMap CDATA #IMPLIED
-                name CDATA #IMPLIED
                 >
 
         <!ELEMENT arg EMPTY>
         <!ATTLIST arg
                 langType CDATA #IMPLIED
                 column CDATA #IMPLIED
-                <!--jdbcType CDATA #IMPLIED-->
-                typeHandler CDATA #IMPLIED
                 select CDATA #IMPLIED
                 resultMap CDATA #IMPLIED
                 name CDATA #IMPLIED
-                >
-
-        <!ELEMENT collection (constructor?,id*,result*,collection* )>
-        <!ATTLIST collection
-                property CDATA #REQUIRED
-                column CDATA #IMPLIED
-                langType CDATA #IMPLIED
-                ofType CDATA #IMPLIED
-                <!--jdbcType CDATA #IMPLIED-->
-                select CDATA #IMPLIED
-                resultMap CDATA #IMPLIED
-                typeHandler CDATA #IMPLIED
-                notNullColumn CDATA #IMPLIED
-                columnPrefix CDATA #IMPLIED
-                resultSet CDATA #IMPLIED
-                foreignColumn CDATA #IMPLIED
-                autoMapping (true|false) #IMPLIED
-                fetchType (lazy|eager) #IMPLIED
-                >
-
-        <!ELEMENT case (constructor?,id*,result*,collection*)>
-        <!ATTLIST case
-                value CDATA #REQUIRED
-                resultMap CDATA #IMPLIED
-                resultType CDATA #IMPLIED
                 >
 
         <!ELEMENT property EMPTY>
@@ -120,8 +77,6 @@
 
                 
                 lang CDATA #IMPLIED
-                
-                
                 >
 
         <!ELEMENT selectTemplete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
@@ -132,8 +87,6 @@
 
 
                 lang CDATA #IMPLIED
-
-
                 tables CDATA #IMPLIED
                 columns CDATA #IMPLIED
                 wheres CDATA #IMPLIED
@@ -146,8 +99,6 @@
                
                 
                 useGeneratedKeys (true|false) #IMPLIED
-                
-                
                 lang CDATA #IMPLIED
                 >
 
@@ -175,7 +126,6 @@
         <!ATTLIST updateTemplete
                 id CDATA #IMPLIED
                 resultMap (BaseResultMap) #IMPLIED
-
                 useGeneratedKeys (true|false) #IMPLIED
 
 
@@ -188,14 +138,12 @@
         <!ELEMENT delete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST delete
                 id CDATA #REQUIRED
-               
-                
+
                 lang CDATA #IMPLIED
                 >
         <!ELEMENT deleteTemplete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST deleteTemplete
                 id CDATA #IMPLIED
-
 
                 lang CDATA #IMPLIED
                 tables CDATA #IMPLIED
