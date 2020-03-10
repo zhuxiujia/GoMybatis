@@ -122,14 +122,14 @@ func main() {
     <!--version_enable 乐观锁版本字段,支持int,int8,int16,int32,int64-->
     <resultMap id="BaseResultMap" tables="biz_activity">
         <id column="id" property="id"/>
-        <result column="name" property="name" langType="string"/>
-        <result column="pc_link" property="pcLink" langType="string"/>
-        <result column="h5_link" property="h5Link" langType="string"/>
-        <result column="remark" property="remark" langType="string"/>
-        <result column="version" property="version" langType="int"
+        <result column="name" property="Name" langType="string"/>
+        <result column="pc_link" property="PcLink" langType="string"/>
+        <result column="h5_link" property="H5Link" langType="string"/>
+        <result column="remark" property="Remark" langType="string"/>
+        <result column="version" property="Version" langType="int"
                 version_enable="true"/>
-        <result column="create_time" property="createTime" langType="time.Time"/>
-        <result column="delete_flag" property="deleteFlag" langType="int"
+        <result column="create_time" property="CreateTime" langType="time.Time"/>
+        <result column="delete_flag" property="DeleteFlag" langType="int"
                 logic_enable="true"
                 logic_undelete="1"
                 logic_deleted="0"/>
