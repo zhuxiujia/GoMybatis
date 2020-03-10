@@ -216,7 +216,7 @@ type ExampleActivityMapper struct {
  ``` go
  //嵌套事务的服务
 type TestService struct {
-	exampleActivityMapper *ExampleActivityMapper //服务包含一个mapper操作数据库，类似java spring mvc
+	exampleActivityMapper *ExampleActivityMapper
 	UpdateName   func(id string, name string) error   `tx:"" rollback:"error"`
 	UpdateRemark func(id string, remark string) error `tx:"" rollback:"error"`
 }
