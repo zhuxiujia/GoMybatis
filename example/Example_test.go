@@ -13,7 +13,7 @@ import (
 )
 
 //支持基本类型和指针(int,string,time.Time,float...且需要指定参数名称`mapperParams:"name"以逗号隔开，且位置要和实际参数相同)
-//参数中包含有*GoMybatis.Session的类型，用于自定义事务
+//参数中包含有*GoMybatis.Session的类型，用于自定义事务，也可以选择例如TestService 这样使用更简单的声明式事务
 //自定义结构体参数（属性必须大写）
 //方法 return 必须包含有error ,为了返回错误信息
 type ExampleActivityMapper struct {
