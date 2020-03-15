@@ -12,8 +12,8 @@ import (
 //本地直连session
 type LocalSession struct {
 	SessionId       string
-	driver          string
-	url             string
+	driverType      string
+	driverLink      string
 	db              *sql.DB
 	stmt            *sql.Stmt
 	txStack         tx.TxStack
@@ -24,14 +24,14 @@ type LocalSession struct {
 	logSystem Log
 }
 
-func (it LocalSession) New(driver string, url string, db *sql.DB, logSystem Log) LocalSession {
+func (it LocalSession) New(driverType string, driverLink string, db *sql.DB, logSystem Log) LocalSession {
 	return LocalSession{
-		SessionId: utils.CreateUUID(),
-		db:        db,
-		txStack:   tx.TxStack{}.New(),
-		driver:    driver,
-		url:       url,
-		logSystem: logSystem,
+		SessionId:  utils.CreateUUID(),
+		db:         db,
+		txStack:    tx.TxStack{}.New(),
+		driverType: driverType,
+		driverLink: driverLink,
+		logSystem:  logSystem,
 	}
 }
 
@@ -189,11 +189,11 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 			//stop old tx
 			//}
 			//new session(tx)
-			var db, e = sql.Open(it.driver, it.url)
+			var db, e = sql.Open(it.driverType, it.driverLink)
 			if e != nil {
 				return e
 			}
-			var sess = LocalSession{}.New(it.driver, it.url, db, it.logSystem) //same PROPAGATION_REQUIRES_NEW
+			var sess = LocalSession{}.New(it.driverType, it.driverLink, db, it.logSystem) //same PROPAGATION_REQUIRES_NEW
 			it.newLocalSession = &sess
 			break
 		case tx.PROPAGATION_NOT_SUPPORTED:
@@ -201,11 +201,11 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 			//stop old tx
 			//}
 			//new session( no tx)
-			var db, e = sql.Open(it.driver, it.url)
+			var db, e = sql.Open(it.driverType, it.driverLink)
 			if e != nil {
 				return e
 			}
-			var sess = LocalSession{}.New(it.driver, it.url, db, it.logSystem)
+			var sess = LocalSession{}.New(it.driverType, it.driverLink, db, it.logSystem)
 			it.newLocalSession = &sess
 			break
 		case tx.PROPAGATION_NEVER: //END
@@ -433,7 +433,7 @@ func (it *LocalSession) ExecPrepare(sqlPrepare string, args ...interface{}) (*Re
 }
 
 func (it *LocalSession) StmtConvert() (stmt.StmtIndexConvert, error) {
-	return stmt.BuildStmtConvert(it.driver)
+	return stmt.BuildStmtConvert(it.driverType)
 }
 
 func (it *LocalSession) dbErrorPack(e error) error {

@@ -8,7 +8,7 @@ import (
 //动态数据源路由
 type GoMybatisDataSourceRouter struct {
 	driverLinkDBMap  map[string]*sql.DB // map[driverLink]*DB
-	driverTypeUrlMap map[string]string  // map[driverType]Url
+	driverLinkUrlMap map[string]string  // map[driverLink]Url
 	routerFunc       func(mapperName string) *string
 }
 
@@ -20,14 +20,14 @@ func (it GoMybatisDataSourceRouter) New(routerFunc func(mapperName string) *stri
 		}
 	}
 	it.driverLinkDBMap = make(map[string]*sql.DB)
-	it.driverTypeUrlMap = make(map[string]string)
+	it.driverLinkUrlMap = make(map[string]string)
 	it.routerFunc = routerFunc
 	return it
 }
 
 func (it *GoMybatisDataSourceRouter) SetDB(driverType string, driverLink string, db *sql.DB) {
 	it.driverLinkDBMap[driverLink] = db
-	it.driverTypeUrlMap[driverLink] = driverType
+	it.driverLinkUrlMap[driverLink] = driverType
 }
 
 func (it *GoMybatisDataSourceRouter) Router(mapperName string, engine SessionEngine) (Session, error) {
@@ -52,11 +52,11 @@ func (it *GoMybatisDataSourceRouter) Router(mapperName string, engine SessionEng
 	if db == nil {
 		return nil, utils.NewError("GoMybatisDataSourceRouter", "router not find datasource opened ! do you forget invoke GoMybatis.GoMybatisEngine{}.New().Open(\"driverName\", Uri)?")
 	}
-	var url = ""
+	var driverLink = ""
 	if key != nil {
-		url = *key
+		driverLink = *key
 	}
-	var local = LocalSession{}.New(it.driverTypeUrlMap[url], url, db, engine.Log())
+	var local = LocalSession{}.New(it.driverLinkUrlMap[driverLink], driverLink, db, engine.Log())
 	var session = Session(&local)
 	return session, nil
 }
