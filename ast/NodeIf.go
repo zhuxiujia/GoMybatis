@@ -1,6 +1,9 @@
 package ast
 
-import "github.com/zhuxiujia/GoMybatis/utils"
+import (
+	"github.com/zhuxiujia/GoMybatis/stmt"
+	"github.com/zhuxiujia/GoMybatis/utils"
+)
 
 //判断节点
 type NodeIf struct {
@@ -15,7 +18,7 @@ func (it *NodeIf) Type() NodeType {
 	return NIf
 }
 
-func (it *NodeIf) Eval(env map[string]interface{}, arg_array *[]interface{}) ([]byte, error) {
+func (it *NodeIf) Eval(env map[string]interface{}, arg_array *[]interface{}, stmtConvert stmt.StmtIndexConvert) ([]byte, error) {
 	if it.holder == nil {
 		return nil, nil
 	}
@@ -24,7 +27,7 @@ func (it *NodeIf) Eval(env map[string]interface{}, arg_array *[]interface{}) ([]
 		err = utils.NewError("GoMybatisSqlBuilder", "[GoMybatis] <test `", it.test, `> fail,`, err.Error())
 	}
 	if result.(bool) {
-		return DoChildNodes(it.childs, env, arg_array)
+		return DoChildNodes(it.childs, env, arg_array, stmtConvert)
 	}
 	return nil, nil
 }

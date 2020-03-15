@@ -2,6 +2,7 @@ package ast
 
 import (
 	"bytes"
+	"github.com/zhuxiujia/GoMybatis/stmt"
 	"reflect"
 )
 
@@ -22,7 +23,7 @@ func (it *NodeForEach) Type() NodeType {
 	return NForEach
 }
 
-func (it *NodeForEach) Eval(env map[string]interface{}, arg_array *[]interface{}) ([]byte, error) {
+func (it *NodeForEach) Eval(env map[string]interface{}, arg_array *[]interface{}, stmtConvert stmt.StmtIndexConvert) ([]byte, error) {
 	if it.collection == "" {
 		panic(`[GoMybatis] collection value can not be "" in <foreach collection=""> !`)
 	}
@@ -57,7 +58,7 @@ func (it *NodeForEach) Eval(env map[string]interface{}, arg_array *[]interface{}
 				tempArgMap[it.item] = collectionItem.Interface()
 			}
 			tempArgMap[it.index] = key
-			var r, err = DoChildNodes(it.childs, tempArgMap, arg_array)
+			var r, err = DoChildNodes(it.childs, tempArgMap, arg_array, stmtConvert)
 			if err != nil {
 				return nil, err
 			}
@@ -78,7 +79,7 @@ func (it *NodeForEach) Eval(env map[string]interface{}, arg_array *[]interface{}
 			if it.index != "" {
 				tempArgMap[it.index] = i
 			}
-			var r, err = DoChildNodes(it.childs, tempArgMap, arg_array)
+			var r, err = DoChildNodes(it.childs, tempArgMap, arg_array, stmtConvert)
 			if err != nil {
 				return nil, err
 			}

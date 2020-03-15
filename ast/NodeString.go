@@ -1,5 +1,7 @@
 package ast
 
+import "github.com/zhuxiujia/GoMybatis/stmt"
+
 //字符串节点
 type NodeString struct {
 	value string
@@ -16,14 +18,14 @@ func (it *NodeString) Type() NodeType {
 	return NString
 }
 
-func (it *NodeString) Eval(env map[string]interface{}, arg_array *[]interface{}) ([]byte, error) {
+func (it *NodeString) Eval(env map[string]interface{}, arg_array *[]interface{}, stmtConvert stmt.StmtIndexConvert) ([]byte, error) {
 	if it.holder == nil {
 		return nil, nil
 	}
 	var data = it.value
 	var err error
 	if it.expressMap != nil {
-		data, err = Replace(it.expressMap, data, it.holder.Convert, env, it.holder.GetExpressionEngineProxy(), arg_array)
+		data, err = Replace(it.expressMap, data, it.holder.Convert, env, it.holder.GetExpressionEngineProxy(), arg_array, stmtConvert)
 		if err != nil {
 			return nil, err
 		}

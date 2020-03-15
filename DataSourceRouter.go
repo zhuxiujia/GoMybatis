@@ -11,7 +11,7 @@ type DataSourceRouter interface {
 	//返回（session,error）路由选择后的session，error异常
 	Router(mapperName string, engine SessionEngine) (Session, error)
 	//设置sql.DB，该方法会被GoMybatis框架内调用
-	SetDB(driver string, url string, db *sql.DB)
+	SetDB(driverName string, url string, db *sql.DB)
 
 	Name() string
 }

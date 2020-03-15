@@ -1,5 +1,7 @@
 package ast
 
+import "github.com/zhuxiujia/GoMybatis/stmt"
+
 type NodeBind struct {
 	t NodeType
 
@@ -13,7 +15,7 @@ func (it *NodeBind) Type() NodeType {
 	return NBind
 }
 
-func (it *NodeBind) Eval(env map[string]interface{}, arg_array *[]interface{}) ([]byte, error) {
+func (it *NodeBind) Eval(env map[string]interface{}, arg_array *[]interface{}, stmtConvert stmt.StmtIndexConvert) ([]byte, error) {
 	if it.name == "" {
 		panic(`[GoMybatis] element <bind name = ""> name can not be nil!`)
 	}

@@ -197,13 +197,13 @@ func (it *GoMybatisEngine) SetSqlResultDecoder(decoder SqlResultDecoder) {
 
 //打开数据库
 //driverName: 驱动名称例如"mysql", dataSourceName: string 数据库url
-func (it *GoMybatisEngine) Open(driverName, dataSourceName string) (*sql.DB, error) {
+func (it *GoMybatisEngine) Open(driverName, dataSourceLink string) (*sql.DB, error) {
 	it.initCheck()
-	db, err := sql.Open(driverName, dataSourceName)
+	db, err := sql.Open(driverName, dataSourceLink)
 	if err != nil {
 		return nil, err
 	}
-	it.dataSourceRouter.SetDB(driverName, dataSourceName, db)
+	it.dataSourceRouter.SetDB(driverName, dataSourceLink, db)
 	return db, nil
 }
 

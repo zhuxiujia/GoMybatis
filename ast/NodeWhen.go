@@ -1,6 +1,9 @@
 package ast
 
-import "github.com/zhuxiujia/GoMybatis/utils"
+import (
+	"github.com/zhuxiujia/GoMybatis/stmt"
+	"github.com/zhuxiujia/GoMybatis/utils"
+)
 
 type NodeWhen struct {
 	childs []Node
@@ -14,7 +17,7 @@ func (it *NodeWhen) Type() NodeType {
 	return NWhen
 }
 
-func (it *NodeWhen) Eval(env map[string]interface{}, arg_array *[]interface{}) ([]byte, error) {
+func (it *NodeWhen) Eval(env map[string]interface{}, arg_array *[]interface{}, stmtConvert stmt.StmtIndexConvert) ([]byte, error) {
 	if it.holder == nil {
 		return nil, nil
 	}
@@ -23,7 +26,7 @@ func (it *NodeWhen) Eval(env map[string]interface{}, arg_array *[]interface{}) (
 		err = utils.NewError("GoMybatisSqlBuilder", "[GoMybatis] <test `", it.test, `> fail,`, err.Error())
 	}
 	if result.(bool) {
-		return DoChildNodes(it.childs, env, arg_array)
+		return DoChildNodes(it.childs, env, arg_array, stmtConvert)
 	}
 	return nil, nil
 }

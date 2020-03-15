@@ -36,7 +36,7 @@
  MsSql:                             github.com/denisenkom/go-mssqldb
  Oracle:                            github.com/mattn/go-oci8
  //Distributed NewSql database
- Tidb:                              github.com/pingcap/tidb
+ Tidb:                              github.com/go-sql-driver/mysql
  CockroachDB:                       github.com/lib/pq
  ```
  

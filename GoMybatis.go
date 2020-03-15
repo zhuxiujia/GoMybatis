@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/zhuxiujia/GoMybatis/ast"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
+	"github.com/zhuxiujia/GoMybatis/stmt"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"log"
 	"reflect"
@@ -328,15 +329,11 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 	var session Session
 	var sql string
 	var err error
-	var array_arg = []interface{}{}
-	session, sql, err = buildSql(proxyArg, nodes, sessionEngine.SqlBuilder(), &array_arg)
+	//session
+	session, err = findArgSession(proxyArg)
 	if err != nil {
 		return err
 	}
-	if sessionEngine.SessionFactory() == nil && session == nil {
-		panic("[GoMybatis] exe sql need a SessionFactory or Session!")
-	}
-	//session
 	if session == nil {
 		var goroutineID int64 //协程id
 		if sessionEngine.GoroutineIDEnable() {
@@ -354,8 +351,17 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 		session = s
 		defer session.Close()
 	}
-	var haveLastReturnValue = returnValue != nil && (*returnValue).IsNil() == false
+	convert, err := session.StmtConvert()
+	if err != nil {
+		return err
+	}
+	var array_arg = []interface{}{}
+	sql, err = buildSql(proxyArg, nodes, sessionEngine.SqlBuilder(), &array_arg, convert)
+	if err != nil {
+		return err
+	}
 	//do CRUD
+	var haveLastReturnValue = returnValue != nil && (*returnValue).IsNil() == false
 	if elementType == Element_Select && haveLastReturnValue {
 		//is select and have return value
 		if sessionEngine.LogEnable() {
@@ -419,8 +425,22 @@ func closeSession(factory *SessionFactory, session Session) {
 	session.Close()
 }
 
-func buildSql(proxyArg ProxyArg, nodes []ast.Node, sqlBuilder SqlBuilder, array_arg *[]interface{}) (Session, string, error) {
+func findArgSession(proxyArg ProxyArg) (Session, error) {
 	var session Session
+	for _, arg := range proxyArg.Args {
+		var argInterface = arg.Interface()
+		if arg.Kind() == reflect.Ptr && arg.IsNil() == false && argInterface != nil && arg.Type().String() == GoMybatis_Session_Ptr {
+			session = *(argInterface.(*Session))
+			continue
+		} else if argInterface != nil && arg.Kind() == reflect.Interface && arg.Type().String() == GoMybatis_Session {
+			session = argInterface.(Session)
+			continue
+		}
+	}
+	return session, nil
+}
+
+func buildSql(proxyArg ProxyArg, nodes []ast.Node, sqlBuilder SqlBuilder, array_arg *[]interface{}, stmtConvert stmt.StmtIndexConvert) (string, error) {
 	var paramMap = make(map[string]interface{})
 	var tagArgsLen = proxyArg.TagArgsLen
 	var argsLen = proxyArg.ArgsLen //参数长度，除session参数外。
@@ -429,10 +449,8 @@ func buildSql(proxyArg ProxyArg, nodes []ast.Node, sqlBuilder SqlBuilder, array_
 	for argIndex, arg := range proxyArg.Args {
 		var argInterface = arg.Interface()
 		if arg.Kind() == reflect.Ptr && arg.IsNil() == false && argInterface != nil && arg.Type().String() == GoMybatis_Session_Ptr {
-			session = *(argInterface.(*Session))
 			continue
 		} else if argInterface != nil && arg.Kind() == reflect.Interface && arg.Type().String() == GoMybatis_Session {
-			session = argInterface.(Session)
 			continue
 		}
 		if isCustomStruct(arg.Type()) {
@@ -466,9 +484,8 @@ func buildSql(proxyArg ProxyArg, nodes []ast.Node, sqlBuilder SqlBuilder, array_
 		}
 		paramMap = scanStructArgFields(proxyArg.Args[customIndex], tag)
 	}
-
-	result, err := sqlBuilder.BuildSql(paramMap, nodes, array_arg)
-	return session, result, err
+	result, err := sqlBuilder.BuildSql(paramMap, nodes, array_arg, stmtConvert)
+	return result, err
 }
 
 //scan params

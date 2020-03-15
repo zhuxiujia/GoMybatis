@@ -3,6 +3,7 @@ package GoMybatis
 import (
 	"database/sql"
 	"errors"
+	"github.com/zhuxiujia/GoMybatis/stmt"
 	"github.com/zhuxiujia/GoMybatis/tx"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"strconv"
@@ -429,6 +430,10 @@ func (it *LocalSession) ExecPrepare(sqlPrepare string, args ...interface{}) (*Re
 			RowsAffected: RowsAffected,
 		}, nil
 	}
+}
+
+func (it *LocalSession) StmtConvert() (stmt.StmtIndexConvert, error) {
+	return stmt.BuildStmtConvert(it.driver)
 }
 
 func (it *LocalSession) dbErrorPack(e error) error {

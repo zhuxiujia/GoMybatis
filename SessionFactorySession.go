@@ -1,6 +1,7 @@
 package GoMybatis
 
 import (
+	"github.com/zhuxiujia/GoMybatis/stmt"
 	"github.com/zhuxiujia/GoMybatis/tx"
 	"github.com/zhuxiujia/GoMybatis/utils"
 )
@@ -73,4 +74,8 @@ func (it *SessionFactorySession) Close() {
 
 func (it *SessionFactorySession) LastPROPAGATION() *tx.Propagation {
 	return it.Session.LastPROPAGATION()
+}
+
+func (it *SessionFactorySession) StmtConvert() (stmt.StmtIndexConvert, error) {
+	return it.Session.StmtConvert()
 }

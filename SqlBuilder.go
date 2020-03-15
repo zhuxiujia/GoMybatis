@@ -1,10 +1,13 @@
 package GoMybatis
 
-import "github.com/zhuxiujia/GoMybatis/ast"
+import (
+	"github.com/zhuxiujia/GoMybatis/ast"
+	"github.com/zhuxiujia/GoMybatis/stmt"
+)
 
 //sql文本构建
 type SqlBuilder interface {
-	BuildSql(paramMap map[string]interface{}, nodes []ast.Node, arg_array *[]interface{}) (string, error)
+	BuildSql(paramMap map[string]interface{}, nodes []ast.Node, arg_array *[]interface{}, stmtConvert stmt.StmtIndexConvert) (string, error)
 	ExpressionEngineProxy() *ExpressionEngineProxy
 	SqlArgTypeConvert() ast.SqlArgTypeConvert
 	SetEnableLog(enable bool)

@@ -7,9 +7,9 @@ import (
 
 //动态数据源路由
 type GoMybatisDataSourceRouter struct {
-	dbMap      map[string]*sql.DB
-	driverMap  map[string]string
-	routerFunc func(mapperName string) *string
+	driverLinkDBMap  map[string]*sql.DB // map[driverLink]*DB
+	driverTypeUrlMap map[string]string  // map[driverType]Url
+	routerFunc       func(mapperName string) *string
 }
 
 //初始化路由，routerFunc为nil或者routerFunc返回nil，则框架自行选择第一个数据库作为数据源
@@ -19,15 +19,15 @@ func (it GoMybatisDataSourceRouter) New(routerFunc func(mapperName string) *stri
 			return nil
 		}
 	}
-	it.dbMap = make(map[string]*sql.DB)
-	it.driverMap = make(map[string]string)
+	it.driverLinkDBMap = make(map[string]*sql.DB)
+	it.driverTypeUrlMap = make(map[string]string)
 	it.routerFunc = routerFunc
 	return it
 }
 
-func (it *GoMybatisDataSourceRouter) SetDB(driver string, url string, db *sql.DB) {
-	it.dbMap[url] = db
-	it.driverMap[url] = driver
+func (it *GoMybatisDataSourceRouter) SetDB(driverType string, driverLink string, db *sql.DB) {
+	it.driverLinkDBMap[driverLink] = db
+	it.driverTypeUrlMap[driverLink] = driverType
 }
 
 func (it *GoMybatisDataSourceRouter) Router(mapperName string, engine SessionEngine) (Session, error) {
@@ -39,9 +39,9 @@ func (it *GoMybatisDataSourceRouter) Router(mapperName string, engine SessionEng
 	}
 
 	if key != nil && *key != "" {
-		db = it.dbMap[*key]
+		db = it.driverLinkDBMap[*key]
 	} else {
-		for k, v := range it.dbMap {
+		for k, v := range it.driverLinkDBMap {
 			if v != nil {
 				db = v
 				key = &k
@@ -56,7 +56,7 @@ func (it *GoMybatisDataSourceRouter) Router(mapperName string, engine SessionEng
 	if key != nil {
 		url = *key
 	}
-	var local = LocalSession{}.New(it.driverMap[url], url, db, engine.Log())
+	var local = LocalSession{}.New(it.driverTypeUrlMap[url], url, db, engine.Log())
 	var session = Session(&local)
 	return session, nil
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/zhuxiujia/GoMybatis/example"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
+	"github.com/zhuxiujia/GoMybatis/stmt"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"testing"
 	"time"
@@ -63,7 +64,7 @@ func Benchmark_SqlBuilder(b *testing.B) {
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		var array = []interface{}{}
-		_, e := builder.BuildSql(paramMap, nodes, &array)
+		_, e := builder.BuildSql(paramMap, nodes, &array, &stmt.MysqlStmtIndexConvertImpl{})
 		if e != nil {
 			b.Fatal(e)
 		}
@@ -108,7 +109,7 @@ func Test_SqlBuilder_Tps(t *testing.T) {
 	for i := 0; i < 100000; i++ {
 		//var sql, e =
 		var array = []interface{}{}
-		_, e := builder.BuildSql(paramMap, nodes, &array)
+		_, e := builder.BuildSql(paramMap, nodes, &array, &stmt.MysqlStmtIndexConvertImpl{})
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -206,7 +207,7 @@ func TestGoMybatisSqlBuilder_BuildSql(t *testing.T) {
 
 	var array = []interface{}{}
 
-	var sql, err = builder.BuildSql(paramMap, nodes, &array)
+	var sql, err = builder.BuildSql(paramMap, nodes, &array, &stmt.MysqlStmtIndexConvertImpl{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -262,7 +263,7 @@ func Benchmark_SqlBuilder_If_Element(b *testing.B) {
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		var array = []interface{}{}
-		builder.BuildSql(paramMap, nodes, &array)
+		builder.BuildSql(paramMap, nodes, &array, &stmt.MysqlStmtIndexConvertImpl{})
 	}
 }
 
@@ -316,7 +317,7 @@ func Benchmark_SqlBuilder_Nested(b *testing.B) {
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		var array = []interface{}{}
-		_, e := builder.BuildSql(paramMap, nodes, &array)
+		_, e := builder.BuildSql(paramMap, nodes, &array, &stmt.MysqlStmtIndexConvertImpl{})
 		if e != nil {
 			b.Fatal(e)
 		}

@@ -1,6 +1,9 @@
 package ast
 
-import "bytes"
+import (
+	"bytes"
+	"github.com/zhuxiujia/GoMybatis/stmt"
+)
 
 //Trim操作节点
 type NodeTrim struct {
@@ -17,8 +20,8 @@ func (it *NodeTrim) Type() NodeType {
 	return NTrim
 }
 
-func (it *NodeTrim) Eval(env map[string]interface{}, arg_array *[]interface{}) ([]byte, error) {
-	var sql, err = DoChildNodes(it.childs, env, arg_array)
+func (it *NodeTrim) Eval(env map[string]interface{}, arg_array *[]interface{}, stmtConvert stmt.StmtIndexConvert) ([]byte, error) {
+	var sql, err = DoChildNodes(it.childs, env, arg_array, stmtConvert)
 	if err != nil {
 		return nil, err
 	}

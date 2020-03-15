@@ -3,6 +3,7 @@ package GoMybatis
 import (
 	"database/sql"
 	"github.com/zhuxiujia/GoMybatis/ast"
+	"github.com/zhuxiujia/GoMybatis/stmt"
 	"github.com/zhuxiujia/GoMybatis/tx"
 )
 
@@ -24,12 +25,13 @@ type Session interface {
 	Begin(p *tx.Propagation) error
 	Close()
 	LastPROPAGATION() *tx.Propagation
+	StmtConvert() (stmt.StmtIndexConvert, error)
 }
 
 //产生session的引擎
 type SessionEngine interface {
 	//打开数据库
-	Open(driverName, dataSourceName string) (*sql.DB, error)
+	Open(driverName, dataSourceLink string) (*sql.DB, error)
 	//写方法到mapper
 	WriteMapperPtr(ptr interface{}, xml []byte)
 	//引擎名称

@@ -2,6 +2,7 @@ package GoMybatis
 
 import (
 	"github.com/zhuxiujia/GoMybatis/ast"
+	"github.com/zhuxiujia/GoMybatis/stmt"
 )
 
 type GoMybatisSqlBuilder struct {
@@ -31,9 +32,9 @@ func (it GoMybatisSqlBuilder) New(SqlArgTypeConvert ast.SqlArgTypeConvert, expre
 	return it
 }
 
-func (it *GoMybatisSqlBuilder) BuildSql(paramMap map[string]interface{}, nodes []ast.Node, arg_array *[]interface{}) (string, error) {
+func (it *GoMybatisSqlBuilder) BuildSql(paramMap map[string]interface{}, nodes []ast.Node, arg_array *[]interface{}, stmtConvert stmt.StmtIndexConvert) (string, error) {
 	//抽象语法树节点构建
-	var sql, err = ast.DoChildNodes(nodes, paramMap, arg_array)
+	var sql, err = ast.DoChildNodes(nodes, paramMap, arg_array, stmtConvert)
 	if err != nil {
 		return "", err
 	}
