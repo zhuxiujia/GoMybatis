@@ -60,7 +60,7 @@ go env -w GOSUMDB=off
 //go.mod加入依赖
 require (
 	github.com/go-sql-driver/mysql v1.5.0
-	github.com/zhuxiujia/GoMybatis v6.1.6+incompatible
+	github.com/zhuxiujia/GoMybatis v6.2.0+incompatible
 )
 ```
 
