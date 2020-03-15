@@ -3,6 +3,7 @@ package GoMybatis
 import (
 	"fmt"
 	"github.com/zhuxiujia/GoMybatis/example"
+	"github.com/zhuxiujia/GoMybatis/stmt"
 	"github.com/zhuxiujia/GoMybatis/tx"
 	"testing"
 	"time"
@@ -125,6 +126,9 @@ func (it *TempleteSession) Begin(p *tx.Propagation) error {
 }
 func (it *TempleteSession) Close() {
 
+}
+func (it *TempleteSession) StmtConvert() (stmt.StmtIndexConvert, error) {
+	return stmt.BuildStmtConvert("mysql")
 }
 
 type El struct {

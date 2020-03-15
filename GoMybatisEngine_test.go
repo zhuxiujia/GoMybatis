@@ -4,6 +4,7 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/zhuxiujia/GoMybatis/example"
+	"github.com/zhuxiujia/GoMybatis/stmt"
 	"github.com/zhuxiujia/GoMybatis/tx"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"sync"
@@ -185,6 +186,10 @@ func (it *TestSession) Begin(*tx.Propagation) error {
 }
 func (it *TestSession) Close() {
 
+}
+
+func (it *TestSession) StmtConvert() (stmt.StmtIndexConvert, error) {
+	return stmt.BuildStmtConvert("mysql")
 }
 
 //定义mapper文件的接口和结构体
