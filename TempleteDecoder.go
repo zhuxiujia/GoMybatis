@@ -6,5 +6,6 @@ import (
 )
 
 type TempleteDecoder interface {
+	SetPrintElement(print bool)
 	DecodeTree(tree map[string]etree.Token, beanType reflect.Type) error
 }

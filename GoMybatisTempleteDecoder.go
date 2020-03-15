@@ -15,6 +15,7 @@ var equalOperator = []string{"/", "+", "-", "*", "**", "|", "^", "&", "%", "<", 
 TODO sqlTemplete解析器，目前直接操作*etree.Element实现，后期应该改成操作xml，换取更好的维护性
 */
 type GoMybatisTempleteDecoder struct {
+	print bool
 }
 
 type LogicDeleteData struct {
@@ -31,6 +32,10 @@ type VersionData struct {
 	Column   string
 	Property string
 	LangType string
+}
+
+func (it *GoMybatisTempleteDecoder) SetPrintElement(print bool) {
+	it.print = print
 }
 
 func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]etree.Token, beanType reflect.Type) error {
@@ -72,9 +77,11 @@ func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]etree.Token, bean
 				if beanType != nil {
 					beanName = beanType.String()
 				}
-				var s = "================DecoderTemplete " + beanName + "." + v.SelectAttrValue("id", "") + "============\n"
-				printElement(v, &s)
-				println(s)
+				if it.print {
+					var s = "================DecoderTemplete " + beanName + "." + v.SelectAttrValue("id", "") + "============\n"
+					printElement(v, &s)
+					println(s)
+				}
 			}
 		}
 	}
