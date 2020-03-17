@@ -349,10 +349,11 @@ func (it *LocalSession) QueryPrepare(sqlPrepare string, args ...interface{}) ([]
 	}
 
 	var rows *sql.Rows
+	var stmt *sql.Stmt
 	var err error
 	var t, _ = it.txStack.Last()
 	if t != nil {
-		stmt, err := t.Prepare(sqlPrepare)
+		stmt, err = t.Prepare(sqlPrepare)
 		err = it.dbErrorPack(err)
 		if err != nil {
 			return nil, err
@@ -363,7 +364,7 @@ func (it *LocalSession) QueryPrepare(sqlPrepare string, args ...interface{}) ([]
 			return nil, err
 		}
 	} else {
-		stmt, err := it.db.Prepare(sqlPrepare)
+		stmt, err = it.db.Prepare(sqlPrepare)
 		err = it.dbErrorPack(err)
 		if err != nil {
 			return nil, err
@@ -374,6 +375,9 @@ func (it *LocalSession) QueryPrepare(sqlPrepare string, args ...interface{}) ([]
 		if err != nil {
 			return nil, err
 		}
+	}
+	if stmt != nil {
+		defer stmt.Close()
 	}
 	if rows != nil {
 		defer rows.Close()
@@ -395,10 +399,11 @@ func (it *LocalSession) ExecPrepare(sqlPrepare string, args ...interface{}) (*Re
 	}
 
 	var result sql.Result
+	var stmt *sql.Stmt
 	var err error
 	var t, _ = it.txStack.Last()
 	if t != nil {
-		stmt, err := t.Prepare(sqlPrepare)
+		stmt, err = t.Prepare(sqlPrepare)
 		err = it.dbErrorPack(err)
 		if err != nil {
 			return nil, err
@@ -409,7 +414,7 @@ func (it *LocalSession) ExecPrepare(sqlPrepare string, args ...interface{}) (*Re
 			return nil, err
 		}
 	} else {
-		stmt, err := it.db.Prepare(sqlPrepare)
+		stmt, err = it.db.Prepare(sqlPrepare)
 		err = it.dbErrorPack(err)
 		if err != nil {
 			return nil, err
@@ -419,6 +424,9 @@ func (it *LocalSession) ExecPrepare(sqlPrepare string, args ...interface{}) (*Re
 		if err != nil {
 			return nil, err
 		}
+	}
+	if stmt != nil {
+		defer stmt.Close()
 	}
 	if err != nil {
 		return nil, err
