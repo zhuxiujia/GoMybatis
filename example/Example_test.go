@@ -6,6 +6,7 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/zhuxiujia/GoMybatis"
+	"github.com/zhuxiujia/GoMybatis/ids"
 	"io/ioutil"
 	"reflect"
 	"testing"
@@ -58,6 +59,9 @@ type TestService struct {
 	UpdateRemark func(id string, remark string) error `tx:"" rollback:"error"`
 }
 
+//推荐使用snowflake雪花算法 代替uuid防止ID碰撞
+var SnowflakeNode, e = ids.NewNode(0)
+
 func init() {
 	if MysqlUri == "*" {
 		println("GoMybatisEngine not init! because MysqlUri is * or MysqlUri is ''")
@@ -109,8 +113,10 @@ func Test_inset(t *testing.T) {
 		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
+	//推荐使用snowflake雪花算法 代替uuid防止ID碰撞
+	var id = SnowflakeNode.Generate()
 	//使用mapper
-	var result, err = exampleActivityMapper.Insert(Activity{Id: "171", Name: "test_insret", CreateTime: time.Now(), DeleteFlag: 1})
+	var result, err = exampleActivityMapper.Insert(Activity{Id: id.String(), Name: "test_insert", CreateTime: time.Now(), DeleteFlag: 1})
 	if err != nil {
 		panic(err)
 	}
