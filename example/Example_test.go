@@ -113,10 +113,10 @@ func Test_inset(t *testing.T) {
 		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
-	//推荐使用snowflake雪花算法 代替uuid防止ID碰撞
-	var id = SnowflakeNode.Generate()
+	//推荐使用snowflake雪花算法 代替uuid防止ID碰撞,id最好用string类型. 否则客户端有可能不支持long类型例如JavaScript
+	var id = SnowflakeNode.Generate().String()
 	//使用mapper
-	var result, err = exampleActivityMapper.Insert(Activity{Id: id.String(), Name: "test_insert", CreateTime: time.Now(), DeleteFlag: 1})
+	var result, err = exampleActivityMapper.Insert(Activity{Id: id, Name: "test_insert", CreateTime: time.Now(), DeleteFlag: 1})
 	if err != nil {
 		panic(err)
 	}
