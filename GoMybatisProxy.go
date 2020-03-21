@@ -25,10 +25,10 @@ func ProxyValue(mapperValue reflect.Value, buildFunc func(funcField reflect.Stru
 }
 
 func buildProxy(v reflect.Value, buildFunc func(funcField reflect.StructField, field reflect.Value) func(arg ProxyArg) []reflect.Value) {
-	for{
+	for {
 		if v.Kind() == reflect.Ptr {
 			v = v.Elem()
-		}else{
+		} else {
 			break
 		}
 	}
@@ -74,13 +74,13 @@ func buildProxy(v reflect.Value, buildFunc func(funcField reflect.StructField, f
 
 func buildRemoteMethod(source reflect.Value, f reflect.Value, ft reflect.Type, sf reflect.StructField, proxyFunc func(arg ProxyArg) []reflect.Value) {
 	var tagParams []string
-	var mapperParams = sf.Tag.Get(`mapperParams`)
-	if mapperParams != `` {
-		tagParams = strings.Split(mapperParams, `,`)
+	var args = sf.Tag.Get(`args`)
+	if args != `` {
+		tagParams = strings.Split(args, `,`)
 	}
 	var tagParamsLen = len(tagParams)
 	if tagParamsLen > ft.NumIn() {
-		panic(`[GoMybatisProxy] method fail! the tag "mapperParams" length can not > arg length ! filed=` + sf.Name)
+		panic(`[GoMybatisProxy] method fail! the tag "args" length can not > arg length ! filed=` + sf.Name)
 	}
 	var tagArgs = make([]TagArg, 0)
 	if tagParamsLen != 0 {
@@ -94,7 +94,7 @@ func buildRemoteMethod(source reflect.Value, f reflect.Value, ft reflect.Type, s
 	}
 	var tagArgsLen = len(tagArgs)
 	if tagArgsLen > 0 && ft.NumIn() != tagArgsLen {
-		panic(`[GoMybatisProxy] method fail! the tag "mapperParams" length  != args length ! filed = ` + sf.Name)
+		panic(`[GoMybatisProxy] method fail! the tag "args" length  != args length ! filed = ` + sf.Name)
 	}
 	var fn = func(args []reflect.Value) (results []reflect.Value) {
 		proxyResults := proxyFunc(ProxyArg{}.New(tagArgs, args))

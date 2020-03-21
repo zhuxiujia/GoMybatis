@@ -640,9 +640,9 @@ func (it *GoMybatisTempleteDecoder) DecodeCollectionName(method *reflect.StructF
 		for i := 0; i < numIn; i++ {
 			var itemType = method.Type.In(i)
 			if itemType.Kind() == reflect.Slice || itemType.Kind() == reflect.Array {
-				var mapperParams = method.Tag.Get("mapperParams")
-				var args = strings.Split(mapperParams, ",")
-				if mapperParams == "" || args == nil || len(args) == 0 {
+				var params = method.Tag.Get("args")
+				var args = strings.Split(params, ",")
+				if params == "" || args == nil || len(args) == 0 {
 					collection = DefaultOneArg + strconv.Itoa(i)
 				} else {
 					if args[i] == "" {

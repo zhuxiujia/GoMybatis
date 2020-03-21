@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-//支持基本类型和指针(int,string,time.Time,float...且需要指定参数名称`mapperParams:"name"以逗号隔开，且位置要和实际参数相同)
+//支持基本类型和指针(int,string,time.Time,float...且需要指定参数名称`args:"name"以逗号隔开，且位置要和实际参数相同)
 //参数中包含有*GoMybatis.Session的类型，用于自定义事务，也可以选择例如TestService 这样使用更简单的声明式事务
 //自定义结构体参数（属性必须大写）
 //方法 return 必须包含有error ,为了返回错误信息
@@ -22,24 +22,24 @@ type ExampleActivityMapper struct {
 	NewSession               func() (GoMybatis.Session, error) //session事务操作.写法2   ExampleActivityMapper.NewSession()
 
 	//模板示例
-	SelectTemplete      func(name string) ([]Activity, error) `mapperParams:"name"`
-	SelectCountTemplete func(name string) (int64, error)      `mapperParams:"name"`
+	SelectTemplete      func(name string) ([]Activity, error) `args:"name"`
+	SelectCountTemplete func(name string) (int64, error)      `args:"name"`
 	InsertTemplete      func(arg Activity) (int64, error)
-	InsertTempleteBatch func(args []Activity) (int64, error) `mapperParams:"args"`
-	UpdateTemplete      func(arg Activity) (int64, error)    `mapperParams:"name"`
-	DeleteTemplete      func(name string) (int64, error)     `mapperParams:"name"`
+	InsertTempleteBatch func(args []Activity) (int64, error) `args:"args"`
+	UpdateTemplete      func(arg Activity) (int64, error)    `args:"name"`
+	DeleteTemplete      func(name string) (int64, error)     `args:"name"`
 
 	//传统mybatis示例
-	SelectByIds       func(ids []string) ([]Activity, error)       `mapperParams:"ids"`
-	SelectByIdMaps    func(ids map[int]string) ([]Activity, error) `mapperParams:"ids"`
+	SelectByIds       func(ids []string) ([]Activity, error)       `args:"ids"`
+	SelectByIdMaps    func(ids map[int]string) ([]Activity, error) `args:"ids"`
 	SelectAll         func() ([]map[string]string, error)
-	SelectByCondition func(name *string, startTime *time.Time, endTime *time.Time, page *int, size *int) ([]Activity, error) `mapperParams:"name,startTime,endTime,page,size"`
+	SelectByCondition func(name *string, startTime *time.Time, endTime *time.Time, page *int, size *int) ([]Activity, error) `args:"name,startTime,endTime,page,size"`
 	UpdateById        func(session *GoMybatis.Session, arg Activity) (int64, error)
 	Insert            func(arg Activity) (int64, error)
-	CountByCondition  func(name string, startTime time.Time, endTime time.Time) (int, error) `mapperParams:"name,startTime,endTime"`
-	DeleteById        func(id string) (int64, error)                                         `mapperParams:"id"`
-	Choose            func(deleteFlag int) ([]Activity, error)                               `mapperParams:"deleteFlag"`
-	SelectLinks       func(column string) ([]Activity, error)                                `mapperParams:"column"`
+	CountByCondition  func(name string, startTime time.Time, endTime time.Time) (int, error) `args:"name,startTime,endTime"`
+	DeleteById        func(id string) (int64, error)                                         `args:"id"`
+	Choose            func(deleteFlag int) ([]Activity, error)                               `args:"deleteFlag"`
+	SelectLinks       func(column string) ([]Activity, error)                                `args:"column"`
 }
 
 var engine GoMybatis.GoMybatisEngine

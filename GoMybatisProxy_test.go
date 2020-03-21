@@ -7,7 +7,7 @@ import (
 )
 
 type TestMapper struct {
-	SelectByIds func(id string) (string, error) `mapperParams:"ids"`
+	SelectByIds func(id string) (string, error) `args:"ids"`
 }
 
 func TestUseMapperValue(t *testing.T) {

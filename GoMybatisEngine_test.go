@@ -193,12 +193,12 @@ func (it *TestSession) StmtConvert() (stmt.StmtIndexConvert, error) {
 }
 
 //定义mapper文件的接口和结构体
-// 支持基本类型(int,string,time.Time,float...且需要指定参数名称`mapperParams:"name"以逗号隔开，且位置要和实际参数相同)
+// 支持基本类型(int,string,time.Time,float...且需要指定参数名称`args:"name"以逗号隔开，且位置要和实际参数相同)
 //自定义结构体参数（属性必须大写）
 //参数中除了session指针外，为指针类型的皆为数据
 // 函数return必须为error 为返回错误信息
 type ExampleActivityMapperImpl struct {
-	SelectByCondition func(session *Session, name *string, startTime *time.Time, endTime *time.Time, page *int, size *int) ([]example.Activity, error) `mapperParams:"session,name,startTime,endTime,page,size"`
+	SelectByCondition func(session *Session, name *string, startTime *time.Time, endTime *time.Time, page *int, size *int) ([]example.Activity, error) `args:"session,name,startTime,endTime,page,size"`
 }
 
 //初始化mapper文件和结构体

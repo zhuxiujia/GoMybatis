@@ -42,13 +42,13 @@ func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine SessionEn
 //写入方法内容，例如
 //type ExampleActivityMapperImpl struct {
 //	SelectAll         func(result *[]Activity) error
-//	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int, result *[]Activity) error `mapperParams:"name,startTime,endTime,page,size"`
+//	SelectByCondition func(name string, startTime time.Time, endTime time.Time, page int, size int, result *[]Activity) error `args:"name,startTime,endTime,page,size"`
 //	UpdateById        func(session *GoMybatis.Session, arg Activity, result *int64) error                                     //只要参数中包含有*GoMybatis.Session的类型，框架默认使用传入的session对象，用于自定义事务
 //	Insert            func(arg Activity, result *int64) error
-//	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error `mapperParams:"name,startTime,endTime"`
+//	CountByCondition  func(name string, startTime time.Time, endTime time.Time, result *int) error `args:"name,startTime,endTime"`
 //}
-//func的基本类型的参数（例如string,int,time.Time,int64,float....）个数无限制(并且需要用Tag指定参数名逗号隔开,例如`mapperParams:"id,phone"`)，返回值必须有error
-//func的结构体参数无需指定mapperParams的tag，框架会自动扫描它的属性，封装为map处理掉
+//func的基本类型的参数（例如string,int,time.Time,int64,float....）个数无限制(并且需要用Tag指定参数名逗号隔开,例如`args:"id,phone"`)，返回值必须有error
+//func的结构体参数无需指定args的tag，框架会自动扫描它的属性，封装为map处理掉
 //使用WriteMapper函数设置代理后即可正常使用。
 func WriteMapper(bean reflect.Value, xml []byte, sessionEngine SessionEngine) {
 	beanCheck(bean)
@@ -143,7 +143,7 @@ func beanCheck(value reflect.Value) {
 			}
 		}
 		if argsLen > 1 && customLen > 1 {
-			panic(`[GoMybats] ` + fieldItem.Name + ` must add tag "mapperParams:"*,*..."`)
+			panic(`[GoMybats] ` + fieldItem.Name + ` must add tag "args:"*,*..."`)
 		}
 	}
 }
@@ -304,9 +304,9 @@ func methodFieldCheck(beanType *reflect.Type, methodType *reflect.StructField) {
 		panic(buffer.String())
 	}
 
-	var mapperParams = methodType.Tag.Get("mapperParams")
-	if methodType.Type.NumOut() > 1 && mapperParams == "" && !(methodType.Name == "NewSession") {
-		log.Println("[GoMybatis] warning ======================== " + (*beanType).Name() + "." + methodType.Name + "() have not define tag mapperParams:\"\",maybe can not get param value!")
+	var args = methodType.Tag.Get("args")
+	if methodType.Type.NumOut() > 1 && args == "" && !(methodType.Name == "NewSession") {
+		log.Println("[GoMybatis] warning ======================== " + (*beanType).Name() + "." + methodType.Name + "() have not define tag args:\"\",maybe can not get param value!")
 	}
 }
 

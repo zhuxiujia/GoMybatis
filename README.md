@@ -150,11 +150,11 @@ type Activity struct {
 	DeleteFlag int       `json:"deleteFlag"`
 }
 type ExampleActivityMapper struct {
-	SelectTemplete      func(name string) ([]Activity, error) `mapperParams:"name"`
+	SelectTemplete      func(name string) ([]Activity, error) `args:"name"`
 	InsertTemplete      func(arg Activity) (int64, error)
-	InsertTempleteBatch func(args []Activity) (int64, error) `mapperParams:"args"`
-	UpdateTemplete      func(arg Activity) (int64, error)    `mapperParams:"name"`
-	DeleteTemplete      func(name string) (int64, error)     `mapperParams:"name"`
+	InsertTempleteBatch func(args []Activity) (int64, error) `args:"args"`
+	UpdateTemplete      func(arg Activity) (int64, error)    `args:"name"`
+	DeleteTemplete      func(name string) (int64, error)     `args:"name"`
 }
 ```
 

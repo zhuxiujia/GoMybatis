@@ -60,7 +60,7 @@ go env -w GOSUMDB=off
 //go.mod加入依赖
 require (
 	github.com/go-sql-driver/mysql v1.5.0
-	github.com/zhuxiujia/GoMybatis v6.2.2+incompatible
+	github.com/zhuxiujia/GoMybatis v6.2.3+incompatible
 )
 ```
 
@@ -146,6 +146,7 @@ func main() {
 </mapper>    
 ```
 xml对应以下定义的Mapper结构体方法,然后将生成对应的SQL语句
+旧版本使用mapperParams的tag，单词太长容易拼错，新版改为args
 ```go
 type Activity struct {
 	Id         string    `json:"id"`
@@ -160,12 +161,12 @@ type Activity struct {
 }
 type ExampleActivityMapper struct {
     //调用即可生成sql(带有逻辑删除)  select * from biz_activity where delete_flag = 1 and name = #{name}
-	SelectTemplete      func(name string) ([]Activity, error) `mapperParams:"name"`
+	SelectTemplete      func(name string) ([]Activity, error) `args:"name"`
 	InsertTemplete      func(arg Activity) (int64, error)
-	InsertTempleteBatch func(args []Activity) (int64, error) `mapperParams:"args"`
+	InsertTempleteBatch func(args []Activity) (int64, error) `args:"args"`
     //生成sql(带有乐观锁.逻辑删除)  update biz_activity set name = #{name},remark=#{remark},version=#{version+1} where delete_flag = 1 and id = #{id} and version = #{version}
-	UpdateTemplete      func(arg Activity) (int64, error)    `mapperParams:"name"`
-	DeleteTemplete      func(name string) (int64, error)     `mapperParams:"name"`
+	UpdateTemplete      func(arg Activity) (int64, error)    `args:"name"`
+	DeleteTemplete      func(name string) (int64, error)     `args:"name"`
 }
 ```
 

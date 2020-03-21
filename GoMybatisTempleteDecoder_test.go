@@ -10,10 +10,10 @@ import (
 )
 
 type ExampleActivityMapper struct {
-	SelectTemplete func(name string, session Session) ([]example.Activity, error) `mapperParams:"name,session"`
-	InsertTemplete func(args []example.Activity, session Session) (int64, error)  `mapperParams:"args,session"`
-	UpdateTemplete func(arg example.Activity, session Session) (int64, error)     `mapperParams:"name,session"`
-	DeleteTemplete func(name string, session Session) (int64, error)              `mapperParams:"name,session"`
+	SelectTemplete func(name string, session Session) ([]example.Activity, error) `args:"name,session"`
+	InsertTemplete func(args []example.Activity, session Session) (int64, error)  `args:"args,session"`
+	UpdateTemplete func(arg example.Activity, session Session) (int64, error)     `args:"name,session"`
+	DeleteTemplete func(name string, session Session) (int64, error)              `args:"name,session"`
 }
 
 //初始化mapper文件和结构体
