@@ -91,10 +91,6 @@ type SessionEngine interface {
 	//设置模板解析器
 	SetTempleteDecoder(decoder TempleteDecoder)
 
-	RegisterObj(ptr interface{}, name string)
-
-	GetObj(name string) interface{}
-
 	//（注意（该方法需要在多协程环境下调用）启用会从栈获取协程id，有一定性能消耗，换取最大的事务定义便捷）
 	GoroutineSessionMap() *GoroutineSessionMap
 

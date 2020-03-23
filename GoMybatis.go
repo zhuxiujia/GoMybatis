@@ -26,7 +26,6 @@ func WriteMapperByValue(value reflect.Value, xml []byte, sessionEngine SessionEn
 		panic("AopProxy: AopProxy arg must be a pointer")
 	}
 	WriteMapper(value, xml, sessionEngine)
-	sessionEngine.RegisterObj(value.Interface(), value.Type().Elem().Name())
 }
 
 //推荐默认使用单例传入
@@ -429,10 +428,15 @@ func findArgSession(proxyArg ProxyArg) (Session, error) {
 	var session Session
 	for _, arg := range proxyArg.Args {
 		var argInterface = arg.Interface()
-		if arg.Kind() == reflect.Ptr && arg.IsNil() == false && argInterface != nil && arg.Type().String() == GoMybatis_Session_Ptr {
+		if arg.Kind() == reflect.Ptr &&
+			arg.IsNil() == false &&
+			argInterface != nil &&
+			arg.Type().String() == GoMybatis_Session_Ptr {
 			session = *(argInterface.(*Session))
 			continue
-		} else if argInterface != nil && arg.Kind() == reflect.Interface && arg.Type().String() == GoMybatis_Session {
+		} else if argInterface != nil &&
+			arg.Kind() == reflect.Interface &&
+			arg.Type().String() == GoMybatis_Session {
 			session = argInterface.(Session)
 			continue
 		}
@@ -448,16 +452,22 @@ func buildSql(proxyArg ProxyArg, nodes []ast.Node, sqlBuilder SqlBuilder, array_
 	var customIndex = -1
 	for argIndex, arg := range proxyArg.Args {
 		var argInterface = arg.Interface()
-		if arg.Kind() == reflect.Ptr && arg.IsNil() == false && argInterface != nil && arg.Type().String() == GoMybatis_Session_Ptr {
+		if arg.Kind() == reflect.Ptr &&
+			arg.IsNil() == false &&
+			argInterface != nil &&
+			arg.Type().String() == GoMybatis_Session_Ptr {
 			continue
-		} else if argInterface != nil && arg.Kind() == reflect.Interface && arg.Type().String() == GoMybatis_Session {
+		} else if argInterface != nil &&
+			arg.Kind() == reflect.Interface &&
+			arg.Type().String() == GoMybatis_Session {
 			continue
 		}
 		if isCustomStruct(arg.Type()) {
 			customLen++
 			customIndex = argIndex
 		}
-		if arg.Type().String() == GoMybatis_Session_Ptr || arg.Type().String() == GoMybatis_Session {
+		if arg.Type().String() == GoMybatis_Session_Ptr ||
+			arg.Type().String() == GoMybatis_Session {
 			if argsLen > 0 {
 				argsLen--
 			}
@@ -465,7 +475,8 @@ func buildSql(proxyArg ProxyArg, nodes []ast.Node, sqlBuilder SqlBuilder, array_
 				tagArgsLen--
 			}
 		}
-		if tagArgsLen > 0 && argIndex < tagArgsLen && proxyArg.TagArgs[argIndex].Name != "" {
+		if tagArgsLen > 0 && argIndex < tagArgsLen &&
+			proxyArg.TagArgs[argIndex].Name != "" {
 			//插入2份参数，兼容大小写不敏感的参数
 			var lowerKey = utils.LowerFieldFirstName(proxyArg.TagArgs[argIndex].Name)
 			var upperKey = utils.UpperFieldFirstName(proxyArg.TagArgs[argIndex].Name)
