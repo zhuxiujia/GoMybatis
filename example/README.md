@@ -13,7 +13,7 @@
  
 ## example运行教程
 
-### 1 下载安装 GoLand 然后打开项目
+### 1 下载安装 GoLand（因为goland对test各种特性支持非常良好） 然后打开项目
 
 ### 2 设置好GoPath,用go get 命令下载GoMybatis和对应的数据库驱动
 ```
