@@ -325,7 +325,8 @@ go run XmlCreateTool.go
 ## 规划
 * 推荐新项目 https://github.com/rbatis/rbatis 提供高性能，无GC,无并发安全问题，内存安全的rust语言 orm框架
 
-## 请及时关注版本，及时升级版本(新的功能，bug修复) ，使用GoMybatis的项目请在Issues里留言您的项目名称+联系方式
+## 请及时关注版本，尽可能使用最新版本(稳定，修复bug) 
+* 不管是商业用途还是个人使用GoMybatis项目，必须在Issues里留言您的项目名称+联系方式 ！
 
 ## 欢迎右上角点下 star 或者 微信 捐赠 和 赞助~
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/wx_account.jpg)
