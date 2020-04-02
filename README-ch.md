@@ -197,7 +197,7 @@ type ExampleActivityMapper struct {
 ## 功能：异步日志接口（可自定义日志输出）
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/log_system.png)
 
- ## 功能：事务传播处理器（嵌套事务）
+ ## 功能：嵌套事务传播处理器
  <table>
  <thead>
  <tr><th>事务类型</th>
