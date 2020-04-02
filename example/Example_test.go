@@ -70,7 +70,7 @@ func init() {
 	engine = GoMybatis.GoMybatisEngine{}.New()
 
 	//设置打印自动生成的xml 到控制台方便调试，false禁用
-	engine.TempleteDecoder().SetPrintElement(true)
+	engine.TempleteDecoder().SetPrintElement(false)
 
 	//mysql链接格式为         用户名:密码@(数据库链接地址:端口)/数据库名称   例如root:123456@(***.mysql.rds.aliyuncs.com:3306)/test
 	_, err := engine.Open("mysql", MysqlUri) //此处请按格式填写你的mysql链接，这里用*号代替
