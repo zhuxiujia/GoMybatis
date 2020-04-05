@@ -11,7 +11,7 @@
 
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/vuetify.png)
 
-### 实际应用（基于GoMybatis的商城项目）[点击](https://github.com/zhuxiujia/GoMybatisMall)
+### 实际应用[点击-GoMybatis商城](https://github.com/zhuxiujia/GoMybatisMall)
 
 ### 使用教程请仔细阅读文档网站 [文档](https://zhuxiujia.github.io/gomybatis.io/#/getting-started)
 
