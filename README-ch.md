@@ -330,6 +330,10 @@ go run XmlCreateTool.go
 
 
 
+## 为了让您快速学习此框架，建议查看在实际项目中的应用 [点击-GoMybatis商城](https://github.com/zhuxiujia/GoMybatisMall) 
+
+
+
 ## 规划
 * 推荐新项目 https://github.com/rbatis/rbatis 提供高性能，无GC,无并发安全问题，内存安全的rust语言 orm框架
 
