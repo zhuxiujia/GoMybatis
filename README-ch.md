@@ -300,6 +300,9 @@ go run XmlCreateTool.go
 ```
  
  
+## 为了让您快速学习此框架，建议查看在实际项目中的应用 [点击-GoMybatis商城](https://github.com/zhuxiujia/GoMybatisMall) 
+ 
+ 
 ## 建议使用的框架（已应用在生产环境）配合GoMybatis
 #### [easy_mvc](https://github.com/zhuxiujia/easy_mvc) 
 * 整体基于反射tag，所有配置（包括http方法，路径，参数，swagger文档参数）都集中于你定义的函数之后
