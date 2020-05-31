@@ -334,7 +334,7 @@ go run XmlCreateTool.go
 
 
 
-## 规划
+## 新特性规划
 * 内置方法explain目录下所有sql，获取每条sql是否走索引.避免上线后因为sql扫全表导致卡顿和死锁悲剧
 * 新项目 https://github.com/rbatis/rbatis 提供高性能，无GC,无并发安全问题，内存安全的rust语言 orm框架
 
