@@ -335,7 +335,8 @@ go run XmlCreateTool.go
 
 
 ## 规划
-* 推荐新项目 https://github.com/rbatis/rbatis 提供高性能，无GC,无并发安全问题，内存安全的rust语言 orm框架
+* 内置方法explain目录下所有sql，获取每条sql是否走索引.避免上线后因为sql扫全表导致卡顿和死锁悲剧
+* 新项目 https://github.com/rbatis/rbatis 提供高性能，无GC,无并发安全问题，内存安全的rust语言 orm框架
 
 ## 请及时关注版本，尽可能使用最新版本(稳定，修复bug) 
 * 不管是商业用途还是个人使用GoMybatis项目，必须在Issues里留言您的项目名称+联系方式 ！
