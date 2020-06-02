@@ -61,9 +61,6 @@ type SessionEngine interface {
 	//设置session工厂
 	SetSessionFactory(factory *SessionFactory)
 
-	//sql类型转换器
-	SqlArgTypeConvert() ast.SqlArgTypeConvert
-
 	//设置sql类型转换器
 	SetSqlArgTypeConvert(convert ast.SqlArgTypeConvert)
 

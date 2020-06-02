@@ -6,7 +6,6 @@ import (
 )
 
 type GoMybatisSqlBuilder struct {
-	sqlArgTypeConvert     ast.SqlArgTypeConvert
 	expressionEngineProxy ExpressionEngineProxy
 	enableLog             bool
 	nodeParser            ast.NodeParser
@@ -15,18 +14,13 @@ type GoMybatisSqlBuilder struct {
 func (it *GoMybatisSqlBuilder) ExpressionEngineProxy() *ExpressionEngineProxy {
 	return &it.expressionEngineProxy
 }
-func (it *GoMybatisSqlBuilder) SqlArgTypeConvert() ast.SqlArgTypeConvert {
-	return it.sqlArgTypeConvert
-}
 
-func (it GoMybatisSqlBuilder) New(SqlArgTypeConvert ast.SqlArgTypeConvert, expressionEngine ExpressionEngineProxy, log Log, enableLog bool) GoMybatisSqlBuilder {
-	it.sqlArgTypeConvert = SqlArgTypeConvert
+func (it GoMybatisSqlBuilder) New(expressionEngine ExpressionEngineProxy, log Log, enableLog bool) GoMybatisSqlBuilder {
 	it.expressionEngineProxy = expressionEngine
 	it.enableLog = enableLog
 	it.nodeParser = ast.NodeParser{
 		Holder: ast.NodeConfigHolder{
-			Convert: SqlArgTypeConvert,
-			Proxy:   &expressionEngine,
+			Proxy: &expressionEngine,
 		},
 	}
 	return it

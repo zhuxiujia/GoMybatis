@@ -57,7 +57,7 @@ func (it GoMybatisEngine) New() GoMybatisEngine {
 
 	if it.sqlBuilder == nil {
 		var expressionEngineProxy = ExpressionEngineProxy{}.New(it.ExpressionEngine(), true)
-		var builder = GoMybatisSqlBuilder{}.New(it.SqlArgTypeConvert(), expressionEngineProxy, it.Log(), it.LogEnable())
+		var builder = GoMybatisSqlBuilder{}.New(expressionEngineProxy, it.Log(), it.LogEnable())
 		it.sqlBuilder = &builder
 	}
 
@@ -138,12 +138,6 @@ func (it *GoMybatisEngine) SessionFactory() *SessionFactory {
 func (it *GoMybatisEngine) SetSessionFactory(factory *SessionFactory) {
 	it.initCheck()
 	it.sessionFactory = factory
-}
-
-//sql类型转换器
-func (it *GoMybatisEngine) SqlArgTypeConvert() ast.SqlArgTypeConvert {
-	it.initCheck()
-	return it.sqlArgTypeConvert
 }
 
 //设置sql类型转换器

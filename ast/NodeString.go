@@ -25,7 +25,7 @@ func (it *NodeString) Eval(env map[string]interface{}, arg_array *[]interface{},
 	var data = it.value
 	var err error
 	if it.expressMap != nil {
-		data, err = Replace(it.expressMap, data, it.holder.Convert, env, it.holder.GetExpressionEngineProxy(), arg_array, stmtConvert)
+		data, err = Replace(it.expressMap, data, env, it.holder.GetExpressionEngineProxy(), arg_array, stmtConvert)
 		if err != nil {
 			return nil, err
 		}
