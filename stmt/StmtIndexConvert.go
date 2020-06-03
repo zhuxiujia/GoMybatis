@@ -5,5 +5,7 @@ package stmt
 // oracle : input 0 ->   :val1
 // sqlite: input 0 ->   " ? "
 type StmtIndexConvert interface {
-	Convert(index int) string
+	Convert() string
+	Inc()
+	Get()int
 }

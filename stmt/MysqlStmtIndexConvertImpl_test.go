@@ -4,7 +4,7 @@ import "testing"
 
 func TestMysqlStmtIndexConvertImpl_Convert(t *testing.T) {
 	var convert = MysqlStmtIndexConvertImpl{}
-	if " ? " != convert.Convert(0) {
+	if " ? " != convert.Convert() {
 		panic("TestMysqlStmtIndexConvertImpl_Convert fail")
 	}
 }
