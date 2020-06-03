@@ -9,7 +9,7 @@ import (
 )
 
 //执行替换操作
-func Replace(findStrs []string, data string, arg map[string]interface{}, engine ExpressionEngine, arg_array *[]interface{}, indexConvert stmt.StmtIndexConvert) (string, error) {
+func Replace(findStrs []string, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine ExpressionEngine, arg_array *[]interface{}, indexConvert stmt.StmtIndexConvert) (string, error) {
 	for index, findStr := range findStrs {
 
 		//find param arg
@@ -26,6 +26,7 @@ func Replace(findStrs []string, data string, arg map[string]interface{}, engine 
 			*arg_array = append(*arg_array, evalData)
 		}
 		//replace index
+		indexConvert.Inc()
 		data = strings.Replace(data, "#{"+findStr+"}", indexConvert.Convert(index), -1)
 	}
 	return data, nil

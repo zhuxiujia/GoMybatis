@@ -1,7 +1,13 @@
 package ast
 
+
 type NodeConfigHolder struct {
-	Proxy ExpressionEngine
+	Convert SqlArgTypeConvert
+	Proxy   ExpressionEngine
+}
+
+func (it *NodeConfigHolder) GetSqlArgTypeConvert() SqlArgTypeConvert {
+	return it.Convert
 }
 
 func (it *NodeConfigHolder) GetExpressionEngineProxy() ExpressionEngine {
