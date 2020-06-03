@@ -10,7 +10,7 @@ import (
 
 //执行替换操作
 func Replace(findStrs []string, data string, typeConvert SqlArgTypeConvert, arg map[string]interface{}, engine ExpressionEngine, arg_array *[]interface{}, indexConvert stmt.StmtIndexConvert) (string, error) {
-	for index, findStr := range findStrs {
+	for _, findStr := range findStrs {
 
 		//find param arg
 		var argValue = arg[findStr]
@@ -27,7 +27,7 @@ func Replace(findStrs []string, data string, typeConvert SqlArgTypeConvert, arg 
 		}
 		//replace index
 		indexConvert.Inc()
-		data = strings.Replace(data, "#{"+findStr+"}", indexConvert.Convert(index), -1)
+		data = strings.Replace(data, "#{"+findStr+"}", indexConvert.Convert(), -1)
 	}
 	return data, nil
 }
