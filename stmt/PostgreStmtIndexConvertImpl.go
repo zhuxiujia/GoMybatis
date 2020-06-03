@@ -7,19 +7,19 @@ import (
 
 type PostgreStmtIndexConvertImpl struct {
 	sync.RWMutex
-	Counter int
+	counter int
 }
 
 func (p *PostgreStmtIndexConvertImpl) Inc() {
 	p.Lock()
 	defer p.Unlock()
-	p.Counter++
+	p.counter++
 }
 
 func (p *PostgreStmtIndexConvertImpl) Get() int {
 	p.RLock()
 	defer p.RUnlock()
-	return p.Counter
+	return p.counter
 }
 
 func (p *PostgreStmtIndexConvertImpl) Convert() string {

@@ -7,7 +7,7 @@ import (
 
 type OracleStmtIndexConvertImpl struct {
 	sync.RWMutex
-	Counter int
+	counter int
 }
 
 func (it *OracleStmtIndexConvertImpl) Convert() string {
@@ -17,11 +17,11 @@ func (it *OracleStmtIndexConvertImpl) Convert() string {
 func (it *OracleStmtIndexConvertImpl) Inc() {
 	it.Lock()
 	defer it.Unlock()
-	it.Counter++
+	it.counter++
 }
 
 func (it *OracleStmtIndexConvertImpl) Get() int {
 	it.RLock()
 	defer it.RUnlock()
-	return it.Counter
+	return it.counter
 }
