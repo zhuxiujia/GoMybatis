@@ -22,8 +22,8 @@ var _XmlData = `<?xml version="1.0" encoding="UTF-8"?>
 `
 var _XmlLogicEnable = `logic_enable="true" logic_undelete="1" logic_deleted="0"`
 var _XmlVersionEnable = `version_enable="true"`
-var _XmlIdItem = `<id column="id" property="id"/>`
-var _ResultItem = `<result column="#{column}" property="#{property}" langType="#{langType}" #{version} #{logic} />`
+var _XmlIdItem = `  <id column="id"/>`
+var _ResultItem = `  <result column="#{column}" langType="#{langType}" #{version} #{logic} />`
 
 /**
 //例子
@@ -48,7 +48,7 @@ func TestUserAddres(t *testing.T)  {
 	utils.OutPutXml("D:/GOPATH/src/dao/ActivityMapper.xml",[]byte(s))//写入磁盘
 }
 */
-//根据结构体 创建xml文件.注意 结构体json对应的是数据库的column，结构体Field 对应的是property
+//根据结构体 创建xml文件.注意 结构体json对应的是数据库的column
 func CreateXml(tableName string, bean interface{}) []byte {
 	var content = ""
 	var tv = reflect.TypeOf(bean)
@@ -57,13 +57,11 @@ func CreateXml(tableName string, bean interface{}) []byte {
 	}
 	for i := 0; i < tv.NumField(); i++ {
 		var item = tv.Field(i)
-		var property = item.Name
 		var jsonName = item.Tag.Get("json")
-		var itemStr = strings.Replace(_ResultItem, "#{property}", property, -1)
-		itemStr = strings.Replace(itemStr, "#{column}", jsonName, -1)
+		var itemStr = strings.Replace(_ResultItem, "#{column}", jsonName, -1)
 		itemStr = strings.Replace(itemStr, "#{langType}", item.Type.Name(), -1)
 		var gm = item.Tag.Get("gm")
-		if gm == "id" || jsonName == "id" || strings.EqualFold(property, "id") {
+		if gm == "id" || jsonName == "id" {
 			content += _XmlIdItem
 			content += "\n"
 			continue

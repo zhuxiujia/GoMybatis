@@ -28,14 +28,12 @@
 
         <!ELEMENT id EMPTY>
         <!ATTLIST id
-                property CDATA #IMPLIED
                 langType CDATA #IMPLIED
                 column CDATA #IMPLIED
                 >
 
         <!ELEMENT result EMPTY>
         <!ATTLIST result
-                property CDATA #IMPLIED
                 langType CDATA #IMPLIED
                 column CDATA #IMPLIED
 
@@ -52,12 +50,6 @@
                 select CDATA #IMPLIED
                 resultMap CDATA #IMPLIED
                 name CDATA #IMPLIED
-                >
-
-        <!ELEMENT property EMPTY>
-        <!ATTLIST property
-                name CDATA #REQUIRED
-                value CDATA #REQUIRED
                 >
 
         <!ELEMENT typeAlias EMPTY>
