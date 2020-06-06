@@ -62,22 +62,6 @@ func Test_Convert_Basic_Type(t *testing.T) {
 	fmt.Println("Test_Convert_Basic_Type,time=", timeResult)
 }
 
-//解码数组
-func Test_Convert_Slice(t *testing.T) {
-	var resMap = make(map[string][]byte)
-	resMap["Amount1"] = []byte("1908")
-	resMap["Amount2"] = []byte("1901")
-	var resMapArray = make([]map[string][]byte, 0)
-	resMapArray = append(resMapArray, resMap)
-
-	var result []int
-	var error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &result)
-	if error != nil {
-		t.Fatal(error)
-	}
-	fmt.Println("Test_Convert_Slice", result)
-}
-
 //解码map
 func Test_Convert_Map(t *testing.T) {
 	var resMap = make(map[string][]byte)
@@ -86,7 +70,7 @@ func Test_Convert_Map(t *testing.T) {
 	var resMapArray = make([]map[string][]byte, 0)
 	resMapArray = append(resMapArray, resMap)
 
-	var result map[string]string
+	var result map[string]interface{}
 	var error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &result)
 	if error != nil {
 		t.Fatal(error)
@@ -95,7 +79,7 @@ func Test_Convert_Map(t *testing.T) {
 
 	resMapArray = append(resMapArray, resMap)
 
-	var resultMapArray []map[string]string
+	var resultMapArray []map[string]interface{}
 	error = GoMybatisSqlResultDecoder{}.Decode(nil, resMapArray, &resultMapArray)
 	if error != nil {
 		t.Fatal(error)
@@ -115,7 +99,7 @@ func Test_convert_struct(t *testing.T) {
 	resMap["Age2"] = []byte("1908")
 	resMap["Age3"] = []byte("1908")
 	resMap["Age4"] = []byte("1908")
-	resMap["Age5"] = []byte("1908")
+	resMap["Age5"] = []byte("1")
 	resMap["Age6"] = []byte("1908")
 	resMap["Age7"] = []byte("1908")
 	resMap["Age8"] = []byte("1908")
@@ -124,6 +108,44 @@ func Test_convert_struct(t *testing.T) {
 
 	var result TestResult
 	GoMybatisSqlResultDecoder.Decode(nil, res, &result)
+
+	if result.Name != string(resMap["Name"]) {
+		panic("convert_struct Name fail")
+	}
+	if result.Amount1 != 1908.1 {
+		panic("convert_struct Amount1 fail")
+	}
+	if result.Amount2 != 1908.444 {
+		panic("convert_struct Amount2 fail")
+	}
+
+	if result.Age1 != 1908 {
+		panic("convert_struct Age1 fail")
+	}
+	if result.Age2 != 1908 {
+		panic("convert_struct Age1 fail")
+	}
+	if result.Age3 != 1908 {
+		panic("convert_struct Age1 fail")
+	}
+	if result.Age4 != 1908 {
+		panic("convert_struct Age1 fail")
+	}
+	if result.Age5 != 1 {
+		panic("convert_struct Age1 fail")
+	}
+	if result.Age6 != 1908 {
+		panic("convert_struct Age1 fail")
+	}
+	if result.Age7 != 1908 {
+		panic("convert_struct Age1 fail")
+	}
+	if result.Age8 != 1908 {
+		panic("convert_struct Age1 fail")
+	}
+	if result.Bool != true {
+		panic("convert_struct Bool fail")
+	}
 
 	fmt.Println("Test_convert_struct", result)
 }

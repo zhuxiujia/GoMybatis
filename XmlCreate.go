@@ -48,7 +48,7 @@ func TestUserAddres(t *testing.T)  {
 	utils.OutPutXml("D:/GOPATH/src/dao/ActivityMapper.xml",[]byte(s))//写入磁盘
 }
 */
-//根据结构体 创建xml文件
+//根据结构体 创建xml文件.注意 结构体json对应的是数据库的column，结构体Field 对应的是property
 func CreateXml(tableName string, bean interface{}) []byte {
 	var content = ""
 	var tv = reflect.TypeOf(bean)
