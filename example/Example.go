@@ -7,7 +7,7 @@ import "time"
 const MysqlUri = "*"
 
 //定义数据库模型
-//例子：Activity 活动数据
+//例子：Activity 活动数据,注意GoMybatis json tag 等价于数据库字段
 type Activity struct {
 	Id         string    `json:"id,omitempty"`
 	Uuid       string    `json:"uuid"`
