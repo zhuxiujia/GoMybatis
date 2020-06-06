@@ -225,25 +225,21 @@ func Test_Decode_Interface(t *testing.T) {
 	resultMap["id"] = &ResultProperty{
 		XMLName:  "id",
 		Column:   "id",
-		Property: "id",
 		LangType: "string",
 	}
 	resultMap["name"] = &ResultProperty{
 		XMLName:  "result",
 		Column:   "name",
-		Property: "Name",
 		LangType: "string",
 	}
 	resultMap["Amount_1"] = &ResultProperty{
 		XMLName:  "result",
 		Column:   "Amount_1",
-		Property: "amount_1",
 		LangType: "string",
 	}
 	resultMap["amount_2"] = &ResultProperty{
 		XMLName:  "result",
 		Column:   "Amount_2",
-		Property: "amount_2",
 		LangType: "string",
 	}
 	var result map[string]string

@@ -7,7 +7,7 @@
     <!--logic_undelete 逻辑删除 未删除字段-->
     <!--version_enable 乐观锁版本字段,支持int,int8,int16,int32,int64-->
     <resultMap id="BaseResultMap" tables="biz_activity">
-        <id column="id"/>
+        <id column="id" langType="string"/>
         <result column="name" langType="string"/>
         <result column="pc_link" langType="string"/>
         <result column="h5_link" langType="string"/>
@@ -105,11 +105,11 @@
         update biz_activity
         <set>
             <if test="name != nil">name = #{name},</if>
-            <if test="pcLink != nil">pc_link = #{pcLink},</if>
-            <if test="h5Link != nil">h5_link = #{h5Link},</if>
+            <if test="pc_link != nil">pc_link = #{pc_link},</if>
+            <if test="h5_link != nil">h5_link = #{h5_link},</if>
             <if test="remark != nil">remark = #{remark},</if>
-            <if test="createTime != nil">create_time = #{createTime},</if>
-            <if test="deleteFlag != nil ">delete_flag = #{deleteFlag},</if>
+            <if test="create_time != nil">create_time = #{create_time},</if>
+            <if test="delete_flag != nil ">delete_flag = #{delete_flag},</if>
         </set>
         where id = #{id} and delete_flag = 1
     </update>
@@ -118,21 +118,21 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != nil">id,</if>
             <if test="name != nil">name,</if>
-            <if test="pcLink != nil">pc_link,</if>
-            <if test="h5Link != nil">h5_link,</if>
+            <if test="pc_link != nil">pc_link,</if>
+            <if test="h5_link != nil">h5_link,</if>
             <if test="remark != nil">remark,</if>
-            <if test="createTime != nil">create_time,</if>
-            <if test="deleteFlag != nil">delete_flag,</if>
+            <if test="create_time != nil">create_time,</if>
+            <if test="delete_flag != nil">delete_flag,</if>
         </trim>
 
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != nil">#{id},</if>
             <if test="name != nil">#{name},</if>
-            <if test="pcLink != nil">#{pcLink},</if>
-            <if test="h5Link != nil">#{h5Link},</if>
+            <if test="pc_link != nil">#{pc_link},</if>
+            <if test="h5_link != nil">#{h5_link},</if>
             <if test="remark != nil">#{remark},</if>
-            <if test="createTime != nil">#{createTime},</if>
-            <if test="deleteFlag != nil">#{deleteFlag},</if>
+            <if test="create_time != nil">#{create_time},</if>
+            <if test="delete_flag != nil">#{delete_flag},</if>
         </trim>
     </insert>
 

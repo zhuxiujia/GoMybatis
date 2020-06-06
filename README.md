@@ -112,15 +112,15 @@ func main() {
     <!--logic_undelete Logically Delete Undeleted Fields-->
     <!--version_enable Optimistic lock version field, support int, int8, int16, int32, Int64-->
     <resultMap id="BaseResultMap" tables="biz_activity">
-        <id column="id" property="id"/>
-        <result column="name" property="Name" langType="string"/>
-        <result column="pc_link" property="PcLink" langType="string"/>
-        <result column="h5_link" property="H5Link" langType="string"/>
-        <result column="remark" property="Remark" langType="string"/>
-        <result column="version" property="Version" langType="int"
+        <id column="id" />
+        <result column="name"  langType="string"/>
+        <result column="pc_link"  langType="string"/>
+        <result column="h5_link"  langType="string"/>
+        <result column="remark"  langType="string"/>
+        <result column="version"  langType="int"
                 version_enable="true"/>
-        <result column="create_time" property="CreateTime" langType="time.Time"/>
-        <result column="delete_flag" property="DeleteFlag" langType="int"
+        <result column="create_time"  langType="time.Time"/>
+        <result column="delete_flag"  langType="int"
                 logic_enable="true"
                 logic_undelete="1"
                 logic_deleted="0"/>
