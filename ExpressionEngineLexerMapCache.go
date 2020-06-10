@@ -6,14 +6,11 @@ import (
 )
 
 type ExpressionEngineLexerMapCache struct {
-	mapCache map[string]interface{}
+	mapCache sync.Map
 	lock     sync.RWMutex
 }
 
 func (it ExpressionEngineLexerMapCache) New() ExpressionEngineLexerMapCache {
-	if it.mapCache == nil {
-		it.mapCache = make(map[string]interface{})
-	}
 	return it
 }
 
@@ -23,14 +20,17 @@ func (it *ExpressionEngineLexerMapCache) Set(expression string, lexer interface{
 	}
 	it.lock.Lock()
 	defer it.lock.Unlock()
-	it.mapCache[expression] = lexer
+	it.mapCache.Store(expression, lexer)
 	return nil
 }
 func (it *ExpressionEngineLexerMapCache) Get(expression string) (interface{}, error) {
 	var result interface{}
 	it.lock.RLock()
 	defer it.lock.RUnlock()
-	result = it.mapCache[expression]
+	result, ok := it.mapCache.Load(expression)
+	if !ok {
+		return nil, nil
+	}
 	return result, nil
 }
 func (it *ExpressionEngineLexerMapCache) Name() string {
