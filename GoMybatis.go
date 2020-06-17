@@ -54,7 +54,7 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionEngine SessionEngine) {
 	var mapperTree = LoadMapperXml(xml)
 	sessionEngine.TempleteDecoder().DecodeTree(mapperTree, bean.Type())
 	//构建期使用的map，无需考虑并发安全
-	var methodXmlMap = makeMethodXmlMap(bean, mapperTree, sessionEngine.SqlBuilder())
+	var methodXmlMap = makeMethodXmlMap(bean, mapperTree, sessionEngine)
 	var resultMaps = makeResultMaps(mapperTree)
 	var returnTypeMap = makeReturnTypeMap(bean.Elem().Type())
 	var beanName = bean.Type().PkgPath() + bean.Type().String()
@@ -243,7 +243,7 @@ func makeResultMaps(xmls map[string]etree.Token) map[string]map[string]*ResultPr
 }
 
 //return a map map[`method`]*MapperXml
-func makeMethodXmlMap(bean reflect.Value, mapperTree map[string]etree.Token, sqlBuilder SqlBuilder) map[string]*Mapper {
+func makeMethodXmlMap(bean reflect.Value, mapperTree map[string]etree.Token, engine SessionEngine) map[string]*Mapper {
 	var beanType = bean.Type()
 	if beanType.Kind() == reflect.Ptr {
 		beanType = beanType.Elem()
@@ -255,12 +255,12 @@ func makeMethodXmlMap(bean reflect.Value, mapperTree map[string]etree.Token, sql
 		var fieldItem = beanType.Field(i)
 		if fieldItem.Type.Kind() == reflect.Func {
 			//field must be func
-			methodFieldCheck(&beanType, &fieldItem)
+			methodFieldCheck(&beanType, &fieldItem, engine.IsPrintWarning())
 			var mapperXml = findMapperXml(mapperTree, fieldItem.Name)
 			if mapperXml != nil {
 				methodXmlMap[fieldItem.Name] = &Mapper{
 					xml:   mapperXml,
-					nodes: sqlBuilder.NodeParser().Parser(mapperXml.Child),
+					nodes: engine.SqlBuilder().NodeParser().Parser(mapperXml.Child),
 				}
 			} else {
 				if fieldItem.Name == NewSessionFunc {
@@ -275,7 +275,7 @@ func makeMethodXmlMap(bean reflect.Value, mapperTree map[string]etree.Token, sql
 }
 
 //方法基本规则检查
-func methodFieldCheck(beanType *reflect.Type, methodType *reflect.StructField) {
+func methodFieldCheck(beanType *reflect.Type, methodType *reflect.StructField, warning bool) {
 	if methodType.Type.NumOut() < 1 {
 		var buffer bytes.Buffer
 		buffer.WriteString("[GoMybatis] bean ")
@@ -304,7 +304,9 @@ func methodFieldCheck(beanType *reflect.Type, methodType *reflect.StructField) {
 
 	var args = methodType.Tag.Get("args")
 	if methodType.Type.NumOut() > 1 && args == "" && !(methodType.Name == "NewSession") {
-		log.Println("[GoMybatis] warning ======================== " + (*beanType).Name() + "." + methodType.Name + "() have not define tag args:\"\",maybe can not get param value!")
+		if warning {
+			log.Println("[GoMybatis] warning ======================== " + (*beanType).Name() + "." + methodType.Name + "() have not define tag args:\"\",maybe can not get param value!")
+		}
 	}
 }
 

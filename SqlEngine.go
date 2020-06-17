@@ -98,4 +98,6 @@ type SessionEngine interface {
 	GoroutineIDEnable() bool
 
 	LogSystem() *LogSystem
+
+	IsPrintWarning() bool
 }

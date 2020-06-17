@@ -11,6 +11,7 @@ import (
 type GoMybatisEngine struct {
 	mutex               sync.RWMutex          //读写锁
 	isInit              bool                  //是否初始化
+	isPrintWarning      bool                  //是否打印警告
 	dataSourceRouter    DataSourceRouter      //动态数据源路由器
 	log                 Log                   //日志实现类
 	logEnable           bool                  //是否允许日志输出（默认开启）
@@ -220,4 +221,12 @@ func (it *GoMybatisEngine) GoroutineIDEnable() bool {
 
 func (it *GoMybatisEngine) LogSystem() *LogSystem {
 	return it.logSystem
+}
+
+func (it *GoMybatisEngine) SetPrintWarning(print bool) {
+	it.isPrintWarning = print
+}
+
+func (it *GoMybatisEngine) IsPrintWarning() bool {
+	return it.isPrintWarning
 }
