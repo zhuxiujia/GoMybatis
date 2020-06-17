@@ -218,7 +218,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 					trimColumn.Child = append(trimColumn.Child, &etree.Element{
 						Tag: Element_If,
 						Attr: []etree.Attr{
-							{Key: "test", Value: it.makeIfNotNull(v.SelectAttrValue("property", ""))},
+							{Key: "test", Value: it.makeIfNotNull(v.SelectAttrValue("column", ""))},
 						},
 						Child: []etree.Token{
 							&etree.CharData{
@@ -245,7 +245,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 
 		if collectionName == "" {
 			for _, v := range resultMapData.ChildElements() {
-				if logic.Enable && v.SelectAttrValue("property", "") == logic.Property {
+				if logic.Enable && v.SelectAttrValue("column", "") == logic.Property {
 					tempElement.Child = append(tempElement.Child, &etree.CharData{
 						Data: logic.Undelete_value + ",",
 					})
@@ -254,16 +254,16 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 				if inserts == "*?*" {
 					tempElement.Child = append(tempElement.Child, &etree.Element{
 						Tag:  Element_If,
-						Attr: []etree.Attr{{Key: "test", Value: it.makeIfNotNull(v.SelectAttrValue("property", ""))}},
+						Attr: []etree.Attr{{Key: "test", Value: it.makeIfNotNull(v.SelectAttrValue("column", ""))}},
 						Child: []etree.Token{
 							&etree.CharData{
-								Data: "#{" + v.SelectAttrValue("property", "") + "},",
+								Data: "#{" + v.SelectAttrValue("column", "") + "},",
 							},
 						},
 					})
 				} else if inserts == "*" {
 					tempElement.Child = append(tempElement.Child, &etree.CharData{
-						Data: "#{" + v.SelectAttrValue("property", "") + "},",
+						Data: "#{" + v.SelectAttrValue("column", "") + "},",
 					})
 				}
 			}
@@ -278,7 +278,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 					prefix = "("
 				}
 				//TODO serch property
-				var defProperty = v.SelectAttrValue("property", "")
+				var defProperty = v.SelectAttrValue("column", "")
 				if method != nil {
 					for i := 0; i < method.Type.NumIn(); i++ {
 						var argItem = method.Type.In(i)
@@ -305,7 +305,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 					}
 				}
 				var value = prefix + "#{" + "item." + defProperty + "}"
-				if logic.Enable && v.SelectAttrValue("property", "") == logic.Property {
+				if logic.Enable && v.SelectAttrValue("column", "") == logic.Property {
 					value = `'` + logic.Undelete_value + "'"
 				}
 				if index+1 == len(resultMapData.ChildElements()) {
@@ -364,7 +364,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 					if v.SelectAttrValue("version_enable", "") == "true" {
 						continue
 					}
-					columns += v.SelectAttrValue("property", "") + "?" + v.SelectAttrValue("column", "") + " = #{" + v.SelectAttrValue("property", "") + "},"
+					columns += v.SelectAttrValue("column", "") + "?" + v.SelectAttrValue("column", "") + " = #{" + v.SelectAttrValue("column", "") + "},"
 				}
 			}
 			columns = strings.Trim(columns, ",")
@@ -592,7 +592,7 @@ func (it *GoMybatisTempleteDecoder) decodeLogicDelete(xml *etree.Element) LogicD
 			logicData.Deleted_value = v.SelectAttrValue("logic_deleted", "")
 			logicData.Undelete_value = v.SelectAttrValue("logic_undelete", "")
 			logicData.Column = v.SelectAttrValue("column", "")
-			logicData.Property = v.SelectAttrValue("property", "")
+			logicData.Property = v.SelectAttrValue("column", "")
 			logicData.LangType = v.SelectAttrValue("langType", "")
 			//check
 			if logicData.Deleted_value == "" {
@@ -619,7 +619,7 @@ func (it *GoMybatisTempleteDecoder) decodeVersionData(xml *etree.Element) *Versi
 
 			var versionData = VersionData{}
 			versionData.Column = v.SelectAttrValue("column", "")
-			versionData.Property = v.SelectAttrValue("property", "")
+			versionData.Property = v.SelectAttrValue("column", "")
 			versionData.LangType = v.SelectAttrValue("langType", "")
 			//check
 			if !(strings.Contains(versionData.LangType, "int") || strings.Contains(versionData.LangType, "time.Time")) {

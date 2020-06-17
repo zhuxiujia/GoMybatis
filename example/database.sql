@@ -1,50 +1,62 @@
+-- MySQL dump 10.13  Distrib 8.0.16, for Win64 (x86_64)
+--
+-- Host: 127.0.0.1    Database: test
+-- ------------------------------------------------------
+-- Server version	5.7.30
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+ SET NAMES utf8 ;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `biz_activity`
+--
+
 DROP TABLE IF EXISTS `biz_activity`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
 CREATE TABLE `biz_activity` (
-  `id` varchar(255) NOT NULL,
+  `id` varchar(50) NOT NULL DEFAULT '' COMMENT '唯一活动码',
   `name` varchar(255) NOT NULL,
-  `uuid` varchar(50) DEFAULT NULL,
   `pc_link` varchar(255) DEFAULT NULL,
   `h5_link` varchar(255) DEFAULT NULL,
+  `sort` varchar(255) NOT NULL COMMENT '排序',
+  `status` int(11) NOT NULL COMMENT '状态（0：已下线，1：已上线）',
+  `version` int(11) NOT NULL,
   `remark` varchar(255) DEFAULT NULL,
-  `version` int(11) DEFAULT 0,
-  `create_time` datetime NULL,
+  `create_time` datetime NOT NULL,
   `delete_flag` int(1) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='test';
+  `pc_banner_img` varchar(255) DEFAULT NULL,
+  `h5_banner_img` varchar(255) DEFAULT NULL,
+  `bbb` bit(4) DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='运营管理-活动管理';
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- ----------------------------
--- Records of biz_activity
--- ----------------------------
-INSERT INTO `biz_activity` VALUES ('165', '安利一波大表哥', null, 'http://www.baidu.com', 'http://www.taobao.com', 'ceshi', '2018-05-23 15:21:22', '1');
-INSERT INTO `biz_activity` VALUES ('166', '注册送好礼', null, '', 'www.baidu.com', '测试', '2018-05-24 10:36:31', '1');
-INSERT INTO `biz_activity` VALUES ('167', 'hello', null, 'www.baidu.com', 'www.baidu.com', 'ceshi', '2018-05-24 10:41:17', '1');
-INSERT INTO `biz_activity` VALUES ('168', 'rs168', null, null, null, null, '2018-05-23 15:21:22', '1');
-INSERT INTO `biz_activity` VALUES ('169', 'rs168', null, null, null, null, '2018-05-23 15:21:22', '1');
-INSERT INTO `biz_activity` VALUES ('170', 'rs168-10', null, null, null, null, '2018-05-23 15:21:22', '1');
+--
+-- Dumping data for table `biz_activity`
+--
 
+LOCK TABLES `biz_activity` WRITE;
+/*!40000 ALTER TABLE `biz_activity` DISABLE KEYS */;
+INSERT INTO `biz_activity` VALUES ('1','活动1',NULL,NULL,'1',1,1,NULL,'2019-12-12 00:00:00',1,NULL,NULL,NULL),('178','test_insret','','','1',1,0,'','2020-06-17 20:08:13',1,NULL,NULL,NULL);
+/*!40000 ALTER TABLE `biz_activity` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
-DROP TABLE IF EXISTS `biz_property`;
-CREATE TABLE `biz_property` (
-  `id` varchar(255) NOT NULL,
-  `user_id` varchar(255) NOT NULL,
-  `total_amount` decimal(18,0) DEFAULT '0',
-  `total_profit` decimal(18,0) DEFAULT '0',
-  `can_use_amount` decimal(18,0) DEFAULT '0' COMMENT '平台可用余额',
-  `freeze` decimal(18,0) DEFAULT '0' COMMENT '冻结',
-  `pool_total_amount` decimal(18,0) DEFAULT '0' COMMENT '资金池，总金额（余额+收益）',
-  `pool_amount` decimal(18,0) DEFAULT '0' COMMENT '资金池/钱包余额',
-  `pool_profit` decimal(18,0) DEFAULT '0' COMMENT '资金池收益',
-  `pool_freeze` decimal(18,0) DEFAULT '0' COMMENT '资金池投资冻结',
-  `accumulation_profit` decimal(18,0) DEFAULT '0' COMMENT '累计收益',
-  `integral` decimal(18,0) DEFAULT '0' COMMENT '积分',
-  `create_time` datetime DEFAULT NULL,
-  `update_time` datetime DEFAULT NULL,
-  `status` int(11) NOT NULL DEFAULT '1',
-  `delete_flag` int(1) DEFAULT '1',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
-
-
-INSERT INTO `test`.`biz_property` (`id`, `user_id`, `total_amount`, `total_profit`, `can_use_amount`, `freeze`, `pool_total_amount`, `pool_amount`, `pool_profit`, `pool_freeze`, `accumulation_profit`, `integral`, `create_time`, `update_time`, `status`, `delete_flag`) VALUES ('20180926172014a2a48a9491004603', '20180926172013b85403d3715d46ed', '14500', '0', '0', '0', '14500', '14800', '0', '100', '0', '0', '2018-09-26 17:20:14', '2018-10-23 16:34:21', '0', '1');
-INSERT INTO `test`.`biz_property` (`id`, `user_id`, `total_amount`, `total_profit`, `can_use_amount`, `freeze`, `pool_total_amount`, `pool_amount`, `pool_profit`, `pool_freeze`, `accumulation_profit`, `integral`, `create_time`, `update_time`, `status`, `delete_flag`) VALUES ('2018102316263216637761fee373d4', '20181023162632152fd236d6877ff4', '14500', '0', '0', '0', '14500', '14400', '0', '0', '0', '0', '2018-10-23 16:26:32', '2018-10-23 16:35:00', '1', '1');
+-- Dump completed on 2020-06-17 20:09:04

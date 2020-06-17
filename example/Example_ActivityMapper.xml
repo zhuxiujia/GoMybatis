@@ -12,6 +12,8 @@
         <result column="pc_link" langType="string"/>
         <result column="h5_link" langType="string"/>
         <result column="remark" langType="string"/>
+        <result column="sort" langType="int"/>
+        <result column="status" langType="status"/>
         <result column="version" langType="int"
                 version_enable="true"/>
         <result column="create_time" langType="time.Time"/>

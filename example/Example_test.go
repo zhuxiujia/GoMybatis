@@ -70,7 +70,7 @@ func init() {
 	engine = GoMybatis.GoMybatisEngine{}.New()
 
 	//设置打印自动生成的xml 到控制台方便调试，false禁用
-	engine.TempleteDecoder().SetPrintElement(false)
+	engine.TempleteDecoder().SetPrintElement(true)
 	//设置是否打印警告(建议开启)
 	engine.SetPrintWarning(false)
 
@@ -316,7 +316,7 @@ func TestInsertTemplete(t *testing.T) {
 		return
 	}
 	//使用mapper
-	var result, err = exampleActivityMapper.InsertTemplete(Activity{Id: "178", Name: "test_insret", CreateTime: time.Now(), DeleteFlag: 1})
+	var result, err = exampleActivityMapper.InsertTemplete(Activity{Id: "178", Name: "test_insret", CreateTime: time.Now(), Sort: 1, Status: 1, DeleteFlag: 1})
 	if err != nil {
 		panic(err)
 	}
@@ -331,16 +331,19 @@ func TestInsertTempleteBatch(t *testing.T) {
 	}
 	var args = []Activity{
 		{
-			Id:   "221",
-			Name: "test",
+			Id:         "221",
+			Name:       "test",
+			CreateTime: time.Now(),
 		},
 		{
-			Id:   "222",
-			Name: "test",
+			Id:         "222",
+			Name:       "test",
+			CreateTime: time.Now(),
 		},
 		{
-			Id:   "223",
-			Name: "test",
+			Id:         "223",
+			Name:       "test",
+			CreateTime: time.Now(),
 		},
 	}
 	n, err := exampleActivityMapper.InsertTempleteBatch(args)
