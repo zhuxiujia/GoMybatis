@@ -126,20 +126,24 @@ func main() {
     <!--logic_undelete 逻辑删除 未删除字段-->
     <!--version_enable 乐观锁版本字段,支持int,int8,int16,int32,int64-->
     <resultMap id="BaseResultMap" tables="biz_activity">
-        <id column="id" />
-        <result column="name"  langType="string"/>
-        <result column="pc_link"  langType="string"/>
-        <result column="h5_link"  langType="string"/>
-        <result column="remark"  langType="string"/>
-        <result column="version"  langType="int"
+        <id column="id" langType="string"/>
+        <result column="name" langType="string"/>
+        <result column="pc_link" langType="string"/>
+        <result column="h5_link" langType="string"/>
+        <result column="remark" langType="string"/>
+        <result column="sort" langType="int"/>
+        <result column="status" langType="status"/>
+        <result column="version" langType="int"
                 version_enable="true"/>
-        <result column="create_time"  langType="time.Time"/>
-        <result column="delete_flag"  langType="int"
+        <result column="create_time" langType="time.Time"/>
+        <result column="delete_flag" langType="int"
                 logic_enable="true"
                 logic_undelete="1"
                 logic_deleted="0"/>
     </resultMap>
+
     <!--模板标签: columns wheres sets 支持逗号,分隔表达式，*?* 为判空表达式-->
+
     <!--插入模板:默认id="insertTemplete,test="field != null",where自动设置逻辑删除字段,支持批量插入" -->
     <insertTemplete/>
     <!--查询模板:默认id="selectTemplete,where自动设置逻辑删除字段-->
