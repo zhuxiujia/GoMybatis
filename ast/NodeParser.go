@@ -161,13 +161,9 @@ func (it NodeParser) Parser(mapperXml []etree.Token) []Node {
 				node = &n
 				break
 			case "where":
-				n := NodeTrim{
-					t:               NTrim,
-					prefix:          []byte(DefaultWhereElement_Prefix),
-					suffix:          []byte(v.SelectAttrValue("suffix", "")),
-					prefixOverrides: []byte(DefaultWhereElement_PrefixOverrides),
-					suffixOverrides: []byte(v.SelectAttrValue("suffixOverrides", "")),
-					childs:          []Node{},
+				n := NodeWhere{
+					t:      NWhere,
+					childs: []Node{},
 				}
 				if childItems != nil {
 					var childNodes = it.Parser(childItems)

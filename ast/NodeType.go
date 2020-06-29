@@ -13,6 +13,7 @@ const (
 	NWhen
 	NBind
 	NInclude
+	NWhere
 )
 
 func (it NodeType) ToString() string {
@@ -35,6 +36,8 @@ func (it NodeType) ToString() string {
 		return "NBind"
 	case NInclude:
 		return "NInclude"
+	case NWhere:
+		return "NWhere"
 	}
 	return "Unknow"
 }
