@@ -38,6 +38,10 @@ func (it *NodeWhere) Eval(env map[string]interface{}, arg_array *[]interface{}, 
 	sql = bytes.TrimPrefix(sql, []byte("AND"))
 	sql = bytes.TrimPrefix(sql, []byte("And"))
 
+	sql = bytes.TrimPrefix(sql, []byte("or"))
+	sql = bytes.TrimPrefix(sql, []byte("OR"))
+	sql = bytes.TrimPrefix(sql, []byte("Or"))
+
 	var newBuffer bytes.Buffer
 	newBuffer.WriteString(` `)
 	newBuffer.WriteString("WHERE")
