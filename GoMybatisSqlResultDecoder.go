@@ -69,7 +69,7 @@ func (it GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultProperty,
 		for _, v := range sqlResult {
 			jsonData.Write(makeJsonObjBytes(resultMap, v, structMap))
 			//write ','
-			if index != done {
+			if index < done {
 				jsonData.WriteString(",")
 			}
 			index += 1
@@ -110,7 +110,7 @@ func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][
 				jsonData.WriteString("\":")
 				jsonData.Write(v)
 				//write ','
-				if index != done {
+				if index < done {
 					jsonData.WriteString(",")
 				}
 				index += 1
@@ -132,20 +132,25 @@ func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][
 					jsonData.Write(sqlV)
 				}
 				//write ','
-				if index != done {
+				if index < done {
 					jsonData.WriteString(",")
 				}
 				index += 1
 			}
 		}
 	} else {
-		var done = len(sqlData) - 1
-		var index = 0
+		var new_data = map[string][]byte{}
 		for k, v := range sqlData {
 			property := resultMap[k]
 			if property == nil {
 				continue
 			}
+			new_data[k] = v
+		}
+		var done = len(new_data) - 1
+		var index = 0
+		for k, v := range new_data {
+			property := resultMap[k]
 			//write key
 			jsonData.WriteString("\"")
 			jsonData.WriteString(property.Column)
@@ -159,13 +164,14 @@ func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][
 				jsonData.Write(v)
 			}
 			//write ','
-			if index != done {
+			if index < done {
 				jsonData.WriteString(",")
 			}
 			index += 1
 		}
 	}
 	jsonData.WriteString("}")
+	println(jsonData.String())
 	return []byte(jsonData.String())
 }
 
