@@ -171,7 +171,6 @@ func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][
 		}
 	}
 	jsonData.WriteString("}")
-	println(jsonData.String())
 	return []byte(jsonData.String())
 }
 
