@@ -20,6 +20,7 @@ type TestResult struct {
 	Age7    uint32  `json:"age_7"`
 	Age8    uint64  `json:"age_8"`
 	Bool    bool    `json:"bool"`
+	F       bool    `json:"f"`
 }
 
 //解码基本数据-int,string,time.Time...

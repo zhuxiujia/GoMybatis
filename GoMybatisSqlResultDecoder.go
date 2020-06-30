@@ -129,6 +129,9 @@ func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][
 					jsonData.WriteString(sqlVEncode(sqlV))
 					jsonData.WriteString("\"")
 				} else {
+					if len(sqlV) == 0 {
+						sqlV = []byte("null")
+					}
 					jsonData.Write(sqlV)
 				}
 				//write ','
@@ -161,6 +164,9 @@ func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][
 				jsonData.WriteString(sqlVEncode(sqlV))
 				jsonData.WriteString("\"")
 			} else {
+				if len(sqlV) == 0 {
+					sqlV = []byte("null")
+				}
 				jsonData.Write(sqlV)
 			}
 			//write ','
