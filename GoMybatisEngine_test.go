@@ -215,7 +215,7 @@ func InitMapperByLocalSession() ExampleActivityMapperImpl {
         "https://raw.githubusercontent.com/zhuxiujia/GoMybatis/master/mybatis-3-mapper.dtd">
 <mapper>
     <resultMap id="BaseResultMap" type="example.Activity">
-        <id column="id" property="id"/>
+        <id column="id" langType="id"/>
         <result column="name" property="name" langType="string"/>
         <result column="pc_link" property="pcLink" langType="string"/>
         <result column="h5_link" property="h5Link" langType="string"/>

@@ -34,7 +34,7 @@ func initMapper() {
     <!--logic_undelete_value 逻辑删除 未删除字段-->
     <!--version_key 乐观锁版本字段,支持int,int8,int16,int32,int64-->
     <resultMap id="BaseResultMap">
-        <id column="id" property="id"/>
+        <id column="id" langType="id"/>
         <result column="name" property="name" langType="string"/>
         <result column="pc_link" property="pcLink" langType="string"/>
         <result column="h5_link" property="h5Link" langType="string"/>
