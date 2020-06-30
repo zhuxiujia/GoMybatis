@@ -179,13 +179,11 @@ func sqlVEncode(v []byte) string {
 		return "null"
 	}
 	var s = string(v)
-	if strings.Contains(s, "\"") {
-		var b, e = json.Marshal(s)
-		if e != nil || len(b) == 0 {
-			return "null"
-		}
-		s = string(b[1 : len(b)-1])
+	var b, e = json.Marshal(s)
+	if e != nil || len(b) == 0 {
+		return "null"
 	}
+	s = string(b[1 : len(b)-1])
 	return s
 }
 
