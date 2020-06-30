@@ -70,7 +70,7 @@ func init() {
 	engine = GoMybatis.GoMybatisEngine{}.New()
 
 	//设置打印自动生成的xml 到控制台方便调试，false禁用
-	engine.TempleteDecoder().SetPrintElement(true)
+	engine.TempleteDecoder().SetPrintElement(false)
 	//设置是否打印警告(建议开启)
 	engine.SetPrintWarning(false)
 
