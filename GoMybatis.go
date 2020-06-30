@@ -52,10 +52,15 @@ func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine SessionEn
 func WriteMapper(bean reflect.Value, xml []byte, sessionEngine SessionEngine) {
 	beanCheck(bean)
 	var mapperTree = LoadMapperXml(xml)
-	sessionEngine.TempleteDecoder().DecodeTree(mapperTree, bean.Type())
+	var decodeErr = sessionEngine.TempleteDecoder().DecodeTree(mapperTree, bean.Type())
+	if decodeErr != nil {
+		panic(decodeErr)
+	}
 	//构建期使用的map，无需考虑并发安全
 	var methodXmlMap = makeMethodXmlMap(bean, mapperTree, sessionEngine)
+	mapperCheck(methodXmlMap)
 	var resultMaps = makeResultMaps(mapperTree)
+	mapperResultMapCheck(resultMaps)
 	var returnTypeMap = makeReturnTypeMap(bean.Elem().Type())
 	var beanName = bean.Type().PkgPath() + bean.Type().String()
 
@@ -120,6 +125,23 @@ func WriteMapper(bean reflect.Value, xml []byte, sessionEngine SessionEngine) {
 			return proxyFunc
 		}
 	})
+}
+
+func mapperCheck(arg map[string]*Mapper) {
+	//TODO check mapper
+}
+
+func mapperResultMapCheck(arg map[string]map[string]*ResultProperty) {
+	for resultMap, item := range arg {
+		for k, v := range item {
+			if v.Column == "" {
+				panic("[GoMybatis] in mapper .resultMap: " + resultMap + "." + k + " 'column' can not be empty!")
+			}
+			if v.LangType == "" {
+				panic("[GoMybatis] in mapper .resultMap: " + resultMap + "." + k + " 'langType' can not be empty!")
+			}
+		}
+	}
 }
 
 //check beans
