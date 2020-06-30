@@ -150,6 +150,69 @@ func Test_convert_struct(t *testing.T) {
 	fmt.Println("Test_convert_struct", result)
 }
 
+func Test_convert_html_struct(t *testing.T) {
+	var GoMybatisSqlResultDecoder = GoMybatisSqlResultDecoder{}
+	var res = make([]map[string][]byte, 0)
+
+	var resMap = make(map[string][]byte)
+	resMap["Name"] = []byte("<p>adfd</p><section class=\"\n\twwei - editor \"><fieldset style=\"\n\tclear: both;padding: 0 px;border: 0 px none;margin: 1e m 0 px 0.5e m;\n\t\"><section style=\"\n\tborder - top: 2 px solid rgb(134, 110, 187);font - size: 1e m;font - weight: inherit;text - decoration: inherit;color: rgb(255, 255, 255);box - sizing: border - box;border - bottom - color: rgb(134, 110, 187);border - left - color: rgb(134, 110, 187);border - right - color: rgb(134, 110, 187);\n\t\"><section class=\"\n\twweibrush \" data-brushtype=\"\n\ttext \" style=\"\n\tpadding: 0 px 0.5e m;display: inline - block;font - size: 16 px;background - color: rgb(134, 110, 187);color: rgb(255, 255, 255);\n\t\">微信编辑器</section></section></fieldset></section><p><br/></p><section class=\"\n\twwei - editor \"><section style=\"\n\tfont - size: 1e m;white - space: normal;margin: 1e m 0 px 0.8e m;text - align: center;vertical - align: middle;\n\t\"><section style=\"\n\theight: 0 px;margin: 0 px 1e m;border - width: 1.5e m;border - style: solid;border - image: initial;border - left - color: transparent!important;border - right - color: transparent!important;border - bottom - color: rgb(134, 110, 187);border - top - color: rgb(134, 110, 187);\n\t\"></section><section style=\"\n\theight: 0 px;margin: -2.75e m 1.65e m;border - width: 1.3e m;border - style: solid;border - color: rgb(255, 255, 255) transparent;\n\t\"></section><section style=\"\n\theight: 0 px;margin: 0.45e m 2.1e m;vertical - align: middle;border - width: 1.1e m;border - style: solid;border - image: initial;border - left - color: transparent!important;border - right - color: transparent!important;border - bottom - color: rgb(134, 110, 187);border - top - color: rgb(134, 110, 187);\n\t\"><section class=\"\n\twweibrush \" data-brushtype=\"\n\ttext \" placeholder=\"\n\t一行短标题 \" style=\"\n\tmax - height: 1e m;padding: 0 px;margin - top: -0.5e m;color: rgb(255, 255, 255);font - size: 1.2e m;line - height: 1e m;overflow: hidden;\n\t\">一行短标题</section></section></section></section><p><br/></p><p><br/></p>")
+	resMap["Amount1"] = []byte("1908.1")
+	resMap["Amount2"] = []byte("1908.444")
+	resMap["Age1"] = []byte("1908")
+	resMap["Age2"] = []byte("1908")
+	resMap["Age3"] = []byte("1908")
+	resMap["Age4"] = []byte("1908")
+	resMap["Age5"] = []byte("1")
+	resMap["Age6"] = []byte("1908")
+	resMap["Age7"] = []byte("1908")
+	resMap["Age8"] = []byte("1908")
+	resMap["Bool"] = []byte("true")
+	res = append(res, resMap)
+
+	var result TestResult
+	GoMybatisSqlResultDecoder.Decode(nil, res, &result)
+
+	//if result.Name != string(resMap["Name"]) {
+	//	panic("convert_struct Name fail")
+	//}
+	if result.Amount1 != 1908.1 {
+		panic("convert_struct Amount1 fail")
+	}
+	if result.Amount2 != 1908.444 {
+		panic("convert_struct Amount2 fail")
+	}
+
+	if result.Age1 != 1908 {
+		panic("convert_struct Age1 fail")
+	}
+	if result.Age2 != 1908 {
+		panic("convert_struct Age1 fail")
+	}
+	if result.Age3 != 1908 {
+		panic("convert_struct Age1 fail")
+	}
+	if result.Age4 != 1908 {
+		panic("convert_struct Age1 fail")
+	}
+	if result.Age5 != 1 {
+		panic("convert_struct Age1 fail")
+	}
+	if result.Age6 != 1908 {
+		panic("convert_struct Age1 fail")
+	}
+	if result.Age7 != 1908 {
+		panic("convert_struct Age1 fail")
+	}
+	if result.Age8 != 1908 {
+		panic("convert_struct Age1 fail")
+	}
+	if result.Bool != true {
+		panic("convert_struct Bool fail")
+	}
+
+	fmt.Println("Test_convert_struct", result)
+}
+
 func Test_Ignore_Case_Underscores(t *testing.T) {
 	var GoMybatisSqlResultDecoder = GoMybatisSqlResultDecoder{}
 	var res = make([]map[string][]byte, 0)

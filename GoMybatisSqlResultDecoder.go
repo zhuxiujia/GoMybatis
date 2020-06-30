@@ -104,11 +104,11 @@ func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][
 		if structMap == nil {
 			var done = len(sqlData) - 1
 			var index = 0
-			for k, v := range sqlData {
+			for k, sqlV := range sqlData {
 				jsonData.WriteString("\"")
 				jsonData.WriteString(k)
 				jsonData.WriteString("\":")
-				jsonData.Write(v)
+				jsonData.WriteString(sqlVEncode(sqlV))
 				//write ','
 				if index < done {
 					jsonData.WriteString(",")
@@ -126,7 +126,7 @@ func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][
 				var sqlV = sqlData[strings.Replace(strings.ToLower(jsonKey), "_", "", -1)]
 				if v.Kind() == reflect.String || v.String() == "time.Time" {
 					jsonData.WriteString("\"")
-					jsonData.Write(sqlV)
+					jsonData.WriteString(sqlVEncode(sqlV))
 					jsonData.WriteString("\"")
 				} else {
 					jsonData.Write(sqlV)
@@ -149,7 +149,7 @@ func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][
 		}
 		var done = len(new_data) - 1
 		var index = 0
-		for k, v := range new_data {
+		for k, sqlV := range new_data {
 			property := resultMap[k]
 			//write key
 			jsonData.WriteString("\"")
@@ -158,10 +158,10 @@ func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][
 			//write value
 			if property.LangType == "string" || property.LangType == "time.Time" {
 				jsonData.WriteString("\"")
-				jsonData.Write(v)
+				jsonData.WriteString(sqlVEncode(sqlV))
 				jsonData.WriteString("\"")
 			} else {
-				jsonData.Write(v)
+				jsonData.Write(sqlV)
 			}
 			//write ','
 			if index < done {
@@ -171,7 +171,24 @@ func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][
 		}
 	}
 	jsonData.WriteString("}")
+
+	println(jsonData.String())
 	return []byte(jsonData.String())
+}
+
+func sqlVEncode(v []byte) string {
+	if v == nil {
+		return "null"
+	}
+	var s = string(v)
+	if strings.Contains(s, "\n") || strings.Contains(s, "\r") || strings.Contains(s, "<") {
+		var b, e = json.Marshal(s)
+		if e != nil || len(b) == 0 {
+			return "null"
+		}
+		s = string(b[1 : len(b)-1])
+	}
+	return s
 }
 
 // is an array or slice
