@@ -181,7 +181,7 @@ func sqlVEncode(v []byte) string {
 		return "null"
 	}
 	var s = string(v)
-	if strings.Contains(s, "\n") || strings.Contains(s, "\r") || strings.Contains(s, "<") {
+	if strings.Contains(s, "\"") {
 		var b, e = json.Marshal(s)
 		if e != nil || len(b) == 0 {
 			return "null"
