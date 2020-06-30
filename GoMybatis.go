@@ -132,7 +132,13 @@ func mapperCheck(arg map[string]*Mapper) {
 }
 
 func mapperResultMapCheck(arg map[string]map[string]*ResultProperty) {
+	if arg == nil {
+		return
+	}
 	for resultMap, item := range arg {
+		if item == nil {
+			return
+		}
 		for k, v := range item {
 			if v.Column == "" {
 				panic("[GoMybatis] in mapper .resultMap: " + resultMap + "." + k + " 'column' can not be empty!")
