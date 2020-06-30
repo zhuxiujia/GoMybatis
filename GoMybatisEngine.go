@@ -185,7 +185,7 @@ func (it *GoMybatisEngine) SetSqlResultDecoder(decoder SqlResultDecoder) {
 	it.sqlResultDecoder = decoder
 }
 
-//打开数据库
+//打开数据库驱动，初始化连接池放入路由。  sql.DB 就是连接池，可以自定义活跃连接数，具体使用参考官方文档
 //driverName: 驱动名称例如"mysql", dataSourceName: string 数据库url
 func (it *GoMybatisEngine) Open(driverName, dataSourceLink string) (*sql.DB, error) {
 	it.initCheck()
