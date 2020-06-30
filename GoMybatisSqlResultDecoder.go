@@ -97,91 +97,52 @@ func makeStructMap(itemType reflect.Type) (map[string]reflect.Type, error) {
 func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][]byte, structMap map[string]reflect.Type) []byte {
 	var jsonData = strings.Builder{}
 	jsonData.WriteString("{")
-	if resultMap == nil {
-		for k, v := range sqlData {
-			sqlData[strings.Replace(strings.ToLower(k), "_", "", -1)] = v
-		}
-		if structMap == nil {
-			var done = len(sqlData) - 1
-			var index = 0
-			for k, sqlV := range sqlData {
-				jsonData.WriteString("\"")
-				jsonData.WriteString(k)
-				jsonData.WriteString("\":")
-				jsonData.WriteString(sqlVEncode(sqlV))
-				//write ','
-				if index < done {
-					jsonData.WriteString(",")
+
+	var done = len(sqlData) - 1
+	var index = 0
+	for k, sqlV := range sqlData {
+		jsonData.WriteString("\"")
+		jsonData.WriteString(k)
+		jsonData.WriteString("\":")
+
+		var isStringType = false
+		if resultMap != nil {
+			var resultMapItem = resultMap[k]
+			if resultMapItem != nil && (resultMapItem.LangType == "string" || resultMapItem.LangType == "time.Time") {
+				isStringType = true
+			}
+		} else if structMap != nil {
+			var v = structMap[k]
+			if v != nil {
+				if v.Kind() == reflect.String || v.String() == "time.Time" {
+					isStringType = true
 				}
-				index += 1
 			}
 		} else {
-			var done = len(structMap) - 1
-			var index = 0
-			for jsonKey, v := range structMap {
-				//insert default type
-				jsonData.WriteString("\"")
-				jsonData.WriteString(jsonKey)
-				jsonData.WriteString("\":")
-				var sqlV = sqlData[strings.Replace(strings.ToLower(jsonKey), "_", "", -1)]
-				if v.Kind() == reflect.String || v.String() == "time.Time" {
-					jsonData.WriteString("\"")
-					jsonData.WriteString(sqlVEncode(sqlV))
-					jsonData.WriteString("\"")
-				} else {
-					if len(sqlV) == 0 {
-						sqlV = []byte("null")
-					}
-					jsonData.Write(sqlV)
-				}
-				//write ','
-				if index < done {
-					jsonData.WriteString(",")
-				}
-				index += 1
-			}
+			isStringType = true
 		}
-	} else {
-		var new_data = map[string][]byte{}
-		for k, v := range sqlData {
-			property := resultMap[k]
-			if property == nil {
-				continue
-			}
-			new_data[k] = v
-		}
-		var done = len(new_data) - 1
-		var index = 0
-		for k, sqlV := range new_data {
-			property := resultMap[k]
-			//write key
+		if isStringType {
 			jsonData.WriteString("\"")
-			jsonData.WriteString(property.Column)
-			jsonData.WriteString("\":")
-			//write value
-			if property.LangType == "string" || property.LangType == "time.Time" {
-				jsonData.WriteString("\"")
-				jsonData.WriteString(sqlVEncode(sqlV))
-				jsonData.WriteString("\"")
-			} else {
-				if len(sqlV) == 0 {
-					sqlV = []byte("null")
-				}
-				jsonData.Write(sqlV)
+			jsonData.WriteString(sqlVEncode(sqlV))
+			jsonData.WriteString("\"")
+		} else {
+			if sqlV == nil || len(sqlV) == 0 {
+				sqlV = []byte("null")
 			}
-			//write ','
-			if index < done {
-				jsonData.WriteString(",")
-			}
-			index += 1
+			jsonData.Write(sqlV)
 		}
+		//write ','
+		if index < done {
+			jsonData.WriteString(",")
+		}
+		index += 1
 	}
 	jsonData.WriteString("}")
 	return []byte(jsonData.String())
 }
 
 func sqlVEncode(v []byte) string {
-	if v == nil {
+	if v == nil || len(v) == 0 {
 		return "null"
 	}
 	var s = string(v)
