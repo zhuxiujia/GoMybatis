@@ -88,7 +88,7 @@ func makeStructMap(itemType reflect.Type) (map[string]reflect.Type, error) {
 	var structMap = map[string]reflect.Type{}
 	for i := 0; i < itemType.NumField(); i++ {
 		var item = itemType.Field(i)
-		structMap[item.Tag.Get("json")] = item.Type
+		structMap[strings.ToLower(item.Tag.Get("json"))] = item.Type
 	}
 	return structMap, nil
 }
@@ -112,7 +112,7 @@ func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][
 				isStringType = true
 			}
 		} else if structMap != nil {
-			var v = structMap[k]
+			var v = structMap[strings.ToLower(k)]
 			if v != nil {
 				if v.Kind() == reflect.String || v.String() == "time.Time" {
 					isStringType = true
