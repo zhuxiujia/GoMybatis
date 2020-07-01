@@ -123,7 +123,7 @@ func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][
 		}
 		if isStringType {
 			jsonData.WriteString("\"")
-			jsonData.WriteString(sqlVEncode(sqlV))
+			jsonData.WriteString(encodeStringValue(sqlV))
 			jsonData.WriteString("\"")
 		} else {
 			if sqlV == nil || len(sqlV) == 0 {
@@ -141,9 +141,12 @@ func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][
 	return []byte(jsonData.String())
 }
 
-func sqlVEncode(v []byte) string {
-	if v == nil || len(v) == 0 {
+func encodeStringValue(v []byte) string {
+	if v == nil {
 		return "null"
+	}
+	if len(v) == 0 {
+		return ""
 	}
 	var s = string(v)
 	var b, e = json.Marshal(s)
