@@ -36,7 +36,6 @@
         <!ATTLIST result
                 langType CDATA #IMPLIED
                 column CDATA #IMPLIED
-
                 version_enable CDATA #IMPLIED
                 logic_enable CDATA #IMPLIED
                 logic_deleted CDATA #IMPLIED
@@ -97,11 +96,6 @@
         <!ELEMENT update (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
         <!ATTLIST update
                 id CDATA #REQUIRED
-               
-                
-                useGeneratedKeys (true|false) #IMPLIED
-                
-                
                 lang CDATA #IMPLIED
                 >
         <!--sets指定值(例如 sets="name?name = #{name}"  )会更新对应值，否则为""设置全部属性-->
@@ -109,9 +103,6 @@
         <!ATTLIST updateTemplete
                 id CDATA #IMPLIED
                 resultMap (BaseResultMap) #IMPLIED
-                useGeneratedKeys (true|false) #IMPLIED
-
-
                 lang CDATA #IMPLIED
                 tables CDATA #IMPLIED
                 sets CDATA #IMPLIED
