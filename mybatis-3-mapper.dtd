@@ -62,9 +62,6 @@
         <!ATTLIST select
                 id CDATA #REQUIRED
                 resultMap CDATA #IMPLIED
-                resultType CDATA #IMPLIED
-
-                
                 lang CDATA #IMPLIED
                 >
 
@@ -72,9 +69,6 @@
         <!ATTLIST selectTemplete
                 id CDATA #IMPLIED
                 resultMap (BaseResultMap) #IMPLIED
-                resultType CDATA #IMPLIED
-
-
                 lang CDATA #IMPLIED
                 tables CDATA #IMPLIED
                 columns CDATA #IMPLIED
