@@ -1,5 +1,5 @@
 # 更简单的xml/sql风格 功能丰富 值得一试的ORM库
-* [点我查看-文档网站](https://zhuxiujia.github.io/gomybatis.io/#/)
+* [文档网站](https://zhuxiujia.github.io/gomybatis.io/#/)
 
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/zhuxiujia/GoMybatis)](https://goreportcard.com/report/github.com/zhuxiujia/GoMybatis)
@@ -13,7 +13,7 @@
 
 ### 实际应用[点击-GoMybatis商城](https://github.com/zhuxiujia/GoMybatisMall)
 
-### 使用教程请仔细阅读[文档网站](https://zhuxiujia.github.io/gomybatis.io/#/)
+### 请仔细阅读[文档网站](https://zhuxiujia.github.io/gomybatis.io/#/)
 
 
 # future
