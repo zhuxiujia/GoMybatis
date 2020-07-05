@@ -13,7 +13,7 @@
 
 ### 实际应用[点击-GoMybatis商城](https://github.com/zhuxiujia/GoMybatisMall)
 
-### 使用教程请仔细阅读文档网站 [文档](https://zhuxiujia.github.io/gomybatis.io/#/getting-started)
+### 使用教程请仔细阅读文档网站 [文档](https://zhuxiujia.github.io/gomybatis.io/#/)
 
 
 # future
