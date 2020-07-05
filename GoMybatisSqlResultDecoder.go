@@ -1,6 +1,7 @@
 package GoMybatis
 
 import (
+	"github.com/spf13/cast"
 	"github.com/zhuxiujia/GoMybatis/utils"
 	"reflect"
 	"strconv"
@@ -118,7 +119,10 @@ func (it GoMybatisSqlResultDecoder) basicTypeConvert(tItemTypeFieldType reflect.
 			return false
 		}
 		resultValue.Set(reflect.ValueOf(newValue))
-	} else {
+	}else if tItemTypeFieldType.Kind() == reflect.Map {
+		jsonValue := cast.ToStringMap(value)
+		resultValue.Set(reflect.ValueOf(jsonValue))
+	}else {
 		return false
 	}
 	return true
@@ -146,7 +150,9 @@ func (it GoMybatisSqlResultDecoder) sqlBasicTypeConvert(clomnName string, result
 		return it.basicTypeConvert(tItemTypeFieldType, valueByte, resultValue)
 	} else if tItemTypeFieldType.Kind() == reflect.Float32 || tItemTypeFieldType.Kind() == reflect.Float64 {
 		return it.basicTypeConvert(tItemTypeFieldType, valueByte, resultValue)
-	} else if tItemTypeFieldType.String() == "time.Time" {
+	}else if tItemTypeFieldType.Kind() == reflect.Map{
+		return it.basicTypeConvert(tItemTypeFieldType, valueByte, resultValue)
+	}else if tItemTypeFieldType.String() == "time.Time" {
 		return it.basicTypeConvert(tItemTypeFieldType, valueByte, resultValue)
 	} else {
 		if resultMap != nil {
@@ -201,7 +207,8 @@ func (it GoMybatisSqlResultDecoder) isGoBasicType(tItemTypeFieldType reflect.Typ
 		tItemTypeFieldType.Kind() == reflect.Uint64 ||
 		tItemTypeFieldType.Kind() == reflect.Float32 ||
 		tItemTypeFieldType.Kind() == reflect.Float64 ||
-		tItemTypeFieldType.Kind() == reflect.String {
+		tItemTypeFieldType.Kind() == reflect.String ||
+		tItemTypeFieldType.Kind() == reflect.Map {
 		return true
 	}
 	if tItemTypeFieldType.Kind() == reflect.Struct && tItemTypeFieldType.String() == "time.Time" {
