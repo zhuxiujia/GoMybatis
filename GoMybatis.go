@@ -342,14 +342,14 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 		}
 		session = sessionEngine.GoroutineSessionMap().Get(goroutineID)
 	}
-	if session == nil {
-		var s, err = sessionEngine.NewSession(beanName)
+	//if session == nil {
+		 s, err := sessionEngine.NewSession(beanName)
 		if err != nil {
 			return err
 		}
 		session = s
 		defer session.Close()
-	}
+	//}
 	convert, err := session.StmtConvert()
 	if err != nil {
 		return err

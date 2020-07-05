@@ -115,6 +115,7 @@ func (it GoMybatisSqlResultDecoder) basicTypeConvert(tItemTypeFieldType reflect.
 		resultValue.SetFloat(newValue)
 	} else if tItemTypeFieldType.Kind() == reflect.Struct && tItemTypeFieldType.String() == "time.Time" {
 		newValue, e := time.Parse(string(time.RFC3339), value)
+
 		if e != nil {
 			return false
 		}
