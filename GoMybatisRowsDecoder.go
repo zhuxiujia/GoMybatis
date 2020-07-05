@@ -2,7 +2,6 @@ package GoMybatis
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -95,13 +94,13 @@ func value2String(rawValue *reflect.Value) (str string, err error) {
 		} else {
 			err = fmt.Errorf("Unsupported struct type %v", vv.Type().Name())
 		}
-	case reflect.Map:
-		jsonByte,err := json.Marshal(vv);if err != nil{
-			return
-		}
-		err = json.Unmarshal(jsonByte,&str);if err != nil{
-				return
-		}
+	//case reflect.Map:
+	//	jsonByte,err := json.Marshal(vv);if err != nil{
+	//		return
+	//	}
+	//	err = json.Unmarshal(jsonByte,&str);if err != nil{
+	//			return
+	//	}
 	case reflect.Bool:
 		str = strconv.FormatBool(vv.Bool())
 	case reflect.Complex128, reflect.Complex64:
