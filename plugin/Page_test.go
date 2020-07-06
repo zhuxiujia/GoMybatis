@@ -24,6 +24,6 @@ func Test_page(t *testing.T) {
 	json.Unmarshal(s, &np)
 
 	var contents = []A{}
-	np.ParserContent(&contents)
+	np.GetContentArray(&contents)
 	println("contents", contents)
 }

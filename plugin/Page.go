@@ -2,14 +2,46 @@ package plugin
 
 import "encoding/json"
 
-//TODO 分页插件
-
+//TODO 分页插件,在go 2.0支持泛型后再计划改为泛型Page
 type Page struct {
 	Content []json.RawMessage `json:"content"`
 }
 
 // parser content to type
-func (it *Page) ParserContent(result interface{}) error {
-	var jsBytes, _ = json.Marshal(it.Content)
-	return json.Unmarshal(jsBytes, &result)
+func (it *Page) GetContentArray(contentArray interface{}) error {
+	var jsBytes, e = json.Marshal(it.Content)
+	if e != nil {
+		return e
+	}
+	return json.Unmarshal(jsBytes, &contentArray)
+}
+
+// parser content to type
+func (it *Page) GetContent(index int, content interface{}) error {
+	return json.Unmarshal(it.Content[index], &content)
+}
+
+//append one content into content array
+func (it *Page) AppendContent(content interface{}) error {
+	var jsBytes, e = json.Marshal(content)
+	if e != nil {
+		return e
+	}
+	it.Content = append(it.Content, jsBytes)
+	return nil
+}
+
+// contentArray interface must be array
+func (it *Page) SetContentArray(contentArray interface{}) error {
+	var jsBytes, e = json.Marshal(contentArray)
+	if e != nil {
+		return e
+	}
+	var data = []json.RawMessage{}
+	e = json.Unmarshal(jsBytes, &data)
+	if e != nil {
+		return e
+	}
+	it.Content = data
+	return nil
 }
