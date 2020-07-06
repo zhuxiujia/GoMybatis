@@ -8,7 +8,7 @@ type Page struct {
 }
 
 // parser content to type
-func (it *Page) GetContentArray(contentArray interface{}) error {
+func (it *Page) GetContent(contentArray interface{}) error {
 	var jsBytes, e = json.Marshal(it.Content)
 	if e != nil {
 		return e
@@ -17,12 +17,12 @@ func (it *Page) GetContentArray(contentArray interface{}) error {
 }
 
 // parser content to type
-func (it *Page) GetContent(index int, content interface{}) error {
+func (it *Page) GetContentData(index int, content interface{}) error {
 	return json.Unmarshal(it.Content[index], &content)
 }
 
 //append one content into content array
-func (it *Page) AppendContent(content interface{}) error {
+func (it *Page) AppendContentData(content interface{}) error {
 	var jsBytes, e = json.Marshal(content)
 	if e != nil {
 		return e
@@ -32,7 +32,7 @@ func (it *Page) AppendContent(content interface{}) error {
 }
 
 // contentArray interface must be array
-func (it *Page) SetContentArray(contentArray interface{}) error {
+func (it *Page) SetContent(contentArray interface{}) error {
 	var jsBytes, e = json.Marshal(contentArray)
 	if e != nil {
 		return e
