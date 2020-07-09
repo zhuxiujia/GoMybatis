@@ -106,10 +106,14 @@ func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][
 		jsonData.WriteString("\":")
 
 		var isStringType = false
+		var fetched = true
 		if resultMap != nil {
 			var resultMapItem = resultMap[k]
 			if resultMapItem != nil && (resultMapItem.LangType == "string" || resultMapItem.LangType == "time.Time") {
 				isStringType = true
+			}
+			if resultMapItem == nil {
+				fetched = false
 			}
 		} else if structMap != nil {
 			var v = structMap[strings.ToLower(k)]
@@ -118,13 +122,23 @@ func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][
 					isStringType = true
 				}
 			}
+			if v == nil {
+				fetched = false
+			}
 		} else {
 			isStringType = true
 		}
-		if isStringType {
-			jsonData.WriteString("\"")
-			jsonData.WriteString(encodeStringValue(sqlV))
-			jsonData.WriteString("\"")
+		if fetched {
+			if isStringType {
+				jsonData.WriteString("\"")
+				jsonData.WriteString(encodeStringValue(sqlV))
+				jsonData.WriteString("\"")
+			} else {
+				if sqlV == nil || len(sqlV) == 0 {
+					sqlV = []byte("null")
+				}
+				jsonData.Write(sqlV)
+			}
 		} else {
 			if sqlV == nil || len(sqlV) == 0 {
 				sqlV = []byte("null")
