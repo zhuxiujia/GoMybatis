@@ -81,20 +81,20 @@ func (it GoMybatisSqlResultDecoder) Decode(resultMap map[string]*ResultProperty,
 	return e
 }
 
-func makeStructMap(itemType reflect.Type) (map[string]reflect.Type, error) {
+func makeStructMap(itemType reflect.Type) (map[string]*reflect.Type, error) {
 	if itemType.Kind() != reflect.Struct {
 		return nil, nil
 	}
-	var structMap = map[string]reflect.Type{}
+	var structMap = map[string]*reflect.Type{}
 	for i := 0; i < itemType.NumField(); i++ {
 		var item = itemType.Field(i)
-		structMap[strings.ToLower(item.Tag.Get("json"))] = item.Type
+		structMap[strings.ToLower(item.Tag.Get("json"))] = &item.Type
 	}
 	return structMap, nil
 }
 
 //make an json value
-func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][]byte, structMap map[string]reflect.Type) []byte {
+func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][]byte, structMap map[string]*reflect.Type) []byte {
 	var jsonData = strings.Builder{}
 	jsonData.WriteString("{")
 
@@ -106,29 +106,41 @@ func makeJsonObjBytes(resultMap map[string]*ResultProperty, sqlData map[string][
 		jsonData.WriteString("\":")
 
 		var isStringType = false
+		var fetched = true
 		if resultMap != nil {
 			var resultMapItem = resultMap[k]
 			if resultMapItem != nil && (resultMapItem.LangType == "string" || resultMapItem.LangType == "time.Time") {
 				isStringType = true
 			}
+			if resultMapItem == nil {
+				fetched = false
+			}
 		} else if structMap != nil {
 			var v = structMap[strings.ToLower(k)]
 			if v != nil {
-				if v.Kind() == reflect.String || v.String() == "time.Time" {
+				if (*v).Kind() == reflect.String || (*v).String() == "time.Time" {
 					isStringType = true
 				}
+			}
+			if v == nil {
+				fetched = false
 			}
 		} else {
 			isStringType = true
 		}
-		if isStringType {
-			jsonData.WriteString("\"")
-			jsonData.WriteString(encodeStringValue(sqlV))
-			jsonData.WriteString("\"")
-		} else {
-			if sqlV == nil || len(sqlV) == 0 {
-				sqlV = []byte("null")
+		if fetched {
+			if isStringType {
+				jsonData.WriteString("\"")
+				jsonData.WriteString(encodeStringValue(sqlV))
+				jsonData.WriteString("\"")
+			} else {
+				if sqlV == nil || len(sqlV) == 0 {
+					sqlV = []byte("null")
+				}
+				jsonData.Write(sqlV)
 			}
+		} else {
+			sqlV = []byte("null")
 			jsonData.Write(sqlV)
 		}
 		//write ','
