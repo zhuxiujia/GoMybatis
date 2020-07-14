@@ -347,6 +347,8 @@ go run XmlCreateTool.go
 ## 请及时关注版本，尽可能使用最新版本(稳定，修复bug) 
 * 不管是商业用途还是个人使用GoMybatis项目，必须在Issues里留言您的项目名称+联系方式 ！
 
+## 联系方式：微信号 zxj347284221
+
 ## 欢迎右上角star 或捐赠赞助~
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/wx_account.jpg)
 
