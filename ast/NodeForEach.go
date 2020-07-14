@@ -2,6 +2,7 @@ package ast
 
 import (
 	"bytes"
+	"errors"
 	"github.com/zhuxiujia/GoMybatis/stmt"
 	"reflect"
 )
@@ -17,6 +18,8 @@ type NodeForEach struct {
 	open       string
 	close      string
 	separator  string
+
+	holder *NodeConfigHolder
 }
 
 func (it *NodeForEach) Type() NodeType {
@@ -28,9 +31,19 @@ func (it *NodeForEach) Eval(env map[string]interface{}, arg_array *[]interface{}
 		panic(`[GoMybatis] collection value can not be "" in <foreach collection=""> !`)
 	}
 	var tempSql bytes.Buffer
-	var datas = env[it.collection]
-	var collectionValue = reflect.ValueOf(datas)
-	if collectionValue.Kind() != reflect.Slice && collectionValue.Kind() != reflect.Map {
+
+	//exec lexer
+	var err error
+	evalData, err := it.holder.GetExpressionEngineProxy().LexerAndEval(it.collection, env)
+	if err != nil {
+		return nil, errors.New(it.holder.GetExpressionEngineProxy().Name() + ":" + err.Error())
+	}
+	var collectionValue = reflect.ValueOf(evalData)
+	var kind = collectionValue.Kind()
+	if kind == reflect.Invalid {
+		return nil, errors.New(it.holder.GetExpressionEngineProxy().Name() + ": collection value is invalid value!")
+	}
+	if kind != reflect.Slice && kind != reflect.Array && kind != reflect.Map {
 		panic(`[GoMybatis] collection value must be a slice or map !`)
 	}
 	var collectionValueLen = collectionValue.Len()

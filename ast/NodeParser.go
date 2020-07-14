@@ -101,6 +101,7 @@ func (it NodeParser) Parser(mapperXml []etree.Token) []Node {
 					open:       v.SelectAttrValue("open", ""),
 					close:      v.SelectAttrValue("close", ""),
 					separator:  v.SelectAttrValue("separator", ""),
+					holder:     &it.Holder,
 				}
 				if childItems != nil {
 					var childNodes = it.Parser(childItems)
