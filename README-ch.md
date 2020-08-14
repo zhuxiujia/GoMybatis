@@ -20,7 +20,7 @@
 
 # future
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">稳定</a>，已应用生产环境App（电商/金融/卡充值类），功能稳定，适合各类 大小型项目以及复杂的金融项目,ERP项目 帮助您将数十万RMB轻松收入囊中<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/">高性能</a>，单机每秒事务数benchmark最高可达751020 Tps/s,总耗时0.14s （测试环境返回模拟sql数据，并发1000，总数100000，6核16GB win10）<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/">高性能</a>，单机最高可达751020 Qps/s,总耗时0.14s （测试环境返回模拟sql数据，并发1000，总数100000，6核16GB win10）<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">无痛迁移</a>，xml对于语言无关/低耦合，兼容大部分Java(Mybatis3,Mybatis Plus)框架逻辑，无痛苦Java Spring Mybatis的xml sql文件迁移至Go语言（仅修改resultMap的javaType为langType指定go语言类型）<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">声明式事务、AOP事务、事务传播行为</a>只需在函数尾部 定义`tx:"" rollback:"error"`即可启用声明式事务，事务传播行为,回滚策略.轻松应对复杂的事务嵌套/回滚<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">扩展日志接口</a>异步消息队列日,框架内sql日志使用带缓存的channel实现 消息队列异步记录日志<br>
