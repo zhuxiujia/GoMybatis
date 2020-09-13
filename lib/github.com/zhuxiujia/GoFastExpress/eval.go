@@ -129,7 +129,10 @@ func DoEqualAction(express string, operator Operator, a interface{}, b interface
 			b = nil
 		}
 		if a == nil || b == nil {
-			//equal nil
+			//empty map not equal nil
+			if av.IsNil() && b == nil{
+				return false,nil
+			}
 			if a != nil || b != nil {
 				return false, nil
 			}
@@ -168,7 +171,7 @@ func DoEqualAction(express string, operator Operator, a interface{}, b interface
 			return a.(bool) == b.(bool), nil
 		}
 		if av.Kind() == reflect.String && bv.Kind() == reflect.String {
-			return a.(string) == b.(string), nil
+			return fmt.Sprintf(`%v`,a) == fmt.Sprintf(`%v`,b), nil
 		}
 		if av.Kind() == reflect.Struct && bv.Kind() == reflect.String {
 			return fmt.Sprint(a) == b.(string), nil
