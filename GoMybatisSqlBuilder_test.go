@@ -3,8 +3,6 @@ package GoMybatis
 import (
 	"fmt"
 	"github.com/zhuxiujia/GoMybatis/engines"
-	"github.com/zhuxiujia/GoMybatis/example"
-	"github.com/zhuxiujia/GoMybatis/lib/github.com/Knetic/govaluate"
 	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 	"github.com/zhuxiujia/GoMybatis/stmt"
 	"github.com/zhuxiujia/GoMybatis/utils"
@@ -116,45 +114,6 @@ func Test_SqlBuilder_Tps(t *testing.T) {
 		//fmt.Println(sql, e)
 	}
 	utils.CountMethodTps(100000, startTime, "Test_SqlBuilder_Tps")
-}
-
-func Test_reflect_tps(t *testing.T) {
-	var p = make(map[string]string)
-	var n = p
-	n["a"] = "b"
-	fmt.Println(p)
-
-	defer utils.CountMethodTps(10000, time.Now(), "Test_reflect_tps")
-
-	for k := 0; k < 10000; k++ {
-		evalExpression, _ := govaluate.NewEvaluableExpression("name != nil")
-		//fmt.Println(err)
-		var p = make(map[string]interface{})
-		p["name"] = "sdaf"
-		evalExpression.Evaluate(p)
-		//fmt.Println(err)
-		//fmt.Println(result)
-	}
-
-}
-
-func Test_bind_string(t *testing.T) {
-	var activity = example.Activity{
-		Id:         "1",
-		DeleteFlag: 1,
-	}
-	var evaluateParameters = make(map[string]interface{})
-	evaluateParameters["activity"] = activity
-	var expression = "'%' + activity.Id + '%'"
-	evalExpression, err := govaluate.NewEvaluableExpression(expression)
-	if err != nil {
-		t.Fatal(err)
-	}
-	result, err := evalExpression.Evaluate(evaluateParameters)
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Println(result)
 }
 
 func TestGoMybatisSqlBuilder_BuildSql(t *testing.T) {
