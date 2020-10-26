@@ -126,7 +126,6 @@ func Test_inset(t *testing.T) {
 }
 
 //修改
-//本地事务使用例子
 func Test_update(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
 		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
