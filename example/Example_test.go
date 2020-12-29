@@ -82,7 +82,7 @@ func init() {
 
 	//动态数据源路由(可选)
 	/**
-	GoMybatis.Open("mysql", MysqlUri)//添加第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
+	engine.Open("mysql", MysqlUri)//添加第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
 	var router = GoMybatis.GoMybatisDataSourceRouter{}.New(func(mapperName string) *string {
 		//根据包名路由指向数据源
 		if strings.Contains(mapperName, "example.") {

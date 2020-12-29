@@ -184,8 +184,8 @@ type ExampleActivityMapper struct {
 ## 功能：动态数据源
 ``` go
         //添加第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
-	GoMybatis.Open("mysql", MysqlUri)
-	//动态数据源路由
+    var engine = GoMybatis.GoMybatisEngine{}.New()
+	engine.Open("mysql", MysqlUri)//添加第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
 	var router = GoMybatis.GoMybatisDataSourceRouter{}.New(func(mapperName string) *string {
 		//根据包名路由指向数据源
 		if strings.Contains(mapperName, "example.") {
@@ -195,6 +195,7 @@ type ExampleActivityMapper struct {
 		}
 		return nil
 	})
+	engine.SetDataSourceRouter(&router)
 ```
 ## 功能：自定义日志输出
 ``` go

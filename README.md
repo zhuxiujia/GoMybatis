@@ -165,17 +165,18 @@ type ExampleActivityMapper struct {
 ## Features：Dynamic Data Source
 ``` go
         //To add a second MySQL database, change Mysql Uri to your second data source link
-	GoMybatis.Open("mysql", MysqlUri)
-	//Dynamic Data Source Routing
+    var engine = GoMybatis.GoMybatisEngine{}.New()
+	engine.Open("mysql", MysqlUri)//添加第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
 	var router = GoMybatis.GoMybatisDataSourceRouter{}.New(func(mapperName string) *string {
-		//Point to the data source according to the packet name routing
+		//根据包名路由指向数据源
 		if strings.Contains(mapperName, "example.") {
-			var url = MysqlUri//The second MySQL database, please change Mysql Uri to your second data source link
+			var url = MysqlUri//第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
 			fmt.Println(url)
 			return &url
 		}
 		return nil
 	})
+	engine.SetDataSourceRouter(&router)
 ```
 ## Features：Custom log output
 ``` go
