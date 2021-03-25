@@ -52,7 +52,7 @@ func WriteMapperPtrByEngine(ptr interface{}, xml []byte, sessionEngine SessionEn
 func WriteMapper(bean reflect.Value, xml []byte, sessionEngine SessionEngine) {
 	beanCheck(bean)
 	var mapperTree = LoadMapperXml(xml)
-	var decodeErr = sessionEngine.TempleteDecoder().DecodeTree(mapperTree, bean.Type())
+	var decodeErr = sessionEngine.TemplateDecoder().DecodeTree(mapperTree, bean.Type())
 	if decodeErr != nil {
 		panic(decodeErr)
 	}

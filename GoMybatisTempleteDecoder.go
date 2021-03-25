@@ -12,9 +12,9 @@ import (
 var equalOperator = []string{"/", "+", "-", "*", "**", "|", "^", "&", "%", "<", ">", ">=", "<=", " in ", " not in ", " or ", "||", " and ", "&&", "==", "!="}
 
 /**
-TODO sqlTemplete解析器，目前直接操作*etree.Element实现，后期应该改成操作xml，换取更好的维护性
+TODO sqlTemplate解析器，目前直接操作*etree.Element实现，后期应该改成操作xml，换取更好的维护性
 */
-type GoMybatisTempleteDecoder struct {
+type GoMybatisTemplateDecoder struct {
 	print bool
 }
 
@@ -34,13 +34,13 @@ type VersionData struct {
 	LangType string
 }
 
-func (it *GoMybatisTempleteDecoder) SetPrintElement(print bool) {
+func (it *GoMybatisTemplateDecoder) SetPrintElement(print bool) {
 	it.print = print
 }
 
-func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]etree.Token, beanType reflect.Type) error {
+func (it *GoMybatisTemplateDecoder) DecodeTree(tree map[string]etree.Token, beanType reflect.Type) error {
 	if tree == nil {
-		return utils.NewError("GoMybatisTempleteDecoder", "decode data map[string]*MapperXml cant be nil!")
+		return utils.NewError("GoMybatisTemplateDecoder", "decode data map[string]*MapperXml cant be nil!")
 	}
 	if beanType != nil {
 		if beanType.Kind() == reflect.Ptr {
@@ -78,7 +78,7 @@ func (it *GoMybatisTempleteDecoder) DecodeTree(tree map[string]etree.Token, bean
 					beanName = beanType.String()
 				}
 				if it.print {
-					var s = "================DecoderTemplete " + beanName + "." + v.SelectAttrValue("id", "") + "============\n"
+					var s = "================DecoderTemplate " + beanName + "." + v.SelectAttrValue("id", "") + "============\n"
 					printElement(v, &s)
 					println(s)
 				}
@@ -109,16 +109,16 @@ func printElement(element *etree.Element, v *string) {
 	*v += "</" + element.Tag + ">\n"
 }
 
-func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *etree.Element, tree map[string]etree.Token) (bool, error) {
+func (it *GoMybatisTemplateDecoder) Decode(method *reflect.StructField, mapper *etree.Element, tree map[string]etree.Token) (bool, error) {
 
 	switch mapper.Tag {
 
-	case "selectTemplete":
+	case "selectTemplate":
 		mapper.Tag = Element_Select
 
 		var id = mapper.SelectAttrValue("id", "")
 		if id == "" {
-			mapper.CreateAttr("id", "selectTemplete")
+			mapper.CreateAttr("id", "selectTemplate")
 		}
 
 		var tables = mapper.SelectAttrValue("tables", "")
@@ -131,7 +131,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 		}
 		var resultMapData = tree[resultMap].(*etree.Element)
 		if resultMapData == nil {
-			panic(utils.NewError("GoMybatisTempleteDecoder", "resultMap not define! id = ", resultMap))
+			panic(utils.NewError("GoMybatisTemplateDecoder", "resultMap not define! id = ", resultMap))
 		}
 		checkTablesValue(mapper, &tables, resultMapData)
 
@@ -154,12 +154,12 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			it.DecodeWheres(wheres, mapper, logic, nil)
 		}
 		break
-	case "insertTemplete": //已支持批量
+	case "insertTemplate": //已支持批量
 		mapper.Tag = Element_Insert
 
 		var id = mapper.SelectAttrValue("id", "")
 		if id == "" {
-			mapper.CreateAttr("id", "insertTemplete")
+			mapper.CreateAttr("id", "insertTemplate")
 		}
 
 		var tables = mapper.SelectAttrValue("tables", "")
@@ -175,7 +175,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 
 		var resultMapData = tree[resultMap].(*etree.Element)
 		if resultMapData == nil {
-			panic(utils.NewError("GoMybatisTempleteDecoder", "resultMap not define! id = ", resultMap))
+			panic(utils.NewError("GoMybatisTemplateDecoder", "resultMap not define! id = ", resultMap))
 		}
 		checkTablesValue(mapper, &tables, resultMapData)
 
@@ -321,12 +321,12 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 		mapper.Child = append(mapper.Child, &tempElement)
 
 		break
-	case "updateTemplete":
+	case "updateTemplate":
 		mapper.Tag = Element_Update
 
 		var id = mapper.SelectAttrValue("id", "")
 		if id == "" {
-			mapper.CreateAttr("id", "updateTemplete")
+			mapper.CreateAttr("id", "updateTemplate")
 		}
 
 		var tables = mapper.SelectAttrValue("tables", "")
@@ -340,7 +340,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 
 		var resultMapData = tree[resultMap].(*etree.Element)
 		if resultMapData == nil {
-			panic(utils.NewError("GoMybatisTempleteDecoder", "resultMap not define! id = ", resultMap))
+			panic(utils.NewError("GoMybatisTemplateDecoder", "resultMap not define! id = ", resultMap))
 		}
 		checkTablesValue(mapper, &tables, resultMapData)
 
@@ -384,12 +384,12 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 			it.DecodeWheres(wheres, mapper, logic, versionData)
 		}
 		break
-	case "deleteTemplete":
+	case "deleteTemplate":
 		mapper.Tag = Element_Delete
 
 		var id = mapper.SelectAttrValue("id", "")
 		if id == "" {
-			mapper.CreateAttr("id", "deleteTemplete")
+			mapper.CreateAttr("id", "deleteTemplate")
 		}
 
 		var tables = mapper.SelectAttrValue("tables", "")
@@ -402,7 +402,7 @@ func (it *GoMybatisTempleteDecoder) Decode(method *reflect.StructField, mapper *
 
 		var resultMapData = tree[resultMap].(*etree.Element)
 		if resultMapData == nil {
-			panic(utils.NewError("GoMybatisTempleteDecoder", "resultMap not define! id = ", resultMap))
+			panic(utils.NewError("GoMybatisTemplateDecoder", "resultMap not define! id = ", resultMap))
 		}
 		checkTablesValue(mapper, &tables, resultMapData)
 
@@ -452,13 +452,13 @@ func checkTablesValue(mapper *etree.Element, tables *string, resultMapData *etre
 	if *tables == "" {
 		*tables = resultMapData.SelectAttrValue("tables", "")
 		if *tables == "" {
-			panic("[GoMybatisTempleteDecoder] attribute 'tables' can not be empty! need define in <resultMap> or <" + mapper.Tag + "Templete>,mapper id=" + mapper.SelectAttrValue("id", ""))
+			panic("[GoMybatisTemplateDecoder] attribute 'tables' can not be empty! need define in <resultMap> or <" + mapper.Tag + "Template>,mapper id=" + mapper.SelectAttrValue("id", ""))
 		}
 	}
 }
 
 //解码逗号分隔的where
-func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Element, logic LogicDeleteData, versionData *VersionData) {
+func (it *GoMybatisTemplateDecoder) DecodeWheres(arg string, mapper *etree.Element, logic LogicDeleteData, versionData *VersionData) {
 	var whereRoot = &etree.Element{
 		Tag:   Element_where,
 		Attr:  []etree.Attr{},
@@ -516,7 +516,7 @@ func (it *GoMybatisTempleteDecoder) DecodeWheres(arg string, mapper *etree.Eleme
 	mapper.Child = append(mapper.Child, whereRoot)
 }
 
-func (it *GoMybatisTempleteDecoder) DecodeSets(arg string, mapper *etree.Element, logic LogicDeleteData, versionData *VersionData) {
+func (it *GoMybatisTemplateDecoder) DecodeSets(arg string, mapper *etree.Element, logic LogicDeleteData, versionData *VersionData) {
 	var sets = strings.Split(arg, ",")
 	for index, v := range sets {
 		if v == "" {
@@ -569,7 +569,7 @@ func (it *GoMybatisTempleteDecoder) DecodeSets(arg string, mapper *etree.Element
 	}
 }
 
-func (it *GoMybatisTempleteDecoder) makeIfNotNull(arg string) string {
+func (it *GoMybatisTemplateDecoder) makeIfNotNull(arg string) string {
 	for _, v := range equalOperator {
 		if v == "" {
 			continue
@@ -581,7 +581,7 @@ func (it *GoMybatisTempleteDecoder) makeIfNotNull(arg string) string {
 	return arg + ` != nil`
 }
 
-func (it *GoMybatisTempleteDecoder) decodeLogicDelete(xml *etree.Element) LogicDeleteData {
+func (it *GoMybatisTemplateDecoder) decodeLogicDelete(xml *etree.Element) LogicDeleteData {
 	if xml == nil || len(xml.Child) == 0 {
 		return LogicDeleteData{}
 	}
@@ -596,13 +596,13 @@ func (it *GoMybatisTempleteDecoder) decodeLogicDelete(xml *etree.Element) LogicD
 			logicData.LangType = v.SelectAttrValue("langType", "")
 			//check
 			if logicData.Deleted_value == "" {
-				panic(utils.NewError("GoMybatisTempleteDecoder", `<resultMap> logic_deleted="" can't be empty !`))
+				panic(utils.NewError("GoMybatisTemplateDecoder", `<resultMap> logic_deleted="" can't be empty !`))
 			}
 			if logicData.Undelete_value == "" {
-				panic(utils.NewError("GoMybatisTempleteDecoder", `<resultMap> logic_undelete="" can't be empty !`))
+				panic(utils.NewError("GoMybatisTemplateDecoder", `<resultMap> logic_undelete="" can't be empty !`))
 			}
 			if logicData.Undelete_value == logicData.Deleted_value {
-				panic(utils.NewError("GoMybatisTempleteDecoder", `<resultMap> logic_deleted value can't be logic_undelete value!`))
+				panic(utils.NewError("GoMybatisTemplateDecoder", `<resultMap> logic_deleted value can't be logic_undelete value!`))
 			}
 			break
 		}
@@ -610,7 +610,7 @@ func (it *GoMybatisTempleteDecoder) decodeLogicDelete(xml *etree.Element) LogicD
 	return logicData
 }
 
-func (it *GoMybatisTempleteDecoder) decodeVersionData(xml *etree.Element) *VersionData {
+func (it *GoMybatisTemplateDecoder) decodeVersionData(xml *etree.Element) *VersionData {
 	if xml == nil || len(xml.Child) == 0 {
 		return nil
 	}
@@ -623,7 +623,7 @@ func (it *GoMybatisTempleteDecoder) decodeVersionData(xml *etree.Element) *Versi
 			versionData.LangType = v.SelectAttrValue("langType", "")
 			//check
 			if !(strings.Contains(versionData.LangType, "int") || strings.Contains(versionData.LangType, "time.Time")) {
-				panic(utils.NewError("GoMybatisTempleteDecoder", `version_enable only support int...,time.Time... number type!`))
+				panic(utils.NewError("GoMybatisTemplateDecoder", `version_enable only support int...,time.Time... number type!`))
 			}
 			return &versionData
 		}
@@ -632,7 +632,7 @@ func (it *GoMybatisTempleteDecoder) decodeVersionData(xml *etree.Element) *Versi
 }
 
 //反射解码得到 集合名词
-func (it *GoMybatisTempleteDecoder) DecodeCollectionName(method *reflect.StructField) string {
+func (it *GoMybatisTemplateDecoder) DecodeCollectionName(method *reflect.StructField) string {
 	var collection string
 	//check method arg type
 	if method != nil {

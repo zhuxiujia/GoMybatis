@@ -21,8 +21,8 @@
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">Intelligent expression</a>Processing dynamic judgment and computation tasks（such as：`#{foo.Bar}#{arg+1}#{arg*1}#{arg/1}#{arg-1}`）,For example, write fuzzy queries `select * from table where phone like #{phone+'%'}`(Note the post-percentile query run in index)<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">Dynamic Data Source</a>Multiple data sources can be customized to dynamically switch multiple database instances<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">Template label（new）</a>One line of code to achieve add, delete, modify, delete logic, optimistic lock, but also retain perfect scalability (tag body can continue to expand SQL logic)<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/">Optimistic Lock（new）</a>`<updateTemplete>`Optimistic locks to prevent concurrent competition to modify records as much as possible<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/">Logical deletion（new）</a>`<insertTemplete><updateTemplete><deleteTemplete><selectTemplete>`Logical deletion, prevent accidental deletion of data, data recovery is simple<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/">Optimistic Lock（new）</a>`<updateTemplate>`Optimistic locks to prevent concurrent competition to modify records as much as possible<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/">Logical deletion（new）</a>`<insertTemplate><updateTemplate><deleteTemplate><selectTemplate>`Logical deletion, prevent accidental deletion of data, data recovery is simple<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">RPC/MVC Component Support（new）</a>To make the service perfect for RPC (reducing parameter restrictions), dynamic proxy, transaction subscription, easy integration and extension of micro services, click on the link https://github.com/zhuxiujia/easyrpc<br>
 
 
@@ -130,14 +130,14 @@ func main() {
 
     <!--模板标签: columns wheres sets 支持逗号,分隔表达式，*?* 为判空表达式-->
 
-    <!--插入模板:默认id="insertTemplete,test="field != null",where自动设置逻辑删除字段,支持批量插入" -->
-    <insertTemplete/>
-    <!--查询模板:默认id="selectTemplete,where自动设置逻辑删除字段-->
-    <selectTemplete wheres="name?name = #{name}"/>
-    <!--更新模板:默认id="updateTemplete,set自动设置乐观锁版本号-->
-    <updateTemplete sets="name?name = #{name},remark?remark=#{remark}" wheres="id?id = #{id}"/>
-    <!--删除模板:默认id="deleteTemplete,where自动设置逻辑删除字段-->
-    <deleteTemplete wheres="name?name = #{name}"/>
+    <!--插入模板:默认id="insertTemplate,test="field != null",where自动设置逻辑删除字段,支持批量插入" -->
+    <insertTemplate/>
+    <!--查询模板:默认id="selectTemplate,where自动设置逻辑删除字段-->
+    <selectTemplate wheres="name?name = #{name}"/>
+    <!--更新模板:默认id="updateTemplate,set自动设置乐观锁版本号-->
+    <updateTemplate sets="name?name = #{name},remark?remark=#{remark}" wheres="id?id = #{id}"/>
+    <!--删除模板:默认id="deleteTemplate,where自动设置逻辑删除字段-->
+    <deleteTemplate wheres="name?name = #{name}"/>
 </mapper>    
 ```
 XML corresponds to the Mapper structure method defined below
@@ -154,11 +154,11 @@ type Activity struct {
 	DeleteFlag int       `json:"deleteFlag"`
 }
 type ExampleActivityMapper struct {
-	SelectTemplete      func(name string) ([]Activity, error) `args:"name"`
-	InsertTemplete      func(arg Activity) (int64, error)
-	InsertTempleteBatch func(args []Activity) (int64, error) `args:"args"`
-	UpdateTemplete      func(arg Activity) (int64, error)    `args:"name"`
-	DeleteTemplete      func(name string) (int64, error)     `args:"name"`
+	SelectTemplate      func(name string) ([]Activity, error) `args:"name"`
+	InsertTemplate      func(arg Activity) (int64, error)
+	InsertTemplateBatch func(args []Activity) (int64, error) `args:"args"`
+	UpdateTemplate      func(arg Activity) (int64, error)    `args:"name"`
+	DeleteTemplate      func(name string) (int64, error)     `args:"name"`
 }
 ```
 

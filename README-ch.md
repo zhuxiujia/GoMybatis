@@ -28,8 +28,8 @@
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">智能表达式</a>可处理动态判断、计算任务（例如：`#{foo.Bar}#{arg+1}#{arg*1}#{arg/1}#{arg-1}`）,例如写模糊查询`select * from table where phone like #{phone+'%'}`(注意后置百分号走索引)<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">动态数据源</a>可自定义多数据源，动态切换多个数据库实例<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">模板标签（新）</a>一行代码实现增删改查，逻辑删除，乐观锁，而且还保留完美的扩展性（标签体内可以继续扩展sql逻辑）<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/">乐观锁（新）</a>`<updateTemplete>`乐观锁,尽可能防止并发竞争修改记录<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/">逻辑删除（新）</a>`<insertTemplete><updateTemplete><deleteTemplete><selectTemplete>`逻辑删除,防止意外删除数据，数据恢复简单<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/">乐观锁（新）</a>`<updateTemplate>`乐观锁,尽可能防止并发竞争修改记录<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/">逻辑删除（新）</a>`<insertTemplate><updateTemplate><deleteTemplate><selectTemplate>`逻辑删除,防止意外删除数据，数据恢复简单<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">RPC/MVC组件支持（新）</a>让服务完美支持RPC（减少参数限制）,动态代理，事务订阅，易于微服务集成和扩展 详情请点击链接https://github.com/zhuxiujia/easyrpc<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">Wrapper插件免写sql支持，Page分页插件支持（预计在golang1.17版本（支持泛型）之后出现）<br>
 
@@ -146,14 +146,14 @@ func main() {
 
     <!--模板标签: columns wheres sets 支持逗号,分隔表达式，*?* 为判空表达式-->
 
-    <!--插入模板:默认id="insertTemplete,test="field != null",where自动设置逻辑删除字段,支持批量插入" -->
-    <insertTemplete/>
-    <!--查询模板:默认id="selectTemplete,where自动设置逻辑删除字段-->
-    <selectTemplete wheres="name?name = #{name}"/>
-    <!--更新模板:默认id="updateTemplete,set自动设置乐观锁版本号-->
-    <updateTemplete sets="name?name = #{name},remark?remark=#{remark}" wheres="id?id = #{id}"/>
-    <!--删除模板:默认id="deleteTemplete,where自动设置逻辑删除字段-->
-    <deleteTemplete wheres="name?name = #{name}"/>
+    <!--插入模板:默认id="insertTemplate,test="field != null",where自动设置逻辑删除字段,支持批量插入" -->
+    <insertTemplate/>
+    <!--查询模板:默认id="selectTemplate,where自动设置逻辑删除字段-->
+    <selectTemplate wheres="name?name = #{name}"/>
+    <!--更新模板:默认id="updateTemplate,set自动设置乐观锁版本号-->
+    <updateTemplate sets="name?name = #{name},remark?remark=#{remark}" wheres="id?id = #{id}"/>
+    <!--删除模板:默认id="deleteTemplate,where自动设置逻辑删除字段-->
+    <deleteTemplate wheres="name?name = #{name}"/>
 </mapper>    
 ```
 xml对应以下定义的Mapper结构体方法,然后将生成对应的SQL语句
@@ -172,12 +172,12 @@ type Activity struct {
 }
 type ExampleActivityMapper struct {
     //调用即可生成sql(带有逻辑删除)  select * from biz_activity where delete_flag = 1 and name = #{name}
-	SelectTemplete      func(name string) ([]Activity, error) `args:"name"`
-	InsertTemplete      func(arg Activity) (int64, error)
-	InsertTempleteBatch func(args []Activity) (int64, error) `args:"args"`
+	SelectTemplate      func(name string) ([]Activity, error) `args:"name"`
+	InsertTemplate      func(arg Activity) (int64, error)
+	InsertTemplateBatch func(args []Activity) (int64, error) `args:"args"`
     //生成sql(带有乐观锁.逻辑删除)  update biz_activity set name = #{name},remark=#{remark},version=#{version+1} where delete_flag = 1 and id = #{id} and version = #{version}
-	UpdateTemplete      func(arg Activity) (int64, error)    `args:"name"`
-	DeleteTemplete      func(name string) (int64, error)     `args:"name"`
+	UpdateTemplate      func(arg Activity) (int64, error)    `args:"name"`
+	DeleteTemplate      func(name string) (int64, error)     `args:"name"`
 }
 ```
 

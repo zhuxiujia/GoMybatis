@@ -24,10 +24,10 @@ func LoadMapperXml(bytes []byte) (items map[string]etree.Token) {
 			s.Tag == Element_Select ||
 			s.Tag == Element_ResultMap ||
 			s.Tag == Element_Sql ||
-			s.Tag == Element_Insert_Templete ||
-			s.Tag == Element_Delete_Templete ||
-			s.Tag == Element_Update_Templete ||
-			s.Tag == Element_Select_Templete {
+			s.Tag == Element_Insert_Template ||
+			s.Tag == Element_Delete_Template ||
+			s.Tag == Element_Update_Template ||
+			s.Tag == Element_Select_Template {
 			var elementID = s.SelectAttrValue(ID, "")
 
 			if elementID == "" {

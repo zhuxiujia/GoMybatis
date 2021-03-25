@@ -11,11 +11,11 @@ const (
 	Element_Select    ElementType = "select"
 	Element_Sql       ElementType = "sql"
 
-	//root templete elements
-	Element_Insert_Templete ElementType = "insertTemplete"
-	Element_Delete_Templete ElementType = "deleteTemplete"
-	Element_Update_Templete ElementType = `updateTemplete`
-	Element_Select_Templete ElementType = "selectTemplete"
+	//root template elements
+	Element_Insert_Template ElementType = "insertTemplate"
+	Element_Delete_Template ElementType = "deleteTemplate"
+	Element_Update_Template ElementType = `updateTemplate`
+	Element_Select_Template ElementType = "selectTemplate"
 
 	//child elements
 	Element_bind      ElementType = "bind"
@@ -34,7 +34,7 @@ const (
 func isMethodElement(tag ElementType) bool {
 	switch tag {
 	case Element_Insert, Element_Delete, Element_Update, Element_Select,
-		Element_Insert_Templete, Element_Delete_Templete, Element_Update_Templete, Element_Select_Templete:
+		Element_Insert_Template, Element_Delete_Template, Element_Update_Template, Element_Select_Template:
 		return true
 	}
 	return false

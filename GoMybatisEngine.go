@@ -21,7 +21,7 @@ type GoMybatisEngine struct {
 	expressionEngine    ast.ExpressionEngine  //表达式解析引擎
 	sqlBuilder          SqlBuilder            //sql 构建
 	sqlResultDecoder    SqlResultDecoder      //sql查询结果解析引擎
-	templeteDecoder     TempleteDecoder       //模板解析引擎
+	templateDecoder     TemplateDecoder       //模板解析引擎
 	goroutineSessionMap *GoroutineSessionMap  //map[协程id]Session
 	goroutineIDEnable   bool                  //是否启用goroutineIDEnable（注意（该方法需要在多协程环境下调用）启用会从栈获取协程id，有一定性能消耗，换取最大的事务定义便捷,单线程处理场景可以关闭此配置）
 }
@@ -52,8 +52,8 @@ func (it GoMybatisEngine) New() GoMybatisEngine {
 	if it.sqlResultDecoder == nil {
 		it.sqlResultDecoder = GoMybatisSqlResultDecoder{}
 	}
-	if it.templeteDecoder == nil {
-		it.SetTempleteDecoder(&GoMybatisTempleteDecoder{})
+	if it.templateDecoder == nil {
+		it.SetTemplateDecoder(&GoMybatisTemplateDecoder{})
 	}
 
 	if it.sqlBuilder == nil {
@@ -198,13 +198,13 @@ func (it *GoMybatisEngine) Open(driverName, dataSourceLink string) (*sql.DB, err
 }
 
 //模板解析器
-func (it *GoMybatisEngine) TempleteDecoder() TempleteDecoder {
-	return it.templeteDecoder
+func (it *GoMybatisEngine) TemplateDecoder() TemplateDecoder {
+	return it.templateDecoder
 }
 
 //设置模板解析器
-func (it *GoMybatisEngine) SetTempleteDecoder(decoder TempleteDecoder) {
-	it.templeteDecoder = decoder
+func (it *GoMybatisEngine) SetTemplateDecoder(decoder TemplateDecoder) {
+	it.templateDecoder = decoder
 }
 
 func (it *GoMybatisEngine) GoroutineSessionMap() *GoroutineSessionMap {
