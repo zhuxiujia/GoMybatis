@@ -33,7 +33,7 @@
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">RPC/MVC组件支持（新）</a>让服务完美支持RPC（减少参数限制）,动态代理，事务订阅，易于微服务集成和扩展 详情请点击链接https://github.com/zhuxiujia/easyrpc<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">Wrapper插件免写sql支持，Page分页插件支持（预计在golang1.17版本（支持泛型）之后出现）<br>
 
-## 数据库驱动
+## 数据库驱动(支持所有基于标准库database/sql下的所有驱动)
 ``` bash
  //传统数据库
  Mysql:                             github.com/go-sql-driver/mysql

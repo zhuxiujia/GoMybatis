@@ -26,7 +26,7 @@
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">RPC/MVC Component Support（new）</a>To make the service perfect for RPC (reducing parameter restrictions), dynamic proxy, transaction subscription, easy integration and extension of micro services, click on the link https://github.com/zhuxiujia/easyrpc<br>
 
 
-## Database Driver support table
+## Database Driver support(support all database of database/sql)
 ``` bash
  //Traditional database
  Mysql:                             github.com/go-sql-driver/mysql
