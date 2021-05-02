@@ -143,7 +143,7 @@
         <choose>
             <when test="deleteFlag > 1">WHERE delete_flag > 1</when>
             <when test="deleteFlag == 1">WHERE delete_flag = 1</when>
-            <otherwise>WHERE delete_flag = #{deleteFlag}</otherwise>
+            <otherwise>  WHERE delete_flag <![CDATA[ < ]]> 1 </otherwise>
         </choose>
     </select>
 
