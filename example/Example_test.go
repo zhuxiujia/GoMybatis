@@ -282,7 +282,7 @@ func Test_choose(t *testing.T) {
 		return
 	}
 	//使用mapper
-	var result, err = exampleActivityMapper.Choose(0)
+	var result, err = exampleActivityMapper.Choose(1)
 	if err != nil {
 		panic(err)
 	}
