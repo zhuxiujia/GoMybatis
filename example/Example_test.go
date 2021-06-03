@@ -244,8 +244,9 @@ func Test_local_Transation(t *testing.T) {
 	}
 	session.Begin(nil) //开启事务
 	var activityBean = Activity{
-		Id:   "170",
-		Name: "rs168-8",
+		Id:         "170",
+		Name:       "rs168-8",
+		DeleteFlag: 1,
 	}
 	var updateNum, e = exampleActivityMapper.UpdateById(&session, activityBean) //sessionId 有值则使用已经创建的session，否则新建一个session
 	fmt.Println("updateNum=", updateNum)
