@@ -216,12 +216,12 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 				it.newLocalSession = &sess
 			}
 			break
-		case tx.PROPAGATION_NEVER: //END
+		case tx.PROPAGATION_NEVER:
 			if it.txStack.Len() > 0 {
 				return errors.New("[GoMybatis] PROPAGATION_NEVER  Nested transaction exception! current Already have a transaction!")
 			}
 			break
-		case tx.PROPAGATION_NESTED: //REQUIRED 类似，增加 save point
+		case tx.PROPAGATION_NESTED:
 			if it.savePointStack == nil {
 				var savePointStack = tx.SavePointStack{}.New()
 				it.savePointStack = &savePointStack
@@ -234,7 +234,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 				return it.Begin(&np)
 			}
 			break
-		case tx.PROPAGATION_NOT_REQUIRED: //end
+		case tx.PROPAGATION_NOT_REQUIRED:
 			if it.txStack.Len() > 0 {
 				return errors.New("[GoMybatis] PROPAGATION_NOT_REQUIRED Nested transaction exception! current Already have a transaction!")
 			} else {
