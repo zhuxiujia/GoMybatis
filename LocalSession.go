@@ -191,8 +191,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 					return e
 				}
 				var session = LocalSession{}.New(it.driverType, it.driverLink, db, it.logSystem) //same PROPAGATION_REQUIRES_NEW
-				var p = tx.PROPAGATION_REQUIRES_NEW
-				e = session.Begin(&p)
+				e = session.Begin(p)
 				if e != nil {
 					return e
 				}
