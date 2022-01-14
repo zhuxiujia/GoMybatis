@@ -22,21 +22,22 @@
 DROP TABLE IF EXISTS `biz_activity`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
  SET character_set_client = utf8mb4 ;
-CREATE TABLE `biz_activity` (
-  `id` varchar(50) NOT NULL DEFAULT '' COMMENT '唯一活动码',
-  `name` varchar(255) NOT NULL,
-  `pc_link` varchar(255) DEFAULT NULL,
-  `h5_link` varchar(255) DEFAULT NULL,
-  `sort` varchar(255) NOT NULL COMMENT '排序',
-  `status` int(11) NOT NULL COMMENT '状态（0：已下线，1：已上线）',
-  `version` int(11) NOT NULL,
-  `remark` varchar(255) DEFAULT NULL,
-  `create_time` datetime NOT NULL,
-  `delete_flag` int(1) NOT NULL,
-  `pc_banner_img` varchar(255) DEFAULT NULL,
-  `h5_banner_img` varchar(255) DEFAULT NULL,
-  `bbb` bit(4) DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
+CREATE TABLE `biz_activity`
+(
+    `id`            varchar(50)  NOT NULL DEFAULT '' COMMENT '唯一活动码',
+    `name`          varchar(255) NOT NULL default '',
+    `pc_link`       varchar(255)          DEFAULT NULL,
+    `h5_link`       varchar(255)          DEFAULT NULL,
+    `sort`          int(11)      NOT NULL default 0 COMMENT '排序',
+    `status`        int(11)      NOT NULL default 0 COMMENT '状态（0：已下线，1：已上线）',
+    `version`       int(11)      NOT NULL default 0,
+    `remark`        varchar(255)          DEFAULT NULL,
+    `create_time`   datetime,
+    `delete_flag`   int(1)       NOT NULL default 0,
+    `pc_banner_img` varchar(255)          DEFAULT NULL,
+    `h5_banner_img` varchar(255)          DEFAULT NULL,
+    `bbb`           bit(4)                DEFAULT NULL,
+    PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='运营管理-活动管理';
 /*!40101 SET character_set_client = @saved_cs_client */;
 

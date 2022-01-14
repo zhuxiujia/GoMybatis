@@ -185,35 +185,43 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 			}
 			break
 		case tx.PROPAGATION_REQUIRES_NEW:
-			//if it.txStack.Len() > 0 {
-			//stop old tx
-			//}
-			//new session(tx)
-			var db, e = sql.Open(it.driverType, it.driverLink)
-			if e != nil {
-				return e
+			if it.txStack.Len() > 0 {
+				var db, e = sql.Open(it.driverType, it.driverLink)
+				if e != nil {
+					return e
+				}
+				var session = LocalSession{}.New(it.driverType, it.driverLink, db, it.logSystem) //same PROPAGATION_REQUIRES_NEW
+				e = session.Begin(p)
+				if e != nil {
+					return e
+				}
+				it.newLocalSession = &session
+			} else {
+				var t, err = it.db.Begin()
+				err = it.dbErrorPack(err)
+				if err == nil {
+					it.txStack.Push(t, p)
+				} else {
+					return err
+				}
 			}
-			var sess = LocalSession{}.New(it.driverType, it.driverLink, db, it.logSystem) //same PROPAGATION_REQUIRES_NEW
-			it.newLocalSession = &sess
 			break
 		case tx.PROPAGATION_NOT_SUPPORTED:
-			//if it.txStack.Len() > 0 {
-			//stop old tx
-			//}
-			//new session( no tx)
-			var db, e = sql.Open(it.driverType, it.driverLink)
-			if e != nil {
-				return e
+			if it.txStack.Len() > 0 {
+				var db, e = sql.Open(it.driverType, it.driverLink)
+				if e != nil {
+					return e
+				}
+				var sess = LocalSession{}.New(it.driverType, it.driverLink, db, it.logSystem)
+				it.newLocalSession = &sess
 			}
-			var sess = LocalSession{}.New(it.driverType, it.driverLink, db, it.logSystem)
-			it.newLocalSession = &sess
 			break
-		case tx.PROPAGATION_NEVER: //END
+		case tx.PROPAGATION_NEVER:
 			if it.txStack.Len() > 0 {
 				return errors.New("[GoMybatis] PROPAGATION_NEVER  Nested transaction exception! current Already have a transaction!")
 			}
 			break
-		case tx.PROPAGATION_NESTED: //TODO REQUIRED 类似，增加 save point
+		case tx.PROPAGATION_NESTED:
 			if it.savePointStack == nil {
 				var savePointStack = tx.SavePointStack{}.New()
 				it.savePointStack = &savePointStack
@@ -226,7 +234,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 				return it.Begin(&np)
 			}
 			break
-		case tx.PROPAGATION_NOT_REQUIRED: //end
+		case tx.PROPAGATION_NOT_REQUIRED:
 			if it.txStack.Len() > 0 {
 				return errors.New("[GoMybatis] PROPAGATION_NOT_REQUIRED Nested transaction exception! current Already have a transaction!")
 			} else {

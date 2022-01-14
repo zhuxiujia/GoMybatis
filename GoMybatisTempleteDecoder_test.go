@@ -10,10 +10,10 @@ import (
 )
 
 type ExampleActivityMapper struct {
-	SelectTemplete func(name string, session Session) ([]example.Activity, error) `args:"name,session"`
-	InsertTemplete func(args []example.Activity, session Session) (int64, error)  `args:"args,session"`
-	UpdateTemplete func(arg example.Activity, session Session) (int64, error)     `args:"name,session"`
-	DeleteTemplete func(name string, session Session) (int64, error)              `args:"name,session"`
+	SelectTemplate func(name string, session Session) ([]example.Activity, error) `args:"name,session"`
+	InsertTemplate func(args []example.Activity, session Session) (int64, error)  `args:"args,session"`
+	UpdateTemplate func(arg example.Activity, session Session) (int64, error)     `args:"name,session"`
+	DeleteTemplate func(name string, session Session) (int64, error)              `args:"name,session"`
 }
 
 //初始化mapper文件和结构体
@@ -44,14 +44,14 @@ func initMapper() {
         <result column="delete_flag" property="deleteFlag" langType="int" logic_enable="true" logic_undelete="1" logic_deleted="0"/>
     </resultMap>
     <!--模板标签: columns wheres sets 支持逗号','分隔表达式，name?name = #{name}为判空表达式-->
-    <!--插入模板:默认id="insertTemplete,test="field != null",where自动设置逻辑删除字段" -->
-    <!--查询模板:默认id="selectTemplete,where自动设置逻辑删除字段-->
-    <!--更新模板:默认id="updateTemplete,set自动设置乐观锁版本号-->
-    <!--删除模板:默认id="deleteTemplete,where自动设置逻辑删除字段-->
-    <insertTemplete tables="biz_activity" />
-    <selectTemplete tables="biz_activity" wheres="name?name = #{name}" columns=""/>
-    <updateTemplete tables="biz_activity" sets="name?name = #{name}" wheres="name?name = #{name}"/>
-    <deleteTemplete tables="biz_activity" wheres="name?name = #{name}"/>
+    <!--插入模板:默认id="insertTemplate,test="field != null",where自动设置逻辑删除字段" -->
+    <!--查询模板:默认id="selectTemplate,where自动设置逻辑删除字段-->
+    <!--更新模板:默认id="updateTemplate,set自动设置乐观锁版本号-->
+    <!--删除模板:默认id="deleteTemplate,where自动设置逻辑删除字段-->
+    <insertTemplate tables="biz_activity" />
+    <selectTemplate tables="biz_activity" wheres="name?name = #{name}" columns=""/>
+    <updateTemplate tables="biz_activity" sets="name?name = #{name}" wheres="name?name = #{name}"/>
+    <deleteTemplate tables="biz_activity" wheres="name?name = #{name}"/>
   </mapper>
 `)
 
@@ -62,7 +62,7 @@ func initMapper() {
 		panic(`Test_Load_Xml fail,LoadMapperXml "example/Example_ActivityMapper.xml"`)
 	}
 
-	var decoder = GoMybatisTempleteDecoder{}
+	var decoder = GoMybatisTemplateDecoder{}
 	err = decoder.DecodeTree(xmlItems, nil)
 	if err != nil {
 		panic(err)
@@ -78,14 +78,14 @@ func initMapper() {
 	engine.WriteMapperPtr(&exampleActivityMapper, bytes)
 }
 
-type TempleteSession struct {
+type TemplateSession struct {
 	Session
 }
 
-func (it *TempleteSession) Id() string {
+func (it *TemplateSession) Id() string {
 	return "sadf"
 }
-func (it *TempleteSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
+func (it *TemplateSession) Query(sqlorArgs string) ([]map[string][]byte, error) {
 	resultsSlice := make([]map[string][]byte, 0)
 
 	result := make(map[string][]byte)
@@ -97,17 +97,17 @@ func (it *TempleteSession) Query(sqlorArgs string) ([]map[string][]byte, error) 
 	resultsSlice = append(resultsSlice, result)
 	return resultsSlice, nil
 }
-func (it *TempleteSession) Exec(sqlorArgs string) (*Result, error) {
+func (it *TemplateSession) Exec(sqlorArgs string) (*Result, error) {
 	var result = Result{
 		LastInsertId: 1,
 		RowsAffected: 1,
 	}
 	return &result, nil
 }
-func (it *TempleteSession) QueryPrepare(sqlorArgs string, args ...interface{}) ([]map[string][]byte, error) {
+func (it *TemplateSession) QueryPrepare(sqlorArgs string, args ...interface{}) ([]map[string][]byte, error) {
 	return nil, nil
 }
-func (it *TempleteSession) ExecPrepare(sqlorArgs string, args ...interface{}) (*Result, error) {
+func (it *TemplateSession) ExecPrepare(sqlorArgs string, args ...interface{}) (*Result, error) {
 	var result = Result{
 		LastInsertId: 1,
 		RowsAffected: 1,
@@ -115,19 +115,19 @@ func (it *TempleteSession) ExecPrepare(sqlorArgs string, args ...interface{}) (*
 	return &result, nil
 }
 
-func (it *TempleteSession) Rollback() error {
+func (it *TemplateSession) Rollback() error {
 	return nil
 }
-func (it *TempleteSession) Commit() error {
+func (it *TemplateSession) Commit() error {
 	return nil
 }
-func (it *TempleteSession) Begin(p *tx.Propagation) error {
+func (it *TemplateSession) Begin(p *tx.Propagation) error {
 	return nil
 }
-func (it *TempleteSession) Close() {
+func (it *TemplateSession) Close() {
 
 }
-func (it *TempleteSession) StmtConvert() (stmt.StmtIndexConvert, error) {
+func (it *TemplateSession) StmtConvert() (stmt.StmtIndexConvert, error) {
 	return stmt.BuildStmtConvert("mysql")
 }
 
@@ -185,7 +185,7 @@ func Test_create_conf(t *testing.T) {
 	fmt.Println(els[0].test)
 }
 
-func TestGoMybatisTempleteDecoder_Create(t *testing.T) {
+func TestGoMybatisTemplateDecoder_Create(t *testing.T) {
 	var act = example.Activity{
 		Id:         "123",
 		Uuid:       "uu",
@@ -204,8 +204,8 @@ func TestGoMybatisTempleteDecoder_Create(t *testing.T) {
 		act,
 		act,
 	}
-	var session = TempleteSession{}
-	n, err := getMapper().InsertTemplete(args, &session)
+	var session = TemplateSession{}
+	n, err := getMapper().InsertTemplate(args, &session)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -213,9 +213,9 @@ func TestGoMybatisTempleteDecoder_Create(t *testing.T) {
 	time.Sleep(time.Second)
 }
 
-func TestGoMybatisTempleteDecoder_Select(t *testing.T) {
-	var session = TempleteSession{}
-	n, err := getMapper().SelectTemplete("test", &session)
+func TestGoMybatisTemplateDecoder_Select(t *testing.T) {
+	var session = TemplateSession{}
+	n, err := getMapper().SelectTemplate("test", &session)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -223,13 +223,13 @@ func TestGoMybatisTempleteDecoder_Select(t *testing.T) {
 	time.Sleep(time.Second)
 }
 
-func TestGoMybatisTempleteDecoder_Update(t *testing.T) {
+func TestGoMybatisTemplateDecoder_Update(t *testing.T) {
 	var act = example.Activity{
 		Id:   "123",
 		Name: "test",
 	}
-	var session = TempleteSession{}
-	n, err := getMapper().UpdateTemplete(act, &session)
+	var session = TemplateSession{}
+	n, err := getMapper().UpdateTemplate(act, &session)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -237,9 +237,9 @@ func TestGoMybatisTempleteDecoder_Update(t *testing.T) {
 	time.Sleep(time.Second)
 }
 
-func TestGoMybatisTempleteDecoder_Delete(t *testing.T) {
-	var session = TempleteSession{}
-	n, err := getMapper().DeleteTemplete("test", &session)
+func TestGoMybatisTemplateDecoder_Delete(t *testing.T) {
+	var session = TemplateSession{}
+	n, err := getMapper().DeleteTemplate("test", &session)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -271,14 +271,14 @@ func initMapperTest() {
         
     </resultMap>
     <!--模板标签: columns wheres sets 支持逗号','分隔表达式，name?name = #{name}为判空表达式-->
-    <!--插入模板:默认id="insertTemplete,test="field != null",where自动设置逻辑删除字段" -->
-    <!--查询模板:默认id="selectTemplete,where自动设置逻辑删除字段-->
-    <!--更新模板:默认id="updateTemplete,set自动设置乐观锁版本号-->
-    <!--删除模板:默认id="deleteTemplete,where自动设置逻辑删除字段-->
-    <insertTemplete tables="biz_activity" />
-    <selectTemplete tables="biz_activity" wheres="name?name = #{name}" columns=""/>
-    <updateTemplete tables="biz_activity" sets="name?name = #{name}" wheres="name?name = #{name}"/>
-    <deleteTemplete tables="biz_activity" wheres="name?name = #{name}"/>
+    <!--插入模板:默认id="insertTemplate,test="field != null",where自动设置逻辑删除字段" -->
+    <!--查询模板:默认id="selectTemplate,where自动设置逻辑删除字段-->
+    <!--更新模板:默认id="updateTemplate,set自动设置乐观锁版本号-->
+    <!--删除模板:默认id="deleteTemplate,where自动设置逻辑删除字段-->
+    <insertTemplate tables="biz_activity" />
+    <selectTemplate tables="biz_activity" wheres="name?name = #{name}" columns=""/>
+    <updateTemplate tables="biz_activity" sets="name?name = #{name}" wheres="name?name = #{name}"/>
+    <deleteTemplate tables="biz_activity" wheres="name?name = #{name}"/>
   </mapper>
 `)
 
@@ -289,7 +289,7 @@ func initMapperTest() {
 		panic(`Test_Load_Xml fail,LoadMapperXml "example/Example_ActivityMapper.xml"`)
 	}
 
-	var decoder = GoMybatisTempleteDecoder{}
+	var decoder = GoMybatisTemplateDecoder{}
 	err = decoder.DecodeTree(xmlItems, nil)
 	if err != nil {
 		panic(err)

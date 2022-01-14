@@ -21,7 +21,7 @@ func (it *NodeChoose) Eval(env map[string]interface{}, arg_array *[]interface{},
 		if e != nil {
 			return nil, e
 		}
-		if r != nil {
+		if v.Type() == NWhen && r != nil {
 			return r, nil
 		}
 	}

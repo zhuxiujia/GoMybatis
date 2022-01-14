@@ -16,7 +16,7 @@
                limitations under the License.
 
         -->
-        <!ELEMENT mapper (resultMap*  | sql* | insert* | update* |updateTemplete* | delete* |deleteTemplete* | select* | selectTemplete* | insertTemplete* )+>
+        <!ELEMENT mapper (resultMap*  | sql* | insert* | update* |updateTemplate* | delete* |deleteTemplate* | select* | selectTemplate* | insertTemplate* )+>
         <!ATTLIST mapper
                 >
 
@@ -64,8 +64,8 @@
                 lang CDATA #IMPLIED
                 >
 
-        <!ELEMENT selectTemplete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
-        <!ATTLIST selectTemplete
+        <!ELEMENT selectTemplate (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+        <!ATTLIST selectTemplate
                 id CDATA #IMPLIED
                 resultMap (BaseResultMap) #IMPLIED
                 lang CDATA #IMPLIED
@@ -84,8 +84,8 @@
                 lang CDATA #IMPLIED
                 >
 
-        <!ELEMENT insertTemplete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
-        <!ATTLIST insertTemplete
+        <!ELEMENT insertTemplate (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+        <!ATTLIST insertTemplate
                 id CDATA #IMPLIED
                 resultMap CDATA #IMPLIED
                 tables CDATA #IMPLIED
@@ -99,8 +99,8 @@
                 lang CDATA #IMPLIED
                 >
         <!--sets指定值(例如 sets="name?name = #{name}"  )会更新对应值，否则为""设置全部属性-->
-        <!ELEMENT updateTemplete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
-        <!ATTLIST updateTemplete
+        <!ELEMENT updateTemplate (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+        <!ATTLIST updateTemplate
                 id CDATA #IMPLIED
                 resultMap (BaseResultMap) #IMPLIED
                 lang CDATA #IMPLIED
@@ -115,8 +115,8 @@
 
                 lang CDATA #IMPLIED
                 >
-        <!ELEMENT deleteTemplete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
-        <!ATTLIST deleteTemplete
+        <!ELEMENT deleteTemplate (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+        <!ATTLIST deleteTemplate
                 id CDATA #IMPLIED
 
                 lang CDATA #IMPLIED

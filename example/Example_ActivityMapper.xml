@@ -25,20 +25,20 @@
 
     <!--模板标签: columns wheres sets 支持逗号,分隔表达式，*?* 为判空表达式-->
 
-    <!--插入模板:默认id="insertTemplete,test="field != null",where自动设置逻辑删除字段,支持批量插入" -->
-    <insertTemplete/>
-    <!--查询模板:默认id="selectTemplete,where自动设置逻辑删除字段-->
-    <selectTemplete wheres="name?name = #{name}"/>
-    <!--更新模板:默认id="updateTemplete,set自动设置乐观锁版本号-->
-    <updateTemplete sets="name?name = #{name},remark?remark=#{remark}" wheres="id?id = #{id}"/>
-    <!--删除模板:默认id="deleteTemplete,where自动设置逻辑删除字段-->
-    <deleteTemplete wheres="name?name = #{name}"/>
+    <!--插入模板:默认id="insertTemplate,test="field != null",where自动设置逻辑删除字段,支持批量插入" -->
+    <insertTemplate/>
+    <!--查询模板:默认id="selectTemplate,where自动设置逻辑删除字段-->
+    <selectTemplate wheres="name?name = #{name}"/>
+    <!--更新模板:默认id="updateTemplate,set自动设置乐观锁版本号-->
+    <updateTemplate sets="name?name = #{name},remark?remark=#{remark}" wheres="id?id = #{id}"/>
+    <!--删除模板:默认id="deleteTemplate,where自动设置逻辑删除字段-->
+    <deleteTemplate wheres="name?name = #{name}"/>
 
 
-    <!--批量插入例子: 因为上面已经有id="insertTemplete" 需要指定id -->
-    <insertTemplete id="InsertTempleteBatch"/>
+    <!--批量插入例子: 因为上面已经有id="insertTemplate" 需要指定id -->
+    <insertTemplate id="InsertTemplateBatch"/>
     <!--统计模板例子:-->
-    <selectTemplete id="selectCountTemplete" columns="count(*)" wheres="name?name = #{name}"/>
+    <selectTemplate id="selectCountTemplate" columns="count(*)" wheres="name?name = #{name}"/>
 
 
     <!--SelectByCondition func(name *string, startTime *time.Time, endTime *time.Time, page *int, size *int) ([]Activity, error) `args:"name,startTime,endTime,page,size"`-->
@@ -143,7 +143,7 @@
         <choose>
             <when test="deleteFlag > 1">WHERE delete_flag > 1</when>
             <when test="deleteFlag == 1">WHERE delete_flag = 1</when>
-            <otherwise>WHERE delete_flag = #{deleteFlag}</otherwise>
+            <otherwise>  WHERE delete_flag <![CDATA[ < ]]> 1 </otherwise>
         </choose>
     </select>
 

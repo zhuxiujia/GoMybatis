@@ -23,12 +23,12 @@ type ExampleActivityMapper struct {
 	NewSession               func() (GoMybatis.Session, error) //session事务操作.写法2   ExampleActivityMapper.NewSession()
 
 	//模板示例
-	SelectTemplete      func(name string) ([]Activity, error) `args:"name"`
-	SelectCountTemplete func(name string) (int64, error)      `args:"name"`
-	InsertTemplete      func(arg Activity) (int64, error)
-	InsertTempleteBatch func(args []Activity) (int64, error) `args:"args"`
-	UpdateTemplete      func(arg Activity) (int64, error)    `args:"name"`
-	DeleteTemplete      func(name string) (int64, error)     `args:"name"`
+	SelectTemplate      func(name string) ([]Activity, error) `args:"name"`
+	SelectCountTemplate func(name string) (int64, error)      `args:"name"`
+	InsertTemplate      func(arg Activity) (int64, error)
+	InsertTemplateBatch func(args []Activity) (int64, error) `args:"args"`
+	UpdateTemplate      func(arg Activity) (int64, error)    `args:"name"`
+	DeleteTemplate      func(name string) (int64, error)     `args:"name"`
 
 	//传统mybatis示例
 	SelectByIds       func(ids []string) ([]Activity, error)       `args:"ids"`
@@ -70,7 +70,7 @@ func init() {
 	engine = GoMybatis.GoMybatisEngine{}.New()
 
 	//设置打印自动生成的xml 到控制台方便调试，false禁用
-	engine.TempleteDecoder().SetPrintElement(false)
+	engine.TemplateDecoder().SetPrintElement(false)
 	//设置是否打印警告(建议开启)
 	engine.SetPrintWarning(false)
 
@@ -82,7 +82,7 @@ func init() {
 
 	//动态数据源路由(可选)
 	/**
-	GoMybatis.Open("mysql", MysqlUri)//添加第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
+	engine.Open("mysql", MysqlUri)//添加第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
 	var router = GoMybatis.GoMybatisDataSourceRouter{}.New(func(mapperName string) *string {
 		//根据包名路由指向数据源
 		if strings.Contains(mapperName, "example.") {
@@ -126,7 +126,6 @@ func Test_inset(t *testing.T) {
 }
 
 //修改
-//本地事务使用例子
 func Test_update(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
 		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
@@ -245,8 +244,9 @@ func Test_local_Transation(t *testing.T) {
 	}
 	session.Begin(nil) //开启事务
 	var activityBean = Activity{
-		Id:   "170",
-		Name: "rs168-8",
+		Id:         "170",
+		Name:       "rs168-8",
+		DeleteFlag: 1,
 	}
 	var updateNum, e = exampleActivityMapper.UpdateById(&session, activityBean) //sessionId 有值则使用已经创建的session，否则新建一个session
 	fmt.Println("updateNum=", updateNum)
@@ -284,39 +284,39 @@ func Test_include_sql(t *testing.T) {
 	fmt.Println("result=", result)
 }
 
-func TestSelectTemplete(t *testing.T) {
+func TestSelectTemplate(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
 		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	//使用mapper
-	var result, err = exampleActivityMapper.SelectTemplete("hello")
+	var result, err = exampleActivityMapper.SelectTemplate("hello")
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("result=", result)
 }
 
-func TestSelectCountTemplete(t *testing.T) {
+func TestSelectCountTemplate(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
 		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	//使用mapper
-	var result, err = exampleActivityMapper.SelectCountTemplete("hello")
+	var result, err = exampleActivityMapper.SelectCountTemplate("hello")
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("result=", result)
 }
 
-func TestInsertTemplete(t *testing.T) {
+func TestInsertTemplate(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
 		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	//使用mapper
-	var result, err = exampleActivityMapper.InsertTemplete(Activity{Id: "178", Name: "test_insret", CreateTime: time.Now(), Sort: 1, Status: 1, DeleteFlag: 1})
+	var result, err = exampleActivityMapper.InsertTemplate(Activity{Id: "178", Name: "test_insret", CreateTime: time.Now(), Sort: 1, Status: 1, DeleteFlag: 1})
 	if err != nil {
 		panic(err)
 	}
@@ -324,7 +324,7 @@ func TestInsertTemplete(t *testing.T) {
 }
 
 //批量插入模板
-func TestInsertTempleteBatch(t *testing.T) {
+func TestInsertTemplateBatch(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
 		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
@@ -346,7 +346,7 @@ func TestInsertTempleteBatch(t *testing.T) {
 			CreateTime: time.Now(),
 		},
 	}
-	n, err := exampleActivityMapper.InsertTempleteBatch(args)
+	n, err := exampleActivityMapper.InsertTemplateBatch(args)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -355,7 +355,7 @@ func TestInsertTempleteBatch(t *testing.T) {
 }
 
 //修改模板默认支持逻辑删除和乐观锁
-func TestUpdateTemplete(t *testing.T) {
+func TestUpdateTemplate(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
 		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
@@ -367,7 +367,7 @@ func TestUpdateTemplete(t *testing.T) {
 	}
 	//会自动生成乐观锁和逻辑删除字段 set version= * where version = * and delete_flag = *
 	// update set name = 'rs168',version = 1 from biz_activity where name = 'rs168' and delete_flag = 1 and version = 0
-	var updateNum, e = exampleActivityMapper.UpdateTemplete(activityBean)
+	var updateNum, e = exampleActivityMapper.UpdateTemplate(activityBean)
 	fmt.Println("updateNum=", updateNum)
 	if e != nil {
 		panic(e)
@@ -375,13 +375,13 @@ func TestUpdateTemplete(t *testing.T) {
 }
 
 //删除
-func TestDeleteTemplete(t *testing.T) {
+func TestDeleteTemplate(t *testing.T) {
 	if MysqlUri == "" || MysqlUri == "*" {
 		fmt.Println("no database url define in Example_config.go , you must set the mysql link!")
 		return
 	}
 	//模板默认支持逻辑删除
-	var result, err = exampleActivityMapper.DeleteTemplete("rs168")
+	var result, err = exampleActivityMapper.DeleteTemplate("rs168")
 	if err != nil {
 		panic(err)
 	}
@@ -415,7 +415,7 @@ func initTestService() TestService {
 			//TODO 此处可能会因为activitys长度为0 导致数组越界 painc,painc 为运行时异常 框架自动回滚事务
 			var activity = activitys[0]
 			activity.Remark = remark
-			updateNum, err := testService.exampleActivityMapper.UpdateTemplete(activity)
+			updateNum, err := testService.exampleActivityMapper.UpdateTemplate(activity)
 			if err != nil {
 				panic(err)
 			}
@@ -432,7 +432,7 @@ func initTestService() TestService {
 			}
 			var activity = activitys[0]
 			activity.Name = name
-			updateNum, err := testService.exampleActivityMapper.UpdateTemplete(activity)
+			updateNum, err := testService.exampleActivityMapper.UpdateTemplate(activity)
 			if err != nil {
 				panic(err)
 			}

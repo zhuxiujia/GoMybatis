@@ -13,7 +13,7 @@
 ![Image text](https://zhuxiujia.github.io/gomybatis.io/assets/vuetify.png)
 ### Please read the documentation website carefully when using the tutorial. [DOC](https://zhuxiujia.github.io/gomybatis.io/#/)
 # Powerful Features
-* <a href="https://zhuxiujia.github.io/gomybatis.io/">High Performance</a>，The maximum number of transactions per second of a single computer can reach 751020 Tps/s, and the total time consumed is 0.14s (test environment returns simulated SQL data, concurrently 1000, total 100000, 6-core 16GB win10)<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/">High Performance</a>， can reach 751020 Qps/s, and the total time consumed is 0.14s (test environment returns simulated SQL data, concurrently 1000, total 100000, 6-core 16GB win10)<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">Painless migration from Java to go</a>，Compatible with most Java(Mybatis3,Mybatis Plus) ，Painless migration of XML SQL files from Java Spring Mybatis to Go language（Modify only the javaType of resultMap to specify go language type for langType）<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">Declarative transaction/AOP transaction/transaction Behavior</a>Only one line Tag is needed to define AOP transactions and transaction propagation behavior<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">Extensible Log Interface</a>Asynchronous message queue day, SQL log in framework uses cached channel to realize asynchronous message queue logging<br>
@@ -21,12 +21,12 @@
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">Intelligent expression</a>Processing dynamic judgment and computation tasks（such as：`#{foo.Bar}#{arg+1}#{arg*1}#{arg/1}#{arg-1}`）,For example, write fuzzy queries `select * from table where phone like #{phone+'%'}`(Note the post-percentile query run in index)<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">Dynamic Data Source</a>Multiple data sources can be customized to dynamically switch multiple database instances<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">Template label（new）</a>One line of code to achieve add, delete, modify, delete logic, optimistic lock, but also retain perfect scalability (tag body can continue to expand SQL logic)<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/">Optimistic Lock（new）</a>`<updateTemplete>`Optimistic locks to prevent concurrent competition to modify records as much as possible<br>
-* <a href="https://zhuxiujia.github.io/gomybatis.io/">Logical deletion（new）</a>`<insertTemplete><updateTemplete><deleteTemplete><selectTemplete>`Logical deletion, prevent accidental deletion of data, data recovery is simple<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/">Optimistic Lock（new）</a>`<updateTemplate>`Optimistic locks to prevent concurrent competition to modify records as much as possible<br>
+* <a href="https://zhuxiujia.github.io/gomybatis.io/">Logical deletion（new）</a>`<insertTemplate><updateTemplate><deleteTemplate><selectTemplate>`Logical deletion, prevent accidental deletion of data, data recovery is simple<br>
 * <a href="https://zhuxiujia.github.io/gomybatis.io/">RPC/MVC Component Support（new）</a>To make the service perfect for RPC (reducing parameter restrictions), dynamic proxy, transaction subscription, easy integration and extension of micro services, click on the link https://github.com/zhuxiujia/easyrpc<br>
 
 
-## Database Driver support table
+## Database Driver support(support all database of database/sql)
 ``` bash
  //Traditional database
  Mysql:                             github.com/go-sql-driver/mysql
@@ -130,14 +130,14 @@ func main() {
 
     <!--模板标签: columns wheres sets 支持逗号,分隔表达式，*?* 为判空表达式-->
 
-    <!--插入模板:默认id="insertTemplete,test="field != null",where自动设置逻辑删除字段,支持批量插入" -->
-    <insertTemplete/>
-    <!--查询模板:默认id="selectTemplete,where自动设置逻辑删除字段-->
-    <selectTemplete wheres="name?name = #{name}"/>
-    <!--更新模板:默认id="updateTemplete,set自动设置乐观锁版本号-->
-    <updateTemplete sets="name?name = #{name},remark?remark=#{remark}" wheres="id?id = #{id}"/>
-    <!--删除模板:默认id="deleteTemplete,where自动设置逻辑删除字段-->
-    <deleteTemplete wheres="name?name = #{name}"/>
+    <!--插入模板:默认id="insertTemplate,test="field != null",where自动设置逻辑删除字段,支持批量插入" -->
+    <insertTemplate/>
+    <!--查询模板:默认id="selectTemplate,where自动设置逻辑删除字段-->
+    <selectTemplate wheres="name?name = #{name}"/>
+    <!--更新模板:默认id="updateTemplate,set自动设置乐观锁版本号-->
+    <updateTemplate sets="name?name = #{name},remark?remark=#{remark}" wheres="id?id = #{id}"/>
+    <!--删除模板:默认id="deleteTemplate,where自动设置逻辑删除字段-->
+    <deleteTemplate wheres="name?name = #{name}"/>
 </mapper>    
 ```
 XML corresponds to the Mapper structure method defined below
@@ -154,28 +154,29 @@ type Activity struct {
 	DeleteFlag int       `json:"deleteFlag"`
 }
 type ExampleActivityMapper struct {
-	SelectTemplete      func(name string) ([]Activity, error) `args:"name"`
-	InsertTemplete      func(arg Activity) (int64, error)
-	InsertTempleteBatch func(args []Activity) (int64, error) `args:"args"`
-	UpdateTemplete      func(arg Activity) (int64, error)    `args:"name"`
-	DeleteTemplete      func(name string) (int64, error)     `args:"name"`
+	SelectTemplate      func(name string) ([]Activity, error) `args:"name"`
+	InsertTemplate      func(arg Activity) (int64, error)
+	InsertTemplateBatch func(args []Activity) (int64, error) `args:"args"`
+	UpdateTemplate      func(arg Activity) (int64, error)    `args:"name"`
+	DeleteTemplate      func(name string) (int64, error)     `args:"name"`
 }
 ```
 
 ## Features：Dynamic Data Source
 ``` go
         //To add a second MySQL database, change Mysql Uri to your second data source link
-	GoMybatis.Open("mysql", MysqlUri)
-	//Dynamic Data Source Routing
+    var engine = GoMybatis.GoMybatisEngine{}.New()
+	engine.Open("mysql", MysqlUri)//添加第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
 	var router = GoMybatis.GoMybatisDataSourceRouter{}.New(func(mapperName string) *string {
-		//Point to the data source according to the packet name routing
+		//根据包名路由指向数据源
 		if strings.Contains(mapperName, "example.") {
-			var url = MysqlUri//The second MySQL database, please change Mysql Uri to your second data source link
+			var url = MysqlUri//第二个mysql数据库,请把MysqlUri改成你的第二个数据源链接
 			fmt.Println(url)
 			return &url
 		}
 		return nil
 	})
+	engine.SetDataSourceRouter(&router)
 ```
 ## Features：Custom log output
 ``` go

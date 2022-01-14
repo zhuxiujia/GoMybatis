@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-type TempleteDecoder interface {
+type TemplateDecoder interface {
 	SetPrintElement(print bool)
 	DecodeTree(tree map[string]etree.Token, beanType reflect.Type) error
 }
