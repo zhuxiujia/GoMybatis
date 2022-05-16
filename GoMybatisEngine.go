@@ -110,9 +110,19 @@ func (it *GoMybatisEngine) SetLogEnable(enable bool) {
 	it.sqlBuilder.SetEnableLog(enable)
 }
 
+type EmptyLog struct {
+}
+
+func (EmptyLog) Println(messages ...string) {
+
+}
+
 //获取日志实现类
 func (it *GoMybatisEngine) Log() Log {
 	it.initCheck()
+	if it.log == nil {
+		return EmptyLog{}
+	}
 	return it.log
 }
 
