@@ -96,13 +96,12 @@ func init() {
 	**/
 
 	//自定义日志实现(可选)
-	/**
-		engine.SetLogEnable(true)
-		engine.SetLog(&GoMybatis.LogStandard{
-			PrintlnFunc: func(messages []byte) {
-			},
-		})
-	    **/
+	//engine.SetLogEnable(true)
+	//engine.SetLog(&GoMybatis.LogStandard{
+	//	PrintlnFunc: func(messages ...string) {
+	//		println("log>> ", fmt.Sprint(messages))
+	//	},
+	//})
 	//读取mapper xml文件
 	bytes, _ := ioutil.ReadFile("Example_ActivityMapper.xml")
 	//设置对应的mapper xml文件

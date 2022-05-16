@@ -60,7 +60,7 @@ func AopProxyServiceValue(service reflect.Value, engine SessionEngine) {
 				if err != nil {
 					panic(err)
 				}
-			}else{
+			} else {
 				var err = session.Begin(&propagation)
 				if err != nil {
 					panic(err)
@@ -94,7 +94,7 @@ func doNativeMethod(funcField reflect.StructField, arg ProxyArg, nativeImplFunc 
 				panic(fmt.Sprint(err) + rollbackErr.Error())
 			}
 			if log != nil {
-				log.Println([]byte(fmt.Sprint(err) + " Throw out error will Rollback! from >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + funcField.Name + "()"))
+				log.Println((fmt.Sprint(err) + " Throw out error will Rollback! from >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + funcField.Name + "()"))
 			}
 			panic(err)
 		}

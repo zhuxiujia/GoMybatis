@@ -393,8 +393,8 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 	if elementType == Element_Select && haveLastReturnValue {
 		//is select and have return value
 		if sessionEngine.LogEnable() {
-			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Query ==> "+sql)
-			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Args  ==> "+utils.SprintArray(array_arg))
+			sessionEngine.Log().Println("[GoMybatis] [", session.Id(), "] Query ==> "+sql)
+			sessionEngine.Log().Println("[GoMybatis] [", session.Id(), "] Args  ==> "+utils.SprintArray(array_arg))
 		}
 		res, err := session.QueryPrepare(sql, array_arg...)
 		defer func() {
@@ -403,9 +403,9 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 				if err == nil && res != nil {
 					RowsAffected = strconv.Itoa(len(res))
 				}
-				sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] ReturnRows <== "+RowsAffected)
+				sessionEngine.Log().Println("[GoMybatis] [", session.Id(), "] ReturnRows <== "+RowsAffected)
 				if err != nil {
-					sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] error == "+err.Error())
+					sessionEngine.Log().Println("[GoMybatis] [", session.Id(), "] error == "+err.Error())
 				}
 			}
 		}()
@@ -418,8 +418,8 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 		}
 	} else {
 		if sessionEngine.LogEnable() {
-			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Exec ==> "+sql)
-			sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] Args ==> "+utils.SprintArray(array_arg))
+			sessionEngine.Log().Println("[GoMybatis] [", session.Id(), "] Exec ==> "+sql)
+			sessionEngine.Log().Println("[GoMybatis] [", session.Id(), "] Args ==> "+utils.SprintArray(array_arg))
 		}
 		var res, err = session.ExecPrepare(sql, array_arg...)
 		defer func() {
@@ -428,9 +428,9 @@ func exeMethodByXml(elementType ElementType, beanName string, sessionEngine Sess
 				if err == nil && res != nil {
 					RowsAffected = strconv.FormatInt(res.RowsAffected, 10)
 				}
-				sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] RowsAffected <== "+RowsAffected)
+				sessionEngine.Log().Println("[GoMybatis] [", session.Id(), "] RowsAffected <== "+RowsAffected)
 				if err != nil {
-					sessionEngine.LogSystem().SendLog("[GoMybatis] [", session.Id(), "] error == "+err.Error())
+					sessionEngine.Log().Println("[GoMybatis] [", session.Id(), "] error == "+err.Error())
 				}
 			}
 		}()
