@@ -15,7 +15,6 @@ type GoMybatisEngine struct {
 	dataSourceRouter    DataSourceRouter      //动态数据源路由器
 	log                 Log                   //日志实现类
 	logEnable           bool                  //是否允许日志输出（默认开启）
-	logSystem           *LogSystem            //日志发送系统
 	sessionFactory      *SessionFactory       //session 工厂
 	sqlArgTypeConvert   ast.SqlArgTypeConvert //sql参数转换
 	expressionEngine    ast.ExpressionEngine  //表达式解析引擎
@@ -30,14 +29,8 @@ func (it GoMybatisEngine) New() GoMybatisEngine {
 	it.logEnable = true
 	it.isInit = true
 	if it.logEnable == true && it.log == nil {
-		it.log = &LogStandard{}
-	}
-	if it.logEnable {
-		var logSystem, err = LogSystem{}.New(it.log, it.log.QueueLen())
-		if err != nil {
-			panic(err)
-		}
-		it.logSystem = &logSystem
+		var s = LogStandard{}
+		it.log = &s
 	}
 	if it.dataSourceRouter == nil {
 		var newRouter = GoMybatisDataSourceRouter{}.New(nil)
@@ -117,9 +110,19 @@ func (it *GoMybatisEngine) SetLogEnable(enable bool) {
 	it.sqlBuilder.SetEnableLog(enable)
 }
 
+type EmptyLog struct {
+}
+
+func (EmptyLog) Println(messages ...string) {
+
+}
+
 //获取日志实现类
 func (it *GoMybatisEngine) Log() Log {
 	it.initCheck()
+	if it.log == nil {
+		return EmptyLog{}
+	}
 	return it.log
 }
 
@@ -217,10 +220,6 @@ func (it *GoMybatisEngine) SetGoroutineIDEnable(enable bool) {
 
 func (it *GoMybatisEngine) GoroutineIDEnable() bool {
 	return it.goroutineIDEnable
-}
-
-func (it *GoMybatisEngine) LogSystem() *LogSystem {
-	return it.logSystem
 }
 
 func (it *GoMybatisEngine) SetPrintWarning(print bool) {

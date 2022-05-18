@@ -21,7 +21,7 @@ type LocalSession struct {
 	isClosed        bool
 	newLocalSession *LocalSession
 
-	logSystem Log
+	log Log
 }
 
 func (it LocalSession) New(driverType string, driverLink string, db *sql.DB, logSystem Log) LocalSession {
@@ -31,7 +31,7 @@ func (it LocalSession) New(driverType string, driverLink string, db *sql.DB, log
 		txStack:    tx.TxStack{}.New(),
 		driverType: driverType,
 		driverLink: driverLink,
-		logSystem:  logSystem,
+		log:        logSystem,
 	}
 }
 
@@ -62,8 +62,8 @@ func (it *LocalSession) Rollback() error {
 			}
 			var point = it.savePointStack.Pop()
 			if point != nil {
-				if it.logSystem != nil {
-					it.logSystem.Println([]byte("[GoMybatis] [" + it.Id() + "] exec ====================" + "rollback to " + *point))
+				if it.log != nil {
+					it.log.Println("[GoMybatis] [" + it.Id() + "] exec ====================" + "rollback to " + *point)
 				}
 				_, e := t.Exec("rollback to " + *point)
 				e = it.dbErrorPack(e)
@@ -74,8 +74,8 @@ func (it *LocalSession) Rollback() error {
 		}
 
 		if it.txStack.Len() == 0 {
-			if it.logSystem != nil {
-				it.logSystem.Println([]byte("[GoMybatis] [" + it.Id() + "] Rollback Session"))
+			if it.log != nil {
+				it.log.Println(("[GoMybatis] [" + it.Id() + "] Rollback Session"))
 			}
 			var err = t.Rollback()
 			if err != nil {
@@ -110,8 +110,8 @@ func (it *LocalSession) Commit() error {
 			}
 			var pId = "p" + strconv.Itoa(it.txStack.Len()+1)
 			it.savePointStack.Push(pId)
-			if it.logSystem != nil {
-				it.logSystem.Println([]byte("[GoMybatis] [" + it.Id() + "] exec " + "savepoint " + pId))
+			if it.log != nil {
+				it.log.Println(("[GoMybatis] [" + it.Id() + "] exec " + "savepoint " + pId))
 			}
 			_, e := t.Exec("savepoint " + pId)
 			e = it.dbErrorPack(e)
@@ -120,8 +120,8 @@ func (it *LocalSession) Commit() error {
 			}
 		}
 		if it.txStack.Len() == 0 {
-			if it.logSystem != nil {
-				it.logSystem.Println([]byte("[GoMybatis] [" + it.Id() + "] Commit tx session:" + it.Id()))
+			if it.log != nil {
+				it.log.Println(("[GoMybatis] [" + it.Id() + "] Commit tx session:" + it.Id()))
 			}
 			var err = t.Commit()
 			if err != nil {
@@ -137,8 +137,8 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 	if p != nil {
 		propagation = tx.ToString(*p)
 	}
-	if it.logSystem != nil {
-		it.logSystem.Println([]byte("[GoMybatis] [" + it.Id() + "] Begin session(Propagation:" + propagation + ")"))
+	if it.log != nil {
+		it.log.Println(("[GoMybatis] [" + it.Id() + "] Begin session(Propagation:" + propagation + ")"))
 	}
 	if it.isClosed == true {
 		return utils.NewError("LocalSession", " can not Begin() a Closed Session!")
@@ -190,7 +190,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 				if e != nil {
 					return e
 				}
-				var session = LocalSession{}.New(it.driverType, it.driverLink, db, it.logSystem) //same PROPAGATION_REQUIRES_NEW
+				var session = LocalSession{}.New(it.driverType, it.driverLink, db, it.log) //same PROPAGATION_REQUIRES_NEW
 				e = session.Begin(p)
 				if e != nil {
 					return e
@@ -212,7 +212,7 @@ func (it *LocalSession) Begin(p *tx.Propagation) error {
 				if e != nil {
 					return e
 				}
-				var sess = LocalSession{}.New(it.driverType, it.driverLink, db, it.logSystem)
+				var sess = LocalSession{}.New(it.driverType, it.driverLink, db, it.log)
 				it.newLocalSession = &sess
 			}
 			break
@@ -265,8 +265,8 @@ func (it *LocalSession) LastPROPAGATION() *tx.Propagation {
 }
 
 func (it *LocalSession) Close() {
-	if it.logSystem != nil {
-		it.logSystem.Println([]byte("[GoMybatis] [" + it.Id() + "] Close session"))
+	if it.log != nil {
+		it.log.Println(("[GoMybatis] [" + it.Id() + "] Close session"))
 	}
 	if it.newLocalSession != nil {
 		it.newLocalSession.Close()
