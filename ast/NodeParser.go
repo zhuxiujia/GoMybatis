@@ -1,21 +1,22 @@
 package ast
 
 import (
-	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 	"reflect"
 	"strings"
+
+	"github.com/zhuxiujia/GoMybatis/lib/github.com/beevik/etree"
 )
 
 const DefaultOverrides = ","
 const DefaultWhereElement_Prefix = "where"
 const DefaultWhereElement_PrefixOverrides = "and |or |And |Or |AND |OR "
 
-//节点解析器
+// 节点解析器
 type NodeParser struct {
 	Holder NodeConfigHolder
 }
 
-//解析为node
+// 解析为node
 func (it NodeParser) Parser(mapperXml []etree.Token) []Node {
 	if it.Holder.Proxy == nil {
 		panic("NodeParser need a *ExpressionEngineProxy{}!")
@@ -118,7 +119,7 @@ func (it NodeParser) Parser(mapperXml []etree.Token) []Node {
 					var childNodes = it.Parser(childItems)
 					for _, v := range childNodes {
 						if v.Type() == NWhen {
-							n.whenNodes = append(n.whenNodes, childNodes...)
+							n.whenNodes = append(n.whenNodes, v)
 						} else if v.Type() == NOtherwise {
 							if n.otherwiseNode != nil {
 								panic("element only support one Otherwise node!")
